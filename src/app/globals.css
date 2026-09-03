@@ -1,26 +1,26 @@
 :root {
-  /* Service UI — Sochi teal (ref rhythm: pills, circles, air) */
-  --background: #f4fbfb;
-  --foreground: #12221f;
-  --primary: #0d7377;
-  --primary-hover: #095456;
-  --secondary: #095456;
-  --accent: #0d7377;
-  --muted: #5b6b68;
+  /* Brand: purple + lime (identity board) */
+  --background: #f7f6fb;
+  --foreground: #1b1430;
+  --primary: #6a42c2;
+  --primary-hover: #53339c;
+  --secondary: #53339c;
+  --accent: #c1d92e;
+  --muted: #5c5670;
   --card-bg: #ffffff;
-  --card-border: #d5e3e1;
+  --card-border: #e4dff2;
   --surface: #ffffff;
-  --surface-elevated: #e7f6f4;
-  --ink-soft: #12221f;
-  --brand-soft: #d7efef;
-  --brand-pill: #e7f6f4;
+  --surface-elevated: #efe8fb;
+  --ink-soft: #1b1430;
+  --brand-soft: #efe8fb;
+  --brand-pill: #f3f8d4;
   --success: #2f9e8c;
   --warn: #c9842a;
   --danger: #c44536;
-  --line: #d5e3e1;
-  --shadow-sm: 0 4px 16px rgba(13, 115, 119, 0.06);
-  --shadow-md: 0 8px 28px rgba(13, 115, 119, 0.08);
-  --shadow-lg: 0 16px 40px rgba(13, 115, 119, 0.1);
+  --line: #e4dff2;
+  --shadow-sm: 0 4px 16px rgba(106, 66, 194, 0.08);
+  --shadow-md: 0 8px 28px rgba(106, 66, 194, 0.1);
+  --shadow-lg: 0 16px 40px rgba(106, 66, 194, 0.12);
 
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
@@ -40,7 +40,7 @@ html {
   overflow-x: clip;
   overflow-y: scroll;
   max-width: 100%;
-  background-color: #f4fbfb;
+  background-color: #f7f6fb;
   scrollbar-gutter: stable;
 }
 
@@ -765,13 +765,13 @@ html.mobile-nav-open {
 .btn-primary {
   background-color: var(--primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);
+  box-shadow: 0 4px 14px rgba(106, 66, 194, 0.28);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.28);
+  box-shadow: 0 8px 22px rgba(106, 66, 194, 0.28);
   color: white;
 }
 
@@ -10580,6 +10580,64 @@ a.yp-modal-close {
 .admin-stats-card__label {
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.admin-stats-card__hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.admin-stats-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-stats-person {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-stats-person__ava {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--brand-soft);
+  flex-shrink: 0;
+}
+
+.admin-stats-person__ava--empty {
+  display: inline-block;
+}
+
+.admin-stats-person__age {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.admin-stats-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-stats-app {
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: baseline;
 }
 
 .admin-stats-chart {
@@ -23104,7 +23162,7 @@ body.yp-scroll-locked {
 /* Home service hero */
 .svc-hero {
   padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.5rem, 3vw, 2.25rem);
-  background: #f4fbfb;
+  background: #f7f6fb;
 }
 .svc-hero__grid {
   display: grid;
@@ -23155,8 +23213,8 @@ body.yp-scroll-locked {
   position: relative;
   border-radius: 2rem;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
-  background: #d7efef;
+  aspect-ratio: 16 / 9;
+  background: var(--brand-soft);
   min-height: 220px;
 }
 .svc-hero__img,
@@ -23165,6 +23223,14 @@ body.yp-scroll-locked {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.svc-hero__img {
+  position: absolute;
+  inset: 0;
+}
+.svc-hero__video {
+  position: absolute;
+  inset: 0;
 }
 .svc-hero__actions {
   display: grid;

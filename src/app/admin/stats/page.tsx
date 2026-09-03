@@ -89,6 +89,10 @@ function AdminStatsInner() {
           <Users size={20} color="var(--primary)" aria-hidden />
           <div className="admin-stats-card__value">{summary.uniqueGuests}</div>
           <div className="admin-stats-card__label">Уникальных гостей</div>
+          <p className="admin-stats-card__hint">
+            {summary.uniqueGuestsHint ||
+              'Разные люди на входе за период (QR/сканер). Повтор одного человека — один раз. Не путать с визитами сайта.'}
+          </p>
         </div>
         <div className="glass admin-stats-card">
           <QrCode size={20} color="var(--primary)" aria-hidden />
@@ -111,6 +115,7 @@ function AdminStatsInner() {
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.vacancyApplications ?? '—'}</div>
             <div className="admin-stats-card__label">Отклики за период</div>
+        </div>
           </div>
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.openContests ?? '—'}</div>
@@ -166,6 +171,52 @@ function AdminStatsInner() {
           );
         })}
         {events.length === 0 && <p style={{ color: 'var(--muted)' }}>Нет подтверждённых мероприятий за выбранный период</p>}
+      </div>
+
+      <h2 className="admin-stats-page__section-title">Кто ходил · профили</h2>
+      <p className="admin-stats-page__subtitle" style={{ marginTop: 0 }}>
+        Люди с отметкой входа за период. Если в профиле нет даты рождения — пишем «возраст не указан».
+      </p>
+      <div className="admin-stats-people">
+        {(data.visitors || []).map((p: { id: string; name: string; image?: string | null; ageLabel: string }) => (
+          <Link key={p.id} href={`/admin/users/${p.id}`} className="glass admin-stats-person">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {p.image ? <img src={p.image} alt="" className="admin-stats-person__ava" /> : <span className="admin-stats-person__ava admin-stats-person__ava--empty" />}
+            <span>
+              <strong>{p.name}</strong>
+              <span className="admin-stats-person__age">{p.ageLabel}</span>
+            </span>
+          </Link>
+        ))}
+        {(!data.visitors || data.visitors.length === 0) && (
+          <p style={{ color: 'var(--muted)' }}>За период никто не отмечался на входе</p>
+        )}
+      </div>
+
+      <h2 className="admin-stats-page__section-title">Отклики на вакансии за период</h2>
+      <div className="admin-stats-apps">
+        {(data.vacancyApplications || []).map(
+          (row: {
+            id: string;
+            name: string;
+            ageLabel: string;
+            vacancyTitle: string;
+            userId?: string;
+          }) => (
+            <div key={row.id} className="glass admin-stats-app">
+              {row.userId ? (
+                <Link href={`/admin/users/${row.userId}`}>{row.name}</Link>
+              ) : (
+                <strong>{row.name}</strong>
+              )}
+              <span className="admin-stats-person__age">{row.ageLabel}</span>
+              <span> → {row.vacancyTitle}</span>
+            </div>
+          )
+        )}
+        {(!data.vacancyApplications || data.vacancyApplications.length === 0) && (
+          <p style={{ color: 'var(--muted)' }}>Нет откликов за выбранный период</p>
+        )}
       </div>
     </div>
   );

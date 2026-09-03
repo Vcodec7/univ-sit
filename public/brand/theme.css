@@ -1,0 +1,46 @@
+/* Live brand tokens — nginx serves /brand/ without Docker rebuild.
+   After the first deploy that links this file, edit it on the VPS and reload. */
+:root {
+  --yp-purple: #6a42c2;
+  --yp-purple-deep: #53339c;
+  --yp-lime: #c1d92e;
+  --yp-lime-deep: #a8c116;
+  --background: #f7f6fb;
+  --foreground: #1b1430;
+  --primary: #6a42c2;
+  --primary-hover: #53339c;
+  --secondary: #53339c;
+  --accent: #c1d92e;
+  --muted: #5c5670;
+  --card-bg: #ffffff;
+  --card-border: #e4dff2;
+  --surface: #ffffff;
+  --surface-elevated: #efe8fb;
+  --ink-soft: #1b1430;
+  --brand-soft: #efe8fb;
+  --brand-pill: #f3f8d4;
+  --line: #e4dff2;
+  --shadow-sm: 0 4px 16px rgba(106, 66, 194, 0.08);
+  --shadow-md: 0 8px 28px rgba(106, 66, 194, 0.1);
+  --shadow-lg: 0 16px 40px rgba(106, 66, 194, 0.12);
+}
+
+html {
+  background-color: #f7f6fb;
+}
+
+.svc-hero {
+  background: #f7f6fb;
+}
+
+.btn-primary {
+  box-shadow: 0 4px 14px rgba(106, 66, 194, 0.28) !important;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 22px rgba(106, 66, 194, 0.28) !important;
+}
+
+.btn-secondary {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line)) !important;
+}

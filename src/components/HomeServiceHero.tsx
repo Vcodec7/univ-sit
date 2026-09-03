@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Building2, CalendarPlus } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
+import HomeHeroMedia from '@/components/HomeHeroMedia';
 
 type Cta = { href: string; label: string };
 
@@ -45,22 +46,7 @@ export default function HomeServiceHero({
           </p>
         </div>
 
-        <div className="svc-hero__media">
-          {wantVideo ? (
-            <video
-              className="svc-hero__video"
-              src={video}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="svc-hero__img" src={poster} alt="" />
-          )}
-        </div>
+        <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
       </div>
 
       {(primary || secondary) && (

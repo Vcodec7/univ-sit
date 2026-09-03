@@ -9,6 +9,7 @@ import {
   periodUsesMonths,
   type StatsRange,
 } from '@/lib/stats-period';
+import { ageLabelRu } from '@/lib/age-label';
 
 function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -157,7 +158,7 @@ export async function GET(req: Request) {
     const checkIns = await prisma.ticketCheckIn.findMany({
       where: checkInWhere || { createdAt: { gte: rangeStartDate({ period: 'year' })! } },
       select: { createdAt: true, method: true },
-      take: 50000,
+      take: 8000,
     });
 
     const qrCount = checkIns.filter((c) => c.method === 'QR').length;
@@ -199,12 +200,36 @@ export async function GET(req: Request) {
       return { name, value: group._count, color };
     });
 
-    const [vacancyApps, contestSubs, dmCount, openVacancies, openContests] = await Promise.all([
-      prisma.vacancyApplication.count({ where: { createdAt: { gte: rangeStartDate(range) || undefined } } }).catch(() => 0),
-      prisma.contestSubmission.count({ where: { createdAt: { gte: rangeStartDate(range) || undefined } } }).catch(() => 0),
-      prisma.directMessage.count({ where: { createdAt: { gte: rangeStartDate(range) || undefined } } }).catch(() => 0),
+    const visitorIds = uniqueInPeriod.map((row) => row.userId).filter(Boolean).slice(0, 80);
+    const since = rangeStartDate(range) || undefined;
+
+    const [vacancyApps, contestSubs, dmCount, openVacancies, openContests, visitorUsers, vacancyAppRows] =
+      await Promise.all([
+      prisma.vacancyApplication.count({ where: { createdAt: { gte: since } } }).catch(() => 0),
+      prisma.contestSubmission.count({ where: { createdAt: { gte: since } } }).catch(() => 0),
+      prisma.directMessage.count({ where: { createdAt: { gte: since } } }).catch(() => 0),
       prisma.vacancy.count({ where: { status: 'OPEN' } }).catch(() => 0),
       prisma.contest.count({ where: { status: { in: ['OPEN', 'VOTING'] } } }).catch(() => 0),
+      visitorIds.length
+        ? prisma.user.findMany({
+            where: { id: { in: visitorIds } },
+            select: { id: true, name: true, image: true, birthDate: true },
+          })
+        : Promise.resolve([]),
+      prisma.vacancyApplication
+        .findMany({
+          where: since ? { createdAt: { gte: since } } : undefined,
+          orderBy: { createdAt: 'desc' },
+          take: 40,
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            vacancy: { select: { title: true } },
+            user: { select: { id: true, name: true, image: true, birthDate: true } },
+          },
+        })
+        .catch(() => []),
     ]);
 
     return NextResponse.json({
@@ -216,6 +241,8 @@ export async function GET(req: Request) {
         totalCheckIns,
         inPeriod: periodCheckIns,
         uniqueGuests: uniqueInPeriod.length,
+        uniqueGuestsHint:
+          'Разные люди, которые отметились на входе (QR или вручную) за период. Повторные проходы одного человека считаются один раз. Это не уникальные визиты сайта.',
         newUsers: newUsers.length,
         pendingApps,
         pendingBookings,
@@ -230,6 +257,22 @@ export async function GET(req: Request) {
       userStats,
       appStats,
       byDay,
+      visitors: visitorUsers.map((u) => ({
+        id: u.id,
+        name: u.name || 'Без имени',
+        image: u.image,
+        ageLabel: ageLabelRu(u.birthDate),
+      })),
+      vacancyApplications: vacancyAppRows.map((row) => ({
+        id: row.id,
+        status: row.status,
+        createdAt: row.createdAt,
+        vacancyTitle: row.vacancy?.title || 'Вакансия',
+        name: row.user?.name || 'Без имени',
+        image: row.user?.image,
+        userId: row.user?.id,
+        ageLabel: ageLabelRu(row.user?.birthDate),
+      })),
       events: bookings.map((b) => ({
         id: b.id,
         title: b.title,

@@ -56,8 +56,22 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       router.replace('/admin?denied=1');
       return;
     }
-    pingSecurity('PING');
   }, [status, session, router, pathname]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    const role = session?.user?.role;
+    if (role !== 'ADMIN' && role !== 'MODERATOR') return;
+    const key = 'yp-admin-sec-ping';
+    try {
+      const last = Number(sessionStorage.getItem(key) || 0);
+      if (Date.now() - last < 5 * 60 * 1000) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch {
+      /* ignore */
+    }
+    pingSecurity('PING');
+  }, [status, session]);
 
   useEffect(() => {
     const fromQuery = searchParams.get('denied') === '1';

@@ -96,7 +96,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#0d9488',
+  themeColor: '#6a42c2',
 };
 
 /**
@@ -117,6 +117,9 @@ export default async function RootLayout({
 
   return (
     <html lang="ru" className={`${manrope.variable} ${unbounded.variable}`}>
+      <head>
+        <link rel="stylesheet" href="/brand/theme.css" />
+      </head>
       <body className={manrope.className}>
         <Script
           id="yp-pwa-early"
