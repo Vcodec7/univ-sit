@@ -1,0 +1,12 @@
+{
+  "at": "2026-08-17T21:07:00Z",
+  "localStamp": "2026-08-17_210700",
+  "operator": "ubuntu",
+  "note": "static ISR public routes (cursor/static-routes-16b2)",
+  "status": "ok",
+  "exitCode": 0,
+  "prodDomain": "py.idivles.ru",
+  "stagingDomain": "ty.idivles.ru",
+  "youngHealthRaw": "{\"ok\":true,\"db\":true,\"maintenanceMode\":false,\"siteName\":\"Молодёжь Сочи\",\"uptimeSec\":44205,\"latencyMs\":7}",
+  "y1HealthRaw": "{\"ok\":true,\"db\":true,\"maintenanceMode\":false,\"siteName\":\"Молодёжь Сочи\",\"uptimeSec\":797,\"latencyMs\":6}"
+}
