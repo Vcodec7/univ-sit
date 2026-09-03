@@ -115,7 +115,6 @@ function AdminStatsInner() {
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.vacancyApplications ?? '—'}</div>
             <div className="admin-stats-card__label">Отклики за период</div>
-        </div>
           </div>
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.openContests ?? '—'}</div>
