@@ -39,8 +39,8 @@ const META: Record<
   },
   ECO: {
     Icon: Leaf,
-    short: 'мб',
-    chipLabel: 'мб',
+    short: 'эко',
+    chipLabel: 'эко',
     defaultColor: RATING_METER_COPY.ECO.color,
   },
 };

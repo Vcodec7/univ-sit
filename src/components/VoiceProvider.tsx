@@ -73,14 +73,18 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready || typeof document === 'undefined') return;
-    const key = loadoutKey(loadout);
+    const coarse =
+      window.matchMedia('(pointer: coarse)').matches || window.matchMedia('(max-width: 900px)').matches;
+    const key = `${loadoutKey(loadout)}|${coarse ? 'm' : 'd'}`;
     if (key === lastKey.current) return;
     lastKey.current = key;
-    /* Defer html data-eco-* writes so shop paint isn't blocked by a CSS recascade. */
+    const safe = coarse
+      ? { voice: loadout.voice, frame: loadout.frame, badge: loadout.badge }
+      : loadout;
     let inner = 0;
     const outer = window.requestAnimationFrame(() => {
       inner = window.requestAnimationFrame(() => {
-        applyEcoDomEffects(document.documentElement, loadout);
+        applyEcoDomEffects(document.documentElement, safe);
       });
     });
     return () => {

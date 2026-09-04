@@ -147,7 +147,7 @@ export default function PresenceScanner() {
                 <div className="presence-muted">{result.user.publicCode}</div>
                 {result.scores ? (
                   <div>
-                    +{result.scores.mBall} М-балл
+                    +{result.scores.mBall} репутации
                     {result.scores.ecoBall ? ` · +${result.scores.ecoBall} Зел.` : ''}
                   </div>
                 ) : null}

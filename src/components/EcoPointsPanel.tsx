@@ -21,6 +21,7 @@ import { useVoiceActions } from '@/components/VoiceProvider';
 import { SLOT_LABELS, COSMETIC_PREVIEW, type CosmeticSlot, type EcoLoadout } from '@/lib/eco-loadout';
 import EcoPoolHint from '@/components/EcoPoolHint';
 import { fetchEcoCached, invalidateEcoCache } from '@/lib/user-data-client';
+import { POINTS } from '@/lib/points-labels';
 
 const SLOT_ICONS: Record<CosmeticSlot, LucideIcon> = {
   frame: Circle,
@@ -269,11 +270,11 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
 
   if (resolvedMode === 'card') {
     return (
-      <section className="eco-card" aria-label="мбаллы">
+      <section className="eco-card" aria-label={POINTS.shop.wallet}>
         <div className="eco-card__top">
           <div>
             <div className="eco-card__label">
-              <Leaf size={14} aria-hidden /> мбаллы
+              <Leaf size={14} aria-hidden /> {POINTS.shop.wallet}
             </div>
             <div className="eco-card__balance">{ecoPoints.toLocaleString('ru-RU')}</div>
           </div>
@@ -308,11 +309,11 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
     <section
       id={resolvedMode === 'shop' || resolvedMode === 'full' ? 'eco-shop' : undefined}
       className={`eco-panel${resolvedMode === 'shop' ? ' eco-panel--shop' : ''}`}
-      aria-label="мбаллы"
+      aria-label={POINTS.shop.wallet}
     >
       <div className="eco-panel__head">
         <h4>
-          <Leaf size={15} aria-hidden /> {resolvedMode === 'shop' ? 'Ваш баланс (можно тратить)' : 'мбаллы'}
+          <Leaf size={15} aria-hidden /> {resolvedMode === 'shop' ? 'Кошелёк магазина — можно тратить' : POINTS.shop.brand}
         </h4>
         <span className="eco-panel__balance">{ecoPoints.toLocaleString('ru-RU')}</span>
       </div>
@@ -346,7 +347,7 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
       </div>
 
       <details className="eco-panel__faq">
-        <summary>Как заработать мбаллы?</summary>
+        <summary>Как заработать эко-очки?</summary>
         <ul className="eco-panel__earn-hints">
           {ECO_EARN_HINTS.map((h) => (
             <li key={h.action}>

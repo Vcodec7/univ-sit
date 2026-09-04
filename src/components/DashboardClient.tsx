@@ -801,9 +801,9 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
 
             <div className="dashboard-aside-foot">
               {modOn('eco') ? (
-                <Link href="/dashboard/shop" className="dashboard-aside-eco" title="Ваш баланс мбаллов">
+                <Link href="/dashboard/shop" className="dashboard-aside-eco" title="Кошелёк магазина">
                   <Leaf size={15} />
-                  <span>мб</span>
+                  <span>кошелёк</span>
                   <strong>{(profile?.ecoPoints ?? 0).toLocaleString('ru-RU')}</strong>
                 </Link>
               ) : null}
@@ -1507,7 +1507,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
               <div className="profile-view profile-shop">
                 <h2 className="profile-view__title">Магазин</h2>
                 <p className="profile-view__lead">
-                  Тратьте мбаллы на рамки, ауры, темы и голос. Покупка сразу надевается на профиль.
+                  Тратьте эко-очки из кошелька магазина на рамки, ауры, темы и голос. Покупка сразу надевается на профиль.
                 </p>
                 <EcoPointsPanel
                   mode="shop"

@@ -49,7 +49,7 @@ const TAB_META: Record<TabId, { label: string; Icon: typeof Zap; blurb: string }
     blurb: RATING_METER_COPY.SOCIAL.tip,
   },
   ECO: {
-    label: 'мб',
+    label: 'Кошелёк',
     Icon: Leaf,
     blurb: RATING_METER_COPY.ECO.tip,
   },
@@ -190,9 +190,10 @@ export default function ReputationHistoryModal({
         </div>
 
         <p className="rep-modal__why">
-          <b>Уровень</b> — ваш вклад на портале (эко + стиль + коллекция).{' '}
+          <b>Уровень</b> — вклад на портале (кошелёк + стиль + коллекция).{' '}
           <b>Надёжность</b> — можно ли доверять вам на событиях;{' '}
-          <b>Сообщество</b> — насколько вы в теме общения. Эко — валюта стиля и карт.
+          <b>Сообщество</b> — насколько вы в теме общения.{' '}
+          <b>Кошелёк</b> — эко-очки на рамки и карты. Репутация участия считается отдельно и не тратится.
         </p>
 
         <div className="rep-modal__tabs" role="tablist">

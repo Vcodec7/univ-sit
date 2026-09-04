@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
-import { Maximize2, RefreshCw, Sparkles, Wallet } from 'lucide-react';
-import { POINTS } from '@/lib/points-labels';
+import { Maximize2, RefreshCw, Wallet } from 'lucide-react';
 
 type Scores = {
   mBall: number;
@@ -25,21 +24,6 @@ type HistoryItem = {
   createdAt: string;
 };
 
-function shopMilestone(points: number) {
-  const n = Math.max(0, Math.floor(points || 0));
-  const target = n < 50 ? 50 : n < 150 ? 150 : n < 400 ? 400 : n < 800 ? 800 : null;
-  if (!target) {
-    return { label: 'Магазин', toNext: 0, progress: 1, nextLabel: null as string | null };
-  }
-  const prev = target === 50 ? 0 : target === 150 ? 50 : target === 400 ? 150 : 400;
-  return {
-    label: 'Кошелёк',
-    toNext: Math.max(0, target - n),
-    progress: Math.min(1, (n - prev) / Math.max(1, target - prev)),
-    nextLabel: `${target}`,
-  };
-}
-
 export default function PersonalQrPanel() {
   const [url, setUrl] = useState('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
@@ -49,9 +33,9 @@ export default function PersonalQrPanel() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showQr, setShowQr] = useState(false);
 
   const load = useCallback(async (force = false) => {
-    // First paint only — rotate keeps the current QR on screen.
     if (!force) setLoading(true);
     try {
       const r = await fetch('/api/presence-qr', {
@@ -83,7 +67,10 @@ export default function PersonalQrPanel() {
     load(false);
   }, [load]);
 
-  const shopLevel = shopMilestone(scores?.ecoPoints ?? 0);
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowQr(true), 120);
+    return () => window.clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (!fullscreen) return;
@@ -97,6 +84,11 @@ export default function PersonalQrPanel() {
       window.removeEventListener('keydown', onKey);
     };
   }, [fullscreen]);
+
+  const qrSize = mounted && window.matchMedia('(max-width: 700px)').matches ? 148 : 188;
+  const reputation = scores?.mBall ?? 0;
+  const wallet = scores?.ecoPoints ?? 0;
+  const level = scores?.mLevel;
 
   const fs =
     mounted && fullscreen && url
@@ -119,13 +111,8 @@ export default function PersonalQrPanel() {
               Закрыть
             </button>
             <div className="presence-fs__card" onClick={(e) => e.stopPropagation()}>
-              <QRCodeDisplay value={url} size={420} />
-              <p>Покажите сотруднику на входе</p>
-              {expiresAt ? (
-                <p className="presence-fs__until">
-                  до {new Date(expiresAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
-                </p>
-              ) : null}
+              <QRCodeDisplay value={url} size={Math.min(360, Math.floor(window.innerWidth * 0.72))} />
+              <p>Покажите на входе</p>
             </div>
           </div>,
           document.body
@@ -133,77 +120,67 @@ export default function PersonalQrPanel() {
       : null;
 
   return (
-    <section className="presence-panel" aria-label="Личный QR и баллы">
-      <div className="presence-grid presence-grid--svc">
-        <div className="presence-points">
-          <h2 className="presence-points__title">Счета</h2>
-          <p className="presence-points__hint">Два разных показателя: репутация и кошелёк магазина.</p>
-          <div className="presence-points__grid">
-            <ScoreRing
-              title="Уровень"
-              kicker="репутация участия"
-              icon={<Sparkles size={18} />}
-              value={scores?.mBall ?? 0}
-              level={scores?.mLevel}
-              tone="m"
-            />
-            <Link href="/dashboard/shop" className="score-ring score-ring-shop score-ring-link" aria-label="Кошелёк магазина">
-              <div className="score-ring-top">
-                <Wallet size={18} />
-                <strong>Кошелёк</strong>
-              </div>
-              <p className="presence-points__kicker">можно тратить в магазине</p>
-              <div className="score-ring-value">{(scores?.ecoPoints ?? 0).toLocaleString('ru-RU')}</div>
-              <div className="score-ring-bar" aria-hidden>
-                <span style={{ width: `${Math.round(shopLevel.progress * 100)}%` }} />
-              </div>
-              <p className="score-ring-meta">
-                {shopLevel.nextLabel
-                  ? `до ${shopLevel.nextLabel} ещё ${shopLevel.toNext}`
-                  : 'можно тратить в магазине'}
-              </p>
-            </Link>
+    <section className="presence-panel yp-pass-block" aria-label="Пропуск и счета">
+      <div className="yp-accounts" aria-label="Счета">
+        <div className="yp-accounts__row">
+          <div>
+            <p className="yp-accounts__label">Репутация</p>
+            <p className="yp-accounts__hint">
+              {level?.label || 'Новичок'}
+              {level?.nextLabel ? ` · ещё ${level.toNext} до «${level.nextLabel}»` : ''}
+            </p>
           </div>
+          <strong className="yp-accounts__value">{reputation.toLocaleString('ru-RU')}</strong>
         </div>
+        <Link href="/dashboard/shop" className="yp-accounts__row yp-accounts__row--link">
+          <div>
+            <p className="yp-accounts__label">
+              <Wallet size={14} aria-hidden /> Кошелёк магазина
+            </p>
+            <p className="yp-accounts__hint">Эко-очки: тратятся на рамки и оформление</p>
+          </div>
+          <strong className="yp-accounts__value">{wallet.toLocaleString('ru-RU')}</strong>
+        </Link>
+      </div>
 
-        <div className="presence-qr-card">
-          <div className="presence-qr-head">
-            <h2>Ваш пропуск</h2>
-            <p>Покажите на входе. Токен обновляется раз в сутки.</p>
-          </div>
-          {loading && !url ? <p className="presence-muted">Готовим QR…</p> : null}
-          {error ? <p className="presence-error">{error}</p> : null}
-          {url ? (
-            <div className="presence-qr-wrap">
-              <QRCodeDisplay value={url} size={200} />
-              <div className="presence-qr-actions">
-                <button type="button" className="btn btn-primary" onClick={() => setFullscreen(true)}>
-                  <Maximize2 size={16} /> На весь экран
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => load(true)}>
-                  <RefreshCw size={16} /> Обновить
-                </button>
-              </div>
-              {expiresAt ? (
-                <p className="presence-muted">
-                  Действует до{' '}
-                  {new Date(expiresAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+      <div className="presence-qr-card">
+        <div className="presence-qr-head">
+          <h2>Пропуск</h2>
+          <p>QR на входе, обновляется раз в сутки</p>
         </div>
+        {loading && !url ? <p className="presence-muted">Готовим QR…</p> : null}
+        {error ? <p className="presence-error">{error}</p> : null}
+        {url && showQr ? (
+          <div className="presence-qr-wrap">
+            <QRCodeDisplay value={url} size={qrSize} />
+            <div className="presence-qr-actions">
+              <button type="button" className="btn btn-primary" onClick={() => setFullscreen(true)}>
+                <Maximize2 size={16} /> На весь экран
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => load(true)}>
+                <RefreshCw size={16} /> Обновить
+              </button>
+            </div>
+            {expiresAt ? (
+              <p className="presence-muted">
+                до {new Date(expiresAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
+              </p>
+            ) : null}
+          </div>
+        ) : url ? (
+          <p className="presence-muted">QR…</p>
+        ) : null}
       </div>
 
       {history.length > 0 ? (
         <div className="presence-history">
-          <h3>История начислений</h3>
+          <h3>История</h3>
           <ul>
-            {history.map((h) => (
+            {history.slice(0, 5).map((h) => (
               <li key={h.id}>
                 <span className={`presence-delta ${h.delta >= 0 ? 'is-plus' : 'is-minus'}`}>
                   {h.delta >= 0 ? '+' : ''}
-                  {h.delta} {h.kind === 'ECO_BALL' ? POINTS.ecoBall.short : POINTS.mBall.short}
+                  {h.delta} {h.kind === 'ECO_POINTS' || h.kind === 'ECO' ? 'кошелёк' : 'репутация'}
                 </span>
                 <span className="presence-reason">{h.reason}</span>
                 <time dateTime={h.createdAt}>
@@ -217,40 +194,5 @@ export default function PersonalQrPanel() {
 
       {fs}
     </section>
-  );
-}
-
-function ScoreRing({
-  title,
-  kicker,
-  icon,
-  value,
-  level,
-  tone,
-}: {
-  title: string;
-  kicker?: string;
-  icon: React.ReactNode;
-  value: number;
-  level?: Scores['mLevel'] | null;
-  tone: 'm' | 'eco';
-}) {
-  const pct = Math.round((level?.progress ?? 0) * 100);
-  return (
-    <div className={`score-ring score-ring-${tone}`}>
-      <div className="score-ring-top">
-        {icon}
-        <strong>{title}</strong>
-      </div>
-      {kicker ? <p className="presence-points__kicker">{kicker}</p> : null}
-      <div className="score-ring-value">{value.toLocaleString('ru-RU')}</div>
-      <div className="score-ring-bar" aria-hidden>
-        <span style={{ width: `${pct}%` }} />
-      </div>
-      <p className="score-ring-meta">
-        {level?.label || 'Новичок'}
-        {level?.nextLabel ? ` · до «${level.nextLabel}» ещё ${level.toNext}` : ' · максимум'}
-      </p>
-    </div>
   );
 }

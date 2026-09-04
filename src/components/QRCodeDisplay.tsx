@@ -6,7 +6,13 @@ import { useVoice } from '@/components/VoiceProvider';
 export default function QRCodeDisplay({ value, size = 120 }: { value: string; size?: number }) {
   const [src, setSrc] = useState<string>('');
   const { loadout } = useVoice();
-  const ticketFx = loadout.ticket || '';
+  const [lite, setLite] = useState(true);
+  useEffect(() => {
+    setLite(
+      window.matchMedia('(pointer: coarse)').matches || window.matchMedia('(max-width: 900px)').matches
+    );
+  }, []);
+  const ticketFx = lite ? '' : loadout.ticket || '';
 
   useEffect(() => {
     QRCode.toDataURL(value, {

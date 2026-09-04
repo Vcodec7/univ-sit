@@ -25250,6 +25250,58 @@ button.svc-cta-card {
   z-index: 50 !important;
 }
 
+.dashboard-hello {
+  display: none !important;
+}
+.presence-scores,
+.score-ring,
+.presence-points {
+  display: none !important;
+}
+.yp-accounts {
+  display: grid !important;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+.yp-accounts__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  text-decoration: none;
+  color: inherit;
+}
+.yp-accounts__row--link:hover {
+  border-color: var(--primary);
+}
+.yp-accounts__label {
+  margin: 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.yp-accounts__hint {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.yp-accounts__value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+.yp-pass-block {
+  display: grid;
+  gap: 0.85rem;
+}
+
 .profile-hero--cabinet {
   background: #fff !important;
   color: var(--foreground) !important;
