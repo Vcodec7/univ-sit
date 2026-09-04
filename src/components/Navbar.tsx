@@ -553,7 +553,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
           used += w + gap;
         }
       }
-      setOverflowIds(hidden);
+      setOverflowIds((prev) => (prev.join() === hidden.join() ? prev : hidden));
     };
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => measure()) : null;
     ro?.observe(nav);

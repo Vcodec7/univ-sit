@@ -1,4 +1,4 @@
-const CACHE = "sochi-shell-v37-audit";
+const CACHE = "sochi-shell-v38-cls";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/offline.html",
@@ -174,6 +174,23 @@ self.addEventListener("fetch", (event) => {
 
   if (path.startsWith("/_next/")) {
     event.respondWith(fetch(req));
+    return;
+  }
+
+  if (path.startsWith("/brand/") && /\.css$/i.test(path)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res.ok && res.status === 200 && res.type !== "opaque") {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => {
+              c.put(req, copy).catch(() => undefined);
+            });
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
     return;
   }
 

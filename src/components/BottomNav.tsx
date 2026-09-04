@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import {
   Gamepad2,
   Home,
@@ -25,8 +25,19 @@ type Tab = {
 
 const NAV_H_VAR = '--yp-bottom-nav-h';
 
-function clearBottomNavHeightVar() {
-  document.documentElement.style.removeProperty(NAV_H_VAR);
+function persistDock(on: boolean) {
+  try {
+    if (on) localStorage.setItem('yp-dock', '1');
+    else localStorage.removeItem('yp-dock');
+  } catch {
+    /* ignore */
+  }
+}
+
+function setDockClass(on: boolean) {
+  document.body.classList.toggle('has-bottom-nav', on);
+  document.documentElement.classList.toggle('has-bottom-nav', on);
+  if (!on) document.documentElement.style.removeProperty(NAV_H_VAR);
 }
 
 /**
@@ -44,7 +55,6 @@ export default function BottomNav() {
   const pathname = usePathname() || '/';
   const [unread, setUnread] = useState(0);
   const [modules, setModules] = useState<Record<string, boolean> | null>(null);
-  const navRef = useRef<HTMLElement | null>(null);
 
   const role = (session?.user as { role?: string } | undefined)?.role;
   const hideForRole = role === 'SCANNER' || role === 'TECH';
@@ -113,35 +123,15 @@ export default function BottomNav() {
   }, [status, session?.user?.id, hideForRole]);
 
   useLayoutEffect(() => {
+    if (status === 'loading') return;
     if (!visible) {
-      document.body.classList.remove('has-bottom-nav');
-      clearBottomNavHeightVar();
+      setDockClass(false);
+      if (status === 'unauthenticated' || hideForRole) persistDock(false);
       return;
     }
-
-    document.body.classList.add('has-bottom-nav');
-
-    const el = navRef.current;
-    if (!el) return;
-
-    const apply = () => {
-      const h = Math.ceil(el.getBoundingClientRect().height);
-      if (h > 0) {
-        document.documentElement.style.setProperty(NAV_H_VAR, `${h}px`);
-      }
-    };
-
-    apply();
-    const ro = new ResizeObserver(apply);
-    ro.observe(el);
-    window.addEventListener('orientationchange', apply);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('orientationchange', apply);
-      document.body.classList.remove('has-bottom-nav');
-      clearBottomNavHeightVar();
-    };
-  }, [visible, unread, modules]);
+    setDockClass(true);
+    persistDock(true);
+  }, [visible, status]);
 
   if (!visible) {
     return null;
@@ -205,10 +195,7 @@ export default function BottomNav() {
 
   return (
     <>
-      {/* In-flow spacer after Footer — clears fixed dock for eco/legal */}
-      <div className="yp-bottom-nav-space" aria-hidden="true" />
       <nav
-        ref={navRef}
         className="yp-bottom-nav"
         aria-label="Основная навигация"
       >

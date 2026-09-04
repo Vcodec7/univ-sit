@@ -44,6 +44,13 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* First paint: freeze motion so late CSS/fonts don't animate every box into place */
+html.yp-booting,
+html.yp-booting * {
+  animation: none !important;
+  transition: none !important;
+}
+
 body {
   background-color: #f4f1fa;
   background-image:
@@ -639,7 +646,9 @@ button {
 .nav-auth-mobile__row {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.2rem;
+  min-width: 8.25rem;
 }
 .nav-auth-mobile__row--guest {
   gap: 0.35rem;
@@ -2006,7 +2015,7 @@ img.site-brand-logo {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
   position: relative;
   text-decoration: none;
   color: inherit;
@@ -16525,6 +16534,7 @@ button.mobile-menu__row {
 :root {
   --yp-bottom-nav-h: 0px;
 }
+html.has-bottom-nav,
 body.has-bottom-nav {
   --yp-bottom-nav-h: calc(4.15rem + env(safe-area-inset-bottom, 0px));
 }
@@ -16542,10 +16552,12 @@ body.has-bottom-nav {
 
 @media (max-width: 860px) {
   /* Anchors / focus don't hide under the dock */
+  html.has-bottom-nav,
   body.has-bottom-nav {
     scroll-padding-bottom: var(--yp-bottom-nav-h);
   }
 
+  html.has-bottom-nav .yp-bottom-nav,
   body.has-bottom-nav .yp-bottom-nav {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -16566,17 +16578,22 @@ body.has-bottom-nav {
   }
 
   /* Spacer after footer — document height clears the fixed dock */
+  html.has-bottom-nav .yp-bottom-nav-space,
   body.has-bottom-nav .yp-bottom-nav-space {
     display: block;
     height: var(--yp-bottom-nav-h);
     min-height: var(--yp-bottom-nav-h);
   }
 
+  html.has-bottom-nav .main-content,
   body.has-bottom-nav .main-content {
     padding-bottom: 1.25rem;
   }
 
   /* Normal footer padding only — clearance is the spacer, not fake pad */
+  html.has-bottom-nav .site-footer,
+  html.has-bottom-nav footer.footer,
+  html.has-bottom-nav .footer,
   body.has-bottom-nav .site-footer,
   body.has-bottom-nav footer.footer,
   body.has-bottom-nav .footer {
@@ -24631,6 +24648,7 @@ fieldset.svc-form-group,
   --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px));
 }
 @media (max-width: 860px) {
+  html.has-bottom-nav,
   body.has-bottom-nav {
     --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, 0px));
   }
@@ -25597,6 +25615,15 @@ html[data-eco-banner] .profile-hero--cabinet {
     width: min(78vw, 18.5rem);
     max-width: min(78vw, 18.5rem);
     scroll-snap-align: start;
+    position: relative;
+  }
+  .home-sections .free-now-badge {
+    position: absolute;
+    top: 0.45rem;
+    left: 0.45rem;
+    z-index: 1;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.92);
   }
   .home-sections .free-now-avatar,
   .home-sections .yp-feed-card__media,

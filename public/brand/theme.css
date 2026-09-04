@@ -1,5 +1,5 @@
-/* Live brand tokens — nginx serves /brand/ without Docker rebuild.
-   After the first deploy that links this file, edit it on the VPS and reload. */
+/* Brand tokens bundled via src/app/layout.tsx (single CSS payload).
+   Keep this file as the source of live tokens; do not also <link> it from HTML. */
 :root {
   --yp-purple: #6a42c2;
   --yp-purple-deep: #53339c;
@@ -27,6 +27,7 @@
 }
 
 @media (max-width: 860px) {
+  html.has-bottom-nav,
   body.has-bottom-nav {
     --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, 0px));
   }

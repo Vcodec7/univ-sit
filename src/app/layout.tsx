@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
 import './auth-layout.css';
+import '../../public/brand/theme.css';
 import NavbarWrapper from '@/components/NavbarWrapper';
 import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
@@ -31,6 +32,7 @@ const manrope = localFont({
   ],
   variable: '--font-manrope',
   display: 'swap',
+  adjustFontFallback: true,
   preload: true,
 });
 
@@ -42,8 +44,8 @@ const unbounded = localFont({
     { path: '../fonts/unbounded/Unbounded-800.ttf', weight: '800', style: 'normal' },
   ],
   variable: '--font-unbounded',
-  display: 'swap',
-  // Avoid unused font preload spam — headings pull weights on demand
+  display: 'optional',
+  adjustFontFallback: true,
   preload: false,
 });
 
@@ -118,10 +120,14 @@ export default async function RootLayout({
 
   return (
     <html lang="ru" className={`${manrope.variable} ${unbounded.variable}`}>
-      <head>
-        <link rel="stylesheet" href="/brand/theme.css?v=cab17" />
-      </head>
       <body className={manrope.className}>
+        <Script
+          id="yp-chrome-boot"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=location.pathname||'';var staff=p.indexOf('/admin')===0||p.indexOf('/ops')===0||p.indexOf('/scanner')===0;var immersive=staff||p.indexOf('/games')===0||p.indexOf('/login')===0||p.indexOf('/register')===0||p.indexOf('/verify')===0||p.indexOf('/maintenance')===0||p.indexOf('/presentation/view')===0||p.indexOf('/forgot-password')===0||p.indexOf('/reset-password')===0;document.documentElement.classList.add('yp-booting');if(staff){document.documentElement.classList.add('is-admin');document.body.classList.add('is-admin')}if(!immersive){try{if(localStorage.getItem('yp-dock')==='1'&&window.matchMedia('(max-width:860px)').matches){document.documentElement.classList.add('has-bottom-nav');document.body.classList.add('has-bottom-nav')}}catch(e){}}function done(){requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('yp-booting')})})}if(document.readyState==='complete')done();else window.addEventListener('load',done)}catch(e){}})();`,
+          }}
+        />
         <Script
           id="yp-pwa-early"
           strategy="beforeInteractive"
@@ -199,6 +205,7 @@ export default async function RootLayout({
           <HideOnPaths>
             {/* Footer first, then bottom-nav spacer+bar so auth mobile never covers footer */}
             <Footer />
+            <div className="yp-bottom-nav-space" aria-hidden="true" />
             <BottomNav />
           </HideOnPaths>
         </Providers>
