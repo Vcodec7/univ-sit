@@ -1048,12 +1048,12 @@ html.mobile-nav-open {
 }
 @media (max-width: 640px) {
   .home-section-head {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: flex-start;
   }
   .home-section-link {
-    align-self: flex-start;
-    white-space: normal;
+    align-self: center;
+    white-space: nowrap;
   }
 }
 .home-section-title {
@@ -6751,29 +6751,8 @@ a.dashboard-nav-btn {
   box-sizing: border-box;
 }
 
-/* Quick access: V handle at the bottom center — not the right edge (conflicts with back swipe) */
 .qa-fab {
-  position: fixed;
-  left: 50%;
-  right: auto;
-  top: auto;
-  bottom: calc(var(--yp-bottom-nav-h, 0px) + 0.15rem);
-  transform: translateX(-50%);
-  z-index: 1100;
-  width: 56px;
-  height: 22px;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 10px 10px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  background: #6a42c2;
-  box-shadow: 0 -4px 16px rgba(106, 66, 194, 0.28);
-  opacity: 1;
+  display: none !important;
 }
 .qa-fab-v {
   width: 14px;
@@ -6807,7 +6786,7 @@ a.dashboard-nav-btn {
   z-index: 1300;
   display: flex;
   align-items: stretch;
-  justify-content: flex-start;
+  justify-content: flex-end;
   padding: 0;
   pointer-events: none;
 }
@@ -6833,16 +6812,16 @@ a.dashboard-nav-btn {
   background: #1b1430;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-radius: 0 1.25rem 1.25rem 0;
+  border-radius: 1.25rem 0 0 1.25rem;
   border: 0;
   padding: 0.55rem 0.45rem 0.85rem;
-  box-shadow: 12px 0 36px rgba(0, 0, 0, 0.22);
+  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.22);
   animation: qa-sheet-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
   color: #f8fafc;
 }
 @keyframes qa-sheet-in {
   from {
-    transform: translateX(-100%);
+    transform: translateX(100%);
     opacity: 0.7;
   }
   to {
@@ -25611,9 +25590,9 @@ html[data-eco-banner] .profile-hero--cabinet {
   }
   .home-sections .free-now-card,
   .home-sections .grid-cards > .catalog-card {
-    flex: 0 0 min(78vw, 18.5rem);
-    width: min(78vw, 18.5rem);
-    max-width: min(78vw, 18.5rem);
+    flex: 0 0 min(86vw, 20rem);
+    width: min(86vw, 20rem);
+    max-width: min(86vw, 20rem);
     scroll-snap-align: start;
     position: relative;
   }
@@ -25693,5 +25672,242 @@ html[data-eco-banner] .profile-hero--cabinet {
   .home-page .event-list.is-slideshow .event-card-body {
     padding: 0.65rem 0.8rem 0.8rem;
   }
+}
+
+/* Compact professional chrome + no wrapping buttons */
+.btn,
+a.btn,
+button.btn,
+.nav-pill,
+.home-section-link,
+.profile-hero__tool,
+.profile-hero__edit-btn,
+.catalog-card-more,
+.qa-edge-foot-btn,
+.yp-sheet__close,
+.profile-edit-sticky__btn {
+  white-space: nowrap !important;
+}
+.btn,
+a.btn,
+button.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+@media (max-width: 860px) {
+  .home-section-head,
+  .catalog-page-header,
+  .places-page__head,
+  .cw-page-head,
+  .profile-page-head {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 0.55rem 0.75rem !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .home-section-head > div,
+  .catalog-page-header > div,
+  .places-page__head > div {
+    min-width: 0;
+    flex: 1;
+  }
+  .home-section-title,
+  .page-hero-title,
+  .places-title,
+  .cw-page-head h1 {
+    font-family: var(--font-unbounded), 'Unbounded', sans-serif !important;
+    font-size: 1.12rem !important;
+    font-weight: 750 !important;
+    letter-spacing: -0.03em;
+    margin: 0 0 0.12rem !important;
+    line-height: 1.2 !important;
+  }
+  .home-section-sub,
+  .page-hero-subtitle,
+  .places-lead,
+  .cw-page-head p {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+    max-width: none !important;
+  }
+  .home-section-link {
+    flex: 0 0 auto;
+    align-self: center !important;
+    padding: 0.28rem 0.7rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+  }
+
+  .home-sections .free-now-actions {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.3rem !important;
+  }
+  .home-sections .free-now-actions .btn,
+  .home-sections .catalog-card__interactive .btn {
+    min-height: 2rem !important;
+    height: 2rem !important;
+    padding: 0 0.4rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+  }
+
+  .profile-hero--cabinet {
+    padding: 0.85rem 0.9rem 0.9rem !important;
+    border-radius: 1.15rem !important;
+  }
+  .profile-hero--cabinet .profile-hero__main {
+    gap: 0.7rem;
+    align-items: center;
+  }
+  .profile-hero--cabinet .profile-hero__avatar {
+    width: 64px !important;
+    height: 64px !important;
+    overflow: hidden;
+  }
+  .profile-hero--cabinet .profile-hero__name-row {
+    flex-wrap: nowrap !important;
+    min-width: 0;
+    align-items: center;
+    gap: 0.4rem !important;
+  }
+  .profile-hero--cabinet .profile-hero__name {
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+    min-width: 0;
+    flex: 1;
+  }
+  .profile-hero--cabinet .profile-hero__role {
+    flex-shrink: 0;
+    margin: 0 !important;
+    font-size: 0.62rem !important;
+    padding: 0.12rem 0.45rem !important;
+  }
+  .profile-hero--cabinet .profile-hero__contacts {
+    gap: 0.2rem 0.75rem !important;
+    margin-top: 0.3rem !important;
+    font-size: 0.78rem;
+  }
+  .profile-hero--cabinet .profile-hero__bio {
+    margin-top: 0.3rem !important;
+    font-size: 0.8rem !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .dashboard-page .profile-hero__toolbar {
+    gap: 0.3rem !important;
+    margin-top: 0.55rem !important;
+  }
+  .dashboard-page .profile-hero__tool,
+  button.profile-hero__tool {
+    min-height: 2.05rem !important;
+    max-height: 2.05rem !important;
+    padding: 0 0.4rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+  }
+  .profile-hero__showcase {
+    margin-top: 0.55rem !important;
+    padding: 0.55rem 0.65rem !important;
+  }
+  .profile-hero__selected {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    gap: 0.35rem;
+    scrollbar-width: none;
+  }
+  .profile-hero__chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .yp-accounts__row {
+    padding: 0.65rem 0.8rem !important;
+  }
+  .yp-accounts__value {
+    font-size: 1.2rem !important;
+  }
+}
+
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.yp-sheet--profile .yp-sheet__panel {
+  background: #fff !important;
+  border-radius: 1.15rem !important;
+}
+.yp-sheet--profile .yp-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 0.7rem !important;
+}
+.yp-sheet--profile .yp-sheet__head h2 {
+  font-size: 1.05rem !important;
+  letter-spacing: -0.03em;
+}
+.yp-sheet--profile .yp-sheet__close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem !important;
+}
+.yp-sheet--profile .yp-sheet__body {
+  padding: 0.85rem 1rem 1rem !important;
+}
+.yp-sheet--profile .profile-view__lead {
+  font-size: 0.78rem !important;
+  color: var(--muted);
+  margin: 0 !important;
+}
+.yp-sheet--profile .profile-edit-fold {
+  border-color: var(--card-border) !important;
+  border-radius: 0.9rem !important;
+  padding: 0.15rem 0.7rem 0.7rem !important;
+  background: #f8f6fc !important;
+}
+.yp-sheet--profile .profile-edit-fold > summary {
+  font-size: 0.82rem !important;
+  color: var(--foreground) !important;
+  padding: 0.55rem 0 !important;
+}
+.yp-sheet--profile .profile-unified-edit input,
+.yp-sheet--profile .profile-unified-edit textarea,
+.yp-sheet--profile .profile-unified-edit select {
+  width: 100% !important;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid var(--card-border) !important;
+  background: #fff !important;
+  font-size: 0.92rem !important;
+}
+.yp-sheet--profile .profile-unified-edit textarea {
+  min-height: 4.5rem;
+}
+.yp-sheet--profile .profile-edit-sticky {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 0.45rem;
+  padding-top: 0.65rem;
+  background: #fff;
+}
+.yp-sheet--profile .profile-edit-sticky__btn {
+  min-height: 2.45rem !important;
+  border-radius: 999px !important;
 }
 

@@ -138,10 +138,9 @@ export function QuickAccessTutorial({ forceOpen = false, restartKey = 0 }: Props
         <div className="qa-tutorial-kicker">
           <Zap size={16} /> Быстрый доступ
         </div>
-        <h2 className="qa-tutorial-title">Тонкая вкладка у края экрана</h2>
+        <h2 className="qa-tutorial-title">Нарисуйте V пальцем</h2>
         <p className="qa-tutorial-lead">
-          Справа еле заметная полоска — как Edge Panel. Тап или свайп от края откроет узкую панель с
-          иконками разделов.
+          По странице проведите пальцем букву V — как галочку вниз. Справа выедет панель разделов, как Edge Panel у Samsung.
         </p>
 
         <div className="qa-tutorial-demo" data-mode={isMobile ? 'mobile' : 'desktop'}>
@@ -164,8 +163,8 @@ export function QuickAccessTutorial({ forceOpen = false, restartKey = 0 }: Props
                 <div className="qa-tutorial-step">
                   <Smartphone size={18} />
                   <div>
-                    <strong>Полоска справа</strong>
-                    <span>Почти незаметна. Тапните или потяните от правого края</span>
+                    <strong>Буква V</strong>
+                    <span>Два штриха вниз к центру и вверх — панель откроется справа</span>
                   </div>
                 </div>
                 <div className="qa-tutorial-step">

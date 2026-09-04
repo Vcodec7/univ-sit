@@ -464,20 +464,20 @@ export default function ProfileHeroCard({
       <div className="profile-hero__toolbar" role="group" aria-label="Действия профиля">
         {openEdit ? (
           <button type="button" className="profile-hero__tool" onClick={openEdit}>
-            <Pencil size={13} aria-hidden /> Редактировать
+            <Pencil size={13} aria-hidden /> Правка
           </button>
         ) : (
           <a href={editSectionHref} className="profile-hero__tool">
-            <Pencil size={13} aria-hidden /> Редактировать
+            <Pencil size={13} aria-hidden /> Правка
           </a>
         )}
         {onSettings ? (
           <button type="button" className="profile-hero__tool" onClick={onSettings}>
-            <Settings size={13} aria-hidden /> Настройки
+            <Settings size={13} aria-hidden /> Ещё
           </button>
         ) : settingsHref ? (
           <Link href={settingsHref} className="profile-hero__tool">
-            <Settings size={13} aria-hidden /> Настройки
+            <Settings size={13} aria-hidden /> Ещё
           </Link>
         ) : null}
         {onPreview ? (

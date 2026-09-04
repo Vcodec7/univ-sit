@@ -1637,7 +1637,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                 <div className="yp-sheet__body">
                 <form
                   id="profile-edit"
-                  className="profile-unified-edit"
+                  className="profile-unified-edit profile-edit-form"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (profileSaving) return;
@@ -1751,7 +1751,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                       setProfileSaving(false);
                     }
                   }}
-                  style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                  style={{ display: 'flex', flexDirection: 'column' }}
                 >
                   <p className="profile-view__lead" style={{ margin: '0 0 0.35rem' }}>
                     Имя, почту и телефон можно менять раз в 30 дней.

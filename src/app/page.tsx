@@ -227,7 +227,7 @@ export default async function Home() {
                         title="Забронировать зал"
                         asButton
                       >
-                        Забронировать
+                        Бронь
                       </GuestAuthPrompt>
                     </div>
                   </div>

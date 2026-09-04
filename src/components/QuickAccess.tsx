@@ -39,6 +39,7 @@ import {
   type HotkeyDef,
 } from '@/lib/quick-access-hotkeys';
 import { QuickAccessTutorial } from '@/components/QuickAccessTutorial';
+import { attachVGesture } from '@/lib/v-gesture';
 
 function itemIcon(item: HotkeyDef): ReactNode {
   const props = { size: 22, strokeWidth: 1.85, 'aria-hidden': true as const };
@@ -186,7 +187,6 @@ export function QuickAccess() {
     [focusSiteSearch, router]
   );
 
-  const openPanel = useCallback(() => setOpen(true), []);
   const closePanel = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
@@ -204,7 +204,10 @@ export function QuickAccess() {
     };
   }, []);
 
-  // No edge-swipe: on phones the right/left edge is the system back gesture.
+  useEffect(() => {
+    if (hideChrome) return;
+    return attachVGesture(() => setOpen(true));
+  }, [hideChrome]);
 
   useEffect(() => {
     let pendingG = false;
@@ -318,22 +321,10 @@ export function QuickAccess() {
 
   return (
     <>
-      {!hideChrome && !open && (
-        <button
-          type="button"
-          className="qa-fab"
-          aria-label="Быстрый доступ"
-          title="Быстрый доступ"
-          onClick={openPanel}
-        >
-          <span className="qa-fab-v" aria-hidden />
-        </button>
-      )}
-
       {open && (
-        <div className="qa-sheet-root" role="dialog" aria-modal="true" aria-label="Быстрый доступ">
+        <div className="qa-sheet-root qa-sheet-root--right" role="dialog" aria-modal="true" aria-label="Быстрый доступ">
           <button type="button" className="qa-sheet-backdrop" aria-label="Закрыть" onClick={closePanel} />
-          <aside className="qa-sheet qa-edge-panel">
+          <aside className="qa-sheet qa-edge-panel qa-edge-panel--right">
             <div className="qa-edge-head">
               <strong>Разделы</strong>
               <div className="qa-edge-head__actions">

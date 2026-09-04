@@ -282,9 +282,9 @@
   }
   .home-sections .free-now-card,
   .home-sections .grid-cards > .catalog-card {
-    flex: 0 0 min(78vw, 18.5rem) !important;
-    width: min(78vw, 18.5rem) !important;
-    max-width: min(78vw, 18.5rem) !important;
+    flex: 0 0 min(86vw, 20rem) !important;
+    width: min(86vw, 20rem) !important;
+    max-width: min(86vw, 20rem) !important;
     scroll-snap-align: start;
   }
   .home-sections .free-now-avatar,
@@ -313,19 +313,7 @@
 }
 
 .qa-fab {
-  width: 56px !important;
-  min-width: 56px !important;
-  height: 22px !important;
-  right: auto !important;
-  left: 50% !important;
-  top: auto !important;
-  transform: translateX(-50%) !important;
-  border-radius: 10px 10px 0 0 !important;
-}
-
-.qa-fab:hover,
-.qa-fab:focus-visible {
-  width: 56px !important;
+  display: none !important;
 }
 
 /* Site-wide brand canvas + auth (applies without Docker rebuild) */

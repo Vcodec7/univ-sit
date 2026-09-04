@@ -42,7 +42,7 @@
   z-index: calc(var(--z-sheet) + 50) !important;
 }
 .qa-fab {
-  z-index: var(--z-fab) !important;
+  display: none !important;
 }
 
 .yp-bottom-nav {

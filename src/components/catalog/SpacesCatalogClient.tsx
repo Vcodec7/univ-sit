@@ -94,7 +94,7 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
             const ctaHref = coworking
               ? `/coworking?space=${encodeURIComponent(space.id)}`
               : `${href}/book`;
-            const ctaLabel = coworking ? 'В коворкинг' : 'Забронировать';
+            const ctaLabel = coworking ? 'Коворкинг' : 'Бронь';
 
             return (
               <article key={space.id} className="svc-space-card yp-feed-card">
