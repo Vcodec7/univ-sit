@@ -218,3 +218,72 @@ html {
     min-width: 14px !important;
   }
 }
+
+/* Site-wide brand canvas + auth (applies without Docker rebuild) */
+body:not(.is-admin) {
+  background-color: #f4f1fa !important;
+  background-image:
+    radial-gradient(1180px 540px at 8% -12%, rgba(106, 66, 194, 0.1), transparent 62%),
+    radial-gradient(900px 460px at 100% 8%, rgba(193, 217, 46, 0.08), transparent 58%),
+    linear-gradient(180deg, #f8f6fc 0%, #f4f1fa 55%, #f6f8f0 100%) !important;
+  background-attachment: fixed !important;
+}
+body.is-admin {
+  background: #f4f1fa !important;
+  background-image: none !important;
+}
+.yp-auth-shell {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+  min-height: calc(100svh - 5rem) !important;
+  margin: 0 !important;
+  padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2rem) 3rem !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+}
+.yp-auth-card {
+  width: 100% !important;
+  max-width: 32rem !important;
+  margin: 0 auto !important;
+  padding: 1.6rem 1.45rem 1.7rem !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid var(--card-border, #e4dff2) !important;
+  border-radius: 1.75rem !important;
+  box-shadow: 0 16px 40px rgba(106, 66, 194, 0.12) !important;
+}
+.yp-auth-input:focus,
+.yp-field input:focus,
+.yp-field textarea:focus,
+.yp-field select:focus,
+.modern-input:focus {
+  border-color: #6a42c2 !important;
+  box-shadow: 0 0 0 3px rgba(106, 66, 194, 0.16) !important;
+}
+.btn-secondary {
+  background: rgba(106, 66, 194, 0.1) !important;
+  color: #53339c !important;
+  border: 1px solid rgba(106, 66, 194, 0.2) !important;
+}
+.btn-secondary:hover {
+  background: rgba(106, 66, 194, 0.16) !important;
+  color: #53339c !important;
+}
+.glass {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #e4dff2 !important;
+}
+.text-gradient {
+  background: linear-gradient(135deg, #6a42c2 0%, #53339c 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+.catalog-card,
+.event-card,
+.news-card,
+.free-now-card,
+.yp-surface {
+  border-color: #e4dff2 !important;
+}

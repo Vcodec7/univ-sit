@@ -53,8 +53,7 @@ function VerifyForm() {
 
   return (
     <motion.div
-      className="glass"
-      style={{ width: '100%', maxWidth: '450px', padding: '1.25rem' }}
+      className="yp-auth-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -145,15 +144,7 @@ function VerifyForm() {
 
 export default function VerifyPage() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 'calc(100vh - 4rem - 100px)',
-        padding: '1rem',
-      }}
-    >
+    <div className="yp-auth-shell">
       <VerifyForm />
     </div>
   );

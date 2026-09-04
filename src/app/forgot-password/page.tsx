@@ -79,8 +79,8 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-      <div className="glass" style={{ width: '100%', maxWidth: '440px', padding: '2rem', borderRadius: 'var(--radius-xl)' }}>
+    <div className="yp-auth-shell">
+      <div className="yp-auth-card">
         <h1 className="auth-form-title">
           Восстановление пароля
         </h1>

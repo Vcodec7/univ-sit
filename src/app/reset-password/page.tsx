@@ -50,7 +50,7 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="glass" style={{ width: '100%', maxWidth: '400px', padding: '2rem', borderRadius: 'var(--radius-xl)' }}>
+    <div className="yp-auth-card">
       <h1 className="auth-form-title" style={{ marginBottom: '1.5rem' }}>Новый пароль</h1>
       
       {status === 'success' ? (
@@ -82,7 +82,7 @@ function ResetPasswordForm() {
 
 export default function ResetPassword() {
   return (
-    <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+    <div className="yp-auth-shell">
       <ResetPasswordForm />
     </div>
   );
