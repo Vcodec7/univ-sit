@@ -21,6 +21,8 @@ import {
   BellOff,
   ArrowLeft,
   CalendarPlus,
+  Check,
+  CheckCheck,
   FolderKanban,
   MapPin,
   MessageCircle,
@@ -31,6 +33,7 @@ import {
   Ticket,
   Users,
 } from 'lucide-react';
+import { splitMessageBodyMedia } from '@/lib/message-body-media';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
 import MessageBodyText from '@/components/MessageBodyText';
@@ -131,6 +134,27 @@ function dayKey(iso: string) {
 function shortTime(iso: string) {
   return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' });
 }
+function isMediaOnlyBody(body: string) {
+  const parts = splitMessageBodyMedia(body || '');
+  const meaningful = parts.filter((p) => (p.type === 'image' ? true : Boolean(p.value.trim())));
+  return meaningful.length > 0 && meaningful.every((p) => p.type === 'image');
+}
+
+function MsgMeta({ mine, message }: { mine: boolean; message: Message }) {
+  return (
+    <div className="msg-bubble__meta">
+      <time dateTime={message.createdAt}>{shortTime(message.createdAt)}</time>
+      {mine ? (
+        message.readAt ? (
+          <CheckCheck size={14} className="msg-ticks is-read" aria-label="Прочитано" />
+        ) : (
+          <Check size={14} className="msg-ticks" aria-label="Отправлено" />
+        )
+      ) : null}
+    </div>
+  );
+}
+
 function groupClass(messages: Message[], index: number) {
   const cur = messages[index];
   const prev = messages[index - 1];
@@ -757,7 +781,7 @@ function MessagesInner() {
               </div>
             </div>
           </div>
-          <div className="msg-bubble__meta">{shortTime(message.createdAt)}{mine && message.readAt ? ' · прочитано' : ''}</div>
+          <MsgMeta mine={mine} message={message} />
         </div>
       );
     }
@@ -774,7 +798,7 @@ function MessagesInner() {
               <div className="msg-invite__actions"><Link href={m.href} className="is-primary is-place">Открыть место</Link></div>
             </div>
           </div>
-          <div className="msg-bubble__meta">{shortTime(message.createdAt)}{mine && message.readAt ? ' · прочитано' : ''}</div>
+          <MsgMeta mine={mine} message={message} />
         </div>
       );
     }
@@ -799,21 +823,25 @@ function MessagesInner() {
               </div>
             </div>
           </div>
-          <div className="msg-bubble__meta">{shortTime(message.createdAt)}</div>
+          <MsgMeta mine={mine} message={message} />
         </div>
       );
     }
 
+    const mediaOnly = !message.flagged && isMediaOnlyBody(message.body);
     return (
-      <div key={message.id} className={`msg-bubble${mine ? ' is-mine' : ''}${message.flagged ? ' is-flagged' : ''}${group ? ` ${group}` : ''}`}>
+      <div
+        key={message.id}
+        className={`msg-bubble${mine ? ' is-mine' : ''}${message.flagged ? ' is-flagged' : ''}${mediaOnly ? ' is-media' : ''}${group ? ` ${group}` : ''}`}
+      >
         {!mine && activeGroup && message.senderName ? (
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)', marginBottom: 2 }}>{message.senderName}</div>
+          <div className="msg-bubble__from">{message.senderName}</div>
         ) : null}
         <div className={message.flagged ? 'msg-bubble__blurred' : undefined}>
           <MessageBodyText body={message.body} />
         </div>
         {message.flagged ? <div className="msg-bubble__flag-note">Скрыто модерацией</div> : null}
-        <div className="msg-bubble__meta">{shortTime(message.createdAt)}{mine && message.readAt ? ' · прочитано' : ''}</div>
+        <MsgMeta mine={mine} message={message} />
       </div>
     );
   };
@@ -1097,47 +1125,47 @@ function MessagesInner() {
                 <button type="button" className="messages-thread-head__back" aria-label="К списку" onClick={closeThread}><ArrowLeft size={18} /></button>
                 {activeGroup ? (
                   <Link href={activeGroup.href} className="messages-thread-head__profile">
-                    <span className="messages-conv__entity-ico" style={{ width: 40, height: 40 }}>{activeGroup.kind === 'CLUB' ? 'К' : 'П'}</span>
-                    <span style={{ minWidth: 0 }}>
+                    <span className="messages-conv__entity-ico">{activeGroup.kind === 'CLUB' ? 'К' : 'П'}</span>
+                    <span className="messages-thread-head__copy">
                       <strong>{activeGroup.title}</strong>
-                      <span className="messages-thread-head__sub">Чат участников · открыть страницу</span>
+                      <span className="messages-thread-head__sub">чат участников</span>
                     </span>
                   </Link>
                 ) : activeUser ? (
                   <Link href={`/u/${activeUser.publicCode || activeUser.id}`} className="messages-thread-head__profile">
-                    <Avatar user={activeUser} size={40} presence={presence} />
-                    <span style={{ minWidth: 0 }}>
+                    <Avatar user={activeUser} size={36} presence={presence} />
+                    <span className="messages-thread-head__copy">
                       <strong>{activeUser.name || 'Пользователь'}</strong>
-                      <span className="messages-thread-head__sub">{presence?.label || 'в сети скрыт'} · открыть профиль</span>
-                      {friendAchs.length ? (
-                        <span className="messages-thread-head__achs">
-                          {friendAchs.map((a) => (
-                            <span key={a.code} className="messages-ach-chip" title={`${a.tierLabel}: ${a.title}`} style={{ borderColor: `${a.accent}44`, color: a.accent }}>{a.title}</span>
-                          ))}
-                        </span>
-                      ) : null}
+                      <span className="messages-thread-head__sub">{presence?.label || 'статус скрыт'}</span>
                     </span>
                   </Link>
                 ) : null}
                 {selectedId ? (
                   <div className="messages-thread-actions">
-                    <button type="button" className="messages-mini-btn is-ghost" title={threadPinned ? 'Открепить' : 'Закрепить'} onClick={() => void updateState(selectedId, { pinned: !threadPinned }).catch((e) => toast.error(e.message))}>
-                      <Pin size={14} />
+                    <button type="button" className={`messages-icon-btn${threadPinned ? ' is-on' : ''}`} title={threadPinned ? 'Открепить' : 'Закрепить'} onClick={() => void updateState(selectedId, { pinned: !threadPinned }).catch((e) => toast.error(e.message))}>
+                      <Pin size={16} />
                     </button>
-                    <button type="button" className="messages-mini-btn is-ghost" title={threadArchived ? 'Вернуть' : 'В архив'} onClick={() => void updateState(selectedId, { archived: !threadArchived }).catch((e) => toast.error(e.message))}>
-                      <Archive size={14} />
+                    <button type="button" className={`messages-icon-btn${threadArchived ? ' is-on' : ''}`} title={threadArchived ? 'Вернуть' : 'В архив'} onClick={() => void updateState(selectedId, { archived: !threadArchived }).catch((e) => toast.error(e.message))}>
+                      <Archive size={16} />
                     </button>
-                    <button type="button" className="messages-mini-btn is-ghost" title={threadMuted ? 'Включить уведомления' : 'Без уведомлений'} onClick={() => void updateState(selectedId, { muted: !threadMuted }).catch((e) => toast.error(e.message))}>
-                      {threadMuted ? <BellOff size={14} /> : <Bell size={14} />}
+                    <button type="button" className={`messages-icon-btn${threadMuted ? ' is-on' : ''}`} title={threadMuted ? 'Включить уведомления' : 'Без уведомлений'} onClick={() => void updateState(selectedId, { muted: !threadMuted }).catch((e) => toast.error(e.message))}>
+                      {threadMuted ? <BellOff size={16} /> : <Bell size={16} />}
                     </button>
                   </div>
                 ) : null}
               </div>
+              {activeUser && friendAchs.length ? (
+                <div className="messages-thread-head__achs" aria-label="Достижения">
+                  {friendAchs.map((a) => (
+                    <span key={a.code} className="messages-ach-chip" title={`${a.tierLabel}: ${a.title}`} style={{ borderColor: `${a.accent}44`, color: a.accent }}>{a.title}</span>
+                  ))}
+                </div>
+              ) : null}
 
               {overlap ? <div className="messages-mutual"><MutualOverlapChips overlap={overlap} compact /></div> : null}
               {messages.length > 0 ? (
                 <div className="messages-tone" title={chatMood.hint}>
-                  <span className="messages-tone__label">Общение · {chatMood.label}</span>
+                  <span className="messages-tone__label">{chatMood.label}</span>
                   <span className="messages-tone__track" aria-hidden>
                     <span className="messages-tone__fill" style={{ width: `${chatMood.score}%` }} />
                   </span>
@@ -1219,7 +1247,7 @@ function MessagesInner() {
                     }}
                     rows={1}
                     maxLength={2000}
-                    placeholder={activeGroup ? 'Сообщение команде…' : 'Сообщение… Enter — отправить'}
+                    placeholder={activeGroup ? 'Сообщение команде…' : 'Сообщение…'}
                     aria-label="Текст сообщения"
                   />
                   <button type="submit" className="messages-send" disabled={!body.trim() || sending} aria-label="Отправить"><Send size={18} /></button>
