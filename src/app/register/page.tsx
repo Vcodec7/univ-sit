@@ -2,6 +2,7 @@
 
 import AuthHomeLink from '@/components/AuthHomeLink';
 import CaptchaField from '@/components/CaptchaField';
+import AuthStage from '@/components/AuthStage';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -190,7 +191,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="yp-auth-shell">
+    <AuthStage>
       <motion.div
         className="yp-auth-card"
         initial={{ opacity: 0, y: 16 }}
@@ -416,7 +417,7 @@ function RegisterForm() {
           </Link>
         </p>
       </motion.div>
-    </div>
+    </AuthStage>
   );
 }
 

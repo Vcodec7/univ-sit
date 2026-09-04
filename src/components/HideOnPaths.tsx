@@ -10,6 +10,7 @@ const HIDE_PREFIXES = [
   '/register',
   '/forgot-password',
   '/reset-password',
+  '/verify',
 ];
 
 /** Hides site chrome on auth/maintenance/immersive routes. Pathname is client-only — keeps the root layout static. */

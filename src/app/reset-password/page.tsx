@@ -3,6 +3,7 @@
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 import { useState } from 'react';
 import Link from 'next/link';
+import AuthStage from '@/components/AuthStage';
 
 function ResetPasswordForm() {
   const searchParams = useSafeSearchParams();
@@ -82,8 +83,8 @@ function ResetPasswordForm() {
 
 export default function ResetPassword() {
   return (
-    <div className="yp-auth-shell">
+    <AuthStage>
       <ResetPasswordForm />
-    </div>
+    </AuthStage>
   );
 }

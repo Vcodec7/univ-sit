@@ -2,6 +2,7 @@
 
 import AuthHomeLink from '@/components/AuthHomeLink';
 import CaptchaField from '@/components/CaptchaField';
+import AuthStage from '@/components/AuthStage';
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
@@ -373,7 +374,7 @@ function LoginForm() {
   }, []);
 
   return (
-    <div className="yp-auth-shell" style={{ minHeight: maintenanceOn ? '100svh' : undefined }}>
+    <AuthStage style={{ minHeight: maintenanceOn ? '100svh' : undefined }}>
       <motion.div
         className="yp-auth-card"
         initial={{ opacity: 0, y: 16 }}
@@ -679,7 +680,7 @@ function LoginForm() {
           </p>
         )}
       </motion.div>
-    </div>
+    </AuthStage>
   );
 }
 

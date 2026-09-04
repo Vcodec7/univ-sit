@@ -233,25 +233,65 @@ body.is-admin {
   background-image: none !important;
 }
 .yp-auth-shell {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
+  display: grid !important;
+  place-items: center !important;
+  justify-items: center !important;
   width: 100% !important;
-  min-height: calc(100svh - 5rem) !important;
-  margin: 0 !important;
-  padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2rem) 3rem !important;
+  max-width: none !important;
+  min-height: 100svh !important;
+  margin: 0 auto !important;
+  padding: clamp(1rem, 3vw, 2rem) !important;
   box-sizing: border-box !important;
   background: transparent !important;
 }
-.yp-auth-card {
-  width: 100% !important;
-  max-width: 32rem !important;
+.yp-auth-stage {
+  width: min(1040px, 100%) !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
   margin: 0 auto !important;
-  padding: 1.6rem 1.45rem 1.7rem !important;
-  background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid var(--card-border, #e4dff2) !important;
+  background: #fff !important;
+  border: 1px solid #e4dff2 !important;
   border-radius: 1.75rem !important;
   box-shadow: 0 16px 40px rgba(106, 66, 194, 0.12) !important;
+  overflow: hidden !important;
+}
+.yp-auth-aside {
+  display: none;
+  position: relative;
+  background: #1b1430 url('/brand/hero-cover.jpg') center / cover no-repeat;
+  color: #fff;
+}
+.yp-auth-aside__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(27, 20, 48, 0.2) 0%, rgba(27, 20, 48, 0.82) 100%);
+}
+.yp-auth-aside__copy {
+  position: relative;
+  z-index: 1;
+  padding: 1.75rem 1.6rem;
+}
+@media (min-width: 860px) {
+  .yp-auth-stage {
+    grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.05fr) !important;
+    min-height: min(680px, calc(100svh - 2.5rem)) !important;
+  }
+  .yp-auth-aside {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+.yp-auth-card {
+  width: min(28rem, 100%) !important;
+  max-width: 28rem !important;
+  margin: 0 auto !important;
+  padding: 1.6rem 1.45rem 1.7rem !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  justify-self: center !important;
 }
 .yp-auth-input:focus,
 .yp-field input:focus,

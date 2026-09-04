@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import AuthStage from '@/components/AuthStage';
 
 type Mode = 'email' | 'phrase';
 
@@ -79,7 +80,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="yp-auth-shell">
+    <AuthStage>
       <div className="yp-auth-card">
         <h1 className="auth-form-title">
           Восстановление пароля
@@ -273,6 +274,6 @@ export default function ForgotPassword() {
           </form>
         )}
       </div>
-    </div>
+    </AuthStage>
   );
 }

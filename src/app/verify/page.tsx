@@ -1,6 +1,6 @@
 'use client';
 
-import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import AuthStage from '@/components/AuthStage';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -144,8 +144,8 @@ function VerifyForm() {
 
 export default function VerifyPage() {
   return (
-    <div className="yp-auth-shell">
+    <AuthStage>
       <VerifyForm />
-    </div>
+    </AuthStage>
   );
 }
