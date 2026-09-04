@@ -25249,3 +25249,89 @@ button.svc-cta-card {
 .catalog-filter-pop__panel {
   z-index: 50 !important;
 }
+
+/* Cabinet speed + mobile layout */
+.dashboard-page .glass {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.dashboard-page .presence-panel,
+.dashboard-page .profile-hero,
+.dashboard-page .cw-cabinet {
+  content-visibility: auto;
+  contain: layout paint;
+}
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (max-width: 860px) {
+  html[data-eco-ticket='ticket_holo'] .yp-ticket-qr,
+  html[data-eco-ticket='ticket_pulse'] .yp-ticket-qr,
+  html[data-eco-aura='wave'] .profile-hero__avatar,
+  html[data-eco-aura='wave'] .profile-hero__avatar-inner,
+  html[data-eco-aura='ember'] .profile-hero__avatar {
+    animation: none !important;
+  }
+}
+@media (max-width: 899px) {
+  .dashboard-page.container {
+    padding-left: max(0.7rem, env(safe-area-inset-left)) !important;
+    padding-right: max(0.7rem, env(safe-area-inset-right)) !important;
+  }
+  .dashboard-aside--nav {
+    position: sticky;
+    top: calc(var(--nav-h, 3.75rem) - 1px);
+    z-index: 8;
+    padding: 0.55rem 0.65rem 0.7rem !important;
+  }
+  .dashboard-menu {
+    display: flex !important;
+    flex-direction: row;
+    gap: 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.15rem;
+  }
+  .dashboard-menu::-webkit-scrollbar { display: none; }
+  .dashboard-menu__group {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+  .dashboard-page .dashboard-nav.dashboard-nav--labeled .dashboard-nav-btn {
+    min-height: 2.4rem !important;
+    padding: 0.35rem 0.75rem !important;
+  }
+  .yp-auth-shell {
+    padding: 0.75rem 0.75rem 1.15rem !important;
+    min-height: 100svh;
+  }
+  .yp-auth-stage {
+    width: 100% !important;
+    border-radius: 1.25rem !important;
+  }
+  .yp-auth-aside {
+    display: none !important;
+  }
+  .yp-auth-card {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 1.15rem 1rem 1.25rem !important;
+  }
+  .svc-hero {
+    min-height: min(54vh, 460px) !important;
+    border-radius: 0 0 1.15rem 1.15rem !important;
+  }
+  .svc-hero > .svc-hero__actions {
+    width: min(100%, 22rem) !important;
+    max-width: none !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .home-sections {
+    padding-left: 0.15rem;
+    padding-right: 0.15rem;
+  }
+  .glass-nav-inner {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+

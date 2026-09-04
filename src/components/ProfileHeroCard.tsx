@@ -247,7 +247,17 @@ export default function ProfileHeroCard({
   }, [showcaseStored]);
 
   useEffect(() => {
-    loadAchievements();
+    let idle = 0;
+    const start = () => loadAchievements();
+    const ric = (window as Window & { requestIdleCallback?: typeof requestIdleCallback }).requestIdleCallback;
+    if (typeof ric === 'function') {
+      idle = ric(start, { timeout: 1800 });
+      return () => {
+        if (typeof cancelIdleCallback === 'function') cancelIdleCallback(idle);
+      };
+    }
+    const t = window.setTimeout(start, 350);
+    return () => window.clearTimeout(t);
   }, [loadAchievements, instructionsVersion, instructionsCompletedAt]);
 
   const unlockedMeta = useMemo<UnlockedShowcase[]>(

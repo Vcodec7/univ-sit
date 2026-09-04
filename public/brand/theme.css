@@ -357,3 +357,39 @@ body.is-admin {
   font-weight: 700;
   text-decoration: none;
 }
+
+.dashboard-page .glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (max-width: 860px) {
+  html[data-eco-ticket='ticket_holo'] .yp-ticket-qr,
+  html[data-eco-ticket='ticket_pulse'] .yp-ticket-qr {
+    animation: none !important;
+  }
+}
+@media (max-width: 899px) {
+  .dashboard-menu {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.75rem !important;
+  }
+  .yp-auth-shell {
+    display: grid !important;
+    place-items: start center !important;
+    padding: 0.75rem !important;
+  }
+  .yp-auth-stage {
+    width: 100% !important;
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+  }
+  .yp-auth-aside { display: none !important; }
+  .yp-auth-card {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .svc-hero { min-height: min(54vh, 460px) !important; }
+}

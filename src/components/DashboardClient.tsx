@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
 import {
   User,
   UserCircle,
@@ -345,23 +344,29 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     let cancelled = false;
     const on = (key: string) => moduleFlags[key] !== false;
 
-    void (async () => {
+    const loadCabinetLists = async () => {
+      if (cancelled) return;
       if (on('events')) {
         const data = await cabinetGet('/api/user/bookings');
         if (!cancelled && Array.isArray(data)) setBookings(data);
-      }
-      if (on('vacancies')) {
-        const d = await cabinetGet('/api/vacancies/apply');
-        if (!cancelled) setVacancyApplications(Array.isArray(d?.items) ? d.items : []);
-      }
-      if (on('applications')) {
-        const data = await cabinetGet('/api/user/applications');
-        if (!cancelled && Array.isArray(data)) setApplications(data);
       }
       if (on('events')) {
         const data = await cabinetGet('/api/user/participations');
         if (!cancelled && Array.isArray(data)) setParticipations(data);
       }
+      if (view === 'applications') {
+        if (on('vacancies')) {
+          const d = await cabinetGet('/api/vacancies/apply');
+          if (!cancelled) setVacancyApplications(Array.isArray(d?.items) ? d.items : []);
+        }
+        if (on('applications')) {
+          const data = await cabinetGet('/api/user/applications');
+          if (!cancelled && Array.isArray(data)) setApplications(data);
+        }
+      }
+    };
+
+    void (async () => {
       try {
         const data: any = await fetchProfileCached();
         if (cancelled || !data?.id) return;
@@ -384,7 +389,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       } catch {
         /* toast handled in cabinet-fetch */
       }
-      if (on('achievements')) {
+      if (on('achievements') && (view === 'overview' || view === 'achievements' || view === 'awards' || view === 'showcase' || view === 'edit')) {
         const data = await cabinetGet('/api/user/achievements?lite=1');
         if (cancelled) return;
         if (data?.progress?.complete || data?.legend) setAchievementLegend(true);
@@ -393,12 +398,26 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
           : Boolean(data?.modernUser);
         setModernUserBadge(hasModern);
       }
+
+      if (view === 'applications') {
+        await loadCabinetLists();
+        return;
+      }
+      if (view !== 'overview') return;
+      const later = (cb: () => void) => {
+        const ric = (window as Window & { requestIdleCallback?: (fn: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+        if (typeof ric === 'function') return ric(cb, { timeout: 2500 });
+        return window.setTimeout(cb, 700);
+      };
+      later(() => {
+        if (!cancelled) void loadCabinetLists();
+      });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [status, router, session?.user?.role, moduleFlags]);
+  }, [status, router, session?.user?.role, moduleFlags, view]);
 
 
   const refreshProfileLive = useCallback((force = false) => {
@@ -460,8 +479,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
 
   useEffect(() => {
     if (status !== 'authenticated') return;
-    refreshProfileLive();
-    // Debounced visibility refresh — cache TTL absorbs focus spam
     let t: ReturnType<typeof setTimeout> | null = null;
     const onVis = () => {
       if (document.visibilityState !== 'visible') return;
@@ -474,10 +491,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       document.removeEventListener('visibilitychange', onVis);
     };
   }, [status, refreshProfileLive]);
-
-  useEffect(() => {
-    if (activeTab === 'profile') refreshProfileLive();
-  }, [activeTab, refreshProfileLive]);
 
 
   const upcomingTickets = useMemo(() => {
@@ -723,7 +736,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
           )}
         </header>
       ) : null}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <div>
         <div
           className={`dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''}${
             isSettings ? ' is-settings' : ''
@@ -2350,7 +2363,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
       <ProfilePreviewModal
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
