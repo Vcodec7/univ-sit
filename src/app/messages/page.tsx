@@ -37,9 +37,6 @@ import { splitMessageBodyMedia } from '@/lib/message-body-media';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
 import MessageBodyText from '@/components/MessageBodyText';
-import MutualOverlapChips from '@/components/MutualOverlapChips';
-import type { MutualOverlap } from '@/lib/social';
-import { threadTone } from '@/lib/chat-tone';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import {
   formatEventWhen,
@@ -54,7 +51,6 @@ import './messages.css';
 type Tab = 'personal' | 'clubs' | 'projects' | 'invites';
 type UserPreview = { id: string; name: string | null; image: string | null; publicCode?: string | null };
 type Presence = { online: boolean; label: string } | null;
-type AchChip = { code: string; title: string; accent: string; tierLabel: string };
 
 type Message = {
   id: string;
@@ -192,9 +188,7 @@ function MessagesInner() {
   const [activeUser, setActiveUser] = useState<UserPreview | null>(null);
   const [activeGroup, setActiveGroup] = useState<{ kind: 'CLUB' | 'PROJECT'; entityId: string; title: string; href: string } | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [overlap, setOverlap] = useState<MutualOverlap | null>(null);
   const [presence, setPresence] = useState<Presence>(null);
-  const [friendAchs, setFriendAchs] = useState<AchChip[]>([]);
   const [body, setBody] = useState('');
   const [loading, setLoading] = useState(true);
   const [threadLoading, setThreadLoading] = useState(false);
@@ -272,20 +266,13 @@ function MessagesInner() {
     try {
       const response = await fetch(`/api/users/${encodeURIComponent(userId)}/public`);
       if (!response.ok) {
-        setOverlap(null);
         setPresence(null);
-        setFriendAchs([]);
         return;
       }
       const result = await response.json();
-      setOverlap(result?.mutualTrust?.overlap || null);
       setPresence(result?.presence ?? null);
-      const achs = Array.isArray(result?.achievements) ? result.achievements : [];
-      setFriendAchs(achs.slice(0, 3).map((a: AchChip) => ({ code: a.code, title: a.title, accent: a.accent, tierLabel: a.tierLabel })));
     } catch {
-      setOverlap(null);
       setPresence(null);
-      setFriendAchs([]);
     }
   }, []);
 
@@ -340,9 +327,7 @@ function MessagesInner() {
   const loadGroupThread = useCallback(async (opts: { conversationId?: string | null; kind: 'CLUB' | 'PROJECT'; entityId: string; title: string; href: string }) => {
     setThreadLoading(true);
     setActiveUser(null);
-    setOverlap(null);
     setPresence(null);
-    setFriendAchs([]);
     setActiveGroup({ kind: opts.kind, entityId: opts.entityId, title: opts.title, href: opts.href });
     try {
       if (opts.conversationId) {
@@ -444,7 +429,6 @@ function MessagesInner() {
               setActiveUser(result.user);
               setActiveGroup(null);
               setMessages([]);
-              setOverlap(result?.mutualTrust?.overlap || null);
               setPresence(result?.presence ?? null);
             }
           } else {
@@ -728,17 +712,10 @@ function MessagesInner() {
     setActiveGroup(null);
     setSelectedId(null);
     setMessages([]);
-    setOverlap(null);
     setPresence(null);
-    setFriendAchs([]);
     setPickerOpen(false);
     setQuery({ with: null, c: null, tab });
   };
-
-  const chatMood = useMemo(
-    () => threadTone(messages.filter((m) => !m.flagged).map((m) => m.body || '')),
-    [messages]
-  );
 
   const messageBlocks = useMemo(() => {
     const blocks: { key: string; day?: string; message?: Message; index?: number }[] = [];
@@ -1141,36 +1118,25 @@ function MessagesInner() {
                   </Link>
                 ) : null}
                 {selectedId ? (
-                  <div className="messages-thread-actions">
-                    <button type="button" className={`messages-icon-btn${threadPinned ? ' is-on' : ''}`} title={threadPinned ? 'Открепить' : 'Закрепить'} onClick={() => void updateState(selectedId, { pinned: !threadPinned }).catch((e) => toast.error(e.message))}>
-                      <Pin size={16} />
-                    </button>
-                    <button type="button" className={`messages-icon-btn${threadArchived ? ' is-on' : ''}`} title={threadArchived ? 'Вернуть' : 'В архив'} onClick={() => void updateState(selectedId, { archived: !threadArchived }).catch((e) => toast.error(e.message))}>
-                      <Archive size={16} />
-                    </button>
-                    <button type="button" className={`messages-icon-btn${threadMuted ? ' is-on' : ''}`} title={threadMuted ? 'Включить уведомления' : 'Без уведомлений'} onClick={() => void updateState(selectedId, { muted: !threadMuted }).catch((e) => toast.error(e.message))}>
-                      {threadMuted ? <BellOff size={16} /> : <Bell size={16} />}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="messages-icon-btn"
+                    aria-label="Ещё"
+                    title="Ещё"
+                    onClick={(e) => {
+                      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      openCtxMenu(r.right - 8, r.bottom + 4, {
+                        id: selectedId,
+                        pinned: threadPinned,
+                        archived: threadArchived,
+                        muted: threadMuted,
+                      });
+                    }}
+                  >
+                    <MoreHorizontal size={18} />
+                  </button>
                 ) : null}
               </div>
-              {activeUser && friendAchs.length ? (
-                <div className="messages-thread-head__achs" aria-label="Достижения">
-                  {friendAchs.map((a) => (
-                    <span key={a.code} className="messages-ach-chip" title={`${a.tierLabel}: ${a.title}`} style={{ borderColor: `${a.accent}44`, color: a.accent }}>{a.title}</span>
-                  ))}
-                </div>
-              ) : null}
-
-              {overlap ? <div className="messages-mutual"><MutualOverlapChips overlap={overlap} compact /></div> : null}
-              {messages.length > 0 ? (
-                <div className="messages-tone" title={chatMood.hint}>
-                  <span className="messages-tone__label">{chatMood.label}</span>
-                  <span className="messages-tone__track" aria-hidden>
-                    <span className="messages-tone__fill" style={{ width: `${chatMood.score}%` }} />
-                  </span>
-                </div>
-              ) : null}
 
               <div className="messages-scroll" ref={scrollRef}>
                 {threadLoading ? (

@@ -1272,6 +1272,8 @@ body:has(.messages-root) .main-content > div {
   gap: 0.4rem;
   padding: 0.4rem 0.55rem;
   background: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
+  flex-wrap: nowrap;
 }
 .messages-thread-head__profile {
   gap: 0.55rem;
