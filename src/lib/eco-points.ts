@@ -202,7 +202,7 @@ export async function grantEcoPoints(
   try {
     const { isModuleEnabled } = await import('@/lib/module-flags');
     if (!(await isModuleEnabled('eco'))) {
-      return { ok: false, message: 'Магазин эко-очков временно отключён' };
+      return { ok: false, message: 'Магазин М-баллов временно отключён' };
     }
   } catch {
     /* fail-open */
@@ -390,7 +390,7 @@ export async function openCardPack(userId: string, packId: string) {
           createUserNotification({
             userId,
             type: 'ECO',
-            title: 'Пак карт за эко-очки',
+            title: 'Пак карт за М-баллы',
             body: `«${result.label}» за ${result.cost} мб${dropNames ? `. Выпало: ${dropNames}` : ''}.`,
             meta: { href: '/dashboard/shop', kind: 'eco_pack', packId: result.pack.id },
           })

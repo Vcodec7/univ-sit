@@ -386,7 +386,7 @@ export default function ProfileHeroCard({
             </div>
             {onAvatarPick ? (
               <label className="profile-hero__avatar-edit" title="Сменить фото">
-                <Camera size={14} />
+                <Camera size={12} />
                 <input
                   type="file"
                   accept="image/png,image/jpeg,image/webp,image/gif"
@@ -399,16 +399,6 @@ export default function ProfileHeroCard({
                   }}
                 />
               </label>
-            ) : null}
-            {legend ? (
-              <span className="profile-hero__avatar-pin profile-hero__avatar-pin--crown" title="Легенда Сочи">
-                <Crown size={11} />
-              </span>
-            ) : null}
-            {modernBadge ? (
-              <span className="profile-hero__avatar-pin profile-hero__avatar-pin--zap" title="Современный человек">
-                <Zap size={11} strokeWidth={2.5} />
-              </span>
             ) : null}
           </div>
         </div>

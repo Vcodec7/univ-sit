@@ -347,7 +347,7 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
       </div>
 
       <details className="eco-panel__faq">
-        <summary>Как заработать эко-очки?</summary>
+        <summary>Как заработать М-баллы?</summary>
         <ul className="eco-panel__earn-hints">
           {ECO_EARN_HINTS.map((h) => (
             <li key={h.action}>

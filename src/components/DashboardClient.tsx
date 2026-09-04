@@ -1507,7 +1507,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
               <div className="profile-view profile-shop">
                 <h2 className="profile-view__title">Магазин</h2>
                 <p className="profile-view__lead">
-                  Тратьте эко-очки из кошелька магазина на рамки, ауры, темы и голос. Покупка сразу надевается на профиль.
+                  Тратьте М-баллы из кошелька на рамки, ауры, темы и голос. Покупка сразу надевается на профиль.
                 </p>
                 <EcoPointsPanel
                   mode="shop"

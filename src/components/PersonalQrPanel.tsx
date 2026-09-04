@@ -142,9 +142,9 @@ export default function PersonalQrPanel() {
         <Link href="/dashboard/shop" className="yp-accounts__row yp-accounts__row--link">
           <div>
             <p className="yp-accounts__label">
-              <Wallet size={14} aria-hidden /> Кошелёк магазина
+              <Wallet size={14} aria-hidden /> Кошелёк · М-баллы
             </p>
-            <p className="yp-accounts__hint">Эко-очки: тратятся на рамки и оформление</p>
+            <p className="yp-accounts__hint">М-баллы: тратятся на рамки и оформление</p>
           </div>
           <strong className="yp-accounts__value">{wallet.toLocaleString('ru-RU')}</strong>
         </Link>

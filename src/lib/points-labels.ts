@@ -5,14 +5,14 @@
 export const POINTS = {
   /** Spendable shop currency (ecoPoints) */
   shop: {
-    brand: 'Эко-очки',
-    short: 'эко',
-    genitive: 'эко-очков',
-    dative: 'эко-очкам',
-    accusative: 'эко-очки',
-    capital: 'Эко-очки',
-    wallet: 'Кошелёк магазина',
-    pool: 'Пул эко-очков',
+    brand: 'М-баллы',
+    short: 'МБ',
+    genitive: 'М-баллов',
+    dative: 'М-баллам',
+    accusative: 'М-баллы',
+    capital: 'М-баллы',
+    wallet: 'Кошелёк',
+    pool: 'Пул М-баллов',
   },
   /** Participation reputation (mBall) */
   mBall: {
@@ -26,14 +26,14 @@ export const POINTS = {
   },
 } as const;
 
-/** «N эко-очков» with simple Russian pluralization. */
+/** «N М-баллов» with simple Russian pluralization. */
 export function shopPointsAmount(n: number): string {
   const abs = Math.abs(Math.trunc(n));
   const mod10 = abs % 10;
   const mod100 = abs % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${n} эко-очко`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} эко-очка`;
-  return `${n} эко-очков`;
+  if (mod10 === 1 && mod100 !== 11) return `${n} М-балл`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} М-балла`;
+  return `${n} М-баллов`;
 }
 
 export function needShopPoints(n: number): string {
