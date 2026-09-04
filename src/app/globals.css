@@ -25302,17 +25302,21 @@ button.svc-cta-card {
   .yp-auth-shell {
     padding: 0.75rem 0.75rem 1.15rem !important;
     min-height: 100svh;
+    align-items: center !important;
   }
   .yp-auth-stage {
-    width: 100% !important;
+    width: min(1040px, 100%) !important;
     border-radius: 1.25rem !important;
   }
   .yp-auth-aside {
     display: none !important;
   }
-  .yp-auth-card {
-    width: 100% !important;
-    max-width: none !important;
+  .yp-auth-shell > .yp-auth-card,
+  .yp-auth-stage > .yp-auth-card {
+    width: min(26.75rem, 100%) !important;
+    max-width: 26.75rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     padding: 1.15rem 1rem 1.25rem !important;
   }
   .svc-hero {

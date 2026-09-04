@@ -7,7 +7,6 @@ import AuthStage from '@/components/AuthStage';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { RU_EMAIL_HINT, isRussianEmail } from '@/lib/ru-email';
 import { safeCallbackUrl } from '@/lib/safe-callback-url';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
@@ -192,12 +191,7 @@ function RegisterForm() {
 
   return (
     <AuthStage>
-      <motion.div
-        className="yp-auth-card"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      >
+      <div className="yp-auth-card">
         <AuthHomeLink />
         <p className="yp-auth-brand">Молодёжь Сочи</p>
         <h1 className="yp-auth-title">Регистрация</h1>
@@ -416,7 +410,7 @@ function RegisterForm() {
             Войти
           </Link>
         </p>
-      </motion.div>
+      </div>
     </AuthStage>
   );
 }

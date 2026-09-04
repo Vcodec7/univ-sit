@@ -9,7 +9,19 @@ export default function AuthStage({
   style?: CSSProperties;
 }) {
   return (
-    <div className="yp-auth-shell" style={style}>
+    <div
+      className="yp-auth-shell"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        minHeight: '100svh',
+        padding: '1.25rem 1rem 2rem',
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
       <div className="yp-auth-stage">
         <aside className="yp-auth-aside" aria-hidden="true">
           <div className="yp-auth-aside__veil" />

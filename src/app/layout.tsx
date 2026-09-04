@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
+import './auth-layout.css';
 import NavbarWrapper from '@/components/NavbarWrapper';
 import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
@@ -118,7 +119,7 @@ export default async function RootLayout({
   return (
     <html lang="ru" className={`${manrope.variable} ${unbounded.variable}`}>
       <head>
-        <link rel="stylesheet" href="/brand/theme.css?v=perf9" />
+        <link rel="stylesheet" href="/brand/theme.css?v=auth10" />
       </head>
       <body className={manrope.className}>
         <Script
