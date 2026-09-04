@@ -638,7 +638,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                         value="image"
                         defaultChecked={((settings as any)?.heroMediaKind || '').trim() !== 'video'}
                       />
-                      <span>Только фото</span>
+                      <span>Фото (по умолчанию)</span>
                     </label>
                     <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                       <input
@@ -647,14 +647,14 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                         value="video"
                         defaultChecked={((settings as any)?.heroMediaKind || '').trim() === 'video'}
                       />
-                      <span>Видео (+ постер)</span>
+                      <span>Только видео</span>
                     </label>
                   </div>
                   <p style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                    Можно загрузить и фото, и видео. На главной показывается строго один режим: фото или видео с
-                    постером. Оба слоя одновременно не конкурируют.
+                    На главной всегда одно: либо фото, либо видео — переключатель выше. По умолчанию фото.
+                    Файлы можно держать оба, второй просто не показывается.
                   </p>
-                  <label style={labelStyle}>Картинка / постер</label>
+                  <label style={labelStyle}>Картинка (режим по умолчанию)</label>
                   <input type="hidden" name="heroImageUrl" defaultValue={(settings as any)?.heroImageUrl || '/brand/hero-cover.jpg'} />
                   <div
                     style={{

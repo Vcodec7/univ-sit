@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+/** Exactly one layer: photo OR video (never both competing). */
 export default function HomeHeroMedia({
   poster,
   video,
@@ -16,9 +17,6 @@ export default function HomeHeroMedia({
 
   return (
     <div className="svc-hero__media">
-      {/* Poster is always painted so video mode never shows an empty box. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="svc-hero__img" src={poster} alt="" />
       {showVideo ? (
         <video
           className="svc-hero__video"
@@ -31,7 +29,10 @@ export default function HomeHeroMedia({
           preload="metadata"
           onError={() => setVideoFailed(true)}
         />
-      ) : null}
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="svc-hero__img" src={poster} alt="" />
+      )}
     </div>
   );
 }

@@ -43,8 +43,8 @@ export const getHomeCatalog = unstable_cache(
         }>,
         siteSettings: {
           heroImageUrl: '/brand/hero-cover.jpg',
-          heroVideoUrl: '/brand/hero-cover.mp4',
-          heroMediaKind: 'video',
+          heroVideoUrl: '',
+          heroMediaKind: 'image',
           heroAnimationMode: 'animated',
           govWidgetsEnabled: null,
           govWidgetsTitle: null,
@@ -135,6 +135,6 @@ export const getHomeCatalog = unstable_cache(
     }));
     return { latestProjects, latestClubs, latestSpaces, latestNews: news, siteSettings };
   },
-  ['home-catalog-v5'],
+  ['home-catalog-v6'],
   { revalidate: 60, tags: ['yp-home-catalog', 'home-catalog'] }
 );
