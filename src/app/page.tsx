@@ -17,6 +17,7 @@ import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
+import HomeSlideRail from '@/components/HomeSlideRail';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
@@ -64,14 +65,14 @@ export default async function Home() {
   const showDocuments = modules.documents !== false;
 
   const heroPrimary = showSpaces
-    ? { href: '/coworking', label: 'Записаться в коворкинг' }
+    ? { href: '/coworking', label: 'Коворкинг' }
     : showEvents
       ? { href: '/events', label: 'Записаться на событие' }
       : showProjects
         ? { href: '/projects', label: 'Проекты' }
         : null;
   const heroSecondary = showSpaces
-    ? { href: '/spaces?filter=free_today', label: 'Свободные залы' }
+    ? { href: '/spaces?filter=free_today', label: 'Залы' }
     : showEvents
       ? { href: '/events', label: 'Афиша' }
       : null;
@@ -108,7 +109,7 @@ export default async function Home() {
           {latestProjects.length === 0 ? (
             <p className="home-empty">Пока нет опубликованных проектов.</p>
           ) : (
-            <div className="grid-cards home-rail">
+            <HomeSlideRail label="Свежие проекты">
               {latestProjects.map((project, idx) => (
                 <Link key={project.id} href={`/projects/${encodeURIComponent(project.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -130,7 +131,7 @@ export default async function Home() {
                   </div>
                 </Link>
               ))}
-            </div>
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -149,7 +150,7 @@ export default async function Home() {
           {latestClubs.length === 0 ? (
             <p className="home-empty">Клубы скоро появятся в каталоге.</p>
           ) : (
-            <div className="grid-cards home-rail">
+            <HomeSlideRail label="Клубы по интересам">
               {latestClubs.map((club, idx) => (
                 <Link key={club.id} href={`/clubs/${encodeURIComponent(club.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -173,7 +174,7 @@ export default async function Home() {
                   </div>
                 </Link>
               ))}
-            </div>
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -192,7 +193,7 @@ export default async function Home() {
           {latestSpaces.length === 0 ? (
             <p className="home-empty">Свободных пространств пока нет в каталоге.</p>
           ) : (
-            <div className="grid-cards home-rail">
+            <HomeSlideRail label="Пространства">
               {latestSpaces.map((space, idx) => (
                 <article key={space.id} className="catalog-card catalog-card--hit" style={{ position: 'relative' }}>
                   <Link
@@ -233,7 +234,7 @@ export default async function Home() {
                   </div>
                 </article>
               ))}
-            </div>
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -281,7 +282,7 @@ export default async function Home() {
           {latestNews.length === 0 ? (
             <p className="home-empty">Новостей пока нет — загляните позже.</p>
           ) : (
-            <div className="grid-cards home-rail">
+            <HomeSlideRail label="Новости">
               {latestNews.map((item) => {
                 const when = item.publishedAt || item.createdAt;
                 const title = item.title?.trim() || stripHtml(item.text).slice(0, 80) || 'Новость';
@@ -310,7 +311,7 @@ export default async function Home() {
                   </Link>
                 );
               })}
-            </div>
+            </HomeSlideRail>
           )}
         </section>
         )}

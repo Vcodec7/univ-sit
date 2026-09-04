@@ -731,3 +731,73 @@ html[data-eco-banner] .profile-hero--cabinet {
     height: var(--yp-hero-h) !important;
   }
 }
+
+/* Home slides + buttons — last so they always win */
+.btn,
+a.btn,
+button.btn {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+.home-page .home-rail {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory !important;
+  scroll-padding-inline: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  grid-template-columns: none !important;
+  padding: 0.2rem 1.35rem 0.9rem 0.15rem !important;
+  margin: 0 -0.35rem !important;
+  scrollbar-width: none;
+}
+.home-page .home-rail::-webkit-scrollbar {
+  display: none;
+}
+.home-page .home-rail__slide {
+  flex: 0 0 min(78vw, 22rem) !important;
+  width: min(78vw, 22rem) !important;
+  max-width: min(78vw, 22rem) !important;
+  scroll-snap-align: start;
+  min-width: 0 !important;
+}
+.home-page .home-rail__slide > * {
+  width: 100% !important;
+  height: 100%;
+}
+.home-page .free-now-actions {
+  display: flex !important;
+  gap: 0.4rem !important;
+}
+.home-page .free-now-actions .btn,
+.home-page .catalog-card__interactive .btn {
+  flex: 1 1 0;
+  min-width: 0 !important;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.55rem !important;
+  font-size: 0.8rem !important;
+  line-height: 1 !important;
+  border-radius: 999px !important;
+}
+.home-page .yp-feed-card__media,
+.home-page .free-now-avatar,
+.home-page .catalog-img-wrap {
+  aspect-ratio: 16 / 10 !important;
+  max-height: 9rem !important;
+}
+@media (min-width: 900px) {
+  .home-page .home-rail__slide {
+    flex: 0 0 min(28vw, 20rem) !important;
+    width: min(28vw, 20rem) !important;
+    max-width: min(28vw, 20rem) !important;
+  }
+}

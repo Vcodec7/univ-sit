@@ -771,7 +771,8 @@ html.mobile-nav-open {
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-primary {
@@ -9636,13 +9637,16 @@ a.yp-modal-close {
   overflow-wrap: anywhere;
 }
 
-/* Buttons: no layout jump, visible focus, safe wrapping */
+/* Buttons: no layout jump, visible focus, never wrap label */
 .btn {
   max-width: 100%;
   min-height: 44px;
   text-align: center;
-  overflow-wrap: anywhere;
-  word-break: normal;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  word-break: keep-all;
   gap: 0.35rem;
 }
 
@@ -26038,6 +26042,51 @@ button.btn,
   .svc-hero--banner {
     min-height: var(--yp-hero-h);
     height: var(--yp-hero-h);
+  }
+}
+
+.home-page .home-rail {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 0.75rem !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch;
+  grid-template-columns: none !important;
+  padding: 0.2rem 1.35rem 0.9rem 0.15rem;
+  margin-inline: -0.35rem;
+  scrollbar-width: none;
+}
+.home-page .home-rail::-webkit-scrollbar { display: none; }
+.home-page .home-rail__slide {
+  flex: 0 0 min(78vw, 22rem) !important;
+  width: min(78vw, 22rem) !important;
+  max-width: min(78vw, 22rem) !important;
+  scroll-snap-align: start;
+}
+.home-page .home-rail__slide > * { width: 100%; height: 100%; }
+.home-page .home-rail .catalog-card-text { display: none !important; }
+.home-page .free-now-actions {
+  display: flex !important;
+  gap: 0.4rem;
+}
+.home-page .free-now-actions .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.5rem !important;
+  font-size: 0.8rem !important;
+  white-space: nowrap !important;
+}
+@media (min-width: 900px) {
+  .home-page .home-rail__slide {
+    flex: 0 0 min(28vw, 20rem) !important;
+    width: min(28vw, 20rem) !important;
+    max-width: min(28vw, 20rem) !important;
   }
 }
 

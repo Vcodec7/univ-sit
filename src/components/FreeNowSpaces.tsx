@@ -9,6 +9,7 @@ import {
 import { spaceCover } from '@/lib/theme-covers';
 import EntityCoverImage from '@/components/EntityCoverImage';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
+import HomeSlideRail from '@/components/HomeSlideRail';
 import { encodeRouteParam } from '@/lib/route-id';
 import { isCoworkingSpace } from '@/lib/coworking';
 import { isNextBuildPhase } from '@/lib/build-phase';
@@ -96,7 +97,7 @@ export default async function FreeNowSpaces({ limit = 8 }: { limit?: number }) {
           Все пространства
         </Link>
       </div>
-      <div className="free-now-grid home-rail">
+      <HomeSlideRail label="Сейчас свободно">
         {cards.map(({ space, idx, next, coworking }) => (
           <article key={space.id} className="free-now-card yp-feed-card">
             <div className="free-now-avatar yp-feed-card__media">
@@ -138,7 +139,7 @@ export default async function FreeNowSpaces({ limit = 8 }: { limit?: number }) {
             </div>
           </article>
         ))}
-      </div>
+      </HomeSlideRail>
     </section>
   );
 }
