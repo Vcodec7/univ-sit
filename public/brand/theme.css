@@ -30,7 +30,11 @@ html {
 }
 
 .svc-hero {
-  background: #f7f6fb;
+  background: #1b1430;
+}
+
+.svc-hero--banner {
+  min-height: min(68vh, 620px);
 }
 
 .btn-primary {

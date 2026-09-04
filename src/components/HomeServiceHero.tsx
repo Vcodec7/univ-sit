@@ -19,9 +19,7 @@ function needsAuth(href: string) {
   return href.startsWith('/coworking') || href.includes('/book');
 }
 
-/**
- * Hero: brand + short lead + media, then practical full-width CTAs.
- */
+/** Full-bleed banner: media + copy + CTAs in one frame. */
 export default function HomeServiceHero({
   siteName,
   imageUrl,
@@ -36,43 +34,41 @@ export default function HomeServiceHero({
   const brand = (siteName || 'Молодёжь Сочи').trim();
 
   return (
-    <section className="svc-hero" aria-label="Главный баннер">
-      <div className="container svc-hero__grid">
-        <div className="svc-hero__copy">
+    <section className="svc-hero svc-hero--banner" aria-label="Главный баннер">
+      <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
+      <div className="svc-hero__overlay">
+        <div className="container svc-hero__content">
           <p className="svc-hero__eyebrow">Официальный портал</p>
           <h1 className="svc-hero__title">{brand}</h1>
           <p className="svc-hero__lead">
             Свободные залы, коворкинг и афиша — без лишних шагов.
           </p>
+          {(primary || secondary) && (
+            <div className="svc-hero__actions svc-hero__actions--practical">
+              {primary ? (
+                needsAuth(primary.href) ? (
+                  <GuestAuthPrompt href={primary.href} className="btn btn-primary svc-hero__cta" asButton>
+                    <CalendarPlus size={18} aria-hidden />
+                    {primary.label}
+                  </GuestAuthPrompt>
+                ) : (
+                  <Link href={primary.href} className="btn btn-primary svc-hero__cta" prefetch>
+                    <CalendarPlus size={18} aria-hidden />
+                    {primary.label}
+                  </Link>
+                )
+              ) : null}
+              {secondary ? (
+                <Link href={secondary.href} className="btn btn-secondary svc-hero__cta svc-hero__cta--ghost" prefetch>
+                  <Building2 size={18} aria-hidden />
+                  {secondary.label}
+                  <ArrowRight size={16} aria-hidden />
+                </Link>
+              ) : null}
+            </div>
+          )}
         </div>
-
-        <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
       </div>
-
-      {(primary || secondary) && (
-        <div className="container svc-hero__actions svc-hero__actions--practical">
-          {primary ? (
-            needsAuth(primary.href) ? (
-              <GuestAuthPrompt href={primary.href} className="btn btn-primary svc-hero__cta" asButton>
-                <CalendarPlus size={18} aria-hidden />
-                {primary.label}
-              </GuestAuthPrompt>
-            ) : (
-              <Link href={primary.href} className="btn btn-primary svc-hero__cta" prefetch>
-                <CalendarPlus size={18} aria-hidden />
-                {primary.label}
-              </Link>
-            )
-          ) : null}
-          {secondary ? (
-            <Link href={secondary.href} className="btn btn-secondary svc-hero__cta" prefetch>
-              <Building2 size={18} aria-hidden />
-              {secondary.label}
-              <ArrowRight size={16} aria-hidden />
-            </Link>
-          ) : null}
-        </div>
-      )}
     </section>
   );
 }

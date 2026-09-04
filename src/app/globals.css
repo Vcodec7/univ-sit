@@ -24235,6 +24235,76 @@ fieldset.svc-form-group,
   text-decoration: none;
   box-sizing: border-box;
 }
+.svc-hero__cta--ghost {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow: none !important;
+}
+.svc-hero__cta--ghost:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
+}
+
+/* Unified full-bleed home banner */
+.svc-hero--banner {
+  position: relative;
+  padding: 0;
+  min-height: min(68vh, 620px);
+  overflow: hidden;
+  border-radius: 0 0 1.75rem 1.75rem;
+  background: #1b1430;
+}
+.svc-hero--banner .svc-hero__media {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  aspect-ratio: auto;
+  min-height: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.svc-hero--banner .svc-hero__overlay {
+  position: relative;
+  z-index: 1;
+  min-height: inherit;
+  display: flex;
+  align-items: flex-end;
+  background:
+    linear-gradient(90deg, rgba(27, 20, 48, 0.88) 0%, rgba(27, 20, 48, 0.5) 42%, rgba(27, 20, 48, 0.12) 100%),
+    linear-gradient(180deg, rgba(27, 20, 48, 0.12) 20%, rgba(27, 20, 48, 0.55) 100%);
+}
+.svc-hero--banner .svc-hero__content {
+  width: 100%;
+  padding: clamp(2.25rem, 6vw, 4.25rem) 0 clamp(2rem, 5vw, 3.25rem);
+}
+.svc-hero--banner .svc-hero__eyebrow {
+  color: var(--accent);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+.svc-hero--banner .svc-hero__title {
+  color: #fff;
+  max-width: 18ch;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+.svc-hero--banner .svc-hero__lead {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 28rem;
+}
+.svc-hero--banner .svc-hero__actions {
+  margin-top: 1.35rem;
+  max-width: 36rem;
+}
+@media (max-width: 640px) {
+  .svc-hero--banner {
+    min-height: min(62vh, 520px);
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
+  .svc-hero--banner .svc-hero__overlay {
+    background:
+      linear-gradient(180deg, rgba(27, 20, 48, 0.2) 0%, rgba(27, 20, 48, 0.78) 70%);
+  }
+}
 @media (max-width: 640px) {
   .svc-hero__actions--practical {
     grid-template-columns: 1fr;
