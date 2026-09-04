@@ -12,6 +12,7 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN mkdir -p /app/certs
 
 # Self-hosted pdf.js worker (no CDN) for in-site PDF viewing
 RUN node scripts/copy-pdf-worker.mjs
