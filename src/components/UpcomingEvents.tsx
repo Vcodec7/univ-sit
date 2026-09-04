@@ -148,7 +148,7 @@ function EventCard({
   const rewards = eventRewardBadge({ ecoTagged: isEcoTagged(null, event.category) });
 
   return (
-    <article key={event.id} id={`event-${event.id}`} className={`glass event-card${iconActions ? " event-card--compact" : ""}`}>
+    <article key={event.id} id={`event-${event.id}`} className={`glass event-card yp-feed-card${iconActions ? " event-card--compact" : ""}`}>
       <div className="event-card-cover">
         <EntityCoverImage
           src={cover}

@@ -97,14 +97,14 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
             const ctaLabel = coworking ? 'В коворкинг' : 'Забронировать';
 
             return (
-              <article key={space.id} className="svc-space-card">
-                <Link href={href} className="svc-space-card__photo" aria-label={space.title}>
+              <article key={space.id} className="svc-space-card yp-feed-card">
+                <Link href={href} className="svc-space-card__photo yp-feed-card__media" aria-label={space.title}>
                   <EntityCoverImage
                     src={spaceCover(space, skip + idx)}
                     alt={space.title}
                     fallback={spaceCover(space, skip + idx + 5)}
                     className="svc-space-card__img"
-                    sizes="160px"
+                    sizes="(max-width: 768px) 100vw, 360px"
                   />
                 </Link>
                 <div className="svc-space-card__body">

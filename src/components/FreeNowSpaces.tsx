@@ -98,14 +98,14 @@ export default async function FreeNowSpaces({ limit = 4 }: { limit?: number }) {
       </div>
       <div className="free-now-grid">
         {cards.map(({ space, idx, next, coworking }) => (
-          <article key={space.id} className="free-now-card">
-            <div className="free-now-avatar">
+          <article key={space.id} className="free-now-card yp-feed-card">
+            <div className="free-now-avatar yp-feed-card__media">
               <EntityCoverImage
                 src={spaceCover(space, idx)}
                 alt={space.title}
                 fallback={spaceCover(space, idx + 2)}
                 className="free-now-img"
-                sizes="120px"
+                sizes="(max-width: 768px) 100vw, 360px"
               />
             </div>
             <div className="free-now-body">

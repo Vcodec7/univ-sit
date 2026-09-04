@@ -100,6 +100,17 @@ export default function PersonalQrPanel() {
             aria-label="Пропуск на весь экран"
             onClick={() => setFullscreen(false)}
           >
+            <div className="presence-fs__card" onClick={(e) => e.stopPropagation()}>
+              <QRCodeDisplay value={url} size={Math.min(280, Math.floor(window.innerWidth * 0.62))} />
+              <p className="presence-fs__hint">Покажите QR на входе</p>
+              <button
+                type="button"
+                className="btn btn-primary presence-fs__done"
+                onClick={() => setFullscreen(false)}
+              >
+                Закрыть
+              </button>
+            </div>
             <button
               type="button"
               className="presence-fs-close"
@@ -110,10 +121,6 @@ export default function PersonalQrPanel() {
             >
               Закрыть
             </button>
-            <div className="presence-fs__card" onClick={(e) => e.stopPropagation()}>
-              <QRCodeDisplay value={url} size={Math.min(360, Math.floor(window.innerWidth * 0.72))} />
-              <p>Покажите на входе</p>
-            </div>
           </div>,
           document.body
         )

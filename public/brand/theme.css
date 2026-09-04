@@ -23,10 +23,13 @@
   --shadow-sm: 0 4px 16px rgba(106, 66, 194, 0.08);
   --shadow-md: 0 8px 28px rgba(106, 66, 194, 0.1);
   --shadow-lg: 0 16px 40px rgba(106, 66, 194, 0.12);
+  --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px));
 }
 
-html {
-  background-color: #f7f6fb;
+@media (max-width: 860px) {
+  body.has-bottom-nav {
+    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, 0px));
+  }
 }
 
 /* Unified banner: photo/video is the canvas; copy sits on top of it.
@@ -34,9 +37,11 @@ html {
 .svc-hero {
   position: relative !important;
   padding: 0 !important;
-  min-height: min(72vh, 680px) !important;
+  min-height: var(--yp-hero-h) !important;
+  height: var(--yp-hero-h) !important;
   overflow: hidden !important;
   background: #1b1430 !important;
+  border-radius: 0 !important;
 }
 .svc-hero::after {
   content: '';
@@ -52,12 +57,12 @@ html {
 .svc-hero .svc-hero__grid.container {
   display: grid !important;
   grid-template-columns: 1fr !important;
-  grid-template-rows: minmax(min(72vh, 680px), 1fr) !important;
+  grid-template-rows: minmax(var(--yp-hero-h), 1fr) !important;
   align-items: stretch !important;
   gap: 0 !important;
   width: 100% !important;
   max-width: none !important;
-  min-height: min(72vh, 680px) !important;
+  min-height: var(--yp-hero-h) !important;
   margin: 0 !important;
   padding: 0 !important;
   position: relative !important;
@@ -76,7 +81,7 @@ html {
   z-index: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  min-height: min(72vh, 680px) !important;
+  min-height: var(--yp-hero-h) !important;
   margin: 0 !important;
   padding: 0 !important;
   align-self: stretch !important;
@@ -122,7 +127,7 @@ html {
   align-items: flex-end !important;
   width: 100% !important;
   max-width: none !important;
-  min-height: min(72vh, 680px) !important;
+  min-height: var(--yp-hero-h) !important;
   padding: 0 !important;
 }
 .svc-hero .svc-hero__title,
@@ -134,12 +139,19 @@ html {
   box-shadow: none !important;
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
-.svc-hero .svc-hero__lead { color: rgba(255, 255, 255, 0.92) !important; max-width: 28rem !important; }
-.svc-hero .svc-hero__eyebrow { color: #c1d92e !important; }
+.svc-hero .svc-hero__lead { color: rgba(255, 255, 255, 0.92) !important; max-width: min(36rem, 100%) !important; }
+.svc-hero .svc-hero__eyebrow {
+  display: inline-flex !important;
+  color: #c1d92e !important;
+  background: rgba(0, 0, 0, 0.38) !important;
+  border-radius: 999px !important;
+  padding: 0.22rem 0.7rem !important;
+  letter-spacing: 0.06em;
+}
 .svc-hero {
   display: grid !important;
   grid-template-columns: 1fr !important;
-  grid-template-rows: minmax(min(72vh, 680px), 1fr) !important;
+  grid-template-rows: minmax(var(--yp-hero-h), 1fr) !important;
 }
 .svc-hero > .svc-hero__grid,
 .svc-hero > .svc-hero__actions,
@@ -158,9 +170,60 @@ html {
   background: transparent !important;
 }
 .svc-hero .svc-hero__copy {
-  padding-bottom: 6.5rem !important;
+  padding-bottom: 1.25rem !important;
 }
 
+.svc-hero__switch {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 1.1rem !important;
+  padding: 0.3rem;
+  max-width: min(100%, 28rem);
+  border-radius: 999px;
+  background: rgba(15, 10, 28, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+.svc-hero__switch-btn {
+  flex: 1 1 9rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.7rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px !important;
+  color: #fff !important;
+  font-weight: 750 !important;
+  text-decoration: none !important;
+  border: 0 !important;
+}
+.svc-hero__switch-btn.is-on {
+  background: #6a42c2 !important;
+}
+.svc-hero__switch-btn:not(.is-on) {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.yp-feed-card,
+.free-now-card,
+.svc-space-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  text-align: left !important;
+}
+.yp-feed-card__media,
+.free-now-avatar,
+.svc-space-card__photo {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9 !important;
+  border-radius: 0 !important;
+}
 .home-page {
   position: relative !important;
   padding-bottom: 2.75rem !important;
@@ -414,22 +477,33 @@ html[data-eco-banner] .profile-hero--cabinet {
 .dashboard-page {
   background: transparent;
 }
-.dashboard-page .glass,
+.dashboard-page .glass.dashboard-aside,
 .dashboard-page .presence-panel,
 .dashboard-page .profile-hero,
 .dashboard-page .cw-cabinet {
   border-color: #e4dff2 !important;
   box-shadow: 0 8px 28px rgba(106, 66, 194, 0.08) !important;
 }
+.dashboard-main {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.dashboard-stack,
+.profile-view--hub {
+  gap: 0.9rem !important;
+}
 .presence-fs {
   position: fixed !important;
   inset: 0 !important;
-  z-index: 14000 !important;
-  background: rgba(27, 20, 48, 0.94) !important;
+  z-index: 40000 !important;
+  background: rgba(27, 20, 48, 0.96) !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
+  padding-bottom: calc(1.25rem + var(--yp-bottom-nav-h, 0px)) !important;
 }
 .presence-fs__card img {
   width: min(72vw, 68vh, 420px) !important;

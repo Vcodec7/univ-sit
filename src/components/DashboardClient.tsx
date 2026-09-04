@@ -825,7 +825,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
             </div>
           </aside>
 
-                    <div className="glass dashboard-main">
+                    <div className="dashboard-main">
             {view === 'applications' && (
               <>
                 <h2 style={{ fontSize: '1.5rem', marginBottom: '0.85rem', fontWeight: 700 }}>Мои заявки</h2>

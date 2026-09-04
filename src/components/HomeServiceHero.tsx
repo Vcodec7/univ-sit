@@ -44,25 +44,25 @@ export default function HomeServiceHero({
             Свободные залы, коворкинг и афиша — без лишних шагов.
           </p>
           {(primary || secondary) && (
-            <div className="svc-hero__actions svc-hero__actions--practical">
+            <div className="svc-hero__switch" role="navigation" aria-label="Быстрые действия на главной">
               {primary ? (
                 needsAuth(primary.href) ? (
-                  <GuestAuthPrompt href={primary.href} className="btn btn-primary svc-hero__cta" asButton>
-                    <CalendarPlus size={18} aria-hidden />
+                  <GuestAuthPrompt href={primary.href} className="svc-hero__switch-btn is-on" asButton>
+                    <CalendarPlus size={16} aria-hidden />
                     {primary.label}
                   </GuestAuthPrompt>
                 ) : (
-                  <Link href={primary.href} className="btn btn-primary svc-hero__cta" prefetch>
-                    <CalendarPlus size={18} aria-hidden />
+                  <Link href={primary.href} className="svc-hero__switch-btn is-on" prefetch>
+                    <CalendarPlus size={16} aria-hidden />
                     {primary.label}
                   </Link>
                 )
               ) : null}
               {secondary ? (
-                <Link href={secondary.href} className="btn btn-secondary svc-hero__cta svc-hero__cta--ghost" prefetch>
-                  <Building2 size={18} aria-hidden />
+                <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
+                  <Building2 size={16} aria-hidden />
                   {secondary.label}
-                  <ArrowRight size={16} aria-hidden />
+                  <ArrowRight size={14} aria-hidden />
                 </Link>
               ) : null}
             </div>
