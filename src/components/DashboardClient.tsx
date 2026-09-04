@@ -685,18 +685,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   const isSettings = view === 'settings';
   const hideAsideOnMobile = true;
 
-  const roleHint = pendingModeration
-    ? 'Просмотр сайта и кабинет доступны. Бронь и запись — после одобрения.'
-    : session?.user?.role === 'MODERATOR'
-      ? 'Быстрое действие: очередь модерации'
-      : session?.user?.role === 'ADMIN'
-        ? session.user.isSuperAdmin === false
-          ? 'Администратор с ограниченными разделами'
-          : 'Полный доступ к панели управления'
-        : session?.user?.role === 'SCANNER'
-          ? 'Быстрое действие: сканер QR'
-          : 'Быстрые действия: заявки и брони';
-
   return (
     <div className="container dashboard-page">
       <EventSoonNotifier tickets={upcomingTickets} />
@@ -716,26 +704,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
           Ваш аккаунт находится на проверке. Полный функционал будет доступен после одобрения администратором
         </div>
       ) : null}
-      {isOverview ? (
-        <header className="profile-page-head dashboard-hello">
-          <div>
-            {roleBadge ? (
-              <p className={`dashboard-hello__role role-pill role-pill--${(session?.user?.role || 'USER').toLowerCase()}`}>
-                {roleBadge}
-              </p>
-            ) : null}
-            <h1 className="profile-view__title dashboard-hello__name">
-              {legalName ? legalName.split(' ')[0] : 'Профиль'}
-            </h1>
-            <p className="profile-view__lead dashboard-hello__lead">{roleHint}</p>
-          </div>
-          {(session?.user?.role === 'ADMIN' || session?.user?.role === 'MODERATOR') && (
-            <Link href="/admin" className="btn btn-secondary">
-              Панель
-            </Link>
-          )}
-        </header>
-      ) : null}
+      {isOverview ? <h1 className="sr-only">Кабинет</h1> : null}
       <div>
         <div
           className={`dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''}${
@@ -1595,8 +1564,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
               <div className="dashboard-stack" style={{ maxWidth: "100%", width: "100%", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
                 <div className="profile-overview-top" id="profile-hub">
                   <div className="profile-view profile-view--unified profile-view--modern profile-view--hub">
-                    <PersonalQrPanel />
-                    <CoworkingCabinetList />
                     <ProfileHeroCard
                       name={legalName || session.user?.name}
                       nickname={profile?.nickname || session.user?.nickname}
@@ -1647,10 +1614,12 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                         )
                       }
                       onStatClick={(key) => openRepModal(key)}
-                      showRatings={modOn('ratings')}
-                      showEco={modOn('eco')}
+                      showRatings={false}
+                      showEco={false}
                       revealContacts
                     />
+                    <PersonalQrPanel />
+                    <CoworkingCabinetList />
 
                   </div>
 

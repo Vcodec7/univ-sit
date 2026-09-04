@@ -136,26 +136,23 @@ export default function PersonalQrPanel() {
     <section className="presence-panel" aria-label="Личный QR и баллы">
       <div className="presence-grid presence-grid--svc">
         <div className="presence-points">
-          <h2 className="presence-points__title">Баллы</h2>
-          <p className="presence-points__hint">
-            <strong>{POINTS.mBall.brand}</strong> — уровень участия.{' '}
-            <strong>{POINTS.shop.brand}</strong> — кошелёк магазина, это разные счета.
-          </p>
+          <h2 className="presence-points__title">Счета</h2>
+          <p className="presence-points__hint">Два разных показателя: репутация и кошелёк магазина.</p>
           <div className="presence-points__grid">
             <ScoreRing
-              title={POINTS.mBall.brand}
-              kicker="Уровень"
+              title="Уровень"
+              kicker="репутация участия"
               icon={<Sparkles size={18} />}
               value={scores?.mBall ?? 0}
               level={scores?.mLevel}
               tone="m"
             />
-            <Link href="/dashboard/shop" className="score-ring score-ring-shop score-ring-link" aria-label="Магазин мбаллов">
+            <Link href="/dashboard/shop" className="score-ring score-ring-shop score-ring-link" aria-label="Кошелёк магазина">
               <div className="score-ring-top">
                 <Wallet size={18} />
-                <strong>{POINTS.shop.brand}</strong>
+                <strong>Кошелёк</strong>
               </div>
-              <p className="presence-points__kicker">Кошелёк</p>
+              <p className="presence-points__kicker">можно тратить в магазине</p>
               <div className="score-ring-value">{(scores?.ecoPoints ?? 0).toLocaleString('ru-RU')}</div>
               <div className="score-ring-bar" aria-hidden>
                 <span style={{ width: `${Math.round(shopLevel.progress * 100)}%` }} />
