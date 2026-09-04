@@ -28,6 +28,7 @@ import {
   MessageCircle,
   MoreHorizontal,
   Pin,
+  Plus,
   Search,
   Send,
   Ticket,
@@ -194,6 +195,7 @@ function MessagesInner() {
   const [threadLoading, setThreadLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [attachOpen, setAttachOpen] = useState(false);
   const [pickerMode, setPickerMode] = useState<'event' | 'club' | 'project'>('event');
   const [invitable, setInvitable] = useState<InvitableEvent[]>([]);
   const [memberships, setMemberships] = useState<MembershipItem[]>([]);
@@ -546,10 +548,9 @@ function MessagesInner() {
   }, [ctxMenu]);
 
   const openInvitePicker = async (mode: 'event' | 'club' | 'project') => {
-    const next = pickerOpen && pickerMode === mode ? false : true;
+    setAttachOpen(false);
     setPickerMode(mode);
-    setPickerOpen(next);
-    if (!next) return;
+    setPickerOpen(true);
     setInvitableLoading(true);
     try {
       if (mode === 'event') {
@@ -714,6 +715,7 @@ function MessagesInner() {
     setMessages([]);
     setPresence(null);
     setPickerOpen(false);
+    setAttachOpen(false);
     setQuery({ with: null, c: null, tab });
   };
 
@@ -1158,26 +1160,21 @@ function MessagesInner() {
               </div>
 
               <form className="messages-composer" onSubmit={send}>
-                {activeUser && !activeGroup ? (
-                  <div className="messages-share-bar" role="toolbar" aria-label="Поделиться в чате">
-                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'event' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('event')}>
-                      <CalendarPlus size={14} aria-hidden /> Событие
-                    </button>
-                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'club' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('club')}>
-                      <Users size={14} aria-hidden /> Клуб
-                    </button>
-                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'project' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('project')}>
-                      <FolderKanban size={14} aria-hidden /> Проект
-                    </button>
-                  </div>
-                ) : null}
                 {pickerOpen && activeUser ? (
                   <div className="messages-invite-picker" role="listbox">
+                    <div className="messages-invite-picker__head">
+                      <strong>
+                        {pickerMode === 'event' ? 'Событие' : pickerMode === 'club' ? 'Клуб' : 'Проект'}
+                      </strong>
+                      <button type="button" className="messages-invite-picker__close" onClick={() => setPickerOpen(false)}>
+                        Закрыть
+                      </button>
+                    </div>
                     {invitableLoading ? (
                       <p className="messages-invite-picker__empty">Загрузка…</p>
                     ) : pickerMode === 'event' ? (
                       invitable.length === 0 ? (
-                        <p className="messages-invite-picker__empty">Нет ближайших мероприятий. <Link href="/events" style={{ color: 'var(--primary)', fontWeight: 700 }}>К афише</Link></p>
+                        <p className="messages-invite-picker__empty">Нет ближайших мероприятий. <Link href="/events">К афише</Link></p>
                       ) : (
                         invitable.map((ev) => (
                           <button key={ev.id} type="button" className="messages-invite-picker__item" disabled={sending} onClick={() => void sendEventInvite(ev.id)}>
@@ -1201,6 +1198,35 @@ function MessagesInner() {
                   </div>
                 ) : null}
                 <div className="messages-composer__row">
+                  {activeUser && !activeGroup ? (
+                    <div className="messages-composer__attach">
+                      <button
+                        type="button"
+                        className={`messages-attach-btn${attachOpen ? ' is-on' : ''}`}
+                        aria-label="Пригласить"
+                        aria-expanded={attachOpen}
+                        onClick={() => {
+                          setPickerOpen(false);
+                          setAttachOpen((v) => !v);
+                        }}
+                      >
+                        <Plus size={20} aria-hidden />
+                      </button>
+                      {attachOpen ? (
+                        <div className="messages-attach-menu" role="menu">
+                          <button type="button" className="messages-attach-menu__item" role="menuitem" onClick={() => void openInvitePicker('event')}>
+                            <CalendarPlus size={16} aria-hidden /> Событие
+                          </button>
+                          <button type="button" className="messages-attach-menu__item" role="menuitem" onClick={() => void openInvitePicker('club')}>
+                            <Users size={16} aria-hidden /> Клуб
+                          </button>
+                          <button type="button" className="messages-attach-menu__item" role="menuitem" onClick={() => void openInvitePicker('project')}>
+                            <FolderKanban size={16} aria-hidden /> Проект
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <textarea
                     ref={textareaRef}
                     value={body}

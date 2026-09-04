@@ -1519,25 +1519,60 @@ body:has(.messages-root) .main-content > div {
   gap: 0.35rem;
   padding: 0.4rem 0.55rem calc(0.45rem + env(safe-area-inset-bottom));
 }
-.messages-share-bar {
+.messages-composer__attach {
+  position: relative;
+  flex-shrink: 0;
+}
+.messages-attach-btn {
+  appearance: none;
+  border: 0;
+  width: 2.55rem;
+  height: 2.55rem;
+  border-radius: 999px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.35rem;
-  overflow: visible;
-  width: 100%;
+  place-items: center;
+  background: rgba(106, 66, 194, 0.1);
+  color: #53339c;
+  cursor: pointer;
   padding: 0;
 }
-.messages-share-chip {
-  flex: none;
+.messages-attach-btn.is-on {
+  background: #6a42c2;
+  color: #fff;
+}
+.messages-attach-menu {
+  min-width: 12.5rem;
+  left: 0;
+  bottom: calc(100% + 0.4rem);
+}
+.messages-attach-menu__item {
   width: 100%;
-  min-width: 0;
-  justify-content: center;
-  min-height: 2.15rem;
-  padding: 0.3rem 0.4rem;
-  font-size: 0.75rem;
+  min-height: 2.35rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+.messages-invite-picker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.15rem 0.2rem 0.35rem;
+}
+.messages-invite-picker__head strong {
+  font-size: 0.82rem;
+}
+.messages-invite-picker__close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
 }
 .messages-composer__row {
   gap: 0.4rem;
