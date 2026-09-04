@@ -132,7 +132,7 @@ export default async function FreeNowSpaces({ limit = 8 }: { limit?: number }) {
                     className="btn btn-primary"
                     asButton
                   >
-                    Бронь
+                    Забронировать
                   </GuestAuthPrompt>
                 )}
               </div>

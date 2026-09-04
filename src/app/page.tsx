@@ -65,14 +65,14 @@ export default async function Home() {
   const showDocuments = modules.documents !== false;
 
   const heroPrimary = showSpaces
-    ? { href: '/coworking', label: 'Коворкинг' }
+    ? { href: '/coworking', label: 'Записаться в коворкинг' }
     : showEvents
       ? { href: '/events', label: 'Записаться на событие' }
       : showProjects
         ? { href: '/projects', label: 'Проекты' }
         : null;
   const heroSecondary = showSpaces
-    ? { href: '/spaces?filter=free_today', label: 'Залы' }
+    ? { href: '/spaces?filter=free_today', label: 'Свободные залы' }
     : showEvents
       ? { href: '/events', label: 'Афиша' }
       : null;
@@ -228,7 +228,7 @@ export default async function Home() {
                         title="Забронировать зал"
                         asButton
                       >
-                        Бронь
+                        Забронировать
                       </GuestAuthPrompt>
                     </div>
                   </div>
