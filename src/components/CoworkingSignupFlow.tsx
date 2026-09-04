@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import {
   clampCoworkingSeats,
   COWORKING_MAX_SEATS,
@@ -265,7 +265,7 @@ export default function CoworkingSignupFlow({
                     onClick={() => setPeriod(p.id)}
                   >
                     <strong>
-                      {p.start}–{p.end.slice(0, 5)}
+                      {p.start}–{p.end}
                     </strong>
                     <em>
                       {typeof slotLeft === 'number'
@@ -344,8 +344,8 @@ export default function CoworkingSignupFlow({
               {submitting ? 'Отправляем…' : 'В лист ожидания'}
             </button>
           )}
-          <Link href="/spaces" className="cw-cta-round" aria-label="К площадкам" title="К площадкам">
-            <ArrowRight size={20} />
+          <Link href="/spaces" className="cw-cta-link">
+            К площадкам
           </Link>
         </div>
         {!busy && left > 0 ? (
@@ -365,9 +365,7 @@ export default function CoworkingSignupFlow({
         ariaLabel="Запись оформлена"
         aside={
           <div className="svc-modal__aside-inner">
-            <div className="svc-modal__circles" aria-hidden>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cover} alt="" />
+            <div className="svc-modal__cover" aria-hidden>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cover} alt="" />
             </div>

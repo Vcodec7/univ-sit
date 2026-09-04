@@ -26,7 +26,6 @@ import {
   MessageCircle,
   MoreHorizontal,
   Pin,
-  Plus,
   Search,
   Send,
   Ticket,
@@ -37,6 +36,7 @@ import UserAvatar from '@/components/UserAvatar';
 import MessageBodyText from '@/components/MessageBodyText';
 import MutualOverlapChips from '@/components/MutualOverlapChips';
 import type { MutualOverlap } from '@/lib/social';
+import { threadTone } from '@/lib/chat-tone';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import {
   formatEventWhen,
@@ -176,9 +176,7 @@ function MessagesInner() {
   const [threadLoading, setThreadLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerMode, setPickerMode] = useState<'event' | 'entity'>('event');
-  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
-  const attachMenuRef = useRef<HTMLDivElement>(null);
+  const [pickerMode, setPickerMode] = useState<'event' | 'club' | 'project'>('event');
   const [invitable, setInvitable] = useState<InvitableEvent[]>([]);
   const [memberships, setMemberships] = useState<MembershipItem[]>([]);
   const [invitableLoading, setInvitableLoading] = useState(false);
@@ -539,28 +537,8 @@ function MessagesInner() {
     };
   }, [ctxMenu]);
 
-
-
-  useEffect(() => {
-    if (!attachMenuOpen) return;
-    const onDoc = (e: MouseEvent) => {
-      const el = attachMenuRef.current;
-      if (el && !el.contains(e.target as Node)) setAttachMenuOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setAttachMenuOpen(false);
-    };
-    document.addEventListener('mousedown', onDoc);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [attachMenuOpen]);
-
-  const openInvitePicker = async (mode: 'event' | 'entity') => {
+  const openInvitePicker = async (mode: 'event' | 'club' | 'project') => {
     const next = pickerOpen && pickerMode === mode ? false : true;
-    setAttachMenuOpen(false);
     setPickerMode(mode);
     setPickerOpen(next);
     if (!next) return;
@@ -575,7 +553,8 @@ function MessagesInner() {
         const res = await fetch('/api/entity-invites?scope=memberships');
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Не удалось загрузить');
-        setMemberships(data.items || []);
+        const all = (data.items || []) as MembershipItem[];
+        setMemberships(all.filter((i) => (mode === 'club' ? i.kind === 'CLUB' : i.kind === 'PROJECT')));
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Ошибка');
@@ -731,6 +710,11 @@ function MessagesInner() {
     setPickerOpen(false);
     setQuery({ with: null, c: null, tab });
   };
+
+  const chatMood = useMemo(
+    () => threadTone(messages.filter((m) => !m.flagged).map((m) => m.body || '')),
+    [messages]
+  );
 
   const messageBlocks = useMemo(() => {
     const blocks: { key: string; day?: string; message?: Message; index?: number }[] = [];
@@ -1151,6 +1135,14 @@ function MessagesInner() {
               </div>
 
               {overlap ? <div className="messages-mutual"><MutualOverlapChips overlap={overlap} compact /></div> : null}
+              {messages.length > 0 ? (
+                <div className="messages-tone" title={chatMood.hint}>
+                  <span className="messages-tone__label">Общение · {chatMood.label}</span>
+                  <span className="messages-tone__track" aria-hidden>
+                    <span className="messages-tone__fill" style={{ width: `${chatMood.score}%` }} />
+                  </span>
+                </div>
+              ) : null}
 
               <div className="messages-scroll" ref={scrollRef}>
                 {threadLoading ? (
@@ -1173,41 +1165,16 @@ function MessagesInner() {
 
               <form className="messages-composer" onSubmit={send}>
                 {activeUser && !activeGroup ? (
-                  <div className="messages-composer__tools" ref={attachMenuRef}>
-                    <button
-                      type="button"
-                      className={`messages-tool messages-tool--attach${attachMenuOpen || pickerOpen ? ' is-open' : ''}`}
-                      aria-label="Прикрепить"
-                      aria-expanded={attachMenuOpen}
-                      aria-haspopup="menu"
-                      title="Прикрепить"
-                      onClick={() => {
-                        setAttachMenuOpen((v) => !v);
-                        if (pickerOpen) setPickerOpen(false);
-                      }}
-                    >
-                      <Plus size={16} aria-hidden />
+                  <div className="messages-share-bar" role="toolbar" aria-label="Поделиться в чате">
+                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'event' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('event')}>
+                      <CalendarPlus size={14} aria-hidden /> Событие
                     </button>
-                    {attachMenuOpen ? (
-                      <div className="messages-attach-menu" role="menu">
-                        <button
-                          type="button"
-                          role="menuitem"
-                          className="messages-attach-menu__item"
-                          onClick={() => void openInvitePicker('event')}
-                        >
-                          <CalendarPlus size={14} aria-hidden /> Событие
-                        </button>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          className="messages-attach-menu__item"
-                          onClick={() => void openInvitePicker('entity')}
-                        >
-                          <Users size={14} aria-hidden /> Клуб / проект
-                        </button>
-                      </div>
-                    ) : null}
+                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'club' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('club')}>
+                      <Users size={14} aria-hidden /> Клуб
+                    </button>
+                    <button type="button" className={`messages-share-chip${pickerOpen && pickerMode === 'project' ? ' is-on' : ''}`} onClick={() => void openInvitePicker('project')}>
+                      <FolderKanban size={14} aria-hidden /> Проект
+                    </button>
                   </div>
                 ) : null}
                 {pickerOpen && activeUser ? (
@@ -1226,7 +1193,9 @@ function MessagesInner() {
                         ))
                       )
                     ) : memberships.length === 0 ? (
-                      <p className="messages-invite-picker__empty">Вы ещё не участник клуба или проекта</p>
+                      <p className="messages-invite-picker__empty">
+                        {pickerMode === 'club' ? 'Вы ещё не в клубе' : 'Вы ещё не в проекте'}
+                      </p>
                     ) : (
                       memberships.map((item) => (
                         <button key={`${item.kind}-${item.entityId}`} type="button" className="messages-invite-picker__item" disabled={sending} onClick={() => void sendEntityInvite(item)}>

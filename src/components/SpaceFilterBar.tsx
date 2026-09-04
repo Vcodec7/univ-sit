@@ -143,7 +143,7 @@ export default function SpaceFilterBar({
 
           <div className="space-filter-panel__section">
             <div className="space-filter-panel__label">Категория</div>
-            <div className="space-filter-panel__chips is-scroll">
+            <div className="space-filter-panel__chips">
               {chip(category === 'ALL', 'Все', () => setCategory('ALL'))}
               {categories.map((c) => chip(category === c, c, () => setCategory(c)))}
             </div>
@@ -151,7 +151,7 @@ export default function SpaceFilterBar({
 
           <div className="space-filter-panel__section">
             <div className="space-filter-panel__label">Особенности</div>
-            <div className="space-filter-panel__chips is-scroll">
+            <div className="space-filter-panel__chips">
               {chip(amenity === 'ALL', 'Любые', () => setAmenity('ALL'))}
               {SPACE_AMENITIES.map((a) => chip(amenity === a.id, a.label, () => setAmenity(a.id)))}
             </div>

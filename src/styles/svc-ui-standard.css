@@ -55,9 +55,6 @@
   .glass-nav.menu-open {
     z-index: var(--z-nav) !important;
   }
-  .qa-fab {
-    display: none !important;
-  }
 }
 
 /* ----- Unified chips / filters (no outer ring, no hover lift) ----- */

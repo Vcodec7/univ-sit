@@ -50,14 +50,14 @@ body:has(.messages-root) .main-content > div {
 }
 
 .messages-root {
-  --msg-accent: #0d9488;
-  --msg-accent-soft: rgba(13, 148, 136, 0.12);
-  --msg-accent-strong: #0f766e;
-  --msg-mine: linear-gradient(145deg, #14b8a6 0%, #0f766e 100%);
+  --msg-accent: #6a42c2;
+  --msg-accent-soft: rgba(106, 66, 194, 0.12);
+  --msg-accent-strong: #53339c;
+  --msg-mine: linear-gradient(145deg, #7b54d4 0%, #6a42c2 100%);
   --msg-theirs: #ffffff;
-  --msg-ink: #0c1a22;
-  --msg-muted: #5b6b76;
-  --msg-surface: rgba(255, 255, 255, 0.82);
+  --msg-ink: #1b1430;
+  --msg-muted: #5c5670;
+  --msg-surface: rgba(255, 255, 255, 0.9);
   font-family: var(--font-manrope), 'Manrope', sans-serif;
   flex: 1 1 0;
   min-height: 0;
@@ -68,7 +68,7 @@ body:has(.messages-root) .main-content > div {
   background:
     radial-gradient(900px 420px at -10% -20%, rgba(45, 212, 191, 0.18), transparent 55%),
     radial-gradient(680px 360px at 110% 8%, rgba(14, 165, 233, 0.08), transparent 52%),
-    linear-gradient(180deg, #e6f4f2 0%, #f2f7f6 42%, #eef5f3 100%);
+    linear-gradient(180deg, #f4f1fa 0%, #f7f6fb 42%, #efe8fb 100%);
 }
 
 .messages-top {
@@ -418,7 +418,7 @@ body:has(.messages-root) .main-content > div {
   background: var(--msg-mine);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.2);
+  box-shadow: 0 6px 16px rgba(106, 66, 194, 0.22);
 }
 
 .msg-bubble.is-group-mid,
@@ -1155,4 +1155,61 @@ body:has(.messages-root) .main-content > div {
 .msg-body-text {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+.messages-tone {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.85rem 0.45rem;
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(106, 66, 194, 0.08);
+}
+.messages-tone__label {
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #53339c;
+  white-space: nowrap;
+}
+.messages-tone__track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: #ece8f6;
+  overflow: hidden;
+}
+.messages-tone__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #c4b5fd, #6a42c2 55%, #c1d92e);
+}
+.messages-share-bar {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0 0.15rem;
+  scrollbar-width: none;
+}
+.messages-share-bar::-webkit-scrollbar { display: none; }
+.messages-share-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid rgba(106, 66, 194, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: #53339c;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.messages-share-chip.is-on {
+  background: #6a42c2;
+  color: #fff;
+  border-color: #6a42c2;
 }

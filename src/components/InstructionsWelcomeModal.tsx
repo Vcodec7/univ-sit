@@ -197,11 +197,7 @@ export default function InstructionsWelcomeModal() {
           <div className="svc-modal__brand-mark" aria-hidden>
             <BookOpen size={28} />
           </div>
-          <div className="svc-modal__circles" aria-hidden>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/hero-cover.jpg" alt="" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/hero-cover.jpg" alt="" />
+          <div className="svc-modal__cover" aria-hidden>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/hero-cover.jpg" alt="" />
           </div>

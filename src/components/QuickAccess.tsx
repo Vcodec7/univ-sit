@@ -204,45 +204,7 @@ export function QuickAccess() {
     };
   }, []);
 
-  // Edge swipe from right to open (Samsung-like)
-  useEffect(() => {
-    if (hideChrome) return;
-    let startX = 0;
-    let startY = 0;
-    let tracking = false;
-
-    const onStart = (e: TouchEvent) => {
-      if (open || e.touches.length !== 1) return;
-      const t = e.touches[0];
-      const fromRight = t.clientX >= window.innerWidth - 28;
-      if (!fromRight) return;
-      tracking = true;
-      startX = t.clientX;
-      startY = t.clientY;
-    };
-    const onMove = (e: TouchEvent) => {
-      if (!tracking || e.touches.length !== 1) return;
-      const t = e.touches[0];
-      const dx = startX - t.clientX;
-      const dy = Math.abs(t.clientY - startY);
-      if (dx > 36 && dy < 40) {
-        tracking = false;
-        setOpen(true);
-      }
-    };
-    const onEnd = () => {
-      tracking = false;
-    };
-
-    window.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('touchmove', onMove, { passive: true });
-    window.addEventListener('touchend', onEnd);
-    return () => {
-      window.removeEventListener('touchstart', onStart);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onEnd);
-    };
-  }, [hideChrome, open]);
+  // No edge-swipe: on phones the right/left edge is the system back gesture.
 
   useEffect(() => {
     let pendingG = false;
@@ -364,8 +326,7 @@ export function QuickAccess() {
           title="Быстрый доступ"
           onClick={openPanel}
         >
-          <span className="qa-fab-grip" aria-hidden />
-          <span className="qa-fab-caption">меню</span>
+          <span className="qa-fab-v" aria-hidden />
         </button>
       )}
 
@@ -373,6 +334,23 @@ export function QuickAccess() {
         <div className="qa-sheet-root" role="dialog" aria-modal="true" aria-label="Быстрый доступ">
           <button type="button" className="qa-sheet-backdrop" aria-label="Закрыть" onClick={closePanel} />
           <aside className="qa-sheet qa-edge-panel">
+            <div className="qa-edge-head">
+              <strong>Разделы</strong>
+              <div className="qa-edge-head__actions">
+                <Link
+                  href={role === 'TECH' ? '/ops' : role === 'SCANNER' ? '/scanner' : '/dashboard/settings'}
+                  className="qa-edge-foot-btn"
+                  aria-label="Настройки"
+                  title="Настройки"
+                  onClick={() => setOpen(false)}
+                >
+                  <Settings size={16} />
+                </Link>
+                <button type="button" className="qa-edge-foot-btn" onClick={closePanel} aria-label="Закрыть">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
             <div className="qa-edge-scroll">
               {navItems.map(renderItem)}
               {(accountItems.length > 0 || staffItems.length > 0) && (
@@ -382,20 +360,6 @@ export function QuickAccess() {
               {staffItems.map(renderItem)}
               {systemItems.length > 0 && <div className="qa-edge-sep" aria-hidden />}
               {systemItems.map(renderItem)}
-            </div>
-            <div className="qa-edge-foot">
-              <button type="button" className="qa-edge-foot-btn" onClick={closePanel} aria-label="Закрыть">
-                <X size={18} />
-              </button>
-              <Link
-                href={role === 'TECH' ? '/ops' : role === 'SCANNER' ? '/scanner' : '/dashboard/settings'}
-                className="qa-edge-foot-btn"
-                aria-label="Настройки"
-                title="Настройки"
-                onClick={() => setOpen(false)}
-              >
-                <Settings size={16} />
-              </Link>
             </div>
           </aside>
         </div>
