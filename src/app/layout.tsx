@@ -118,7 +118,7 @@ export default async function RootLayout({
   return (
     <html lang="ru" className={`${manrope.variable} ${unbounded.variable}`}>
       <head>
-        <link rel="stylesheet" href="/brand/theme.css" />
+        <link rel="stylesheet" href="/brand/theme.css?v=hero4" />
       </head>
       <body className={manrope.className}>
         <Script

@@ -29,27 +29,60 @@ html {
   background-color: #f7f6fb;
 }
 
+/* Unified banner: photo/video is the canvas; copy sits on top of it.
+   Works for both new (.svc-hero--banner) and old (.svc-hero__grid) markup. */
 .svc-hero {
   position: relative !important;
   padding: 0 !important;
-  min-height: min(70vh, 640px) !important;
+  min-height: min(72vh, 680px) !important;
   overflow: hidden !important;
   background: #1b1430 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-end !important;
 }
 .svc-hero::after {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(27, 20, 48, 0.86) 0%, rgba(27, 20, 48, 0.4) 50%, rgba(27, 20, 48, 0.1) 100%),
-    linear-gradient(180deg, rgba(27, 20, 48, 0.08) 20%, rgba(27, 20, 48, 0.5) 100%);
+    linear-gradient(90deg, rgba(27, 20, 48, 0.88) 0%, rgba(27, 20, 48, 0.42) 48%, rgba(27, 20, 48, 0.12) 100%),
+    linear-gradient(180deg, rgba(27, 20, 48, 0.08) 18%, rgba(27, 20, 48, 0.52) 100%);
 }
-.svc-hero .svc-hero__media {
+.svc-hero .container.svc-hero__grid,
+.svc-hero .svc-hero__grid.container {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: minmax(min(72vh, 680px), 1fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: min(72vh, 680px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  z-index: 3;
+}
+.svc-hero .svc-hero__copy,
+.svc-hero .svc-hero__visual,
+.svc-hero .svc-hero__grid > .svc-hero__media {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+  min-width: 0 !important;
+}
+.svc-hero .svc-hero__visual,
+.svc-hero .svc-hero__grid > .svc-hero__media {
+  position: relative !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: min(72vh, 680px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: stretch !important;
+}
+.svc-hero > .svc-hero__media,
+.svc-hero--banner > .svc-hero__media {
   position: absolute !important;
   inset: 0 !important;
   z-index: 0 !important;
@@ -59,36 +92,73 @@ html {
   border-radius: 0 !important;
   aspect-ratio: auto !important;
 }
+.svc-hero .svc-hero__grid > .svc-hero__media {
+  border-radius: 0 !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+}
 .svc-hero .svc-hero__img,
 .svc-hero .svc-hero__video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
 }
-.svc-hero .svc-hero__grid,
+.svc-hero .svc-hero__copy,
 .svc-hero .svc-hero__overlay,
-.svc-hero .svc-hero__actions,
-.svc-hero .svc-hero__content,
-.svc-hero .svc-hero__copy {
+.svc-hero .svc-hero__content {
   position: relative !important;
-  z-index: 2 !important;
+  z-index: 3 !important;
+  align-self: end !important;
+  justify-self: start !important;
+  max-width: min(42rem, 92vw) !important;
+  padding: clamp(1.5rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 4rem) !important;
+  background: transparent !important;
 }
-.svc-hero .svc-hero__grid {
+.svc-hero .svc-hero__overlay {
   display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-end !important;
-  grid-template-columns: none !important;
-  gap: 0 !important;
-  min-height: min(70vh, 640px) !important;
-  max-width: 100% !important;
+  align-items: flex-end !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: min(72vh, 680px) !important;
+  padding: 0 !important;
 }
-.svc-hero .svc-hero__title { color: #fff !important; }
-.svc-hero .svc-hero__lead { color: rgba(255, 255, 255, 0.92) !important; }
+.svc-hero .svc-hero__title,
+.svc-hero .svc-hero__copy h1,
+.svc-hero .svc-pill {
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+.svc-hero .svc-hero__lead { color: rgba(255, 255, 255, 0.92) !important; max-width: 28rem !important; }
 .svc-hero .svc-hero__eyebrow { color: #c1d92e !important; }
-.svc-hero .svc-hero__actions {
-  margin-top: 0 !important;
-  padding-bottom: 1.75rem !important;
-  max-width: 38rem !important;
+.svc-hero {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: minmax(min(72vh, 680px), 1fr) !important;
+}
+.svc-hero > .svc-hero__grid,
+.svc-hero > .svc-hero__actions,
+.svc-hero > .svc-hero__overlay {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+}
+.svc-hero > .svc-hero__actions {
+  align-self: end !important;
+  justify-self: start !important;
+  z-index: 4 !important;
+  width: min(42rem, 92vw) !important;
+  max-width: 42rem !important;
+  margin: 0 !important;
+  padding: 0 clamp(1.25rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2.25rem) !important;
+  background: transparent !important;
+}
+.svc-hero .svc-hero__copy {
+  padding-bottom: 6.5rem !important;
 }
 
 .home-sections {
