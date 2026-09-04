@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { safeCallbackUrl } from '@/lib/safe-callback-url';
+import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 
 function VerifyForm() {
   const [code, setCode] = useState('');
