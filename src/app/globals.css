@@ -6693,7 +6693,7 @@ a.dashboard-nav-btn {
   top: 42%;
   transform: translateY(-50%);
   z-index: 1100;
-  width: 22px;
+  width: 14px;
   height: 108px;
   min-height: 0;
   padding: 0 2px 0 0;
@@ -6731,7 +6731,7 @@ a.dashboard-nav-btn {
 }
 .qa-fab:hover,
 .qa-fab:focus-visible {
-  width: 26px;
+  width: 16px;
   opacity: 1;
   background: linear-gradient(180deg, rgba(13, 148, 136, 1), rgba(13, 148, 136, 0.95));
   outline: none;
@@ -24172,8 +24172,8 @@ fieldset.svc-form-group,
     padding-right: 0;
   }
   .qa-fab {
-    width: 28px !important;
-    min-width: 28px !important;
+    width: 14px !important;
+    min-width: 14px !important;
     padding: 0 !important;
   }
   .qa-fab-caption {

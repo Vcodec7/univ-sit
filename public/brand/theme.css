@@ -41,6 +41,19 @@ html {
   box-shadow: 0 8px 22px rgba(106, 66, 194, 0.28) !important;
 }
 
-.btn-secondary {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--line)) !important;
+.qa-fab {
+  width: 14px !important;
+  min-width: 14px !important;
+}
+
+.qa-fab:hover,
+.qa-fab:focus-visible {
+  width: 16px !important;
+}
+
+@media (min-width: 1101px) {
+  .qa-fab {
+    width: 14px !important;
+    min-width: 14px !important;
+  }
 }
