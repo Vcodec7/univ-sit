@@ -70,10 +70,10 @@ export const COLLECTIBLE_CARDS: CollectibleCard[] = [
   { id: 'qr_checkin', title: 'QR на входе', series: 'Афиша', rarity: 'common', tagline: 'Вы на месте', accent: '#94a3b8', glyph: '📱' },
   { id: 'open_mic', title: 'Открытый микрофон', series: 'Афиша', rarity: 'rare', tagline: 'Голос зала', accent: '#f43f5e', glyph: '🎙' },
   { id: 'host_pass', title: 'Хозяин площадки', series: 'Афиша', rarity: 'epic', tagline: 'Ключи от зала', accent: '#c084fc', glyph: '🔑' },
-  { id: 'leaf_care', title: 'Зелёный жест', series: 'Эко', rarity: 'common', tagline: 'Забота рядом', accent: '#22c55e', glyph: '🍃' },
-  { id: 'clean_shore', title: 'Чистый берег', series: 'Эко', rarity: 'uncommon', tagline: 'Субботник', accent: '#10b981', glyph: '🧹' },
-  { id: 'seed_bank', title: 'Банк семян', series: 'Эко', rarity: 'rare', tagline: 'Завтрашний лес', accent: '#84cc16', glyph: '🌱' },
-  { id: 'planet_keeper', title: 'Хранитель планеты', series: 'Эко', rarity: 'legendary', tagline: 'Максимум заботы', accent: '#fbbf24', glyph: '🌍' },
+  { id: 'leaf_care', title: 'Зелёный жест', series: 'Природа', rarity: 'common', tagline: 'Забота рядом', accent: '#22c55e', glyph: '🍃' },
+  { id: 'clean_shore', title: 'Чистый берег', series: 'Природа', rarity: 'uncommon', tagline: 'Субботник', accent: '#10b981', glyph: '🧹' },
+  { id: 'seed_bank', title: 'Банк семян', series: 'Природа', rarity: 'rare', tagline: 'Завтрашний лес', accent: '#84cc16', glyph: '🌱' },
+  { id: 'planet_keeper', title: 'Хранитель планеты', series: 'Природа', rarity: 'legendary', tagline: 'Максимум заботы', accent: '#fbbf24', glyph: '🌍' },
   { id: 'snake_run', title: 'Змейка-спринт', series: 'Игры', rarity: 'common', tagline: 'Ещё один рекорд', accent: '#22c55e', glyph: '🐍' },
   { id: 'tetris_flow', title: 'Тетрис-флоу', series: 'Игры', rarity: 'uncommon', tagline: 'Линии сыплются', accent: '#3b82f6', glyph: '🧱' },
   { id: 'fifteen_master', title: 'Мастер пятнашек', series: 'Игры', rarity: 'rare', tagline: 'Порядок из хаоса', accent: '#06b6d4', glyph: '🧩' },
@@ -217,8 +217,8 @@ function pickCardOfRarity(rarity: CardRarity, preferSeries?: string[]): Collecti
 const PACK_SERIES: Partial<Record<CardPackId, string[]>> = {
   sochi: ['Сочи', 'Афиша'],
   night: ['Ночь', 'Сочи', 'Афиша'],
-  keeper: ['Эко', 'Легенды', 'Сообщество'],
-  legend: ['Легенды', 'Эко', 'Игры'],
+  keeper: ['Природа', 'Легенды', 'Сообщество'],
+  legend: ['Легенды', 'Природа', 'Игры'],
 };
 
 export function rollPack(

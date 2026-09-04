@@ -140,7 +140,7 @@ const LEVELS: Omit<ProfileLevel, 'next'>[] = [
     color: '#0d9488',
     min: 120,
     band: 'bay',
-    reward: { eco: 18, perk: 'Бонус к эко за активность' },
+    reward: { eco: 18, perk: 'Бонус М-баллов за активность' },
   },
   {
     level: 5,
@@ -170,7 +170,7 @@ const LEVELS: Omit<ProfileLevel, 'next'>[] = [
     color: '#0891b2',
     min: 480,
     band: 'horizon',
-    reward: { eco: 40, perk: 'Премиум-эко пакет за ранг' },
+    reward: { eco: 40, perk: 'Премиум-пакет М-баллов за ранг' },
   },
   {
     level: 8,
@@ -190,7 +190,7 @@ const LEVELS: Omit<ProfileLevel, 'next'>[] = [
     color: '#d97706',
     min: 1000,
     band: 'summit',
-    reward: { eco: 70, perk: 'Капитанский бонус эко' },
+    reward: { eco: 70, perk: 'Капитанский бонус М-баллов' },
   },
   {
     level: 10,

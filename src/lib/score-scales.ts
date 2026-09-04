@@ -123,7 +123,7 @@ export async function awardCheckInScores(opts: {
     userId: opts.userId,
     scale: 'M_BALL',
     delta: eco ? M_BALL.CHECK_IN + M_BALL.ECO_EVENT_BONUS : M_BALL.CHECK_IN,
-    reason: eco ? 'Чек-ин на эко-событии' : 'Чек-ин по QR',
+    reason: eco ? 'Чек-ин на зелёном событии' : 'Чек-ин по QR',
     meta: { source: opts.source, bookingId: opts.bookingId || null, eco },
   });
   let e = null;
@@ -132,7 +132,7 @@ export async function awardCheckInScores(opts: {
       userId: opts.userId,
       scale: 'ECO_BALL',
       delta: ECO_BALL.ECO_EVENT,
-      reason: 'Эко-акция',
+      reason: 'Зелёная акция',
       meta: { source: opts.source, bookingId: opts.bookingId || null },
     });
   }

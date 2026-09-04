@@ -193,7 +193,7 @@ export async function POST(req: Request) {
       await createUserNotification({
         userId,
         type: 'CONTEST',
-        title: `+${amount} эко за конкурс`,
+        title: `+${amount} М-баллов за конкурс`,
         body: `Награда по конкурсу «${contest.title}»`,
         meta: { href: `/contests/${contestId}` },
       }).catch(() => null);

@@ -275,7 +275,7 @@ export default async function AdminDashboard() {
           <h1>Дашборд</h1>
           <p>
             {isAdmin
-              ? 'Сводка активности, модерации и экосистемы портала'
+              ? 'Сводка активности, модерации и сервисов портала'
               : `Модератор · права: ${perms.length ? perms.join(', ') : 'не назначены — отметьте разделы у администратора'}`}
           </p>
         </div>
@@ -306,7 +306,7 @@ export default async function AdminDashboard() {
           </div>
           <div className="admin-dash__pulse-card">
             <strong>{ecoSpenders}</strong>
-            <span>с эко-балансом</span>
+            <span>с балансом М-баллов</span>
           </div>
           <div className="admin-dash__pulse-card">
             <strong>{linkedMessengers}</strong>

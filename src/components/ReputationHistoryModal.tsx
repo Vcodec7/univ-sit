@@ -257,7 +257,7 @@ export default function ReputationHistoryModal({
                       <strong>{row.title}</strong>
                       <small>
                         {band?.title} · вклад от {row.min}
-                        {row.reward.eco > 0 ? ` · +${row.reward.eco} эко` : ''}
+                        {row.reward.eco > 0 ? ` · +${row.reward.eco} М-баллов` : ''}
                       </small>
                       <em>{row.reward.perk}</em>
                     </span>
@@ -279,7 +279,7 @@ export default function ReputationHistoryModal({
                 onClose();
               }}
             >
-              <ShoppingBag size={15} /> Эко-магазин и карты
+              <ShoppingBag size={15} /> Магазин и карты
             </button>
           </div>
         )}
@@ -290,7 +290,7 @@ export default function ReputationHistoryModal({
           ) : events.length === 0 ? (
             <p className="rep-modal__empty">
               {tab === 'LEVEL'
-                ? 'История вклада пока пуста — зарабатывайте эко, оформляйте профиль и открывайте карты.'
+                ? 'История вклада пока пуста — зарабатывайте М-баллы, оформляйте профиль и открывайте карты.'
                 : 'Пока нет записей в этой категории'}
             </p>
           ) : (

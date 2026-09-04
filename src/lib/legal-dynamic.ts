@@ -286,7 +286,7 @@ export function buildRulesDynamicAppendix(input: LegalDynamicInput): string {
   if (input.modules?.contests !== false) enabledHints.push('конкурсы (после входа)');
   if (input.modules?.vacancies !== false) enabledHints.push('вакансии (после входа)');
   if (input.modules?.games !== false) enabledHints.push('мини-игры');
-  if (input.modules?.eco !== false) enabledHints.push('эко-магазин');
+  if (input.modules?.eco !== false) enabledHints.push('магазин М-баллов');
   if (enabledHints.length) {
     parts.push(`Сейчас доступны в штатном режиме: ${enabledHints.join(', ')}.`);
   }

@@ -72,7 +72,7 @@ export const CATEGORY_META: Record<
   profile: { label: 'Профиль', short: 'Профиль', order: 1 },
   events: { label: 'Афиша и площадки', short: 'Афиша', order: 2 },
   social: { label: 'Друзья и общение', short: 'Друзья', order: 3 },
-  eco: { label: 'Эко и забота', short: 'Эко', order: 4 },
+  eco: { label: 'М-баллы и стиль', short: 'Магазин', order: 4 },
   places: { label: 'Куда сходить', short: 'Места', order: 5 },
   games: { label: 'Игры', short: 'Игры', order: 6 },
   portfolio: { label: 'Портфолио', short: 'Портфолио', order: 7 },
@@ -511,7 +511,7 @@ const ACHIEVEMENTS_SEED: AchievementSeed[] = [
   },
   {
     code: 'ECO_STARTER',
-    title: 'Эко-старт',
+    title: 'Первые М-баллы',
     description: 'Получили первые мбаллы за активность',
     tier: 'bronze',
     icon: 'Leaf',
