@@ -108,7 +108,7 @@ export default async function Home() {
           {latestProjects.length === 0 ? (
             <p className="home-empty">Пока нет опубликованных проектов.</p>
           ) : (
-            <div className="grid-cards">
+            <div className="grid-cards home-rail">
               {latestProjects.map((project, idx) => (
                 <Link key={project.id} href={`/projects/${encodeURIComponent(project.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -149,7 +149,7 @@ export default async function Home() {
           {latestClubs.length === 0 ? (
             <p className="home-empty">Клубы скоро появятся в каталоге.</p>
           ) : (
-            <div className="grid-cards">
+            <div className="grid-cards home-rail">
               {latestClubs.map((club, idx) => (
                 <Link key={club.id} href={`/clubs/${encodeURIComponent(club.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -192,7 +192,7 @@ export default async function Home() {
           {latestSpaces.length === 0 ? (
             <p className="home-empty">Свободных пространств пока нет в каталоге.</p>
           ) : (
-            <div className="grid-cards">
+            <div className="grid-cards home-rail">
               {latestSpaces.map((space, idx) => (
                 <article key={space.id} className="catalog-card catalog-card--hit" style={{ position: 'relative' }}>
                   <Link
@@ -281,7 +281,7 @@ export default async function Home() {
           {latestNews.length === 0 ? (
             <p className="home-empty">Новостей пока нет — загляните позже.</p>
           ) : (
-            <div className="grid-cards">
+            <div className="grid-cards home-rail">
               {latestNews.map((item) => {
                 const when = item.publishedAt || item.createdAt;
                 const title = item.title?.trim() || stripHtml(item.text).slice(0, 80) || 'Новость';
