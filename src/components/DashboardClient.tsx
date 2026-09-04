@@ -1587,7 +1587,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                     <ProfileHeroCard
                       name={legalName || session.user?.name}
                       nickname={profile?.nickname || session.user?.nickname}
-                      email={session.user?.email}
+                      email={profile?.email || session.user?.email}
                       phone={profile?.phone || session.user?.phone}
                       roleLabel={roleBadge}
                       image={avatarPreview || profile?.image || session.user?.image || null}
@@ -1636,6 +1636,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                       onStatClick={(key) => openRepModal(key)}
                       showRatings={modOn('ratings')}
                       showEco={modOn('eco')}
+                      revealContacts
                     />
 
                   </div>

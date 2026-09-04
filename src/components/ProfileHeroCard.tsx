@@ -150,6 +150,8 @@ type Props = {
   showRatings?: boolean;
   showEco?: boolean;
   showShowcase?: boolean;
+  /** Own cabinet: show full email and phone. Public views stay masked. */
+  revealContacts?: boolean;
 };
 
 function BadgeIcon({ def, size = 12 }: { def: AchievementDef; size?: number }) {
@@ -191,6 +193,7 @@ export default function ProfileHeroCard({
   showRatings = true,
   showEco = true,
   showShowcase = true,
+  revealContacts = false,
 }: Props) {
   const emptyAch = useVoiceCopy('profile.empty.achievements', 'Пока нет открытых достижений');
   const { loadout } = useVoice();
@@ -405,13 +408,21 @@ export default function ProfileHeroCard({
           {showLegal ? <div className="profile-hero__sub">{name}</div> : null}
           {roleLabel ? <span className="profile-hero__role">{roleLabel}</span> : null}
           {email ? (
-            <div className="profile-hero__email" title="Email скрыт в интерфейсе">
-              <span>{maskEmail(email)}</span>
+            <div className="profile-hero__email">
+              {revealContacts ? (
+                <a href={`mailto:${email}`}>{email}</a>
+              ) : (
+                <span title="Email скрыт в интерфейсе">{maskEmail(email)}</span>
+              )}
             </div>
           ) : null}
           {phone ? (
-            <div className="profile-hero__email" title="Телефон скрыт в интерфейсе">
-              <span>{maskPhone(phone)}</span>
+            <div className="profile-hero__email">
+              {revealContacts ? (
+                <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>
+              ) : (
+                <span title="Телефон скрыт в интерфейсе">{maskPhone(phone)}</span>
+              )}
             </div>
           ) : null}
           {publicCode ? (

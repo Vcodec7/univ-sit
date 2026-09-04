@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import { Maximize2, RefreshCw, Sparkles, Wallet } from 'lucide-react';
 import { POINTS } from '@/lib/points-labels';
@@ -45,6 +46,7 @@ export default function PersonalQrPanel() {
   const [scores, setScores] = useState<Scores | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [fullscreen, setFullscreen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,37 +76,97 @@ export default function PersonalQrPanel() {
   }, []);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     load(false);
   }, [load]);
 
   const shopLevel = shopMilestone(scores?.ecoPoints ?? 0);
 
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreen(false);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [fullscreen]);
+
+  const fs =
+    mounted && fullscreen && url
+      ? createPortal(
+          <div
+            className="presence-fs"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Пропуск на весь экран"
+            onClick={() => setFullscreen(false)}
+          >
+            <button
+              type="button"
+              className="presence-fs-close"
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullscreen(false);
+              }}
+            >
+              Закрыть
+            </button>
+            <div className="presence-fs__card" onClick={(e) => e.stopPropagation()}>
+              <QRCodeDisplay value={url} size={420} />
+              <p>Покажите сотруднику на входе</p>
+              {expiresAt ? (
+                <p className="presence-fs__until">
+                  до {new Date(expiresAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
+                </p>
+              ) : null}
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
     <section className="presence-panel" aria-label="Личный QR и баллы">
       <div className="presence-grid presence-grid--svc">
-        <div className="presence-scores">
-          <ScoreRing
-            title={POINTS.mBall.brand}
-            icon={<Sparkles size={18} />}
-            value={scores?.mBall ?? 0}
-            level={scores?.mLevel}
-            tone="m"
-          />
-          <Link href="/dashboard/shop" className="score-ring score-ring-shop score-ring-link" aria-label="Магазин мбаллов">
-            <div className="score-ring-top">
-              <Wallet size={18} />
-              <strong>{POINTS.shop.brand}</strong>
-            </div>
-            <div className="score-ring-value">{(scores?.ecoPoints ?? 0).toLocaleString('ru-RU')}</div>
-            <div className="score-ring-bar" aria-hidden>
-              <span style={{ width: `${Math.round(shopLevel.progress * 100)}%` }} />
-            </div>
-            <p className="score-ring-meta">
-              {shopLevel.nextLabel
-                ? `до ${shopLevel.nextLabel} ещё ${shopLevel.toNext}`
-                : 'можно тратить в магазине'}
-            </p>
-          </Link>
+        <div className="presence-points">
+          <h2 className="presence-points__title">Баллы</h2>
+          <p className="presence-points__hint">
+            <strong>{POINTS.mBall.brand}</strong> — уровень участия.{' '}
+            <strong>{POINTS.shop.brand}</strong> — кошелёк магазина, это разные счета.
+          </p>
+          <div className="presence-points__grid">
+            <ScoreRing
+              title={POINTS.mBall.brand}
+              kicker="Уровень"
+              icon={<Sparkles size={18} />}
+              value={scores?.mBall ?? 0}
+              level={scores?.mLevel}
+              tone="m"
+            />
+            <Link href="/dashboard/shop" className="score-ring score-ring-shop score-ring-link" aria-label="Магазин мбаллов">
+              <div className="score-ring-top">
+                <Wallet size={18} />
+                <strong>{POINTS.shop.brand}</strong>
+              </div>
+              <p className="presence-points__kicker">Кошелёк</p>
+              <div className="score-ring-value">{(scores?.ecoPoints ?? 0).toLocaleString('ru-RU')}</div>
+              <div className="score-ring-bar" aria-hidden>
+                <span style={{ width: `${Math.round(shopLevel.progress * 100)}%` }} />
+              </div>
+              <p className="score-ring-meta">
+                {shopLevel.nextLabel
+                  ? `до ${shopLevel.nextLabel} ещё ${shopLevel.toNext}`
+                  : 'можно тратить в магазине'}
+              </p>
+            </Link>
+          </div>
         </div>
 
         <div className="presence-qr-card">
@@ -156,27 +218,21 @@ export default function PersonalQrPanel() {
         </div>
       ) : null}
 
-      {fullscreen && url ? (
-        <div className="presence-fs" role="dialog" aria-label="QR на весь экран">
-          <button type="button" className="presence-fs-close" onClick={() => setFullscreen(false)}>
-            Закрыть
-          </button>
-          <QRCodeDisplay value={url} size={320} />
-          <p>Покажите сотруднику на ресепшен</p>
-        </div>
-      ) : null}
+      {fs}
     </section>
   );
 }
 
 function ScoreRing({
   title,
+  kicker,
   icon,
   value,
   level,
   tone,
 }: {
   title: string;
+  kicker?: string;
   icon: React.ReactNode;
   value: number;
   level?: Scores['mLevel'] | null;
@@ -189,7 +245,8 @@ function ScoreRing({
         {icon}
         <strong>{title}</strong>
       </div>
-      <div className="score-ring-value">{value}</div>
+      {kicker ? <p className="presence-points__kicker">{kicker}</p> : null}
+      <div className="score-ring-value">{value.toLocaleString('ru-RU')}</div>
       <div className="score-ring-bar" aria-hidden>
         <span style={{ width: `${pct}%` }} />
       </div>

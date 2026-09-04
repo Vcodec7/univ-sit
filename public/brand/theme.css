@@ -287,3 +287,33 @@ body.is-admin {
 .yp-surface {
   border-color: #e4dff2 !important;
 }
+
+.dashboard-page {
+  background: transparent;
+}
+.dashboard-page .glass,
+.dashboard-page .presence-panel,
+.dashboard-page .profile-hero,
+.dashboard-page .cw-cabinet {
+  border-color: #e4dff2 !important;
+  box-shadow: 0 8px 28px rgba(106, 66, 194, 0.08) !important;
+}
+.presence-fs {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 14000 !important;
+  background: rgba(27, 20, 48, 0.94) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.presence-fs__card img {
+  width: min(72vw, 68vh, 420px) !important;
+  height: auto !important;
+}
+.profile-hero__email a {
+  color: #6a42c2 !important;
+  font-weight: 700;
+  text-decoration: none;
+}
