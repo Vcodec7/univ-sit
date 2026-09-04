@@ -33,8 +33,16 @@ html {
   background: #1b1430;
 }
 
-.svc-hero--banner {
-  min-height: min(68vh, 620px);
+.home-sections {
+  width: 100%;
+  max-width: min(1680px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+.home-sections .free-now-grid,
+.home-sections .grid-cards {
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
 }
 
 .btn-primary {
