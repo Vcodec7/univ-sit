@@ -177,16 +177,15 @@
 .svc-hero__switch {
   display: flex !important;
   flex-direction: column;
-  flex-wrap: nowrap;
-  gap: 0.35rem;
+  gap: 0.5rem;
   margin-top: 1.1rem !important;
-  padding: 0.32rem;
+  padding: 0;
   width: 100%;
-  max-width: min(100%, 22rem);
-  border-radius: 1.15rem;
-  background: rgba(15, 10, 28, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  overflow: hidden;
+  max-width: min(100%, 20rem);
+  border-radius: 0;
+  background: transparent !important;
+  border: 0;
+  overflow: visible;
   box-sizing: border-box;
 }
 .svc-hero__switch-btn {
@@ -199,7 +198,7 @@
   gap: 0.35rem;
   min-height: 2.65rem;
   padding: 0.5rem 0.85rem;
-  border-radius: 999px !important;
+  border-radius: 14px !important;
   color: #fff !important;
   font-weight: 750 !important;
   font-size: 0.88rem !important;
@@ -210,6 +209,7 @@
   text-decoration: none !important;
   border: 0 !important;
   box-sizing: border-box;
+  box-shadow: none !important;
 }
 .svc-hero__switch-btn.is-on {
   background: #6a42c2 !important;

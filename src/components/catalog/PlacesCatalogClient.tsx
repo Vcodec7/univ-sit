@@ -67,15 +67,13 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
 
   return (
     <div className="places-page catalog-page">
-      <header className="places-hero places-hero--image-only" style={{ backgroundImage: `url(${heroCover})` }} aria-label="Куда сходить">
-        <span className="sr-only">Куда сходить — гид по Сочи</span>
+      <header className="places-hero" style={{ backgroundImage: `url(${heroCover})` }}>
+        <div className="places-hero__veil" aria-hidden />
+        <div className="container places-hero__inner">
+          <h1 className="places-title">Куда сходить</h1>
+          <p className="places-lead">Пляжи, горы, парки и смотровые — с маршрутом и советами.</p>
+        </div>
       </header>
-      <div className="container places-page__head">
-        <h1 className="page-hero-title">Куда сходить</h1>
-        <p className="page-hero-subtitle" style={{ marginTop: 0 }}>
-          Пляжи, горы, парки и смотровые — с маршрутом и советами.
-        </p>
-      </div>
 
       <div className="container places-catalog">
         <div className="places-toolbar places-toolbar--stack">
@@ -90,17 +88,19 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
               autoComplete="off"
               aria-label="Поиск мест"
             />
-            <label className="places-sort">
-              <span className="sr-only">Сортировка</span>
-              <select name="sort" defaultValue={sort} aria-label="Сортировка">
-                <option value="order">По порядку</option>
-                <option value="rating">По рейтингу</option>
-                <option value="title">По названию</option>
-              </select>
-            </label>
-            <button type="submit" className="places-search__btn">
-              Найти
-            </button>
+            <div className="places-search-actions">
+              <label className="places-sort">
+                <span className="sr-only">Сортировка</span>
+                <select name="sort" defaultValue={sort} aria-label="Сортировка">
+                  <option value="order">По порядку</option>
+                  <option value="rating">По рейтингу</option>
+                  <option value="title">По названию</option>
+                </select>
+              </label>
+              <button type="submit" className="places-search__btn">
+                Найти
+              </button>
+            </div>
           </form>
           <PlaceCategoryChips />
         </div>

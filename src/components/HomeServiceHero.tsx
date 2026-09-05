@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Building2, CalendarPlus } from 'lucide-react';
+import { Building2, CalendarPlus } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import HomeHeroMedia from '@/components/HomeHeroMedia';
 
@@ -62,7 +62,6 @@ export default function HomeServiceHero({
                 <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
                   <Building2 size={16} aria-hidden />
                   {secondary.label}
-                  <ArrowRight size={14} aria-hidden />
                 </Link>
               ) : null}
             </div>

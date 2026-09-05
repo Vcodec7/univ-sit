@@ -25941,8 +25941,7 @@ button.btn,
   text-overflow: ellipsis;
 }
 .nav-pill,
-.home-section-link,
-.svc-hero__switch-btn {
+.home-section-link {
   border-radius: 999px !important;
 }
 
@@ -26136,4 +26135,172 @@ button.btn,
     padding-inline: 2.4rem 2.4rem;
   }
 }
+
+/* ===== 1.6.16 home + places polish ===== */
+.svc-hero__switch {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+  padding: 0;
+  width: 100%;
+  max-width: min(100%, 20rem);
+  border-radius: 0;
+  background: transparent !important;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.svc-hero__switch-btn,
+a.svc-hero__switch-btn,
+button.svc-hero__switch-btn {
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+.svc-hero__switch-btn.is-on {
+  background: #6a42c2 !important;
+}
+.svc-hero__switch-btn:not(.is-on) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+}
+.svc-hero--banner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5.5rem;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(244, 241, 250, 0) 0%, #f4f1fa 92%);
+}
+.svc-hero--banner .svc-hero__overlay {
+  z-index: 1;
+}
+.svc-hero--banner .svc-hero__content {
+  position: relative;
+  z-index: 3;
+  padding-bottom: clamp(2.5rem, 8vw, 4rem);
+}
+.home-page {
+  background: #f4f1fa;
+}
+.home-page .home-sections {
+  padding-top: 1.25rem;
+  padding-bottom: 1.5rem;
+}
+.home-page .home-section-link {
+  background: #fff !important;
+  border: 1px solid rgba(106, 66, 194, 0.22) !important;
+  color: #53339c !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.places-hero {
+  min-height: min(38vh, 280px);
+  border-radius: 0;
+  margin: 0;
+}
+.places-hero .places-title {
+  color: #fff !important;
+  font-size: clamp(1.7rem, 6.5vw, 2.75rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  margin: 0 0 0.45rem !important;
+}
+.places-hero .places-lead {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.95rem !important;
+  max-width: 28rem !important;
+}
+.places-catalog {
+  padding-top: 1.1rem;
+}
+.places-toolbar,
+.places-toolbar--stack {
+  background: #fff;
+  border: 1px solid rgba(106, 66, 194, 0.1);
+  border-radius: 1.15rem;
+  padding: 0.85rem 0.9rem 0.95rem;
+  box-shadow: 0 8px 24px rgba(27, 20, 48, 0.04);
+}
+.places-toolbar--stack .places-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: none;
+}
+.places-search input[type='search'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.6rem;
+  border: 1px solid rgba(106, 66, 194, 0.16);
+  border-radius: 12px;
+  background: #f8f6fc;
+  padding: 0.55rem 0.9rem;
+  font-size: 16px;
+  color: #1b1430;
+  outline: none;
+  box-shadow: none;
+}
+.places-search input[type='search']:focus {
+  border-color: #6a42c2;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(106, 66, 194, 0.12);
+}
+.places-toolbar--stack .places-search-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+.places-sort {
+  min-width: 0;
+}
+.places-sort select {
+  width: 100%;
+  min-height: 2.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(106, 66, 194, 0.16);
+  background: #fff;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: 0.88rem;
+  color: #1b1430;
+}
+.places-search__btn {
+  min-height: 2.6rem;
+  padding: 0 1.15rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.places-toolbar--stack .places-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.4rem;
+  padding: 0.15rem 0 0.1rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.places-toolbar--stack .places-chips::-webkit-scrollbar { display: none; }
+.places-chip {
+  flex: 0 0 auto;
+}
+@media (min-width: 720px) {
+  .places-toolbar--stack .places-search {
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, 12rem) auto;
+    align-items: center;
+  }
+  .places-toolbar--stack .places-search-actions {
+    display: contents;
+  }
+}
+
 
