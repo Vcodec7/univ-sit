@@ -21,3 +21,11 @@ test('media page is a partner hub not a plain CMS article', () => {
   assert.match(mediaHub, /MEDIA_PARTNERS/);
   assert.match(mediaPage, /MediaHubPage/);
 });
+
+const house = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/lib/house-rules.ts'), 'utf8');
+
+test('house rules page uses cards not a skinny article', () => {
+  assert.match(house, /HOUSE_RULES/);
+  assert.match(house, /Навагинская/);
+  assert.match(mediaPage, /HouseRulesPage/);
+});
