@@ -1,41 +1,46 @@
 ---
 name: youngportal-ops
-description: Work on YoungPortal (ty/py.idivles.ru) from this Cloud Agent. SSH, staging deploy, live brand CSS, stats, hero.
+description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деплой, дымовые проверки. Use for deploy, VPS, ty/py, apply-staging, smoke, secrets.
 ---
 
 # YoungPortal — как работать здесь
 
+## Цикл (меньше трудозатрат)
+
+1. Правки кода пакетом, не по файлу с пушем.
+2. `npm test && npm run ui:guard`
+3. Commit + push + PR.
+4. На ty: `bash scripts/apply-staging.sh` (или `npm run ty`).
+5. `bash scripts/smoke-sites.sh --staging-only`
+6. Прод только после «одобряю»: `CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh`
+
+Не запускать `docker compose ... --build` на VPS (OOM). Только CSS бренда: `bash scripts/apply-staging.sh static`.
+
 ## Домены и SSH
 
-- Тест: `https://ty.idivles.ru` → `/opt/sochi-portal-staging` → Docker `sochi-staging-web-1` `:3001`
+- Тест: `https://ty.idivles.ru` → `/opt/sochi-portal-staging` → `:3001`
 - Прод: `https://py.idivles.ru` → `/opt/sochi-portal` → `:3000`
-- SSH: `cursor-site@77.110.125.241` ключ `~/.ssh/id_ed25519_cursor_site`, sudo без пароля
+- SSH: `cursor-site@77.110.125.241`, ключ `~/.ssh/id_ed25519_cursor_site` (локально может быть `id_ed25519_yp`)
 - **Не катить на py** без явного «одобряю»
 
-## Живые правки без полной пересборки Next на VPS
+## Скрипты
 
-Один вход:
-
-```bash
-bash scripts/apply-staging.sh          # код → prebuilt на ty
-bash scripts/apply-staging.sh static   # только public/brand
-```
-
-Nginx отдаёт `/brand/` с диска staging: `/opt/sochi-portal-staging/public/brand/theme.css`
-
-Не запускать `docker compose ... --build` на VPS — там OOM. Прод (py) не трогать без «одобряю».
+| Команда | Зачем |
+| --- | --- |
+| `npm run ty` | `apply-staging.sh` |
+| `npm run smoke:ty` | HTTP smoke только ty |
+| `npm run ui:guard` | регрессии CSS/контраста |
+| `npm test` | `tests/*.test.mjs` |
+| `bash scripts/apply-staging.sh static` | только `public/brand` |
+| `bash scripts/dev-loop.sh` | test + ui-guard одной командой |
 
 ## Фирменные цвета
 
-Фирменные цвета с логотипа «Молодёжные пространства Сочи»: лаванда `#8562D8`, лайм `#AFCA03`, чернила `#0A0C2A`. Токены `--primary` / `--accent` в `src/app/globals.css` и `public/brand/theme.css`. CTA — лайм с тёмным текстом.
+Лаванда `#8562D8`, лайм `#AFCA03`, чернила `#0A0C2A`. CTA лайм + тёмный текст; бронь — белый на фиолетовом.
 
 ## Герой главной
 
-Режим «Видео (+ постер)» обязан показывать **постер**, если ролик не грузится. Не оставлять пустой `<video>` без `poster`.
-
-## Статистика
-
-«Уникальный гость» = разные `userId` в `TicketCheckIn` за период (проходы QR/вручную). Это не уникальные посетители сайта. Возраст: `ageLabelRu` — если `birthDate` пустая, писать «возраст не указан».
+Режим «Видео (+ постер)» обязан показывать **постер**, если ролик не грузится.
 
 ## Секреты
 

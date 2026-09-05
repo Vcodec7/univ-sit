@@ -10,7 +10,8 @@
 
 ## How to work (save time)
 
-- Batch code fixes, **one** git push, **one** apply to ty: `bash scripts/apply-staging.sh`
+- Batch code fixes, **one** git push, **one** apply to ty: `npm run ty` / `bash scripts/apply-staging.sh`
+- Before push: `npm run dev:loop` (tests + `ui:guard`). Visual bugs: skill `.cursor/skills/youngportal-ui`.
   (builds Next off the VPS, then a small Docker image on staging). Do not `docker compose --build` on the 2GB box.
 - Verify with scripts, not a browser: `bash scripts/smoke-sites.sh --staging-only`
 - SSH/SCP only via workflow scripts (`scripts/lib/vps.sh` retries Connection reset). No ad-hoc retry loops.
