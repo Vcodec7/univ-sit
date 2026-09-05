@@ -81,24 +81,6 @@ body {
   pointer-events: none;
   background-color: var(--background);
 }
-.blob {
-  display: none;
-}
-.blob-1 {
-  display: none;
-}
-.blob-2 {
-  display: none;
-}
-.blob-3 {
-  display: none;
-}
-@keyframes float {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5%, 15%) scale(1.1); }
-  66% { transform: translate(-5%, 5%) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
-}
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-unbounded), 'Unbounded', sans-serif;
@@ -26331,10 +26313,6 @@ button.svc-hero__switch-btn {
 .svc-hero.svc-hero--banner {
   border-radius: 0;
 }
-.svc-hero.svc-hero--banner::after {
-  content: none;
-  display: none;
-}
 .svc-hero--banner .svc-hero__overlay {
   z-index: 1;
 }
@@ -26568,6 +26546,21 @@ body:has(.dashboard-page) .main-content {
 .svc-hero--banner {
   margin-top: 0;
   border-top: 0;
+  border-bottom: 0;
+  box-shadow: none;
+}
+.svc-hero.svc-hero--banner::after,
+.svc-hero--banner::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  height: 0 !important;
+}
+.svc-hero--banner .svc-hero__content > div:first-child {
+  overflow: visible;
+}
+.svc-hero--banner .svc-hero__title {
+  overflow-wrap: anywhere;
 }
 .svc-hero--banner .svc-hero__img,
 .svc-hero--banner .svc-hero__video,
