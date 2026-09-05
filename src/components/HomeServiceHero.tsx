@@ -38,41 +38,57 @@ export default function HomeServiceHero({
       <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
       <div className="svc-hero__overlay">
         <div className="container svc-hero__content">
-          <p className="svc-hero__eyebrow">Официальный портал</p>
-          <h1 className="svc-hero__title">{brand}</h1>
-          <p className="svc-hero__lead">
-            Свободные залы, коворкинг и афиша — без лишних шагов.
-          </p>
-          {(primary || secondary) && (
-            <div className="svc-hero__switch" role="navigation" aria-label="Быстрые действия на главной">
-              {primary ? (
-                needsAuth(primary.href) ? (
-                  <GuestAuthPrompt href={primary.href} className="svc-hero__switch-btn is-on" asButton>
-                    <CalendarPlus size={16} aria-hidden />
-                    {primary.label}
-                  </GuestAuthPrompt>
-                ) : (
-                  <Link href={primary.href} className="svc-hero__switch-btn is-on" prefetch>
-                    <CalendarPlus size={16} aria-hidden />
-                    {primary.label}
-                  </Link>
-                )
-              ) : null}
-              {secondary ? (
-                needsAuth(secondary.href) ? (
-                  <GuestAuthPrompt href={secondary.href} className="svc-hero__switch-btn" asButton>
-                    <Building2 size={16} aria-hidden />
-                    {secondary.label}
-                  </GuestAuthPrompt>
-                ) : (
-                  <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
-                    <Building2 size={16} aria-hidden />
-                    {secondary.label}
-                  </Link>
-                )
-              ) : null}
+          <div>
+            <p className="svc-hero__eyebrow">Официальный портал</p>
+            <h1 className="svc-hero__title">{brand}</h1>
+            <p className="svc-hero__lead">
+              Свободные залы, коворкинг и афиша — без лишних шагов.
+            </p>
+            {(primary || secondary) && (
+              <div className="svc-hero__switch" role="navigation" aria-label="Быстрые действия на главной">
+                {primary ? (
+                  needsAuth(primary.href) ? (
+                    <GuestAuthPrompt href={primary.href} className="svc-hero__switch-btn is-on" asButton>
+                      <CalendarPlus size={16} aria-hidden />
+                      {primary.label}
+                    </GuestAuthPrompt>
+                  ) : (
+                    <Link href={primary.href} className="svc-hero__switch-btn is-on" prefetch>
+                      <CalendarPlus size={16} aria-hidden />
+                      {primary.label}
+                    </Link>
+                  )
+                ) : null}
+                {secondary ? (
+                  needsAuth(secondary.href) ? (
+                    <GuestAuthPrompt href={secondary.href} className="svc-hero__switch-btn" asButton>
+                      <Building2 size={16} aria-hidden />
+                      {secondary.label}
+                    </GuestAuthPrompt>
+                  ) : (
+                    <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
+                      <Building2 size={16} aria-hidden />
+                      {secondary.label}
+                    </Link>
+                  )
+                ) : null}
+              </div>
+            )}
+          </div>
+          <aside className="svc-hero__aside" aria-label="Что умеет портал">
+            <div className="svc-hero__aside-item">
+              <strong>Бронь залов</strong>
+              <span>Слоты и календарь площадок Центра.</span>
             </div>
-          )}
+            <div className="svc-hero__aside-item">
+              <strong>Коворкинг</strong>
+              <span>Почасовая запись на те же пространства.</span>
+            </div>
+            <div className="svc-hero__aside-item">
+              <strong>Афиша</strong>
+              <span>События, клубы и проекты без лишних шагов.</span>
+            </div>
+          </aside>
         </div>
       </div>
     </section>

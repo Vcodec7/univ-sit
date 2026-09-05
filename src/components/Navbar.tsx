@@ -599,6 +599,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       {showAuthedNav ? (
         <Link
           href={profileHref}
+          prefetch
           className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
           aria-label="Профиль"
           title="Профиль"

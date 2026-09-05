@@ -242,18 +242,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       router.push('/scanner');
       return;
     }
-    if (moduleFlags == null) return;
-
     let cancelled = false;
-    const on = (key: string) => moduleFlags[key] !== false;
-
-    const loadCabinetLists = async () => {
-      if (cancelled) return;
-      if (on('events')) {
-        const data = await cabinetGet('/api/user/participations');
-        if (!cancelled && Array.isArray(data)) setParticipations(data);
-      }
-    };
 
     void (async () => {
       try {
@@ -278,6 +267,28 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       } catch {
         /* toast handled in cabinet-fetch */
       }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, router, session?.user?.role]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    if (moduleFlags == null) return;
+    let cancelled = false;
+    const on = (key: string) => moduleFlags[key] !== false;
+
+    const loadCabinetLists = async () => {
+      if (cancelled) return;
+      if (on('events')) {
+        const data = await cabinetGet('/api/user/participations');
+        if (!cancelled && Array.isArray(data)) setParticipations(data);
+      }
+    };
+
+    void (async () => {
       if (on('achievements') && (view === 'overview' || view === 'edit')) {
         const data = await cabinetGet('/api/user/achievements?lite=1');
         if (cancelled) return;
@@ -302,7 +313,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [status, router, session?.user?.role, moduleFlags, view]);
+  }, [status, moduleFlags, view]);
 
 
   const refreshProfileLive = useCallback((force = false) => {

@@ -11660,13 +11660,19 @@ a.yp-modal-close {
   padding: 0;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  gap: 0.75rem;
+  width: 100%;
 }
 
 @media (min-width: 720px) {
   .about-highlights {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .about-highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -11674,17 +11680,10 @@ a.yp-modal-close {
   display: flex;
   gap: 0.85rem;
   align-items: flex-start;
-  padding: 1rem 0.15rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-@media (min-width: 720px) {
-  .about-highlight:nth-child(odd) {
-    padding-right: 1rem;
-  }
-  .about-highlight:nth-child(even) {
-    padding-left: 1rem;
-  }
+  padding: 1rem 1rem;
+  border: 1px solid rgba(133, 98, 216, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .about-highlight__icon {
@@ -11718,7 +11717,8 @@ a.yp-modal-close {
 }
 
 .about-section--prose {
-  max-width: 44rem;
+  max-width: none;
+  width: 100%;
 }
 
 .about-prose {
@@ -13523,10 +13523,11 @@ pre {
   z-index: 40;
   flex-shrink: 0;
   isolation: isolate;
-  background: #ffffff;
+  background: transparent;
   padding-left: 0.55rem;
   margin-left: 0;
-  box-shadow: -14px 0 18px 10px #ffffff;
+  box-shadow: none;
+  min-width: 9.5rem;
 }
 
 .glass-nav-inner {
@@ -18796,6 +18797,8 @@ body.is-admin .ops-page-shell__top .yp-notif-bell {
 .catalog-page {
   padding: 1.25rem 1rem 2rem;
   min-height: auto;
+  width: 100%;
+  max-width: 1600px;
 }
 .catalog-page .catalog-page-header {
   margin-bottom: 1rem;
@@ -23444,7 +23447,7 @@ body.yp-scroll-locked {
 
 .glass-nav {
   background: rgba(255, 255, 255, 0.94) !important;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0 !important;
   backdrop-filter: blur(10px);
   box-shadow: none !important;
 }
@@ -23516,6 +23519,9 @@ body.yp-scroll-locked {
 .svc-hero .svc-hero__content {
   max-width: min(52rem, 100%);
   width: 100%;
+}
+.svc-hero--banner .svc-hero__content {
+  max-width: none;
 }
 .svc-hero .svc-hero__title {
   color: #fff;
@@ -24017,7 +24023,7 @@ fieldset.svc-form-group,
 /* Space catalog — service cards (round photo + pill CTA) */
 .svc-space-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr));
   gap: 1.15rem;
   width: 100%;
 }
@@ -24792,6 +24798,48 @@ html.has-session .nav-auth-mobile {
 .svc-hero--banner .svc-hero__content {
   width: 100%;
   padding: clamp(2.25rem, 6vw, 4.25rem) 0 clamp(2rem, 5vw, 3.25rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: end;
+}
+@media (min-width: 860px) {
+  .svc-hero--banner .svc-hero__content {
+    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+    gap: 2rem;
+  }
+}
+.svc-hero__aside {
+  display: none;
+}
+@media (min-width: 860px) {
+  .svc-hero__aside {
+    display: grid;
+    gap: 0.65rem;
+    padding: 1rem;
+    border-radius: 1.25rem;
+    background: rgba(10, 12, 42, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(10px);
+  }
+  .svc-hero__aside-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+  .svc-hero__aside-item strong {
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+  .svc-hero__aside-item span {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.35;
+  }
 }
 .svc-hero--banner .svc-hero__eyebrow {
   color: var(--accent);
@@ -24799,12 +24847,12 @@ html.has-session .nav-auth-mobile {
 }
 .svc-hero--banner .svc-hero__title {
   color: #fff;
-  max-width: 18ch;
+  max-width: none;
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
 }
 .svc-hero--banner .svc-hero__lead {
   color: rgba(255, 255, 255, 0.9);
-  max-width: 28rem;
+  max-width: 40rem;
 }
 .svc-hero--banner .svc-hero__actions {
   margin-top: 1.35rem;

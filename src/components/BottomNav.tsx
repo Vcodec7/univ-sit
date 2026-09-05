@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import {
@@ -54,6 +54,7 @@ function setDockClass(on: boolean) {
 export default function BottomNav() {
   const { data: session, status } = useSession();
   const pathname = usePathname() || '/';
+  const router = useRouter();
   const [unread, setUnread] = useState(0);
   const [modules, setModules] = useState<Record<string, boolean> | null>(null);
   const [dockHint, setDockHint] = useState(false);
@@ -79,6 +80,11 @@ export default function BottomNav() {
     !immersive &&
     !hideForRole &&
     ((status === 'authenticated' && !!session?.user) || (status === 'loading' && dockHint));
+
+  useEffect(() => {
+    router.prefetch('/dashboard');
+    router.prefetch('/messages');
+  }, [router]);
 
   useEffect(() => {
     let cancelled = false;
