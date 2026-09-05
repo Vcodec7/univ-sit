@@ -455,6 +455,7 @@ export default function ProfileGuides({
         >
           Готово
           <em>{seen.length}</em>
+        </button>
       </div>
 
       {list.length === 0 ? (
