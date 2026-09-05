@@ -37,6 +37,7 @@ import {
   UsersRound,
   Home,
   UserCircle,
+  CalendarRange,
 } from 'lucide-react';
 import { hasPermission, type ModeratorPermission } from '@/lib/acl-shared';
 import NotificationsBell from '@/components/NotificationsBell';
@@ -59,6 +60,7 @@ const NAV_ITEMS: NavDef[] = [
   { href: '/admin/places', label: 'Куда сходить', icon: MapPin, requiredPermission: 'places', group: 'content' },
   { href: '/admin/programs', label: 'Гранты и добро', icon: HandHeart, requiredPermission: ['programs', 'pages'], group: 'content' },
   { href: '/admin/bookings', label: 'Афиша', icon: Clock, requiredPermission: 'bookings', group: 'ops', badgeKey: '/admin/bookings' },
+  { href: '/admin/occupancy', label: 'Занятость залов', icon: CalendarRange, requiredPermission: 'bookings', group: 'ops' },
   { href: '/admin/pages', label: 'Страницы', icon: ScrollText, requiredPermission: 'pages', group: 'content' },
   { href: '/admin/faq', label: 'FAQ', icon: FileText, requiredPermission: 'pages', group: 'content' },
   { href: '/admin/about-team', label: 'Команда «О нас»', icon: Users, requiredPermission: ['pages', 'portfolios'], group: 'content' },
