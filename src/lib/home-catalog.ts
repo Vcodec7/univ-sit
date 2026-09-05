@@ -61,7 +61,7 @@ export const getHomeCatalog = unstable_cache(
       prisma.project.findMany({
         where: { ...publicCatalogWhere(), status: 'ACTIVE' },
         orderBy: { createdAt: 'desc' },
-        take: 8,
+        take: 24,
         select: {
           id: true,
           title: true,
@@ -73,7 +73,7 @@ export const getHomeCatalog = unstable_cache(
       prisma.club.findMany({
         where: publicCatalogWhere(),
         orderBy: { createdAt: 'desc' },
-        take: 8,
+        take: 24,
         select: {
           id: true,
           title: true,
@@ -85,7 +85,7 @@ export const getHomeCatalog = unstable_cache(
       prisma.space.findMany({
         where: { ...publicCatalogWhere(), status: { notIn: ['INACTIVE', 'COMPLETED'] } },
         orderBy: { createdAt: 'desc' },
-        take: 8,
+        take: 24,
         select: {
           id: true,
           title: true,
@@ -98,7 +98,7 @@ export const getHomeCatalog = unstable_cache(
       prisma.news.findMany({
         where: publishedNonDemoWhere(),
         orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-        take: 8,
+        take: 24,
         select: {
           id: true,
           title: true,
@@ -135,6 +135,6 @@ export const getHomeCatalog = unstable_cache(
     }));
     return { latestProjects, latestClubs, latestSpaces, latestNews: news, siteSettings };
   },
-  ['home-catalog-v7'],
+  ['home-catalog-v8'],
   { revalidate: 60, tags: ['yp-home-catalog', 'home-catalog'] }
 );

@@ -98,13 +98,13 @@ export default async function Home() {
         {showProjects && (
         <section className="home-section">
           <div className="home-section-head">
-            <div>
+            <div className="home-section-kicker">
               <h2 className="home-section-title">Свежие проекты</h2>
-              <p className="home-section-sub">
-                {latestProjects.length
-                  ? ruCount(latestProjects.length, 'проект на главной', 'проекта на главной', 'проектов на главной')
-                  : 'Актуальные инициативы, к которым можно присоединиться'}
-              </p>
+              {latestProjects.length ? (
+                <p className="catalog-page-header__count">
+                  {ruCount(latestProjects.length, 'проект', 'проекта', 'проектов')}
+                </p>
+              ) : null}
             </div>
             <Link href="/projects" className="home-section-link">
               Смотреть все <ArrowRight size={18} />
@@ -143,13 +143,13 @@ export default async function Home() {
         {showClubs && (
         <section className="home-section">
           <div className="home-section-head">
-            <div>
+            <div className="home-section-kicker">
               <h2 className="home-section-title">Клубы по интересам</h2>
-              <p className="home-section-sub">
-                {latestClubs.length
-                  ? ruCount(latestClubs.length, 'клуб на главной', 'клуба на главной', 'клубов на главной')
-                  : 'Найди сообщество и занимайся тем, что близко'}
-              </p>
+              {latestClubs.length ? (
+                <p className="catalog-page-header__count">
+                  {ruCount(latestClubs.length, 'клуб', 'клуба', 'клубов')}
+                </p>
+              ) : null}
             </div>
             <Link href="/clubs" className="home-section-link">
               Все клубы <ArrowRight size={18} />
@@ -190,13 +190,13 @@ export default async function Home() {
         {showSpaces && (
         <section className="home-section">
           <div className="home-section-head">
-            <div>
+            <div className="home-section-kicker">
               <h2 className="home-section-title">Пространства</h2>
-              <p className="home-section-sub">
-                {latestSpaces.length
-                  ? ruCount(latestSpaces.length, 'площадка на главной', 'площадки на главной', 'площадок на главной')
-                  : 'Площадки для встреч, репетиций и своих мероприятий'}
-              </p>
+              {latestSpaces.length ? (
+                <p className="catalog-page-header__count">
+                  {ruCount(latestSpaces.length, 'площадка', 'площадки', 'площадок')}
+                </p>
+              ) : null}
             </div>
             <Link href="/spaces" className="home-section-link">
               Все пространства <ArrowRight size={18} />
@@ -283,13 +283,13 @@ export default async function Home() {
         {showNews && (
         <section className="home-section">
           <div className="home-section-head">
-            <div>
+            <div className="home-section-kicker">
               <h2 className="home-section-title">Новости</h2>
-              <p className="home-section-sub">
-                {latestNews.length
-                  ? ruCount(latestNews.length, 'новость на главной', 'новости на главной', 'новостей на главной')
-                  : 'Что происходит в молодёжной повестке'}
-              </p>
+              {latestNews.length ? (
+                <p className="catalog-page-header__count">
+                  {ruCount(latestNews.length, 'новость', 'новости', 'новостей')}
+                </p>
+              ) : null}
             </div>
             <Link href="/news" className="home-section-link">
               Все новости <ArrowRight size={18} />
