@@ -3,15 +3,16 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
-import { ArrowRight, Calendar, MapPin, Wallet, Users } from 'lucide-react';
+import { ArrowRight, Calendar, HeartHandshake, MapPin, Wallet, Users } from 'lucide-react';
 import FilterBar from '@/components/FilterBar';
 import EntityCoverImage from '@/components/EntityCoverImage';
 import {
   BODY_TYPE_LABELS,
   PROGRAM_KIND_META,
-  PROGRAM_STATUS_LABELS,
   formatProgramDate,
+  programIsApplyOpen,
   programPublicPath,
+  programStatusLabel,
   type ProgramKind,
 } from '@/lib/programs-ui';
 import { programCover } from '@/lib/theme-covers';
@@ -63,29 +64,23 @@ export default function ProgramCatalog({
   const meta = PROGRAM_KIND_META[kind];
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1rem', minHeight: 'auto' }}>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          marginBottom: '1.25rem',
-        }}
-      >
-        <div style={{ flex: '1 1 240px', minWidth: 0 }}>
-          <h1 className="text-gradient" style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 0.5rem' }}>
-            {meta.title}
-          </h1>
-          <p style={{ color: 'var(--muted)', margin: 0, maxWidth: 640, lineHeight: 1.55 }}>{meta.listDescription}</p>
+    <div className={`container prog-hub prog-hub--${kind.toLowerCase()}`}>
+      <header className="prog-hub__head">
+        <div>
+          {kind === 'DOBRO' ? (
+            <p className="prog-hub__kicker">
+              <HeartHandshake size={15} aria-hidden /> Добро.Центр Сочи
+            </p>
+          ) : null}
+          <h1 className="text-gradient">{meta.title}</h1>
+          <p>{meta.listDescription}</p>
         </div>
-        <div style={{ flex: '1 1 220px', minWidth: 0, maxWidth: '100%' }}>
+        <div className="prog-hub__search">
           <FilterBar placeholder={`Поиск: ${meta.title.toLowerCase()}…`} hideStatus />
         </div>
-      </div>
+      </header>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.75rem' }}>
+      <div className="prog-hub__tabs">
         {[
           { id: 'ALL', label: 'Все' },
           { id: 'OPEN', label: 'Открыт набор' },
@@ -98,20 +93,7 @@ export default function ProgramCatalog({
           const qs = params.toString();
           const href = qs ? `?${qs}` : programPublicPath(kind);
           return (
-            <Link
-              key={tab.id}
-              href={href}
-              className="btn"
-              style={{
-                padding: '0.4rem 0.9rem',
-                borderRadius: 999,
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                background: active ? 'var(--primary)' : 'rgba(15,23,42,0.04)',
-                color: active ? '#fff' : 'var(--foreground)',
-                border: active ? 'none' : '1px solid rgba(15,23,42,0.08)',
-              }}
-            >
+            <Link key={tab.id} href={href} className={`prog-tab${active ? ' is-on' : ''}`}>
               {tab.label}
             </Link>
           );
@@ -119,18 +101,9 @@ export default function ProgramCatalog({
       </div>
 
       {filtered.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '3rem 1.5rem',
-            background: 'white',
-            borderRadius: 'var(--radius-lg)',
-            color: 'var(--muted)',
-            border: '1px solid rgba(15,23,42,0.06)',
-          }}
-        >
-          <h3 style={{ color: 'var(--foreground)', marginBottom: '0.5rem' }}>Пока пусто</h3>
-          <p style={{ maxWidth: 420, margin: '0 auto' }}>
+        <div className="prog-empty">
+          <h3>Пока пусто</h3>
+          <p>
             {query
               ? 'Ничего не найдено по запросу. Попробуйте другие слова.'
               : `Скоро здесь появятся актуальные ${meta.title.toLowerCase()}. Следите за новостями.`}
@@ -141,16 +114,15 @@ export default function ProgramCatalog({
           {filtered.map((item, idx) => {
             const ends = formatProgramDate(item.endsAt);
             const body = item.bodyType ? BODY_TYPE_LABELS[item.bodyType] : null;
+            const open = programIsApplyOpen(item.status, item.endsAt);
             return (
               <Link
                 key={item.id}
                 href={programPublicPath(kind, item.id)}
-                className="catalog-card"
+                className={`catalog-card prog-card${open ? ' is-open' : ''}`}
               >
-                <div
-                  className={`catalog-badge${item.status !== 'OPEN' ? ' status-completed' : ''}`}
-                >
-                  {PROGRAM_STATUS_LABELS[item.status] || item.status}
+                <div className={`catalog-badge${open ? '' : ' status-completed'}`}>
+                  {programStatusLabel(item.status, item.endsAt)}
                 </div>
                 <div className="catalog-img-wrap" style={{ position: 'relative' }}>
                   <EntityCoverImage
@@ -161,78 +133,37 @@ export default function ProgramCatalog({
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
-                <div
-                  style={{
-                    padding: '1.25rem 1.25rem 1rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexGrow: 1,
-                    gap: '0.65rem',
-                  }}
-                >
-                  <h3
-                    style={{
-                      fontSize: '1.1rem',
-                      fontWeight: 700,
-                      lineHeight: 1.3,
-                      color: 'var(--foreground)',
-                      margin: 0,
-                    }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p
-                    className="line-clamp-3"
-                    style={{ color: 'var(--muted)', fontSize: '0.95rem', flexGrow: 1, lineHeight: 1.55, margin: 0 }}
-                  >
+                <div className="prog-card__body">
+                  <h3>{item.title}</h3>
+                  <p className="line-clamp-3">
                     {item.summary || item.description.replace(/<[^>]+>/g, '')}
                   </p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '0.55rem 0.9rem',
-                      fontSize: '0.82rem',
-                      color: 'var(--muted)',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {item.amountLabel && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <div className="prog-card__meta">
+                    {item.amountLabel ? (
+                      <span>
                         <Wallet size={14} /> {item.amountLabel}
                       </span>
-                    )}
-                    {ends && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    ) : null}
+                    {ends ? (
+                      <span>
                         <Calendar size={14} /> до {ends}
                       </span>
-                    )}
-                    {item.place && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    ) : null}
+                    {item.place ? (
+                      <span>
                         <MapPin size={14} /> {item.place}
                       </span>
-                    )}
-                    {typeof item.seats === 'number' && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    ) : null}
+                    {typeof item.seats === 'number' ? (
+                      <span>
                         <Users size={14} /> мест: {item.seats}
                       </span>
-                    )}
-                    {body && <span>{body}</span>}
+                    ) : null}
+                    {body ? <span>{body}</span> : null}
                   </div>
                   <div className="catalog-card-meta">
-                    <span style={{ color: 'var(--muted)', fontSize: '0.9rem', fontWeight: 500 }}>
-                      {item.organizer || 'Центр развития молодежи Сочи'}
-                    </span>
-                    <span
-                      style={{
-                        color: 'var(--primary)',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        fontSize: '0.95rem',
-                      }}
-                    >
+                    <span>{item.organizer || 'Центр развития молодежи Сочи'}</span>
+                    <span className="prog-card__more">
                       Подробнее <ArrowRight size={16} />
                     </span>
                   </div>

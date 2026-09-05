@@ -76,3 +76,16 @@ export function formatProgramDate(d: Date | string | null | undefined) {
     year: 'numeric',
   });
 }
+
+export function programIsApplyOpen(status: string, endsAt?: Date | string | null) {
+  if (status !== 'OPEN') return false;
+  if (!endsAt) return true;
+  const t = typeof endsAt === 'string' ? new Date(endsAt).getTime() : endsAt.getTime();
+  if (Number.isNaN(t)) return true;
+  return t >= Date.now();
+}
+
+export function programStatusLabel(status: string, endsAt?: Date | string | null) {
+  if (status === 'OPEN' && !programIsApplyOpen(status, endsAt)) return 'Срок набора вышел';
+  return PROGRAM_STATUS_LABELS[status] || status;
+}

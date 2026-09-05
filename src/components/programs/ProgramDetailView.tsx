@@ -1,15 +1,15 @@
 import Link from 'next/link';
-import { ArrowLeft, Calendar, ExternalLink, MapPin, Users, Wallet } from 'lucide-react';
+import { ArrowLeft, Calendar, ExternalLink, HeartHandshake, MapPin, Users, Wallet } from 'lucide-react';
 import ApplyButton from '@/components/ApplyButton';
 import ShareButton from '@/components/ShareButton';
 import ContentRenderer from '@/components/ContentRenderer';
 import {
   BODY_TYPE_LABELS,
   PROGRAM_KIND_META,
-  PROGRAM_STATUS_LABELS,
   formatProgramDate,
   programIsApplyOpen,
   programPublicPath,
+  programStatusLabel,
   type ProgramKind,
 } from '@/lib/programs';
 import { programCover } from '@/lib/theme-covers';
@@ -44,6 +44,7 @@ export default function ProgramDetailView({
   const kind = program.kind as ProgramKind;
   const meta = PROGRAM_KIND_META[kind];
   const canApply = programIsApplyOpen(program.status, program.endsAt);
+  const statusLabel = programStatusLabel(program.status, program.endsAt);
   const ends = formatProgramDate(program.endsAt);
   const starts = formatProgramDate(program.startsAt);
   const body = program.bodyType ? BODY_TYPE_LABELS[program.bodyType] : null;
@@ -53,189 +54,80 @@ export default function ProgramDetailView({
   const cover = programCover(program, 0);
 
   return (
-    <div style={{ minHeight: 'auto', paddingBottom: '5rem', backgroundColor: '#fafafa' }}>
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: 'min(420px, 55vh)',
-          backgroundImage: `url(${cover})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to top, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.25) 55%, rgba(15,23,42,0.35) 100%)',
-          }}
-        />
-        <div
-          className="container"
-          style={{
-            position: 'absolute',
-            top: '1.5rem',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'space-between',
-            zIndex: 20,
-          }}
-        >
-          <Link
-            href={programPublicPath(kind)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              color: '#fff',
-              fontWeight: 600,
-              textDecoration: 'none',
-              background: 'rgba(15,23,42,0.35)',
-              padding: '0.45rem 0.85rem',
-              borderRadius: 999,
-              backdropFilter: 'blur(6px)',
-            }}
-          >
-            <ArrowLeft size={18} /> {meta.title}
+    <div className={`prog-detail prog-detail--${kind.toLowerCase()}`}>
+      <div className="prog-hero" style={{ backgroundImage: `url(${cover})` }}>
+        <div className="prog-hero__shade" />
+        <div className="container prog-hero__bar">
+          <Link href={programPublicPath(kind)} className="prog-hero__back">
+            {kind === 'DOBRO' ? <HeartHandshake size={16} aria-hidden /> : <ArrowLeft size={18} />}
+            {meta.title}
           </Link>
           <ShareButton title={program.title} />
         </div>
-        <div
-          className="container"
-          style={{
-            position: 'absolute',
-            bottom: '1.75rem',
-            left: 0,
-            right: 0,
-            zIndex: 10,
-            color: '#fff',
-          }}
-        >
-          <div
-            style={{
-              display: 'inline-block',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              opacity: 0.9,
-              marginBottom: '0.65rem',
-              background: 'rgba(255,255,255,0.15)',
-              padding: '0.25rem 0.65rem',
-              borderRadius: 999,
-            }}
-          >
-            {PROGRAM_STATUS_LABELS[program.status] || program.status}
-          </div>
-          <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)', fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
-            {program.title}
-          </h1>
-          {program.summary && (
-            <p style={{ margin: '0.75rem 0 0', maxWidth: 640, opacity: 0.92, fontSize: '1.05rem', lineHeight: 1.5 }}>
-              {program.summary}
-            </p>
-          )}
+        <div className="container prog-hero__copy">
+          <span className={`prog-pill${canApply ? ' is-open' : ' is-closed'}`}>{statusLabel}</span>
+          <h1>{program.title}</h1>
+          {program.summary ? <p>{program.summary}</p> : null}
         </div>
       </div>
 
-      <div className="container" style={{ marginTop: '-1.5rem', position: 'relative', zIndex: 5 }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(260px, 320px)',
-            gap: '1.25rem',
-            alignItems: 'start',
-          }}
-          className="program-detail-grid"
-        >
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.5rem 1.35rem',
-              border: '1px solid rgba(15,23,42,0.06)',
-              boxShadow: '0 8px 30px rgba(15,23,42,0.04)',
-            }}
-          >
+      <div className="container prog-detail__body">
+        <div className="prog-detail__grid">
+          <div className="prog-article">
             <ContentRenderer content={program.description} template="DEFAULT" />
           </div>
 
-          <aside
-            style={{
-              background: '#fff',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.25rem',
-              border: '1px solid rgba(15,23,42,0.06)',
-              boxShadow: '0 8px 30px rgba(15,23,42,0.04)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.85rem',
-              position: 'sticky',
-              top: '5.5rem',
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Условия</h2>
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '0.65rem' }}>
-              {program.organizer && (
-                <li style={{ color: 'var(--muted)', fontSize: '0.92rem' }}>
-                  <strong style={{ color: 'var(--foreground)' }}>Организатор:</strong> {program.organizer}
+          <aside className="prog-aside">
+            <h2>Условия</h2>
+            <ul className="prog-facts">
+              {program.organizer ? (
+                <li>
+                  <strong>Организатор</strong>
+                  <span>{program.organizer}</span>
                 </li>
-              )}
-              {program.amountLabel && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem' }}>
-                  <Wallet size={16} color="var(--primary)" /> {program.amountLabel}
+              ) : null}
+              {program.amountLabel ? (
+                <li>
+                  <Wallet size={16} aria-hidden /> {program.amountLabel}
                 </li>
-              )}
-              {starts && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem' }}>
-                  <Calendar size={16} color="var(--primary)" /> Старт: {starts}
+              ) : null}
+              {starts ? (
+                <li>
+                  <Calendar size={16} aria-hidden /> Старт: {starts}
                 </li>
-              )}
-              {ends && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem' }}>
-                  <Calendar size={16} color="var(--primary)" />
+              ) : null}
+              {ends ? (
+                <li>
+                  <Calendar size={16} aria-hidden />
                   {kind === 'GRANT' ? `Дедлайн: ${ends}` : `До: ${ends}`}
                 </li>
-              )}
-              {program.place && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem' }}>
-                  <MapPin size={16} color="var(--primary)" /> {program.place}
+              ) : null}
+              {program.place ? (
+                <li>
+                  <MapPin size={16} aria-hidden /> {program.place}
                 </li>
-              )}
-              {body && (
-                <li style={{ fontSize: '0.92rem' }}>
-                  <strong>Формат:</strong> {body}
+              ) : null}
+              {body ? (
+                <li>
+                  <strong>Формат</strong> {body}
                 </li>
-              )}
-              {typeof program.seats === 'number' && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem' }}>
-                  <Users size={16} color="var(--primary)" />
+              ) : null}
+              {typeof program.seats === 'number' ? (
+                <li>
+                  <Users size={16} aria-hidden />
                   {seatsLeft != null ? `Свободно мест: ${seatsLeft} из ${program.seats}` : `Мест: ${program.seats}`}
                 </li>
-              )}
+              ) : null}
             </ul>
 
-            {program.externalUrl && (
-              <a
-                href={program.externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secondary"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  padding: '0.7rem 1rem',
-                }}
-              >
-                Внешняя ссылка <ExternalLink size={16} />
+            {program.externalUrl ? (
+              <a href={program.externalUrl} target="_blank" rel="noreferrer" className="btn btn-secondary prog-ext">
+                {/dobro\.ru/i.test(program.externalUrl) ? 'Добро.ру' : 'Внешняя ссылка'}{' '}
+                <ExternalLink size={16} />
               </a>
-            )}
+            ) : null}
 
-            <div style={{ borderTop: '1px solid rgba(15,23,42,0.06)', paddingTop: '0.85rem' }}>
+            <div className="prog-aside__apply">
               {canApply || applicationStatus !== 'NONE' ? (
                 <ApplyButton
                   programId={program.id}
@@ -252,33 +144,18 @@ export default function ProgramDetailView({
                   }
                 />
               ) : (
-                <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.9rem' }}>
+                <p className="prog-aside__closed">
                   Набор сейчас закрыт. Следите за обновлениями в разделе «{meta.title}».
                 </p>
               )}
             </div>
 
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--muted)', lineHeight: 1.45 }}>
+            <p className="prog-aside__note">
               Заявки рассматривает администратор портала. Статус появится в личном кабинете.
             </p>
           </aside>
         </div>
       </div>
-
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          @media (max-width: 900px) {
-            .program-detail-grid {
-              grid-template-columns: 1fr !important;
-            }
-            .program-detail-grid aside {
-              position: static !important;
-            }
-          }
-        `,
-        }}
-      />
     </div>
   );
 }

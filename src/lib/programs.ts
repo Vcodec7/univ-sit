@@ -454,3 +454,8 @@ export function programIsApplyOpen(status: string, endsAt?: Date | null) {
   if (endsAt && endsAt.getTime() < Date.now()) return false;
   return true;
 }
+
+export function programStatusLabel(status: string, endsAt?: Date | null) {
+  if (status === 'OPEN' && !programIsApplyOpen(status, endsAt)) return 'Срок набора вышел';
+  return PROGRAM_STATUS_LABELS[status] || status;
+}
