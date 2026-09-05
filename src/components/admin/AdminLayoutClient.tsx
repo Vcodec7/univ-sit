@@ -97,8 +97,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (status === 'loading' || !session) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        Загрузка админ-панели...
+      <div className="admin-layout-wrapper admin-layout-wrapper--boot" data-admin-shell="1">
+        <main className="admin-main" id="admin-main" />
       </div>
     );
   }
@@ -126,13 +126,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     <div className="admin-layout-wrapper" data-admin-shell="1">
       <AdminSidebar userRole={userRole} userPermissions={userPermissions} />
       <main className="admin-main" id="admin-main">
-        <nav className="admin-escape-bar" aria-label="Выход из панели">
-          <Link href="/" className="admin-escape-bar__home">
-            ← На сайт
-          </Link>
-          <Link href="/dashboard">Кабинет</Link>
-          <Link href="/admin">Панель</Link>
-        </nav>
+        {pathname !== '/admin' ? (
+          <nav className="admin-escape-bar" aria-label="Выход из раздела">
+            <Link href="/" className="admin-escape-bar__home">
+              На сайт
+            </Link>
+            <Link href="/dashboard">Кабинет</Link>
+            <Link href="/admin">Обзор</Link>
+          </nav>
+        ) : null}
         {deniedBanner ? (
           <div
             role="status"

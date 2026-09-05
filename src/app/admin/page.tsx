@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import DashboardCharts from '@/components/DashboardCharts';
-import { Users, LayoutDashboard, CheckSquare, CalendarDays, MapPin, BarChart3, ScanLine, Trophy, ShieldAlert, Bell, Leaf, Bot, CalendarRange, Server } from 'lucide-react';
+import { CheckSquare, CalendarDays, BarChart3, ScanLine, ShieldAlert, Server } from 'lucide-react';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { hasPermission, parsePermissions } from '@/lib/acl';
@@ -30,9 +30,7 @@ export default async function AdminDashboard() {
     applicationsGroup,
     modReviewers,
     openModerationCount,
-    unreadNotifCount,
     weekEventsCount,
-    ecoSpenders,
     linkedMessengers,
   ] = await Promise.all([
     can('applications')
@@ -92,9 +90,6 @@ export default async function AdminDashboard() {
     can('moderation')
       ? prisma.contentFlag.count({ where: { status: 'OPEN' } })
       : Promise.resolve(0),
-    isAdmin
-      ? prisma.userNotification.count({ where: { readAt: null } })
-      : Promise.resolve(0),
     can('bookings')
       ? prisma.booking.count({
           where: {
@@ -105,9 +100,6 @@ export default async function AdminDashboard() {
             },
           },
         })
-      : Promise.resolve(0),
-    isAdmin
-      ? prisma.user.count({ where: { ecoPoints: { gt: 0 }, deletedAt: null } })
       : Promise.resolve(0),
     isAdmin
       ? prisma.user.count({
@@ -176,398 +168,215 @@ export default async function AdminDashboard() {
     return { name, value: group._count, color };
   });
 
-  const kpiCards: Array<{
+  const attention: Array<{
     href: string;
     label: string;
+    hint: string;
     value: number;
     icon: typeof CheckSquare;
-    emphasize?: boolean;
   }> = [];
   if (can('applications')) {
-    kpiCards.push({
+    attention.push({
       href: '/admin/applications?status=PENDING',
       label: 'Заявки',
+      hint: 'ждут решения',
       value: pendingApplicationsCount,
       icon: CheckSquare,
-      emphasize: pendingApplicationsCount > 0,
     });
   }
-  if (can('projects')) {
-    kpiCards.push({ href: '/admin/projects', label: 'Проекты', value: projectsCount, icon: LayoutDashboard });
-  }
-  if (can('clubs')) {
-    kpiCards.push({ href: '/admin/clubs', label: 'Клубы', value: clubsCount, icon: Users });
-  }
-  // Admin already sees usersCount in the pulse strip — skip duplicate KPI tile.
-  if (can('spaces')) {
-    kpiCards.push({ href: '/admin/spaces', label: 'Пространства', value: spacesCount, icon: MapPin });
-  }
   if (can('bookings')) {
-    kpiCards.push({
+    attention.push({
       href: '/admin/bookings?status=PENDING',
-      label: 'Мероприятия',
+      label: 'Бронь',
+      hint: 'на согласование',
       value: pendingBookingsCount,
       icon: CalendarDays,
-      emphasize: pendingBookingsCount > 0,
     });
   }
-  if (can('bookings')) {
-    kpiCards.push({
-      href: '/admin/bookings?status=APPROVED',
-      label: 'События ±7 дней',
-      value: weekEventsCount,
-      icon: CalendarRange,
+  if (can('moderation')) {
+    attention.push({
+      href: '/admin/moderation',
+      label: 'Модерация',
+      hint: 'открытых флагов',
+      value: openModerationCount,
+      icon: ShieldAlert,
     });
   }
-  if (isAdmin) {
-    kpiCards.push({
-      href: '/admin/users',
-      label: 'С мбаллами',
-      value: ecoSpenders,
-      icon: Leaf,
-    });
-    kpiCards.push({
-      href: '/admin/bots',
-      label: 'Мессенджеры',
-      value: linkedMessengers,
-      icon: Bot,
-    });
-    kpiCards.push({
-      href: '/admin',
-      label: 'Непрочит. уведомл.',
-      value: unreadNotifCount,
-      icon: Bell,
-      emphasize: unreadNotifCount > 20,
-    });
-  }
+
+  const catalog: Array<{ href: string; label: string; value: number }> = [];
+  if (isAdmin) catalog.push({ href: '/admin/users', label: 'Люди', value: usersCount });
+  if (can('projects')) catalog.push({ href: '/admin/projects', label: 'Проекты', value: projectsCount });
+  if (can('clubs')) catalog.push({ href: '/admin/clubs', label: 'Клубы', value: clubsCount });
+  if (can('spaces')) catalog.push({ href: '/admin/spaces', label: 'Площадки', value: spacesCount });
+  if (can('bookings')) catalog.push({ href: '/admin/bookings?status=APPROVED', label: 'Неделя', value: weekEventsCount });
+  if (isAdmin) catalog.push({ href: '/admin/bots', label: 'Боты', value: linkedMessengers });
+
+  const hotCount = attention.reduce((n, a) => n + a.value, 0);
 
   return (
     <div className="admin-page-shell admin-dash">
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        .admin-dash-app-row { cursor: pointer; transition: background 0.15s; }
-        .admin-dash-app-row:hover { background: #f8fafc; }
-        .admin-dash-event-card:hover { background: #f8fafc; }
-        .admin-dash__pulse {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-          gap: 0.75rem;
-          margin: 0 0 1.1rem;
-        }
-        .admin-dash__pulse-card {
-          padding: 0.9rem 1rem;
-          border-radius: 14px;
-          background: linear-gradient(145deg, rgba(13,148,136,0.08), rgba(14,165,233,0.06));
-          border: 1px solid rgba(13,148,136,0.14);
-        }
-        .admin-dash__pulse-card strong { display:block; font-size: 1.35rem; font-weight: 800; color: #0f766e; }
-        .admin-dash__pulse-card span { font-size: 0.78rem; color: #64748b; font-weight: 600; }
-      `,
-        }}
-      />
-      <div className="admin-page-header admin-dash__header">
+      <header className="admin-dash__head">
         <div>
-          <div className="admin-escape">
-            <Link href="/">← Главная</Link>
-            <Link href="/dashboard">Профиль</Link>
-          </div>
-          <h1>Дашборд</h1>
+          <h1>Сегодня</h1>
           <p>
             {isAdmin
-              ? 'Сводка активности, модерации и сервисов портала'
-              : `Модератор · права: ${perms.length ? perms.join(', ') : 'не назначены — отметьте разделы у администратора'}`}
+              ? hotCount
+                ? `В очереди ${hotCount} — сначала это.`
+                : 'Очередь пуста. Каталог и события ниже.'
+              : `Модератор${perms.length ? ` · ${perms.join(', ')}` : ' · права назначит администратор'}`}
           </p>
         </div>
-        <div className="admin-dash__actions">
+        <nav className="admin-dash__tools" aria-label="Сервисы">
           {isAdmin && (
-            <Link href="/admin/system" className="admin-dash__btn" prefetch>
-              <Server size={16} /> Сервер
+            <Link href="/admin/system" prefetch>
+              <Server size={15} /> Сервер
             </Link>
           )}
           {can(['stats', 'bookings']) && (
-            <a href="#admin-analytics" className="admin-dash__btn">
-              <BarChart3 size={16} /> Статистика
+            <a href="#admin-analytics">
+              <BarChart3 size={15} /> Графики
             </a>
           )}
           {can('scanner') && (
-            <Link href="/admin/scanner" className="admin-dash__btn admin-dash__btn--primary" prefetch>
-              <ScanLine size={16} /> Сканер
+            <Link href="/admin/scanner" prefetch>
+              <ScanLine size={15} /> Сканер
             </Link>
           )}
-        </div>
-      </div>
+        </nav>
+      </header>
 
-      {isAdmin ? (
-        <div className="admin-dash__pulse" aria-label="Пульс портала">
-          <div className="admin-dash__pulse-card">
-            <strong>{usersCount}</strong>
-            <span>пользователей</span>
-          </div>
-          <div className="admin-dash__pulse-card">
-            <strong>{ecoSpenders}</strong>
-            <span>с балансом М-баллов</span>
-          </div>
-          <div className="admin-dash__pulse-card">
-            <strong>{linkedMessengers}</strong>
-            <span>привязали ботов</span>
-          </div>
-          <div className="admin-dash__pulse-card">
-            <strong>{unreadNotifCount}</strong>
-            <span>непрочитанных уведомлений</span>
-          </div>
-        </div>
-      ) : null}
-
-      <div className="admin-dash__kpi">
-        {kpiCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link key={card.href} href={card.href} className="admin-dash__kpi-card" prefetch>
-              <Icon size={28} className="admin-dash__kpi-bg" aria-hidden />
-              <span className="admin-dash__kpi-label">{card.label}</span>
-              <strong className={card.emphasize ? 'is-hot' : undefined}>{card.value}</strong>
-            </Link>
-          );
-        })}
-      </div>
-
-      {can('moderation') ? (
-        <div className="admin-card" style={{ padding: '1.15rem 1.25rem', marginBottom: '1rem' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 12,
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              marginBottom: 10,
-            }}
-          >
-            <div>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: '1.05rem',
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+      {attention.length ? (
+        <section className="admin-dash__now" aria-label="Очередь">
+          {attention.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`admin-dash__now-card${item.value > 0 ? ' is-hot' : ''}`}
+                prefetch
               >
-                <Trophy size={18} color="#ca8a04" /> Доска почёта администрации
-              </h2>
-              <p style={{ margin: '0.25rem 0 0', color: 'var(--muted)', fontSize: '0.82rem' }}>
-                Разборы модерации за 30 дней
-                {openModerationCount > 0 ? ` · открытых флагов: ${openModerationCount}` : ''}
-              </p>
-            </div>
-            <Link
-              href="/admin/moderation"
-              className="btn btn-secondary"
-              style={{ display: 'inline-flex', gap: 6, alignItems: 'center', fontSize: '0.82rem' }}
-            >
-              <ShieldAlert size={15} /> Модерация
-            </Link>
-          </div>
-          {hallOfFame.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--muted)', fontSize: '0.88rem' }}>
-              Пока нет разобранных флагов — доска заполнится по мере работы модераторов.
-            </p>
-          ) : (
-            <div className="mod-hof-grid">
-              {hallOfFame.map((r) => (
-                <div key={r.userId || r.rank} className="mod-hof-card">
-                  <span className="mod-hof-rank">#{r.rank}</span>
-                  <div>
-                    <div style={{ fontWeight: 800 }}>{r.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{r.count} разборов</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <Icon size={18} aria-hidden />
+                <strong>{item.value}</strong>
+                <span>
+                  {item.label}
+                  <small>{item.hint}</small>
+                </span>
+              </Link>
+            );
+          })}
+        </section>
       ) : null}
 
-      {(isAdmin || can('applications')) && (
-        <>
-          <p className="admin-analytics-hint" style={{ margin: '0 0 0.75rem', color: 'var(--muted)', fontSize: '0.82rem' }}>
-            Период меняется без перезагрузки. «Проходы QR» — детальная статистика сканера.
-          </p>
-          <DashboardCharts userStats={userStats} appStats={appStats} />
-        </>
-      )}
+      {catalog.length ? (
+        <nav className="admin-dash__catalog" aria-label="Разделы">
+          {catalog.map((item) => (
+            <Link key={item.href} href={item.href} prefetch>
+              <b>{item.value}</b>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      ) : null}
 
       {can('bookings') && (
-        <div
-          style={{
-            backgroundColor: 'white',
-            padding: '1.25rem',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-sm)',
-            marginBottom: '1rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 700 }}>События сегодня ({todayEvents.length})</h2>
-            <Link
-              href="/admin/bookings?status=APPROVED"
-              style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 500 }}
-              prefetch
-            >
-              Все мероприятия &rarr;
+        <section className="admin-dash__block">
+          <div className="admin-dash__block-head">
+            <h2>События сегодня</h2>
+            <Link href="/admin/bookings?status=APPROVED" prefetch>
+              Все
             </Link>
           </div>
-          {todayEvents.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '1rem' }}>
+          {todayEvents.length ? (
+            <ul className="admin-dash__events">
               {todayEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/admin/bookings?status=APPROVED&view=${event.id}`}
-                  prefetch
-                  style={{
-                    display: 'block',
-                    padding: '1rem',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 'var(--radius-md)',
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    cursor: 'pointer',
-                    transition: 'background 0.15s',
-                  }}
-                  className="admin-dash-event-card"
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ fontWeight: 600 }}>{event.title}</span>
-                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
-                      {formatMskTimeRange(event.startTime, event.endTime)} (МСК)
+                <li key={event.id}>
+                  <Link href={`/admin/bookings?status=APPROVED&view=${event.id}`} prefetch>
+                    <strong>{event.title}</strong>
+                    <span>
+                      {formatMskTimeRange(event.startTime, event.endTime)} · {event.space?.title}
                     </span>
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '0.75rem' }}>
-                    Локация: {event.space?.title}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--muted)' }}>
-                    <span>Записано: {event.participants?.length || 0} чел.</span>
-                    <span>Орг: {event.user?.name || 'Без имени'}</span>
-                  </div>
-                </Link>
+                    <em>{event.participants?.length || 0} чел.</em>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '1rem 0' }}>На сегодня ничего не запланировано.</p>
+            <p className="admin-dash__empty">На сегодня ничего не стоит.</p>
           )}
-        </div>
+        </section>
       )}
 
       {can('applications') && (
-        <div style={{ backgroundColor: 'white', padding: '1.25rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '1rem',
-              gap: '0.75rem',
-              flexWrap: 'wrap',
-            }}
-          >
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>Последние заявки</h2>
-            <Link
-              href="/admin/applications?status=PENDING"
-              style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 500 }}
-              prefetch
-            >
-              Все ожидающие &rarr;
+        <section className="admin-dash__block">
+          <div className="admin-dash__block-head">
+            <h2>Последние заявки</h2>
+            <Link href="/admin/applications?status=PENDING" prefetch>
+              Очередь
             </Link>
           </div>
-          <div className="admin-table-wrap">
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-                  <th style={{ padding: '0.75rem', color: 'var(--muted)', fontSize: '0.9rem' }}>Тип</th>
-                  <th style={{ padding: '0.75rem', color: 'var(--muted)', fontSize: '0.9rem' }}>Пользователь</th>
-                  <th style={{ padding: '0.75rem', color: 'var(--muted)', fontSize: '0.9rem' }}>Дата</th>
-                  <th style={{ padding: '0.75rem', color: 'var(--muted)', fontSize: '0.9rem' }}>Статус</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentApplications.length > 0 ? (
-                  recentApplications.map((app) => (
-                    <tr key={app.id} className="admin-dash-app-row" style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td data-label="Тип" style={{ padding: '0.75rem', fontSize: '0.95rem' }}>
-                        <Link
-                          href={`/admin/applications?status=${app.status}&focus=${app.id}${app.project ? '&type=project' : app.club ? '&type=club' : app.program ? '&type=program' : ''}`}
-                          style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
-                          prefetch
-                        >
-                          {app.project
-                            ? `Проект «${app.project.title}»`
-                            : app.club
-                              ? `Клуб «${app.club.title}»`
-                              : app.program
-                                ? `${
-                                    app.program.kind === 'GRANT'
-                                      ? 'Грант'
-                                      : app.program.kind === 'DOBRO'
-                                        ? 'Добро'
-                                        : 'Самоупр.'
-                                  } «${app.program.title}»`
-                                : '—'}
-                        </Link>
-                      </td>
-                      <td data-label="Пользователь" style={{ padding: '0.75rem', fontSize: '0.95rem' }}>
-                        <Link
-                          href={`/admin/applications?status=${app.status}&focus=${app.id}`}
-                          style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
-                          prefetch
-                        >
-                          {app.user.name || app.user.email}
-                        </Link>
-                      </td>
-                      <td data-label="Дата" style={{ padding: '0.75rem', fontSize: '0.95rem', color: 'var(--muted)' }}>
-                        <Link
-                          href={`/admin/applications?status=${app.status}&focus=${app.id}`}
-                          style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
-                          prefetch
-                        >
-                          {new Date(app.createdAt).toLocaleDateString()}
-                        </Link>
-                      </td>
-                      <td data-label="Статус" style={{ padding: '0.75rem' }}>
-                        <Link
-                          href={`/admin/applications?status=${app.status}&focus=${app.id}`}
-                          style={{ color: 'inherit', textDecoration: 'none', display: 'inline-block' }}
-                          prefetch
-                        >
-                          <span
-                            style={{
-                              backgroundColor:
-                                app.status === 'PENDING' ? '#fef3c7' : app.status === 'APPROVED' ? '#dcfce7' : '#fee2e2',
-                              color:
-                                app.status === 'PENDING' ? '#d97706' : app.status === 'APPROVED' ? '#166534' : '#991b1b',
-                              padding: '0.2rem 0.5rem',
-                              borderRadius: '4px',
-                              fontSize: '0.8rem',
-                              fontWeight: 500,
-                            }}
-                          >
-                            {app.status === 'PENDING' ? 'Ожидает' : app.status === 'APPROVED' ? 'Одобрено' : 'Отклонено'}
-                          </span>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: 'var(--muted)' }}>
-                      Нет последних действий
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          {recentApplications.length ? (
+            <ul className="admin-dash__apps">
+              {recentApplications.map((app) => {
+                const title = app.project
+                  ? `Проект «${app.project.title}»`
+                  : app.club
+                    ? `Клуб «${app.club.title}»`
+                    : app.program
+                      ? `${
+                          app.program.kind === 'GRANT'
+                            ? 'Грант'
+                            : app.program.kind === 'DOBRO'
+                              ? 'Добро'
+                              : 'Самоупр.'
+                        } «${app.program.title}»`
+                      : 'Заявка';
+                const st =
+                  app.status === 'PENDING' ? 'Ждёт' : app.status === 'APPROVED' ? 'Ок' : 'Нет';
+                return (
+                  <li key={app.id}>
+                    <Link href={`/admin/applications?status=${app.status}&focus=${app.id}`} prefetch>
+                      <strong>{title}</strong>
+                      <span>{app.user.name || app.user.email}</span>
+                      <em className={`is-${app.status.toLowerCase()}`}>{st}</em>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="admin-dash__empty">Новых заявок нет.</p>
+          )}
+        </section>
+      )}
+
+      {can('moderation') ? (
+        <section className="admin-dash__block">
+          <div className="admin-dash__block-head">
+            <h2>Модераторы · 30 дней</h2>
+            <Link href="/admin/moderation" prefetch>
+              Флаги
+            </Link>
           </div>
+          {hallOfFame.length === 0 ? (
+            <p className="admin-dash__empty">Пока нет разобранных флагов.</p>
+          ) : (
+            <ol className="admin-dash__hof">
+              {hallOfFame.map((r) => (
+                <li key={r.userId || r.rank}>
+                  <span>#{r.rank}</span>
+                  <strong>{r.name}</strong>
+                  <em>{r.count}</em>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+      ) : null}
+
+      {(isAdmin || can('applications')) && (
+        <div id="admin-analytics" className="admin-dash__charts">
+          <DashboardCharts userStats={userStats} appStats={appStats} />
         </div>
       )}
     </div>

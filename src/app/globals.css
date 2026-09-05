@@ -26907,8 +26907,197 @@ html:not(.has-session) .nav-auth-mobile__profile {
   visibility: hidden;
   pointer-events: none;
 }
-html.yp-booting .qa-edge-tab {
-  visibility: hidden;
+.admin-dash__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin: 0 0 1rem;
+}
+.admin-dash__head h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+  font-weight: 800;
+}
+.admin-dash__head p {
+  margin: 0.3rem 0 0;
+  color: #5a5670;
+  font-size: 0.9rem;
+}
+.admin-dash__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 0.9rem;
+}
+.admin-dash__tools a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #6e4bc4;
+  font-weight: 750;
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+.admin-dash__now {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+@media (min-width: 560px) {
+  .admin-dash__now {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.admin-dash__now-card {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.55rem 0.65rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 1rem;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  color: inherit;
+  text-decoration: none;
+}
+.admin-dash__now-card svg { color: #6e4bc4; }
+.admin-dash__now-card strong {
+  font-size: 1.45rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.admin-dash__now-card span {
+  display: flex;
+  flex-direction: column;
+  font-weight: 750;
+  font-size: 0.92rem;
+}
+.admin-dash__now-card small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #5a5670;
+}
+.admin-dash__now-card.is-hot {
+  border-color: #6e4bc4;
+  background: #f7f4ff;
+}
+.admin-dash__catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1.1rem;
+}
+.admin-dash__catalog a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  color: #0a0c2a;
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+.admin-dash__catalog b {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #6e4bc4;
+}
+.admin-dash__block {
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 1.1rem;
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 0.75rem;
+}
+.admin-dash__block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+.admin-dash__block-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.admin-dash__block-head a {
+  color: #6e4bc4;
+  font-weight: 750;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+.admin-dash__empty {
+  margin: 0;
+  color: #5a5670;
+  font-size: 0.88rem;
+}
+.admin-dash__events,
+.admin-dash__apps,
+.admin-dash__hof {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.admin-dash__events a,
+.admin-dash__apps a {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 0.85rem;
+  background: #f7f4ff;
+  color: inherit;
+  text-decoration: none;
+}
+.admin-dash__events strong,
+.admin-dash__apps strong {
+  font-size: 0.92rem;
+}
+.admin-dash__events span,
+.admin-dash__apps span {
+  font-size: 0.78rem;
+  color: #5a5670;
+}
+.admin-dash__events em,
+.admin-dash__apps em {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 750;
+  color: #6e4bc4;
+}
+.admin-dash__apps em.is-pending { color: #b45309; }
+.admin-dash__apps em.is-approved { color: #15803d; }
+.admin-dash__apps em.is-rejected { color: #b42318; }
+.admin-dash__hof li {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0.15rem;
+}
+.admin-dash__hof span { color: #6e4bc4; font-weight: 800; }
+.admin-dash__hof em { font-style: normal; font-weight: 750; color: #5a5670; }
+.admin-dash__charts { margin-top: 0.5rem; }
+.admin-escape-bar a {
+  background: transparent !important;
+  border: 0 !important;
+  color: #6e4bc4 !important;
+  padding: 0.2rem 0.35rem !important;
+  min-height: 0 !important;
+}
+.admin-escape-bar__home {
+  background: transparent !important;
+  color: #6e4bc4 !important;
+}
+.admin-layout-wrapper--boot .admin-main {
+  min-height: 50vh;
 }
 
 
