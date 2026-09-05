@@ -1,12 +1,35 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { flushGameScoreQueue } from '@/lib/game-scores-client';
 import EcoAwardToast from '@/components/EcoAwardToast';
 import QuickAccess from '@/components/QuickAccess';
 import InstructionsWelcomeModal from '@/components/InstructionsWelcomeModal';
 import { VoiceProvider } from '@/components/VoiceProvider';
+
+function ChromePaintLock() {
+  const { status } = useSession();
+  useLayoutEffect(() => {
+    document.documentElement.classList.add('yp-booting');
+  }, []);
+  useEffect(() => {
+    if (status === 'loading') return;
+    let frames = 0;
+    let raf = 0;
+    const tick = () => {
+      frames += 1;
+      if (frames < 2) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      document.documentElement.classList.remove('yp-booting');
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [status]);
+  return null;
+}
 
 function GameScoreSync() {
   useEffect(() => {
@@ -88,6 +111,7 @@ export function Providers({
   return (
     <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
       <VoiceProvider>
+        {!minimal && <ChromePaintLock />}
         {!minimal && <GameScoreSync />}
         {!minimal && <PresenceHeartbeat />}
         {!minimal && <EcoAwardToast />}

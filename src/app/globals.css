@@ -2713,8 +2713,7 @@ img.site-brand-logo {
     display: flex !important;
   }
   /* Desktop auth chrome stays off mobile; compact mobile strip instead */
-  .nav-auth-desktop--session,
-  .nav-auth-desktop--guest {
+  .nav-auth-desktop {
     display: none !important;
   }
   .nav-auth-mobile {
@@ -13569,8 +13568,7 @@ pre {
   .nav-header-mobile {
     display: flex !important;
   }
-  .nav-auth-desktop--session,
-  .nav-auth-desktop--guest {
+  .nav-auth-desktop {
     display: none !important;
   }
   .nav-auth-mobile {
@@ -26897,6 +26895,20 @@ button.svc-hero__switch-btn {
 .dashboard-page .presence-panel,
 .dashboard-page .yp-pass-block {
   display: none;
+}
+
+html.has-session .nav-auth-guest {
+  display: none !important;
+}
+html:not(.has-session) .nav-auth-authed {
+  display: none !important;
+}
+html:not(.has-session) .nav-auth-mobile__profile {
+  visibility: hidden;
+  pointer-events: none;
+}
+html.yp-booting .qa-edge-tab {
+  visibility: hidden;
 }
 
 

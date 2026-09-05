@@ -149,9 +149,8 @@ export default function BottomNav() {
     persistSessionHint(true);
   }, [visible, status]);
 
-  if (!visible) {
-    return null;
-  }
+  if (immersive) return null;
+  if (status === 'authenticated' && hideForRole) return null;
 
   const tabs: Tab[] = [
     {

@@ -33,6 +33,7 @@ import {
   Ticket,
   LayoutDashboard,
   UserCircle,
+  Bell,
   Settings,
   Users,
   Award,
@@ -368,45 +369,45 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       className="nav-auth-slot"
       style={{ ['--nav-auth-slots' as string]: authIconCount }}
     >
-      {!showAuthedNav ? (
-        <div className="nav-auth-icons nav-auth-guest">
-          <GuestAuthPrompt
-            href="/coworking"
-            className="nav-pill nav-pill--solid nav-pill--desktop-cta"
-            title="Записаться"
-            asButton
-          >
-            Запись
-          </GuestAuthPrompt>
-          <Link href="/login" className="nav-pill nav-pill--ghost" title="Вход">
-            Вход
+      <div className="nav-auth-icons nav-auth-guest">
+        <GuestAuthPrompt
+          href="/coworking"
+          className="nav-pill nav-pill--solid nav-pill--desktop-cta"
+          title="Записаться"
+          asButton
+        >
+          Запись
+        </GuestAuthPrompt>
+        <Link href="/login" className="nav-pill nav-pill--ghost" title="Вход">
+          Вход
+        </Link>
+        {modOn(siteSettings, 'registration') ? (
+          <Link href="/register" className="nav-pill nav-pill--solid" title="Регистрация">
+            Регистрация
           </Link>
-          {modOn(siteSettings, 'registration') ? (
-            <Link href="/register" className="nav-pill nav-pill--solid" title="Регистрация">
-              Регистрация
-            </Link>
-          ) : null}
-        </div>
-      ) : (
-        <div className="nav-auth-icons nav-auth-icons--compact">
-          {isAuthenticated && modOn(siteSettings, 'notifications') ? (
-            <NotificationsBell compact useNavStyle />
-          ) : (
-            <span className="nav-icon-btn nav-icon-btn--reserve" aria-hidden />
-          )}
-          <div className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}>
-            <button
-              type="button"
-              className="nav-icon-btn nav-account-trigger"
-              aria-expanded={openMenu === 'account'}
-              aria-haspopup="menu"
-              title="Аккаунт"
-              aria-label="Аккаунт"
-              onClick={() => setOpenMenu((m) => (m === 'account' ? null : 'account'))}
-            >
-              <UserCircle size={18} />
-              <ChevronDown size={12} className="nav-account-chevron" aria-hidden />
-            </button>
+        ) : null}
+      </div>
+      <div className="nav-auth-icons nav-auth-icons--compact nav-auth-authed">
+        {isAuthenticated && modOn(siteSettings, 'notifications') ? (
+          <NotificationsBell compact useNavStyle />
+        ) : (
+          <span className="nav-icon-btn" aria-hidden>
+            <Bell size={18} />
+          </span>
+        )}
+        <div className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}>
+          <button
+            type="button"
+            className="nav-icon-btn nav-account-trigger"
+            aria-expanded={openMenu === 'account'}
+            aria-haspopup="menu"
+            title="Аккаунт"
+            aria-label="Аккаунт"
+            onClick={() => setOpenMenu((m) => (m === 'account' ? null : 'account'))}
+          >
+            <UserCircle size={18} />
+            <ChevronDown size={12} className="nav-account-chevron" aria-hidden />
+          </button>
             {openMenu === 'account' && (
               <div className="dropdown nav-account-menu" role="menu">
                 <div className="nav-account-menu__head">
@@ -535,7 +536,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             )}
           </div>
         </div>
-      )}
     </div>
   );
 
@@ -584,32 +584,26 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
 
   /** Mobile: CTA always the same width; profile slot reserved so refresh does not shove Запись. */
   const renderMobileHeaderActions = () => (
-    <div
-      className={`nav-auth-mobile__row${showAuthedNav ? ' nav-auth-mobile__row--session' : ' nav-auth-mobile__row--guest'}`}
-    >
+    <div className="nav-auth-mobile__row">
       <GuestAuthPrompt
         href="/coworking"
         className="nav-pill nav-pill--solid nav-pill--mobile-cta"
         title="Записаться"
-        preferLink={showAuthedNav}
-        asButton={!showAuthedNav}
+        preferLink={isAuthenticated}
+        asButton={!isAuthenticated}
       >
         Запись
       </GuestAuthPrompt>
-      {showAuthedNav ? (
-        <Link
-          href={profileHref}
-          prefetch
-          className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
-          aria-label="Профиль"
-          title="Профиль"
-          aria-current={isActive(profileHref) ? 'page' : undefined}
-        >
-          <UserCircle size={18} aria-hidden />
-        </Link>
-      ) : (
-        <span className="nav-auth-mobile__profile is-spacer" aria-hidden />
-      )}
+      <Link
+        href={profileHref}
+        prefetch
+        className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
+        aria-label="Профиль"
+        title="Профиль"
+        aria-current={isActive(profileHref) ? 'page' : undefined}
+      >
+        <UserCircle size={18} aria-hidden />
+      </Link>
     </div>
   );
 
@@ -832,9 +826,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
           <div className="nav-header-mobile nav-header-mobile--compact" aria-hidden>
             {/* Search moves into burger menu on narrow screens to avoid logo crush */}
           </div>
-          <div
-            className={`nav-auth-desktop${showAuthedNav ? ' nav-auth-desktop--session' : ' nav-auth-desktop--guest'}`}
-          >
+          <div className="nav-auth-desktop">
             {renderAuthIcons()}
           </div>
           <div className="nav-auth-mobile" aria-label="Быстрые действия">
