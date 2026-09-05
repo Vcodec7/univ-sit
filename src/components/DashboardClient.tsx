@@ -102,6 +102,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   const [modernUserBadge, setModernUserBadge] = useState(false);
   const [repModalOpen, setRepModalOpen] = useState(false);
   const [repModalTab, setRepModalTab] = useState<'LEVEL' | 'AUTHORITY' | 'SOCIAL' | 'ECO'>('AUTHORITY');
+  const [passOpen, setPassOpen] = useState(false);
   const [moduleFlags, setModuleFlags] = useState<Record<string, boolean> | null>(null);
   const [levelMeta, setLevelMeta] = useState<{
     level: number;
@@ -145,6 +146,17 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     setRepModalTab(tab);
     setRepModalOpen(true);
   };
+  const openPass = () => setPassOpen(true);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.hash === '#pass') setPassOpen(true);
+    const onHash = () => {
+      if (window.location.hash === '#pass') setPassOpen(true);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   useEffect(() => {
     fetchPublicStatusCached()
@@ -584,11 +596,12 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                         )
                       }
                       onStatClick={(key) => openRepModal(key)}
+                      onPassClick={openPass}
                       showRatings
                       showEco
                       revealContacts
                     />
-                    <PersonalQrPanel />
+                    <PersonalQrPanel open={passOpen} onClose={() => setPassOpen(false)} />
                     <CoworkingCabinetList />
 
                   </div>

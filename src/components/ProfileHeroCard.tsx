@@ -147,6 +147,7 @@ type Props = {
   editSectionHref?: string;
   onShowcaseSaved?: (codes: string[]) => void;
   onStatClick?: (key: ProfileStatKey) => void;
+  onPassClick?: () => void;
   showRatings?: boolean;
   showEco?: boolean;
   showShowcase?: boolean;
@@ -190,6 +191,7 @@ export default function ProfileHeroCard({
   editSectionHref = '#profile-edit',
   onShowcaseSaved,
   onStatClick,
+  onPassClick,
   showRatings = true,
   showEco = true,
   showShowcase = true,
@@ -487,13 +489,23 @@ export default function ProfileHeroCard({
 
       {showHud ? (
         <div className="profile-hero__meters" aria-label="Пропуск, репутация и М-баллы">
-          <a className="profile-hero__meter" href="#pass">
-            <QrCode size={18} aria-hidden />
-            <span>
-              <small>Пропуск</small>
-              <strong>QR</strong>
-            </span>
-          </a>
+          {onPassClick ? (
+            <button type="button" className="profile-hero__meter" onClick={onPassClick}>
+              <QrCode size={18} aria-hidden />
+              <span>
+                <small>Пропуск</small>
+                <strong>Открыть</strong>
+              </span>
+            </button>
+          ) : (
+            <a className="profile-hero__meter" href="#pass">
+              <QrCode size={18} aria-hidden />
+              <span>
+                <small>Пропуск</small>
+                <strong>QR</strong>
+              </span>
+            </a>
+          )}
           <button
             type="button"
             className="profile-hero__meter"
@@ -517,57 +529,24 @@ export default function ProfileHeroCard({
         </div>
       ) : null}
 
-      <div className="profile-hero__loadout-wrap">
-      <details className="profile-hero__loadout-details">
-        <summary className="profile-hero__loadout-summary">
-          <span className="profile-hero__loadout-summary-main">
-            <Sparkles size={14} aria-hidden />
-            Оформление
-            {equipped.length ? (
-              <em className="profile-hero__loadout-count">{equipped.length}</em>
-            ) : null}
-          </span>
-        </summary>
-        {equipped.length ? (
-          <div className="profile-hero__loadout" aria-label="Надетые предметы">
-            <ul className="profile-hero__loadout-list">
-              {equipped.map((item) => (
-                <li
-                  key={item.slot}
-                  className="profile-hero__loadout-chip"
-                  style={{ ['--chip' as string]: item.tint } as CSSProperties}
-                  title={item.label}
-                >
-                  <span aria-hidden>{item.glyph}</span>
-                  <em>{item.label}</em>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="profile-hero__loadout profile-hero__loadout--empty">
-            <Sparkles size={14} aria-hidden />
-            <span>Рамка аватара и тема профиля — в магазине. После покупки кольцо вокруг фото появится здесь.</span>
-          </p>
-        )}
-      </details>
-      <Link href="/dashboard/shop" className="profile-hero__loadout-link">
-        Магазин
-      </Link>
-      </div>
-
       {showShowcase ? (
       <div className="profile-hero__showcase profile-hero__showcase--shelf">
         <div className="profile-hero__showcase-head">
           <div className="profile-hero__showcase-label">
-            Витрина значков
+            Значки
             <span>
               {achLoading ? '…' : `${activeCodes.length}/${SHOWCASE_MAX}`}
+              {equipped.length ? ` · стиль ${equipped.length}` : ''}
             </span>
           </div>
-          <Link href={showcaseHref} className="profile-hero__edit-btn">
-            Собрать
-          </Link>
+          <div className="profile-hero__showcase-actions">
+            <Link href="/dashboard/shop" className="profile-hero__edit-btn">
+              Магазин
+            </Link>
+            <Link href={showcaseHref} className="profile-hero__edit-btn">
+              Собрать
+            </Link>
+          </div>
         </div>
         <div className="profile-hero__showcase-body" aria-busy={achLoading}>
           {achLoading ? (

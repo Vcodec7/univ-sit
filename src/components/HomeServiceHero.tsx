@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Building2, CalendarPlus } from 'lucide-react';
+import { Building2, CalendarDays, CalendarPlus } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import HomeHeroMedia from '@/components/HomeHeroMedia';
 
@@ -49,12 +49,12 @@ export default function HomeServiceHero({
                 {primary ? (
                   needsAuth(primary.href) ? (
                     <GuestAuthPrompt href={primary.href} className="svc-hero__switch-btn is-on" asButton>
-                      <CalendarPlus size={16} aria-hidden />
+                      <CalendarPlus size={18} aria-hidden />
                       {primary.label}
                     </GuestAuthPrompt>
                   ) : (
                     <Link href={primary.href} className="svc-hero__switch-btn is-on" prefetch>
-                      <CalendarPlus size={16} aria-hidden />
+                      <CalendarPlus size={18} aria-hidden />
                       {primary.label}
                     </Link>
                   )
@@ -62,33 +62,23 @@ export default function HomeServiceHero({
                 {secondary ? (
                   needsAuth(secondary.href) ? (
                     <GuestAuthPrompt href={secondary.href} className="svc-hero__switch-btn" asButton>
-                      <Building2 size={16} aria-hidden />
+                      <Building2 size={18} aria-hidden />
                       {secondary.label}
                     </GuestAuthPrompt>
                   ) : (
                     <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
-                      <Building2 size={16} aria-hidden />
+                      <Building2 size={18} aria-hidden />
                       {secondary.label}
                     </Link>
                   )
                 ) : null}
               </div>
             )}
+            <Link href="/events" className="svc-hero__afisha" prefetch>
+              <CalendarDays size={16} aria-hidden />
+              Афиша
+            </Link>
           </div>
-          <aside className="svc-hero__aside" aria-label="Что умеет портал">
-            <div className="svc-hero__aside-item">
-              <strong>Бронь залов</strong>
-              <span>Слоты и календарь площадок Центра.</span>
-            </div>
-            <div className="svc-hero__aside-item">
-              <strong>Коворкинг</strong>
-              <span>Почасовая запись на те же пространства.</span>
-            </div>
-            <div className="svc-hero__aside-item">
-              <strong>Афиша</strong>
-              <span>События, клубы и проекты без лишних шагов.</span>
-            </div>
-          </aside>
         </div>
       </div>
     </section>

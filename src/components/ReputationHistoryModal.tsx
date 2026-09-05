@@ -99,6 +99,8 @@ type Props = {
   initialTab?: TabId;
   onOpenShop?: () => void;
   onEcoChange?: (eco: number) => void;
+  /** One metric at a time — no glossary of other ratings. */
+  focusOnly?: boolean;
 };
 
 export default function ReputationHistoryModal({
@@ -106,6 +108,7 @@ export default function ReputationHistoryModal({
   onClose,
   initialTab = 'AUTHORITY',
   onOpenShop,
+  focusOnly = true,
 }: Props) {
   const [tab, setTab] = useState<TabId>(initialTab);
   const [data, setData] = useState<ReputationData | null>(null);
@@ -179,42 +182,47 @@ export default function ReputationHistoryModal({
         className="rep-modal rep-modal--wide rep-modal--game"
         role="dialog"
         aria-modal="true"
-        aria-label="Рейтинги, уровень и история"
+        aria-label={TAB_META[tab].label}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="rep-modal__head">
-          <strong>Прогрессия и рейтинги</strong>
+          <strong>{TAB_META[tab].label}</strong>
           <button type="button" className="yp-modal-close" aria-label="Закрыть" onClick={onClose}>
             <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
-        <p className="rep-modal__why">
-          <b>Уровень</b> — вклад на портале (кошелёк + стиль + коллекция).{' '}
-          <b>Надёжность</b> — можно ли доверять вам на событиях;{' '}
-          <b>Сообщество</b> — насколько вы в теме общения.{' '}
-          <b>Кошелёк</b> — М-баллы на рамки и карты. Репутация участия считается отдельно и не тратится.
-        </p>
-
-        <div className="rep-modal__tabs" role="tablist">
-          {(Object.keys(TAB_META) as TabId[]).map((id) => {
-            const meta = TAB_META[id];
-            const Icon = meta.Icon;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={tab === id}
-                className={`rep-modal__tab${tab === id ? ' is-active' : ''}`}
-                onClick={() => setTab(id)}
-              >
-                <Icon size={14} aria-hidden />
-                {meta.label}
-              </button>
-            );
-          })}
-        </div>
+        {focusOnly ? (
+          <p className="rep-modal__why rep-modal__why--short">{TAB_META[tab].blurb}</p>
+        ) : (
+          <>
+            <p className="rep-modal__why">
+              <b>Уровень</b> — вклад на портале (кошелёк + стиль + коллекция).{' '}
+              <b>Надёжность</b> — можно ли доверять вам на событиях;{' '}
+              <b>Сообщество</b> — насколько вы в теме общения.{' '}
+              <b>Кошелёк</b> — М-баллы на рамки и карты. Репутация участия считается отдельно и не тратится.
+            </p>
+            <div className="rep-modal__tabs" role="tablist">
+              {(Object.keys(TAB_META) as TabId[]).map((id) => {
+                const meta = TAB_META[id];
+                const Icon = meta.Icon;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === id}
+                    className={`rep-modal__tab${tab === id ? ' is-active' : ''}`}
+                    onClick={() => setTab(id)}
+                  >
+                    <Icon size={14} aria-hidden />
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         <div className="rep-modal__balance">
           <span className="rep-modal__balance-val">{loading ? '…' : balance}</span>
@@ -224,7 +232,13 @@ export default function ReputationHistoryModal({
                   level.toNext ? ` · до следующего: ${level.toNext}` : ' · максимум'
                 }`
               : tab === 'AUTHORITY' && data
-                ? `${data.authorityLabel || 'Надёжность'} · пришёл: ${data.attendedCount ?? 0}, пропусков: ${data.noShowCount ?? 0}`
+                ? `${data.authorityLabel || 'Надёжность'}${
+                    data.noShowCount
+                      ? ` · пропусков: ${data.noShowCount}`
+                      : data.attendedCount
+                        ? ` · визитов: ${data.attendedCount}`
+                        : ''
+                  }`
                 : tab === 'SOCIAL' && data
                   ? `${data.socialLabel || 'Сообщество'} · ${TAB_META.SOCIAL.blurb}`
                   : TAB_META.ECO.blurb}

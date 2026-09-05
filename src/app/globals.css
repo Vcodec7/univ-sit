@@ -24784,41 +24784,16 @@ html.has-session .nav-auth-mobile {
 }
 @media (min-width: 1100px) {
   .svc-hero--banner .svc-hero__content {
-    grid-template-columns: minmax(24rem, 1fr) 17.5rem;
-    gap: 2.25rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
   }
 }
-.svc-hero__aside {
-  display: none;
+.svc-hero__aside,
+.svc-hero__aside-item {
+  display: none !important;
 }
-@media (min-width: 1100px) {
-  .svc-hero__aside {
-    display: grid;
-    gap: 0.65rem;
-    padding: 1rem;
-    border-radius: 1.25rem;
-    background: rgba(10, 12, 42, 0.42);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(10px);
-  }
-  .svc-hero__aside-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.7rem 0.85rem;
-    border-radius: 0.9rem;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-  }
-  .svc-hero__aside-item strong {
-    font-size: 0.95rem;
-    font-weight: 800;
-  }
-  .svc-hero__aside-item span {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.78);
-    line-height: 1.35;
-  }
+.svc-hero--banner .svc-hero__content {
+  grid-template-columns: minmax(0, 1fr) !important;
 }
 .svc-hero--banner .svc-hero__eyebrow {
   color: var(--accent);
@@ -26283,12 +26258,13 @@ button.btn,
 /* ===== 1.6.16 home + places polish ===== */
 .svc-hero__switch {
   display: flex !important;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 1.15rem;
   padding: 0;
   width: 100%;
-  max-width: min(100%, 20rem);
+  max-width: min(100%, 22.5rem);
   border-radius: 0;
   background: transparent !important;
   border: 0;
@@ -26622,23 +26598,23 @@ body:has(.dashboard-page) .main-content {
 .qa-edge-tab {
   position: fixed;
   right: 0;
-  top: 42%;
+  top: 46%;
   z-index: 12050;
-  width: 2rem;
-  height: 4.4rem;
+  width: 1.15rem;
+  height: 2.55rem;
   border: 0;
-  border-radius: 12px 0 0 12px;
-  background: #6e4bc4;
-  color: #fff;
+  border-radius: 8px 0 0 8px;
+  background: rgba(10, 12, 42, 0.38);
+  color: rgba(255, 255, 255, 0.88);
   display: grid;
   place-items: center;
-  box-shadow: -6px 8px 20px rgba(10, 12, 42, 0.22);
+  box-shadow: none;
   cursor: pointer;
 }
 .qa-edge-tab:hover,
 .qa-edge-tab:focus-visible {
-  width: 2.35rem;
-  background: #5a3bb0;
+  width: 1.55rem;
+  background: rgba(10, 12, 42, 0.62);
 }
 
 .profile-hero__avatar {
@@ -26815,6 +26791,118 @@ body:has(.dashboard-page) .main-content {
   .site-footer-nav-list a {
     width: 100% !important;
   }
+}
+
+.nav-icon-btn,
+.yp-notif-bell.is-nav-style {
+  width: 32px !important;
+  height: 32px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.nav-icon-btn:hover,
+.yp-notif-bell.is-nav-style:hover,
+.yp-notif-bell.is-nav-style.is-open {
+  background: rgba(10, 12, 42, 0.06) !important;
+}
+.nav-icon-btn--reserve {
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+}
+.glass-nav-end {
+  min-width: 0 !important;
+  padding-left: 0.2rem !important;
+  gap: 0.12rem !important;
+}
+.nav-auth-icons {
+  gap: 0.08rem !important;
+}
+.nav-search {
+  margin-right: 0.1rem;
+}
+
+.svc-hero__afisha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+.svc-hero__afisha:hover {
+  color: var(--accent);
+}
+.svc-hero__switch-btn {
+  flex: 1 1 calc(50% - 0.25rem);
+  width: auto !important;
+}
+
+.rep-modal__why--short {
+  background: transparent;
+  border: 0;
+  padding: 0 0 0.35rem;
+  color: #5a5670;
+}
+
+.profile-hero__showcase-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.presence-pass-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+}
+.presence-pass-sheet__back {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(10, 12, 42, 0.45);
+}
+.presence-pass-sheet__card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 86vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 1.35rem 1.35rem 0 0;
+  padding: 1.1rem 1.15rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.presence-pass-sheet .presence-qr-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.35rem;
+}
+.presence-pass-sheet .presence-qr-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.presence-pass-sheet__lead {
+  margin: 0 0 0.85rem;
+  color: #5a5670;
+  font-size: 0.9rem;
+}
+.dashboard-page .presence-panel,
+.dashboard-page .yp-pass-block {
+  display: none;
 }
 
 

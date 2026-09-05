@@ -25,7 +25,7 @@ import {
   User,
   Users,
   X,
-  Zap,
+  LayoutGrid,
 } from 'lucide-react';
 import {
   QUICK_ACCESS_OPEN_EVENT,
@@ -371,7 +371,7 @@ export function QuickAccess() {
           title="Быстрый доступ"
           onClick={() => setOpen(true)}
         >
-          <Zap size={16} aria-hidden />
+          <LayoutGrid size={14} aria-hidden />
         </button>
       ) : null}
 
