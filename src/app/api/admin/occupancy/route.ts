@@ -156,3 +156,34 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, closure: row }, { status: 201 });
 }
+
+export async function DELETE(req: Request) {
+  const originBlock = assertSameOrigin(req);
+  if (originBlock) return originBlock;
+
+  const session = await getServerSession(authOptions);
+  if (!session?.user || !canManage(session.user.role)) {
+    return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
+  }
+
+  const body = await req.json().catch(() => null);
+  const spaceId = String(body?.spaceId || '');
+  const startTime = body?.startTime ? new Date(body.startTime) : null;
+  const endTime = body?.endTime ? new Date(body.endTime) : null;
+  if (!spaceId || !startTime || !endTime || Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) {
+    return NextResponse.json({ message: 'Нужны spaceId, startTime, endTime' }, { status: 400 });
+  }
+
+  const { count } = await prisma.spaceClosure.deleteMany({
+    where: {
+      spaceId,
+      kind: { in: ['SERVICE', 'CLOSED'] },
+      startTime,
+      endTime,
+    },
+  });
+  if (!count) {
+    return NextResponse.json({ message: 'Служебный слот не найден (бронь снимается в афише)' }, { status: 404 });
+  }
+  return NextResponse.json({ ok: true, removed: count });
+}

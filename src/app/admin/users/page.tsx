@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Trash2, Eye } from 'lucide-react';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, requireAdminPage } from '@/lib/acl';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
@@ -182,9 +183,9 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
                     </Link>
                     <form action={deleteUser}>
                       <input type="hidden" name="id" value={user.id} />
-                      <button type="submit" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }} title="Удалить">
+                      <ConfirmSubmitButton message="Удалить пользователя? Это необратимо." className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }} title="Удалить">
                         <Trash2 size={16} />
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   </div>
                 </td>

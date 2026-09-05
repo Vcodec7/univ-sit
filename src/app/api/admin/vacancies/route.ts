@@ -19,6 +19,7 @@ export async function GET() {
         take: 100,
         include: {
           employer: { select: { id: true, title: true, status: true, isInternal: true } },
+          questions: { orderBy: { sortOrder: 'asc' } },
           _count: { select: { applications: true, questions: true } },
         },
       }),

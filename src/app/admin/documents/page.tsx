@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Trash2, Plus, Eye, FileText, Shield } from 'lucide-react';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
@@ -215,9 +216,9 @@ export default async function AdminDocumentsPage({
               </Link>
               <form action={deleteItem}>
                 <input type="hidden" name="id" value={doc.id} />
-                <button type="submit" className="btn btn-secondary" style={{ color: '#b91c1c', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <ConfirmSubmitButton message="Удалить документ?" className="btn btn-secondary" style={{ color: '#b91c1c', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <Trash2 size={16} /> Удалить
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </div>
           </div>

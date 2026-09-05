@@ -103,7 +103,7 @@ export function permissionsForAdminPath(
   if (pathname.startsWith('/admin/clubs')) return ['clubs'];
   if (pathname.startsWith('/admin/spaces')) return ['spaces'];
   if (pathname.startsWith('/admin/places')) return ['places'];
-  if (pathname.startsWith('/admin/bookings')) return ['bookings'];
+  if (pathname.startsWith('/admin/bookings') || pathname.startsWith('/admin/occupancy')) return ['bookings'];
   if (pathname.startsWith('/admin/applications')) return ['applications'];
   if (pathname.startsWith('/admin/pages')) return ['pages'];
   if (pathname.startsWith('/admin/faq')) return ['pages'];

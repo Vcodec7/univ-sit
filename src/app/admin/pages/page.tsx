@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Edit, Trash2, Eye, Plus, Shield, Users, FileStack } from 'lucide-react';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { deletePage } from './actions';
 import { requirePermissionPage } from '@/lib/acl';
 import { publishLabel } from '@/lib/publish';
@@ -322,9 +323,9 @@ export default async function AdminPages({
                       {!system && (
                         <form action={deletePage}>
                           <input type="hidden" name="id" value={item.id} />
-                          <button type="submit" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }}>
+                          <ConfirmSubmitButton message="Удалить страницу?" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }}>
                             <Trash2 size={16} />
-                          </button>
+                          </ConfirmSubmitButton>
                         </form>
                       )}
                     </div>

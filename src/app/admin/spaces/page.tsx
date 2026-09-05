@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Edit, Trash2, X, QrCode } from 'lucide-react';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import RichTextInput from '@/components/RichTextInput';
@@ -200,7 +201,7 @@ export default async function AdminSpaces({ searchParams }: { searchParams: Prom
                       <Link href={`/admin/spaces?edit=${item.id}`} className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--primary)' }}><Edit size={16} /></Link>
                       <form action={deleteItem}>
                         <input type="hidden" name="id" value={item.id} />
-                        <button type="submit" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }}><Trash2 size={16} /></button>
+                        <ConfirmSubmitButton message="Удалить пространство?" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }}><Trash2 size={16} /></ConfirmSubmitButton>
                       </form>
                     </div>
                   </td>

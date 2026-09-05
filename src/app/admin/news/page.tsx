@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Trash2, Plus } from 'lucide-react';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
@@ -222,9 +223,9 @@ export default async function AdminNews({
               <Link href={'/admin/news?edit=' + n.id} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem' }}>Изменить</Link>
               <form action={deleteItem}>
                 <input type="hidden" name="id" value={n.id} />
-                <button type="submit" className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', color: '#e11d48' }} aria-label="Удалить">
+                <ConfirmSubmitButton message="Удалить новость?" className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', color: '#e11d48' }} aria-label="Удалить">
                   <Trash2 size={16} />
-                </button>
+                </ConfirmSubmitButton>
               </form>
             </div>
           </div>

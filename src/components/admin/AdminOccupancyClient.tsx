@@ -33,14 +33,17 @@ export default function AdminOccupancyClient() {
   const [note, setNote] = useState('Уборка');
   const [blocking, setBlocking] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch(`/api/admin/occupancy?day=${encodeURIComponent(day)}`, { credentials: 'same-origin' })
+  function refresh() {
+    return fetch(`/api/admin/occupancy?day=${encodeURIComponent(day)}`, { credentials: 'same-origin' })
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) throw new Error(data.message || 'Ошибка');
         setHalls(data.halls || []);
-      })
-      .catch((e) => setError(e.message));
+      });
+  }
+
+  useEffect(() => {
+    refresh().catch((e) => setError((e as Error).message));
   }, [day]);
 
   async function blockSlot(spaceId: string, start: string, end: string) {
@@ -55,11 +58,27 @@ export default function AdminOccupancyClient() {
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.message || 'Конфликт');
-      const refreshed = await fetch(`/api/admin/occupancy?day=${encodeURIComponent(day)}`, {
+      await refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBlocking(null);
+    }
+  }
+
+  async function unblockSlot(spaceId: string, start: string, end: string) {
+    setBlocking(spaceId + start);
+    setError(null);
+    try {
+      const r = await fetch('/api/admin/occupancy', {
+        method: 'DELETE',
         credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spaceId, startTime: start, endTime: end }),
       });
-      const body = await refreshed.json();
-      setHalls(body.halls || []);
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.message || 'Не снято');
+      await refresh();
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -104,6 +123,16 @@ export default function AdminOccupancyClient() {
                       onClick={() => blockSlot(hall.spaceId, slot.start, slot.end)}
                     >
                       Блок
+                    </button>
+                  ) : null}
+                  {slot.status === 'service' || slot.status === 'closed' ? (
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      disabled={blocking === hall.spaceId + slot.start}
+                      onClick={() => unblockSlot(hall.spaceId, slot.start, slot.end)}
+                    >
+                      Снять
                     </button>
                   ) : null}
                 </div>
