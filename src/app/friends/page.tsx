@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, MessageCircle, Search, UserPlus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
+import './friends.css';
 
 type Trust = {
   score: number;
@@ -47,20 +48,10 @@ type FriendsData = {
 };
 
 const emptyData: FriendsData = { friends: [], incoming: [], outgoing: [] };
-const actionStyle = {
-  border: 0,
-  borderRadius: 10,
-  padding: '0.55rem 0.75rem',
-  fontWeight: 700,
-  cursor: 'pointer',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 5,
-} as const;
 
 function Avatar({
   person,
-  size = 44,
+  size = 40,
 }: {
   person: {
     name: string | null;
@@ -225,7 +216,7 @@ export default function FriendsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <main className="container friends-page" style={{ padding: '1.25rem 1rem 2rem' }}>
+      <main className="container friends-page">
         <div className="svc-skel" aria-busy="true" aria-label="Загрузка">
           <div className="svc-skel__pill" />
           <div className="svc-skel__row" />
@@ -236,106 +227,73 @@ export default function FriendsPage() {
   }
 
   return (
-    <main className="container friends-page" style={{ padding: '1.25rem 1rem 2rem' }}>
-      <div className="messages-top" style={{ marginBottom: '1rem' }}>
-        <Link href="/dashboard" className="messages-top__back" aria-label="Назад в профиль">
-          <ArrowLeft size={20} />
+    <main className="container friends-page">
+      <header className="friends-head">
+        <Link href="/dashboard" className="friends-head__back" aria-label="Назад в профиль">
+          <ArrowLeft size={18} />
         </Link>
-        <div className="messages-top__copy">
+        <div className="friends-head__copy">
           <h1>Друзья</h1>
-          <p>
-            Ищите участников по имени и отправляйте заявки. Закрытые профили в поиске не показываются.
-          </p>
+          <p>Поиск участников и заявки. Закрытые профили скрыты.</p>
         </div>
-        <Link href="/messages" className="messages-top__friends">
-          <MessageCircle size={16} aria-hidden />
-          Сообщения
+        <Link href="/messages" className="friends-head__msg">
+          <MessageCircle size={15} aria-hidden />
+          Чаты
         </Link>
-      </div>
+      </header>
 
-      <section className="glass" style={{ padding: '1rem', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.05rem', margin: '0 0 0.75rem' }}>Поиск по сайту</h2>
-        <label style={{ position: 'relative', display: 'block' }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+      <section className="friends-card">
+        <h2>Поиск по сайту</h2>
+        <label className="friends-field">
+          <Search size={15} aria-hidden />
           <input
             value={siteQuery}
             onChange={(event) => setSiteQuery(event.target.value)}
-            placeholder="Имя участника (от 2 символов)"
+            placeholder="Имя (от 2 символов)"
             aria-label="Поиск друзей по сайту"
-            style={{
-              width: '100%',
-              padding: '0.65rem 0.8rem 0.65rem 2.2rem',
-              border: '1px solid rgba(15,23,42,.12)',
-              borderRadius: 12,
-              background: '#fff',
-              fontSize: '1rem',
-            }}
           />
         </label>
-        {siteSearching && (
-          <p style={{ margin: '0.75rem 0 0', color: 'var(--muted)', fontSize: '0.85rem' }}>Ищем…</p>
-        )}
+        {siteSearching && <p className="friends-hint">Ищем…</p>}
         {!siteSearching && siteSearched && siteResults.length === 0 && (
-          <p style={{ margin: '0.75rem 0 0', color: 'var(--muted)', fontSize: '0.85rem' }}>
-            Никого не найдено. Закрытые профили скрыты из поиска.
-          </p>
+          <p className="friends-hint">Никого не найдено. Закрытые профили скрыты из поиска.</p>
         )}
         {siteResults.length > 0 && (
-          <div style={{ display: 'grid', gap: 8, marginTop: 12 }}>
+          <div className="friends-rows">
             {siteResults.map((hit) => (
-              <div
-                key={hit.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '0.5rem',
-                  borderRadius: 12,
-                  background: 'rgba(255,255,255,.55)',
-                  minWidth: 0,
-                }}
-              >
+              <div key={hit.id} className="friends-row">
                 <Avatar person={hit} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link href={`/u/${hit.id}`} style={{ color: 'var(--foreground)', fontWeight: 750 }}>
+                <div className="friends-row__meta">
+                  <Link href={`/u/${hit.id}`} className="friends-row__name">
                     {hit.name || 'Пользователь'}
                   </Link>
-                  {hit.aliased && (
-                    <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: 2 }}>
-                      Сказочный псевдоним
+                  {(hit.aliased || hit.city) && (
+                    <div className="friends-row__sub">
+                      {hit.aliased ? 'Сказочный псевдоним' : hit.city}
                     </div>
-                  )}
-                  {hit.city && (
-                    <div style={{ color: 'var(--muted)', fontSize: '0.78rem', marginTop: 2 }}>{hit.city}</div>
                   )}
                 </div>
                 {!hit.friendship && (
                   <button
                     type="button"
+                    className="friends-btn"
                     disabled={busyId === hit.id}
                     onClick={() => sendRequest(hit.id)}
-                    style={{ ...actionStyle, background: '#2563eb', color: '#fff' }}
                   >
-                    <UserPlus size={16} />
-                    <span className="desktop-only">Добавить</span>
+                    <UserPlus size={14} />
+                    Добавить
                   </button>
                 )}
                 {hit.friendship?.status === 'PENDING' && hit.friendship.direction === 'outgoing' && (
-                  <span style={{ ...actionStyle, background: '#eef2f7', color: '#64748b', cursor: 'default' }}>
-                    Отправлено
-                  </span>
+                  <span className="friends-btn is-wait">Отправлено</span>
                 )}
                 {hit.friendship?.status === 'PENDING' && hit.friendship.direction === 'incoming' && (
-                  <Link href="/friends" style={{ ...actionStyle, background: '#16a34a', color: '#fff' }}>
+                  <Link href="/friends" className="friends-btn">
                     Ответить
                   </Link>
                 )}
                 {hit.friendship?.status === 'ACCEPTED' && (
-                  <Link
-                    href={`/messages?with=${hit.id}`}
-                    style={{ ...actionStyle, background: '#2563eb', color: '#fff' }}
-                  >
-                    <MessageCircle size={16} />
+                  <Link href={`/messages?with=${hit.id}`} className="friends-btn is-icon" aria-label="Написать">
+                    <MessageCircle size={15} />
                   </Link>
                 )}
               </div>
@@ -345,48 +303,38 @@ export default function FriendsPage() {
       </section>
 
       {data.incoming.length > 0 && (
-        <section className="glass" style={{ padding: '1rem', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1.05rem', margin: '0 0 0.75rem' }}>
-            Входящие заявки · {data.incoming.length}
-          </h2>
-          <div style={{ display: 'grid', gap: 8 }}>
+        <section className="friends-card">
+          <h2>Входящие · {data.incoming.length}</h2>
+          <div className="friends-rows is-flush">
             {data.incoming.map((person) => (
-              <div
-                key={person.friendshipId}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}
-              >
+              <div key={person.friendshipId} className="friends-row">
                 <Avatar person={person} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link
-                    href={`/u/${person.id}`}
-                    style={{ color: 'var(--foreground)', fontWeight: 750 }}
-                  >
+                <div className="friends-row__meta">
+                  <Link href={`/u/${person.id}`} className="friends-row__name">
                     {person.name || 'Пользователь'}
                   </Link>
-                  {person.aliased && (
-                    <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: 2 }}>
-                      Сказочный псевдоним
-                    </div>
-                  )}
+                  {person.aliased && <div className="friends-row__sub">Сказочный псевдоним</div>}
                 </div>
-                <button
-                  type="button"
-                  disabled={busyId === person.friendshipId}
-                  onClick={() => act(person.friendshipId, 'accept')}
-                  style={{ ...actionStyle, background: '#16a34a', color: '#fff' }}
-                  aria-label="Принять заявку"
-                >
-                  <Check size={16} /> <span className="desktop-only">Принять</span>
-                </button>
-                <button
-                  type="button"
-                  disabled={busyId === person.friendshipId}
-                  onClick={() => act(person.friendshipId, 'decline')}
-                  style={{ ...actionStyle, background: '#f1f5f9', color: '#475569' }}
-                  aria-label="Отклонить заявку"
-                >
-                  <X size={16} />
-                </button>
+                <div className="friends-actions">
+                  <button
+                    type="button"
+                    className="friends-btn"
+                    disabled={busyId === person.friendshipId}
+                    onClick={() => act(person.friendshipId, 'accept')}
+                    aria-label="Принять заявку"
+                  >
+                    <Check size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className="friends-btn is-ghost is-icon"
+                    disabled={busyId === person.friendshipId}
+                    onClick={() => act(person.friendshipId, 'decline')}
+                    aria-label="Отклонить заявку"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -394,29 +342,23 @@ export default function FriendsPage() {
       )}
 
       {data.outgoing.length > 0 && (
-        <section className="glass" style={{ padding: '1rem', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1.05rem', margin: '0 0 0.75rem' }}>
-            Отправленные · {data.outgoing.length}
-          </h2>
-          <div style={{ display: 'grid', gap: 8 }}>
+        <section className="friends-card">
+          <h2>Отправленные · {data.outgoing.length}</h2>
+          <div className="friends-rows is-flush">
             {data.outgoing.map((person) => (
-              <div key={person.friendshipId} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div key={person.friendshipId} className="friends-row">
                 <Avatar person={person} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link href={`/u/${person.id}`} style={{ color: 'var(--foreground)', fontWeight: 700 }}>
+                <div className="friends-row__meta">
+                  <Link href={`/u/${person.id}`} className="friends-row__name">
                     {person.name || 'Пользователь'}
                   </Link>
-                  {person.aliased && (
-                    <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: 2 }}>
-                      Сказочный псевдоним
-                    </div>
-                  )}
+                  {person.aliased && <div className="friends-row__sub">Сказочный псевдоним</div>}
                 </div>
                 <button
                   type="button"
+                  className="friends-btn is-ghost"
                   disabled={busyId === person.friendshipId}
                   onClick={() => act(person.friendshipId, 'cancel')}
-                  style={{ ...actionStyle, background: '#f1f5f9', color: '#475569' }}
                 >
                   Отменить
                 </button>
@@ -426,80 +368,47 @@ export default function FriendsPage() {
         </section>
       )}
 
-      <section className="glass" style={{ padding: '1rem' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            flexWrap: 'wrap',
-            marginBottom: '0.8rem',
-          }}
-        >
-          <h2 style={{ fontSize: '1.05rem', margin: 0 }}>Мои друзья · {data.friends.length}</h2>
-          <label style={{ position: 'relative', display: 'block', flex: '1 1 190px', maxWidth: 280 }}>
-            <Search size={16} style={{ position: 'absolute', left: 10, top: 10, color: '#94a3b8' }} />
+      <section className="friends-card">
+        <div className="friends-card__title">
+          <h2>Мои друзья · {data.friends.length}</h2>
+          <label className="friends-field is-filter">
+            <Search size={14} aria-hidden />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Фильтр среди друзей"
-              style={{
-                width: '100%',
-                padding: '0.55rem 0.7rem 0.55rem 2rem',
-                border: '1px solid rgba(15,23,42,.12)',
-                borderRadius: 10,
-                background: '#fff',
-              }}
+              placeholder="Фильтр"
+              aria-label="Фильтр среди друзей"
             />
           </label>
         </div>
 
         {friends.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--muted)', padding: '2rem 1rem' }}>
-            <UserPlus size={28} style={{ marginBottom: 6 }} />
+          <div className="friends-empty">
+            <UserPlus size={22} />
             <div>{query ? 'Никого не найдено' : 'Список друзей пока пуст'}</div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 8 }}>
+          <div className="friends-rows is-flush">
             {friends.map((friend) => (
-              <div
-                key={friend.friendshipId}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '0.5rem',
-                  borderRadius: 12,
-                  background: 'rgba(255,255,255,.55)',
-                }}
-              >
-                <Avatar person={friend} size={48} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Link href={`/u/${friend.id}`} style={{ color: 'var(--foreground)', fontWeight: 750 }}>
+              <div key={friend.friendshipId} className="friends-row">
+                <Avatar person={friend} />
+                <div className="friends-row__meta">
+                  <Link href={`/u/${friend.id}`} className="friends-row__name">
                     {friend.name || 'Пользователь'}
                   </Link>
-                  <div style={{ color: 'var(--muted)', fontSize: '0.78rem', marginTop: 2 }}>
-                    {friend.presence ? (
-                      <span style={{ color: friend.presence.online ? '#16a34a' : undefined }}>
-                        {friend.presence.label}
-                      </span>
-                    ) : null}
+                  <div className={`friends-row__sub${friend.presence?.online ? ' is-online' : ''}`}>
+                    {friend.presence?.label}
                     {friend.presence && friend.trust ? ' · ' : null}
-                    {friend.trust ? (
-                      <span>
-                        {friend.trust.label} · {friend.trust.score}%
-                      </span>
-                    ) : null}
+                    {friend.trust ? `${friend.trust.label} · ${friend.trust.score}%` : null}
                   </div>
                 </div>
                 <Link
                   href={`/messages?with=${friend.id}`}
-                  style={{ ...actionStyle, background: '#2563eb', color: '#fff' }}
+                  className="friends-btn"
                   aria-label={`Написать ${friend.name || 'другу'}`}
                 >
-                  <MessageCircle size={16} />
-                  <span className="desktop-only">Написать</span>
+                  <MessageCircle size={14} />
+                  Написать
                 </Link>
               </div>
             ))}

@@ -1,5 +1,10 @@
 # Changelog — YoungPortal
 
+## [1.6.23] — 2026-09-05
+
+### Changed
+- Друзья: компактная страница в цветах портала (лайм / лаванда / чернила)
+
 Формат: [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/).  
 Версия в футере и в `package.json` / `src/lib/app-version.ts` должны совпадать.  
 Каждый пользовательский релиз на ty → запись здесь + bump версии **до** staging deploy.
