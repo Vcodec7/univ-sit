@@ -40,6 +40,7 @@ export type PublicSpaceCard = {
   address: string | null;
   capacity: number;
   category: string | null;
+  bookingMode?: string | null;
   amenities: string | null;
   createdAt: string;
   bookings: Array<{
@@ -183,6 +184,7 @@ export const getCachedPublicSpaces = unstable_cache(
         address: true,
         capacity: true,
         category: true,
+        bookingMode: true,
         amenities: true,
         createdAt: true,
         bookings: {
@@ -211,6 +213,7 @@ export const getCachedPublicSpaces = unstable_cache(
       address: s.address,
       capacity: s.capacity,
       category: s.category,
+      bookingMode: s.bookingMode,
       amenities: s.amenities,
       createdAt: s.createdAt.toISOString(),
       bookings: s.bookings.map((b) => ({
@@ -225,7 +228,7 @@ export const getCachedPublicSpaces = unstable_cache(
       })),
     }));
   },
-  ['public-spaces-catalog-v2'],
+          ['public-spaces-catalog-v3'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 

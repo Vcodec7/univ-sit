@@ -46,16 +46,33 @@ export function resolveCoworkingPeriod(period: string): CoworkingPeriodDef {
   return COWORKING_PERIODS[0];
 }
 
+export function spaceBookingMode(space: {
+  bookingMode?: string | null;
+}): 'HALL' | 'COWORKING' | 'BOTH' {
+  const mode = (space.bookingMode || '').toUpperCase();
+  if (mode === 'COWORKING' || mode === 'BOTH' || mode === 'HALL') return mode;
+  return 'HALL';
+}
+
 export function isCoworkingSpace(space: {
   category?: string | null;
   bookingMode?: string | null;
   title?: string | null;
 }) {
-  const mode = (space.bookingMode || '').toUpperCase();
+  const mode = spaceBookingMode(space);
   if (mode === 'COWORKING' || mode === 'BOTH') return true;
   const cat = (space.category || '').toLowerCase();
   const title = (space.title || '').toLowerCase();
   return cat.includes('коворк') || title.includes('коворк');
+}
+
+/** Hall calendar / «Бронь» — off only when the space is coworking-only. */
+export function isHallBookable(space: {
+  category?: string | null;
+  bookingMode?: string | null;
+  title?: string | null;
+}) {
+  return spaceBookingMode(space) !== 'COWORKING';
 }
 
 export function periodBounds(dayKey: string, period: CoworkingPeriodId | string) {

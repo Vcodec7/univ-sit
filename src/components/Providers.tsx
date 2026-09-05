@@ -59,7 +59,7 @@ function PresenceHeartbeat() {
       }
     };
 
-    void ping();
+    schedule(12_000);
     const onVis = () => {
       // Don't stampede on tab focus — only resume the scheduled loop
       if (document.visibilityState === 'visible' && !timer && !inFlight) {

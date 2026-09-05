@@ -43,6 +43,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
           style={{
             display: 'block',
             width: '100%',
+            maxWidth: '100%',
             maxHeight: '420px',
             objectFit: 'cover',
             borderRadius: '16px',

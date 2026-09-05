@@ -215,6 +215,7 @@ export default function BottomNav() {
             <Link
               key={tab.href + tab.label}
               href={tab.href}
+              prefetch
               className={`yp-bottom-nav__item${active ? ' is-active' : ''}`}
               aria-current={active ? 'page' : undefined}
             >

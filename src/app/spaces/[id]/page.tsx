@@ -14,7 +14,7 @@ import { galleryUrls, parseGalleryItems } from '@/lib/gallery-shared';
 import { staticSpaceParams } from '@/lib/generate-public-static-params';
 import HallWeekGrid from '@/components/HallWeekGrid';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
-import { isCoworkingSpace } from '@/lib/coworking';
+import { isCoworkingSpace, isHallBookable } from '@/lib/coworking';
 import { isPublicCatalogEntity } from '@/lib/publish';
 
 export const revalidate = 60;
@@ -48,7 +48,7 @@ export default async function SpaceDetail({ params }: { params: Promise<{ id: st
   const amenities = parseSpaceAmenities(space.amenities);
 
   return (
-    <div style={{ minHeight: 'auto', paddingBottom: '5rem', backgroundColor: '#fafafa' }}>
+    <div style={{ minHeight: 'auto', paddingBottom: '5rem' }}>
       <div
         style={{
           position: 'relative',
@@ -200,23 +200,25 @@ export default async function SpaceDetail({ params }: { params: Promise<{ id: st
                   className="btn btn-secondary"
                   style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}
                 >
-                  В коворкинг
+                  Коворкинг
                 </Link>
               ) : null}
-              <GuestAuthPrompt
-                href={`/spaces/${encodeURIComponent(space.id)}/book`}
-                className="btn btn-primary"
-                title="Забронировать зал"
-              >
-                <CalendarPlus size={18} /> Забронировать
-              </GuestAuthPrompt>
+              {isHallBookable(space) ? (
+                <GuestAuthPrompt
+                  href={`/spaces/${encodeURIComponent(space.id)}/book`}
+                  className="btn btn-primary"
+                  title="Забронировать зал"
+                >
+                  <CalendarPlus size={18} /> Бронь зала
+                </GuestAuthPrompt>
+              ) : null}
             </div>
           )}
         </div>
       </div>
 
       <div className="container" style={{ marginTop: '2rem', padding: '0 clamp(1rem, 3vw, 2rem)' }}>
-        {space.status !== 'COMPLETED' ? (
+        {space.status !== 'COMPLETED' && isHallBookable(space) ? (
           <div style={{ marginBottom: '1.25rem' }}>
             <HallWeekGrid spaceId={space.id} />
           </div>

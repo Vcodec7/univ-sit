@@ -16,7 +16,7 @@ import { spaceCover } from '@/lib/theme-covers';
 import CatalogPagination from '@/components/CatalogPagination';
 import { CATALOG_PAGE_SIZE, catalogSlice, totalPages } from '@/lib/pagination';
 import type { PublicSpaceCard } from '@/lib/public-catalogs';
-import { isCoworkingSpace } from '@/lib/coworking';
+import { isCoworkingSpace, isHallBookable } from '@/lib/coworking';
 
 export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[] }) {
   const sp = useSafeSearchParams();
@@ -56,7 +56,9 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
     <div className="container catalog-page">
       <div className="catalog-page-header" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
         <h1 className="page-hero-title">Молодёжные пространства</h1>
-        <p className="page-hero-subtitle">Коворкинг и залы ЦРМ — запись и бронь в одном стиле</p>
+        <p className="page-hero-subtitle">
+          Одна площадка может быть и залом под бронь, и коворкингом — смотрите кнопки на карточке.
+        </p>
       </div>
       <SpaceFilterBar placeholder="Поиск пространств…" categories={usedCategories} />
 
@@ -82,19 +84,18 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
         <div className="svc-space-grid">
           {spaces.map((space, idx) => {
             const coworking = isCoworkingSpace(space);
+            const hall = isHallBookable(space);
             const statusLine =
               space.status === 'COMPLETED'
                 ? 'площадка закрыта'
-                : coworking
-                  ? `до ${space.capacity} мест`
-                  : (space.bookings?.length || 0) > 0
-                    ? `событий рядом: ${space.bookings.length}`
-                    : 'есть свободные слоты';
+                : coworking && hall
+                  ? `бронь и коворкинг · до ${space.capacity} мест`
+                  : coworking
+                    ? `коворкинг · до ${space.capacity} мест`
+                    : (space.bookings?.length || 0) > 0
+                      ? `событий рядом: ${space.bookings.length}`
+                      : 'есть свободные слоты';
             const href = `/spaces/${encodeRouteParam(space.id)}`;
-            const ctaHref = coworking
-              ? `/coworking?space=${encodeURIComponent(space.id)}`
-              : `${href}/book`;
-            const ctaLabel = coworking ? 'Коворкинг' : 'Бронь';
 
             return (
               <article key={space.id} className="svc-space-card yp-feed-card">
@@ -108,7 +109,11 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
                   />
                 </Link>
                 <div className="svc-space-card__body">
-                  <span className="svc-space-card__badge">{space.category || (coworking ? 'Коворкинг' : 'Зал')}</span>
+                  <span className="svc-space-card__badge">
+                    {coworking && hall
+                      ? 'Бронь и коворкинг'
+                      : space.category || (coworking ? 'Коворкинг' : 'Зал')}
+                  </span>
                   <h3>
                     <Link href={href}>{space.title}</Link>
                   </h3>
@@ -118,13 +123,26 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
                   </p>
                   <p className={`svc-space-card__status${coworking ? ' is-cowork' : ''}`}>{statusLine}</p>
                   {space.status !== 'COMPLETED' ? (
-                    <GuestAuthPrompt
-                      href={ctaHref}
-                      className="svc-pill svc-pill--brand svc-space-card__cta"
-                      asButton
-                    >
-                      {ctaLabel}
-                    </GuestAuthPrompt>
+                    <div className={`svc-space-card__cta-row${coworking && hall ? ' is-dual' : ''}`}>
+                      {hall ? (
+                        <GuestAuthPrompt
+                          href={`${href}/book`}
+                          className="svc-pill svc-pill--brand svc-space-card__cta"
+                          asButton
+                        >
+                          Бронь
+                        </GuestAuthPrompt>
+                      ) : null}
+                      {coworking ? (
+                        <GuestAuthPrompt
+                          href={`/coworking?space=${encodeURIComponent(space.id)}`}
+                          className="svc-pill svc-space-card__cta svc-space-card__cta--cowork"
+                          asButton
+                        >
+                          Коворкинг
+                        </GuestAuthPrompt>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
               </article>

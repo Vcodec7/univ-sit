@@ -59,10 +59,17 @@ export default function HomeServiceHero({
                 )
               ) : null}
               {secondary ? (
-                <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
-                  <Building2 size={16} aria-hidden />
-                  {secondary.label}
-                </Link>
+                needsAuth(secondary.href) ? (
+                  <GuestAuthPrompt href={secondary.href} className="svc-hero__switch-btn" asButton>
+                    <Building2 size={16} aria-hidden />
+                    {secondary.label}
+                  </GuestAuthPrompt>
+                ) : (
+                  <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
+                    <Building2 size={16} aria-hidden />
+                    {secondary.label}
+                  </Link>
+                )
               ) : null}
             </div>
           )}

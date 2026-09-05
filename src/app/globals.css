@@ -41,7 +41,7 @@ html {
   overflow-x: clip;
   overflow-y: scroll;
   max-width: 100%;
-  background-color: #fafbf4;
+  background-color: #f4f0fb;
   scrollbar-gutter: stable;
 }
 
@@ -53,11 +53,12 @@ html.yp-booting * {
 }
 
 body {
-  background-color: #fafbf4;
+  background-color: #f4f0fb;
   background-image:
-    radial-gradient(1100px 520px at 6% -14%, rgba(175, 202, 3, 0.16), transparent 58%),
-    radial-gradient(900px 480px at 100% 4%, rgba(133, 98, 216, 0.12), transparent 56%),
-    linear-gradient(180deg, #ffffff 0%, #fafbf4 48%, #f4f8c4 140%);
+    radial-gradient(70rem 36rem at 100% -8%, rgba(175, 202, 3, 0.22), transparent 58%),
+    radial-gradient(54rem 32rem at -8% 12%, rgba(133, 98, 216, 0.2), transparent 54%),
+    radial-gradient(40rem 24rem at 70% 110%, rgba(175, 202, 3, 0.12), transparent 60%),
+    linear-gradient(180deg, #fbfaff 0%, #f3eefc 42%, #f7f8e8 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-manrope), 'Manrope', sans-serif;
@@ -166,16 +167,18 @@ button {
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 0;
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 10100; /* above cookie/onboarding sheets so «Вход» stays clickable */
   overflow: visible;
   contain: layout;
-  min-height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
+  min-height: var(--nav-h);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .glass-nav.menu-open {
@@ -203,8 +206,8 @@ button {
   gap: 0.75rem;
   min-height: var(--nav-h);
   height: var(--nav-h);
-  padding-top: max(0.45rem, env(safe-area-inset-top, 0px));
-  padding-bottom: 0.45rem;
+  padding-top: 0;
+  padding-bottom: 0;
   min-width: 0;
   box-sizing: border-box;
   overflow: visible;
@@ -2142,9 +2145,10 @@ img.site-brand-logo {
 .event-list-head p { margin: 0; color: var(--muted); font-size: 0.95rem; }
 .event-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1rem;
   align-items: stretch;
+  width: 100%;
 }
 .event-card {
   display: flex;
@@ -8142,8 +8146,9 @@ a.dashboard-nav-btn {
 }
 .places-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr));
   gap: 1.1rem;
+  width: 100%;
 }
 .places-card {
   display: flex;
@@ -9345,8 +9350,9 @@ a.dashboard-nav-btn {
 /* About team — fill width without empty gaps */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 0.75rem;
+  width: 100%;
 }
 .team-card {
   display: flex;
@@ -9663,8 +9669,8 @@ a.yp-modal-close {
   color: var(--muted);
   font-size: clamp(0.95rem, 2.2vw, 1.1rem);
   line-height: 1.5;
-  max-width: 42rem;
-  margin: 0 auto 1.5rem;
+  max-width: 52rem;
+  margin: 0 0 1.5rem;
   overflow-wrap: anywhere;
 }
 
@@ -11603,7 +11609,7 @@ a.yp-modal-close {
   margin: 0.85rem 0 0;
   font-size: clamp(1rem, 2.4vw, 1.15rem);
   line-height: 1.5;
-  max-width: 34rem;
+  max-width: min(46rem, 100%);
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -23508,14 +23514,15 @@ body.yp-scroll-locked {
 }
 .svc-hero .svc-hero__copy,
 .svc-hero .svc-hero__content {
-  max-width: 38rem;
+  max-width: min(52rem, 100%);
+  width: 100%;
 }
 .svc-hero .svc-hero__title {
   color: #fff;
 }
 .svc-hero .svc-hero__lead {
   color: rgba(255, 255, 255, 0.9);
-  max-width: 28rem;
+  max-width: 40rem;
 }
 .svc-hero .svc-hero__eyebrow {
   color: var(--accent);
@@ -24010,8 +24017,9 @@ fieldset.svc-form-group,
 /* Space catalog — service cards (round photo + pill CTA) */
 .svc-space-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   gap: 1.15rem;
+  width: 100%;
 }
 .svc-space-card {
   display: flex;
@@ -24097,6 +24105,28 @@ fieldset.svc-form-group,
   text-decoration: none;
   font-size: 0.88rem !important;
   padding: 0.45rem 0.95rem !important;
+}
+.svc-space-card__cta-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  width: 100%;
+}
+.svc-space-card__cta-row.is-dual {
+  grid-template-columns: 1fr 1fr;
+}
+.svc-space-card__cta-row .svc-space-card__cta {
+  width: 100%;
+  justify-content: center;
+  align-self: stretch;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+.svc-space-card__cta--cowork {
+  background: rgba(133, 98, 216, 0.1) !important;
+  color: var(--primary-hover) !important;
+  border: 1px solid rgba(133, 98, 216, 0.28) !important;
 }
 .svc-empty {
   text-align: center;
@@ -24648,7 +24678,7 @@ html.has-session .nav-auth-mobile {
   margin-top: 1.15rem;
   padding: 0.32rem;
   width: 100%;
-  max-width: min(100%, 22rem);
+  max-width: 100%;
   border-radius: 1.15rem;
   background: rgba(15, 10, 28, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -24689,6 +24719,15 @@ html.has-session .nav-auth-mobile {
 }
 .svc-hero__switch-btn:not(.is-on) {
   background: rgba(255, 255, 255, 0.12);
+}
+@media (min-width: 720px) {
+  .svc-hero__switch {
+    flex-direction: row;
+    max-width: 100%;
+  }
+  .svc-hero__switch-btn {
+    flex: 1 1 0;
+  }
 }
 .svc-hero__cta {
   display: inline-flex !important;
