@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import CmsPage from '@/components/CmsPage';
+import MediaHubPage from '@/components/MediaHubPage';
 import AboutPage from '@/components/AboutPage';
 import AboutTeamAuth from '@/components/AboutTeamAuth';
 import { Metadata } from 'next';
@@ -80,6 +80,10 @@ export default async function DynamicPage({ params }: { params: Promise<{ slug: 
         teamSlot={<AboutTeamAuth />}
       />
     );
+  }
+
+  if (resolved.slug === 'media') {
+    return <MediaHubPage page={page} siteName={id.siteName} publicOrigin={id.publicOrigin} />;
   }
 
   return <CmsPage page={page} siteName={id.siteName} publicOrigin={id.publicOrigin} />;

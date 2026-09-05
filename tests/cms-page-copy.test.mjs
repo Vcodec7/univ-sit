@@ -11,3 +11,13 @@ test('youth CMS copy keeps house rules and media meaning', () => {
   assert.match(src, /Медиапроекты/);
   assert.match(src, /pravila-dm/);
 });
+
+const mediaHub = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/lib/media-hub.ts'), 'utf8');
+const mediaPage = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/app/p/[slug]/page.tsx'), 'utf8');
+
+test('media page is a partner hub not a plain CMS article', () => {
+  assert.match(mediaHub, /Премия «ШУМ»/);
+  assert.match(mediaHub, /crm.sochi/);
+  assert.match(mediaHub, /MEDIA_PARTNERS/);
+  assert.match(mediaPage, /MediaHubPage/);
+});
