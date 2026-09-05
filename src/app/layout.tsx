@@ -42,7 +42,6 @@ const unbounded = localFont({
   variable: '--font-unbounded',
   display: 'swap',
   preload: true,
-  adjustFontFallback: true,
 });
 
 export async function generateMetadata(): Promise<Metadata> {
