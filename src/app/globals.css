@@ -6817,21 +6817,22 @@ a.dashboard-nav-btn {
 .qa-sheet,
 .qa-edge-panel {
   position: relative;
-  width: min(18rem, 86vw);
+  width: min(17.5rem, 82vw);
   max-height: none;
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: #0a0c2a;
+  background: #fff;
+  color: #0a0c2a;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border-radius: 1.25rem 0 0 1.25rem;
-  border: 0;
-  padding: 0.55rem 0.45rem 0.85rem;
-  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.22);
+  border-radius: 1.15rem 0 0 1.15rem;
+  border: 1px solid var(--card-border, #e6e2f2);
+  border-right: 0;
+  padding: 0.45rem 0.5rem 0.7rem;
+  box-shadow: -10px 0 28px rgba(133, 98, 216, 0.12);
   animation: qa-sheet-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
-  color: #f8fafc;
 }
 @keyframes qa-sheet-in {
   from {
@@ -6851,8 +6852,9 @@ a.dashboard-nav-btn {
   padding: 0.35rem 0.35rem 0.55rem;
 }
 .qa-edge-head strong {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 800;
+  color: #0a0c2a;
 }
 .qa-edge-head__actions {
   display: flex;
@@ -6863,11 +6865,11 @@ a.dashboard-nav-btn {
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.15rem;
-  padding: 0.15rem 0.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.1rem 0.1rem 0.4rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -6877,56 +6879,55 @@ a.dashboard-nav-btn {
 
 .qa-edge-item {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.65rem;
+  justify-content: center;
+  gap: 0.28rem;
   margin: 0;
-  padding: 0.45rem 0.45rem;
-  border: 0;
+  min-height: 3.35rem;
+  padding: 0.4rem 0.3rem;
+  border: 1px solid rgba(133, 98, 216, 0.12);
   border-radius: 12px;
-  background: transparent;
-  color: inherit;
+  background: #f7f4ff;
+  color: #0a0c2a;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .qa-edge-item:hover,
 .qa-edge-item:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
+  background: #eee9fb;
+  border-color: #8562d8;
   outline: none;
 }
 .qa-edge-icon {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  color: #6e4bc4;
   flex-shrink: 0;
 }
 .qa-edge-label {
-  font-size: 0.88rem;
-  font-weight: 650;
-  line-height: 1.2;
-  text-align: left;
-  color: rgba(248, 250, 252, 0.94);
-  max-width: none;
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+  color: #0a0c2a;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0;
 }
 .qa-edge-sep {
+  grid-column: 1 / -1;
   height: 1px;
-  margin: 0.35rem 0.55rem;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.28) 0 3px,
-    transparent 3px 7px
-  );
-  opacity: 0.85;
+  margin: 0.15rem 0;
+  background: #e6e2f2;
+  opacity: 1;
 }
 .qa-edge-foot {
   display: flex;
@@ -6938,19 +6939,20 @@ a.dashboard-nav-btn {
   margin-top: 0.2rem;
 }
 .qa-edge-foot-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: #f3f0fb;
+  color: #0a0c2a;
   text-decoration: none;
   cursor: pointer;
 }
 .qa-edge-foot-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: #eee9fb;
+  color: #6e4bc4;
 }
 
 /* Legacy kbd styles for tutorial / chord toast */

@@ -43,7 +43,7 @@ import { QuickAccessTutorial } from '@/components/QuickAccessTutorial';
 import { attachEdgeSwipe } from '@/lib/v-gesture';
 
 function itemIcon(item: HotkeyDef): ReactNode {
-  const props = { size: 22, strokeWidth: 1.85, 'aria-hidden': true as const };
+          const props = { size: 18, strokeWidth: 2, 'aria-hidden': true as const };
   switch (item.keys) {
     case 'G H':
       return <Home {...props} />;
@@ -327,21 +327,10 @@ export function QuickAccess() {
           <button type="button" className="qa-sheet-backdrop" aria-label="Закрыть" onClick={closePanel} />
           <aside className="qa-sheet qa-edge-panel qa-edge-panel--right">
             <div className="qa-edge-head">
-              <strong>Разделы</strong>
-              <div className="qa-edge-head__actions">
-                <Link
-                  href={role === 'TECH' ? '/ops' : role === 'SCANNER' ? '/scanner' : '/dashboard/settings'}
-                  className="qa-edge-foot-btn"
-                  aria-label="Настройки"
-                  title="Настройки"
-                  onClick={() => setOpen(false)}
-                >
-                  <Settings size={16} />
-                </Link>
-                <button type="button" className="qa-edge-foot-btn" onClick={closePanel} aria-label="Закрыть">
-                  <X size={18} />
-                </button>
-              </div>
+              <strong>Меню</strong>
+              <button type="button" className="qa-edge-foot-btn" onClick={closePanel} aria-label="Закрыть">
+                <X size={18} />
+              </button>
             </div>
             <div className="qa-edge-scroll">
               {navItems.map(renderItem)}
