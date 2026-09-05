@@ -1,13 +1,4 @@
-/* Messages — modern immersive chat */
-
-body:has(.messages-root) .site-footer,
-body:has(.messages-root) footer.site-footer,
-body:has(.messages-root) .qa-fab {
-  display: none !important;
-}
-
-/* Immersive messages: own chrome + bottom nav only */
-body:has(.messages-root) .glass-nav,
+/* Messages — keep site header; hide footer chrome only */
 body:has(.messages-root) .site-footer,
 body:has(.messages-root) footer.site-footer,
 body:has(.messages-root) .qa-fab,
@@ -1621,4 +1612,41 @@ body:has(.messages-root) .main-content > div {
     max-width: 88%;
     font-size: 0.88rem;
   }
+}
+
+/* Site header stays; inbox chrome stays compact */
+.messages-tabs {
+  padding: 0.4rem 0.7rem 0.25rem;
+  gap: 0.3rem;
+}
+.messages-tab {
+  font-size: 0.74rem;
+  padding: 0.32rem 0.7rem;
+  min-height: 1.85rem;
+}
+.messages-search {
+  margin: 0 0.7rem 0.4rem;
+  padding: 0.35rem 0.7rem;
+  min-height: 2.15rem;
+  border-radius: 12px;
+}
+.messages-search input {
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+.messages-list {
+  padding: 0.25rem 0.45rem 0.6rem;
+}
+.messages-conv {
+  padding: 0.5rem 0.5rem;
+  gap: 0.55rem;
+  margin-bottom: 0;
+  border-radius: 12px;
+}
+.messages-conv__name {
+  font-size: 0.86rem;
+}
+.messages-conv__preview {
+  font-size: 0.72rem;
+  margin-top: 0.08rem;
 }

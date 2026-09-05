@@ -851,24 +851,6 @@ function MessagesInner() {
   return (
     <div className={`messages-root${inThread ? ' is-thread' : ''}`}>
       {!inThread ? (
-        <div className="messages-top">
-          <Link href="/dashboard" className="messages-top__back" aria-label="Назад в профиль">
-            <ArrowLeft size={20} />
-          </Link>
-          <div className="messages-top__copy">
-            <h1>Сообщения</h1>
-            <p>{clubChatOn ? 'Личные, клубы, проекты и приглашения' : 'Личные и приглашения'}</p>
-          </div>
-          {friendsOn ? (
-            <Link href="/friends" className="messages-top__friends">
-              <Users size={16} aria-hidden />
-              Друзья
-            </Link>
-          ) : null}
-        </div>
-      ) : null}
-
-      {!inThread ? (
         <div className="messages-tabs" role="tablist" aria-label="Разделы сообщений">
           {visibleTabs.map((t) => (
             <button
