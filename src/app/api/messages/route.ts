@@ -18,6 +18,7 @@ import { resolvePresenceForViewer } from '@/lib/presence';
 import { previewForMessage } from '@/lib/message-meta';
 import { encodeRouteParam } from '@/lib/route-id';
 import { assertSameOrigin } from '@/lib/csrf-origin';
+import { checkLinksInText, notifyStaffRknLinks } from '@/lib/rkn-link-guard';
 
 function unauthorized() {
   return NextResponse.json({ message: 'Необходимо авторизоваться' }, { status: 401 });
@@ -665,6 +666,19 @@ export async function POST(req: Request) {
       });
       warning = mod.warning;
       result.message.body = mod.body;
+    }
+
+    const linkHits = await checkLinksInText(body);
+    if (linkHits.some((h) => h.status === 'rkn')) {
+      await notifyStaffRknLinks({
+        actorId: me,
+        actorName: sender?.name || 'Пользователь',
+        conversationId: result.conversationId,
+        messageId: result.message.id,
+        hits: linkHits,
+        snippet: body,
+      });
+      warning = [warning, 'Ссылка из базы РКН. Администрация уведомлена.'].filter(Boolean).join(' ');
     }
 
     await evaluateAchievements(me);

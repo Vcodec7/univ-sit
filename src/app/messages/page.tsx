@@ -30,6 +30,7 @@ import {
   Pin,
   Plus,
   Search,
+  ShieldCheck,
   Send,
   Ticket,
   Users,
@@ -131,6 +132,10 @@ function dayKey(iso: string) {
 function shortTime(iso: string) {
   return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' });
 }
+function extractUrlsClient(text: string) {
+  return String(text || '').match(/(?:https?:\/\/|www\.)[^\s<>"')\]]+/gi) || [];
+}
+
 function isMediaOnlyBody(body: string) {
   const parts = splitMessageBodyMedia(body || '');
   const meaningful = parts.filter((p) => (p.type === 'image' ? true : Boolean(p.value.trim())));
@@ -708,6 +713,31 @@ function MessagesInner() {
     }
   };
 
+  const checkThreadLinks = async () => {
+    const fromThread = messages
+      .slice(-12)
+      .map((m) => m.body)
+      .join('\n');
+    const text = [body, fromThread].filter(Boolean).join('\n');
+    if (!extractUrlsClient(text).length && !body.trim()) {
+      toast('Вставьте ссылку в сообщение или дождитесь ссылки в чате');
+      return;
+    }
+    try {
+      const response = await fetch('/api/messages/link-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text || body, conversationId: selectedId, alert: true }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Не удалось проверить');
+      if (result.rknCount) toast.error(result.summary, { duration: 7000 });
+      else toast.success(result.summary);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка проверки');
+    }
+  };
+
   const closeThread = () => {
     setActiveUser(null);
     setActiveGroup(null);
@@ -1224,6 +1254,15 @@ function MessagesInner() {
                     placeholder={activeGroup ? 'Сообщение команде…' : 'Сообщение…'}
                     aria-label="Текст сообщения"
                   />
+                  <button
+                    type="button"
+                    className="messages-attach-btn"
+                    aria-label="Проверить ссылки"
+                    title="Проверить ссылки по базе РКН"
+                    onClick={() => void checkThreadLinks()}
+                  >
+                    <ShieldCheck size={18} aria-hidden />
+                  </button>
                   <button type="submit" className="messages-send" disabled={!body.trim() || sending} aria-label="Отправить"><Send size={18} /></button>
                 </div>
               </form>

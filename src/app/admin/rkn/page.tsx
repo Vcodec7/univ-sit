@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Check, Download, FileBadge, Save } from 'lucide-react';
+import RknChatBlocklistPanel from '@/components/admin/RknChatBlocklistPanel';
 import {
   DEFAULT_RKN_PACK,
   parseRknPack,
@@ -231,6 +232,7 @@ export default function AdminRknPage() {
           </div>
         ))}
       </div>
+      <RknChatBlocklistPanel />
     </div>
   );
 }

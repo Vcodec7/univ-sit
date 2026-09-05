@@ -6,6 +6,7 @@ import { ProfanityError, scanUnsafeContent } from '@/lib/censor';
 import { moderateDirectMessage } from '@/lib/content-moderation';
 import { getModerationConfig } from '@/lib/moderation-settings';
 import { entityPairKey, hasEntityAccess, type EntityKind } from '@/lib/entity-access';
+import { checkLinksInText, notifyStaffRknLinks } from '@/lib/rkn-link-guard';
 import {
   messagePerHourLimiter,
   messagePerMinuteLimiter,
@@ -243,6 +244,20 @@ export async function POST(req: Request) {
       });
       warning = mod.warning;
       result.message.body = mod.body;
+    }
+
+    const linkHits = await checkLinksInText(body);
+    if (linkHits.some((h) => h.status === 'rkn')) {
+      const sender = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+      await notifyStaffRknLinks({
+        actorId: userId,
+        actorName: sender?.name || 'Участник',
+        conversationId: result.conversationId,
+        messageId: result.message.id,
+        hits: linkHits,
+        snippet: body,
+      });
+      warning = [warning, 'Ссылка из базы РКН. Администрация уведомлена.'].filter(Boolean).join(' ');
     }
 
     return NextResponse.json(

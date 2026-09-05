@@ -99,6 +99,7 @@ const CATEGORY_LABELS: Record<SafetyCategory, string> = {
 };
 
 export function safetyCategoryLabel(c: SafetyCategory | string) {
+  if (c === 'RKN_BLOCK') return 'Реестр РКН (запрещённый ресурс)';
   return CATEGORY_LABELS[c as SafetyCategory] || c;
 }
 
