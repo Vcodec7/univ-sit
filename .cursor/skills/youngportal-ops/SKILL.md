@@ -31,7 +31,8 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 | `npm run smoke:ty` | HTTP smoke только ty |
 | `npm run ui:guard` | регрессии CSS/контраста |
 | `npm test` | `tests/*.test.mjs` |
-| `bash scripts/apply-staging.sh static` | только `public/brand` |
+| `bash scripts/apply-staging.sh prebuilt` | Next собирается здесь, на VPS только маленькая Docker-сборка |
+| `YP_REUSE_NEXT=1 bash scripts/apply-staging.sh prebuilt` | Повторная выкладка того же `.next` (только если сборка уже есть и код не менялся) |
 | `bash scripts/dev-loop.sh` | test + ui-guard одной командой |
 
 ## Фирменные цвета

@@ -4,6 +4,7 @@
 #
 #   bash scripts/apply-staging.sh           # auto: src → prebuilt, brand → static
 #   bash scripts/apply-staging.sh prebuilt  # Next build here, cheap image on VPS
+#   YP_REUSE_NEXT=1 … prebuilt              # skip next build if .next/standalone exists
 #   bash scripts/apply-staging.sh static    # public/brand|icons|covers only
 #   bash scripts/apply-staging.sh sync      # rsync source, no Docker rebuild
 set -euo pipefail
@@ -45,12 +46,25 @@ build_prebuilt_here() {
     echo "==> npm ci"
     npm ci
   fi
-  echo "==> prisma generate + next build (off the VPS)"
   export SKIP_DB_AT_BUILD=1
   export NEXT_TELEMETRY_DISABLED=1
   export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=4096}"
-  npx prisma generate
-  npm run build
+  schema_sha="$(sha256sum prisma/schema.prisma | awk '{print $1}')"
+  client_sha_file="node_modules/.prisma/.schema-sha"
+  if [[ -f node_modules/.prisma/client/index.js && -f "$client_sha_file" && "$(cat "$client_sha_file")" == "$schema_sha" ]]; then
+    echo "==> prisma client already matches schema, skip generate"
+  else
+    echo "==> prisma generate"
+    npx prisma generate
+    mkdir -p node_modules/.prisma
+    echo "$schema_sha" > "$client_sha_file"
+  fi
+  if [[ "${YP_REUSE_NEXT:-}" == "1" && -f .next/standalone/server.js ]]; then
+    echo "==> YP_REUSE_NEXT=1, skip next build"
+  else
+    echo "==> next build (off the VPS)"
+    npm run build
+  fi
   bash "$ROOT/scripts/pack-staging-prebuilt.sh" /tmp/yp-staging-prebuilt.tgz
   bash "$ROOT/scripts/deploy-staging-prebuilt.sh" /tmp/yp-staging-prebuilt.tgz
 }

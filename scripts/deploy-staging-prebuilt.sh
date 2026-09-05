@@ -4,7 +4,7 @@
 #
 # Expects a tarball at $1 (or /tmp/yp-staging-prebuilt.tgz) with:
 #   Dockerfile.prebuilt, .next/standalone, .next/static, public, prisma,
-#   prisma.config.ts, scripts, package.json
+#   prisma.config.ts, scripts
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
@@ -35,7 +35,6 @@ cat > "$REMOTE_SCRIPT" <<'REMOTE'
 set -euo pipefail
 APP=/opt/sochi-portal-staging
 EXTRACT=/var/tmp/yp-pre-extract
-BUILDCTX=/var/tmp/yp-pre-buildctx
 BUNDLE=/var/tmp/yp-staging-prebuilt.tgz
 
 if [[ ! -d "$APP" ]]; then
@@ -47,48 +46,68 @@ if [[ ! -f "$BUNDLE" ]]; then
   exit 1
 fi
 
-sudo -n mkdir -p "$EXTRACT" "$BUILDCTX"
-sudo -n rm -rf "$EXTRACT"/* "$BUILDCTX"/* || true
+sudo -n mkdir -p "$EXTRACT"
+sudo -n rm -rf "$EXTRACT"/* || true
 sudo -n tar -xzf "$BUNDLE" -C "$EXTRACT"
 sudo -n rm -f "$BUNDLE"
 
 command -v rsync >/dev/null || sudo -n apt-get install -y -qq rsync
 
-sudo -n rsync -a --delete \
-  --exclude data/ \
-  --exclude public/uploads/ \
-  --exclude public/backups/ \
-  --exclude .env \
-  --exclude node_modules/ \
-  --exclude .next/ \
-  "$EXTRACT/" "$APP/"
+# Host copy is only for nginx /brand and compose files — not the 200MB standalone.
+sudo -n mkdir -p "$APP/public" "$APP/prisma" "$APP/scripts"
+sudo -n rsync -a "$EXTRACT/Dockerfile.prebuilt" "$APP/Dockerfile.prebuilt"
+if [[ -f "$EXTRACT/docker-compose.staging.yml" ]]; then
+  sudo -n rsync -a "$EXTRACT/docker-compose.staging.yml" "$APP/docker-compose.staging.yml"
+fi
+sudo -n rsync -a "$EXTRACT/prisma/" "$APP/prisma/"
+if [[ -d "$EXTRACT/public/brand" ]]; then
+  sudo -n rsync -a "$EXTRACT/public/brand/" "$APP/public/brand/"
+fi
+if [[ -d "$EXTRACT/public/icons" ]]; then
+  sudo -n rsync -a "$EXTRACT/public/icons/" "$APP/public/icons/"
+fi
+if [[ -d "$EXTRACT/public/covers" ]]; then
+  sudo -n rsync -a "$EXTRACT/public/covers/" "$APP/public/covers/"
+fi
 
-sudo -n mkdir -p "$BUILDCTX/.next" "$BUILDCTX/certs"
-sudo -n cp "$EXTRACT/Dockerfile.prebuilt" "$BUILDCTX/Dockerfile.prebuilt"
-sudo -n cp -a "$EXTRACT/.next/standalone" "$BUILDCTX/.next/standalone"
-sudo -n cp -a "$EXTRACT/.next/static" "$BUILDCTX/.next/static"
-sudo -n cp -a "$EXTRACT/public" "$BUILDCTX/public"
-sudo -n cp -a "$EXTRACT/prisma" "$BUILDCTX/prisma"
-sudo -n cp "$EXTRACT/prisma.config.ts" "$BUILDCTX/prisma.config.ts"
-sudo -n cp -a "$EXTRACT/scripts" "$BUILDCTX/scripts"
-if [[ -d "$EXTRACT/certs" ]]; then
-  sudo -n cp -a "$EXTRACT/certs" "$BUILDCTX/certs"
-fi
-if [[ -f "$APP/certs/russian_trusted_ca.pem" ]]; then
-  sudo -n mkdir -p "$BUILDCTX/certs"
-  sudo -n cp -a "$APP/certs/." "$BUILDCTX/certs/" || true
-fi
+NEW_SHA="$(sha256sum "$EXTRACT/prisma/schema.prisma" | awk '{print $1}')"
+OLD_SHA="$(sudo -n cat "$APP/.yp-schema-sha" 2>/dev/null || true)"
 
 cd "$APP"
-# Cheap image: copy standalone, no next compile
-sudo -n docker build -f "$BUILDCTX/Dockerfile.prebuilt" -t sochi-staging_web:latest "$BUILDCTX"
+# Build from the extract itself — skip a second 200MB copy into a buildctx.
+sudo -n docker build -f "$EXTRACT/Dockerfile.prebuilt" -t sochi-staging_web:latest "$EXTRACT"
 sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml up -d --no-build web
-sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T web npx prisma db push --accept-data-loss || echo "WARN: prisma db push failed"
 
-sudo -n rm -rf "$EXTRACT" "$BUILDCTX"
-sleep 6
-curl -sS --max-time 20 http://127.0.0.1:3001/api/health || true
-echo
+if [[ "$NEW_SHA" == "$OLD_SHA" ]]; then
+  echo "==> prisma schema unchanged, skip db push"
+else
+  echo "==> prisma schema changed, db push (additive, no data-loss flag)"
+  if sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T web \
+      sh -c 'test -x ./node_modules/.bin/prisma && ./node_modules/.bin/prisma db push'; then
+    echo "$NEW_SHA" | sudo -n tee "$APP/.yp-schema-sha" >/dev/null
+  else
+    echo "WARN: prisma CLI not in image; schema not applied. Image still started." >&2
+  fi
+fi
+
+sudo -n rm -rf "$EXTRACT"
+
+echo "==> wait localhost:3001"
+ok=0
+for i in 1 2 3 4 5 6 7 8 9 10 12 14; do
+  body="$(curl -sS --max-time 3 http://127.0.0.1:3001/api/health || true)"
+  if echo "$body" | grep -q '"ok":true'; then
+    echo "$body"
+    ok=1
+    break
+  fi
+  sleep 2
+done
+if [[ "$ok" != "1" ]]; then
+  echo "ERROR: staging web did not become healthy on :3001" >&2
+  sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml logs --tail 40 web || true
+  exit 1
+fi
 REMOTE
 
 yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-stg-pre-remote.sh"
@@ -97,14 +116,14 @@ yp_ssh "bash /var/tmp/yp-stg-pre-remote.sh; ec=\$?; rm -f /var/tmp/yp-stg-pre-re
 
 echo "==> verify https://${STAGING_DOMAIN}/api/health == ${EXPECTED_VER}"
 ok=0
-for i in 1 2 3 4 5 6 7 8; do
-  body="$(curl -fsS --max-time 25 "https://${STAGING_DOMAIN}/api/health" || true)"
+for i in 1 2 3 4 5 6; do
+  body="$(curl -fsS --max-time 12 "https://${STAGING_DOMAIN}/api/health" || true)"
   echo "  try $i: $body"
   if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
     ok=1
     break
   fi
-  sleep 4
+  sleep 3
 done
 if [[ "$ok" != "1" ]]; then
   echo "ERROR: staging version mismatch (expected $EXPECTED_VER)" >&2
