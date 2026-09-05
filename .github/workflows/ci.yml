@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: node --test tests/*.test.mjs
+      - name: Shell syntax
+        run: |
+          bash -n scripts/apply-staging.sh
+          bash -n scripts/deploy-staging-prebuilt.sh
+          bash -n scripts/pack-staging-prebuilt.sh
+          bash -n scripts/workflow-deploy-staging.sh
+          bash -n scripts/lib/vps.sh

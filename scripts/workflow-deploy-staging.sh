@@ -67,9 +67,9 @@ if [[ ! -f "\$REMOTE_TGZ" ]]; then
 fi
 tar -xzf "\$REMOTE_TGZ" -C /tmp/yp-staging-extract
 rm -f "\$REMOTE_TGZ"
-command -v rsync >/dev/null || { apt-get update -qq && apt-get install -y -qq rsync; }
+command -v rsync >/dev/null || { sudo -n apt-get update -qq && sudo -n apt-get install -y -qq rsync; }
 
-rsync -a --delete \
+sudo -n rsync -a --delete \
   --exclude data/ \
   --exclude public/uploads/ \
   --exclude public/backups/ \
@@ -97,7 +97,7 @@ if [[ "\$SKIP_BUILD" == "1" ]]; then
   echo "SKIP_BUILD=1 — sync only"
 else
   yp_compose() {
-    if command -v docker-compose >/dev/null 2>&1; then docker-compose "\$@"; else docker compose "\$@"; fi
+    if sudo -n docker compose version >/dev/null 2>&1; then sudo -n docker compose "\$@"; elif command -v docker-compose >/dev/null 2>&1; then sudo -n docker-compose "\$@"; else sudo -n docker compose "\$@"; fi
   }
   if [[ "\$MODE" == "dual" ]]; then
     if [[ -f docker-compose.staging.yml ]]; then

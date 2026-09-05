@@ -10,17 +10,19 @@
 
 ## How to work (save time)
 
-- Batch code fixes, **one** git push, **one** staging deploy. Do not rebuild Docker per tiny tweak.
-- Verify with scripts, not a browser: `bash scripts/smoke-sites.sh`
+- Batch code fixes, **one** git push, **one** apply to ty: `bash scripts/apply-staging.sh`
+  (builds Next off the VPS, then a small Docker image on staging). Do not `docker compose --build` on the 2GB box.
+- Verify with scripts, not a browser: `bash scripts/smoke-sites.sh --staging-only`
 - SSH/SCP only via workflow scripts (`scripts/lib/vps.sh` retries Connection reset). No ad-hoc retry loops.
-- Script/nginx/docs-only on VPS: `SKIP_BUILD=1 bash scripts/workflow-deploy-staging.sh`
+- Brand CSS only: `bash scripts/apply-staging.sh static`
+- Script/nginx/docs-only on VPS: `bash scripts/apply-staging.sh sync`
 - Promote reuses the existing image (`--no-build`); do not run `safe-rebuild-web.sh` unless recreate failed.
-- Reuse helpers: `scripts/lib/vps.sh`, `workflow-deploy-staging.sh`, `manual-promote-to-young.sh`, `smoke-sites.sh`, `safe-rebuild-web.sh`.
+- Reuse helpers: `scripts/apply-staging.sh`, `scripts/lib/vps.sh`, `workflow-deploy-staging.sh`, `manual-promote-to-young.sh`, `smoke-sites.sh`.
 
 ## Deploy workflow (mandatory)
 
 1. **GitHub first** — commit, push, update PR. Never leave changes only on the VPS.
-2. **Staging next** — `bash scripts/workflow-deploy-staging.sh` then `bash scripts/smoke-sites.sh --staging-only`
+2. **Staging next** — `bash scripts/apply-staging.sh` then smoke. GitHub Action `apply-staging` can do the same on push to `main` after secret `STAGING_SSH_KEY` is set. Then `bash scripts/smoke-sites.sh --staging-only`
 3. **Human checks ty** — wait for «одобряю» / «кати на py» / «promote». Do not promote early.
 4. **Only then prod** —  
    `CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh`  

@@ -45,7 +45,7 @@ GitHub → тест ty.idivles.ru → ваше «одобряю» → бэкап
 ```
 
 ```bash
-bash scripts/workflow-deploy-staging.sh
+bash scripts/apply-staging.sh
 bash scripts/smoke-sites.sh --staging-only
 # только после «одобряю»:
 CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh

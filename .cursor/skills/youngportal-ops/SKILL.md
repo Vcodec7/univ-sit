@@ -12,23 +12,18 @@ description: Work on YoungPortal (ty/py.idivles.ru) from this Cloud Agent. SSH, 
 - SSH: `cursor-site@77.110.125.241` ключ `~/.ssh/id_ed25519_cursor_site`, sudo без пароля
 - **Не катить на py** без явного «одобряю»
 
-## Живые правки без полной пересборки
+## Живые правки без полной пересборки Next на VPS
 
-Nginx отдаёт `/brand/` с диска staging:
-
-```
-/opt/sochi-portal-staging/public/brand/theme.css
-```
-
-Цвета и мелкий CSS — править `public/brand/theme.css` в git, затем:
+Один вход:
 
 ```bash
-scp -i ~/.ssh/id_ed25519_cursor_site public/brand/theme.css \
-  cursor-site@77.110.125.241:/tmp/theme.css
-ssh … 'sudo cp /tmp/theme.css /opt/sochi-portal-staging/public/brand/theme.css'
+bash scripts/apply-staging.sh          # код → prebuilt на ty
+bash scripts/apply-staging.sh static   # только public/brand
 ```
 
-Страница подхватывает файл сразу (Ctrl+F5). Код React/API — нужен `docker compose -p sochi-staging -f docker-compose.staging.yml up -d --build` из `/opt/sochi-portal-staging`. Перед сборкой смотреть `df -h` (диск ~30G).
+Nginx отдаёт `/brand/` с диска staging: `/opt/sochi-portal-staging/public/brand/theme.css`
+
+Не запускать `docker compose ... --build` на VPS — там OOM. Прод (py) не трогать без «одобряю».
 
 ## Фирменные цвета
 

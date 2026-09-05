@@ -6,7 +6,7 @@
 
 ```
 1. Код и доки → GitHub (ветка + PR)
-2. Деплой на ТЕСТ  → https://ty.idivles.ru
+2. Деплой на ТЕСТ  → https://ty.idivles.ru  (`bash scripts/apply-staging.sh`)
 3. Вы смотрите ty и пишете явное одобрение
 4. Бэкап ПРОДА     → py.idivles.ru (live snapshot)
 5. Выкат на ПРОД   → https://py.idivles.ru из одобренного теста
@@ -39,6 +39,15 @@ VPS: `root@77.110.125.241:22` (ключ `id_ed25519_yp`).
 
 - **py.idivles.ru** — прод, `:3000`
 - **ty.idivles.ru** — тест, `:3001`
+
+```bash
+bash scripts/apply-staging.sh
+bash scripts/smoke-sites.sh --staging-only
+```
+
+Сборка Next идёт **не на 2GB VPS**, а на машине агента / GitHub Actions. На сервер уезжает уже готовый standalone-образ.
+
+Секрет для автовыката из GitHub: `STAGING_SSH_KEY` (ключ `cursor-site`), опционально `STAGING_HOST`.
 
 Проверка без браузера:
 

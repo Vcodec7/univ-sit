@@ -13,7 +13,7 @@
     "db:push": "prisma db push",
     "test": "node --test tests/*.test.mjs",
     "qa": "node scripts/qa-all.mjs",
-    "qa:all": "node scripts/qa-all.mjs",
+    "apply:staging": "bash scripts/apply-staging.sh",
     "qa:modules": "node scripts/qa-modules-toggle.mjs",
     "qa:roles": "node scripts/qa-deep-roles-ux.mjs",
     "qa:roles:full": "node scripts/qa-full-roles.mjs",

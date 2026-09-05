@@ -10,13 +10,13 @@ if [[ -f "$_yp_env" ]]; then
   set +a
 fi
 
-HOST="${HOST:-root@77.110.125.241}"
+HOST="${HOST:-cursor-site@77.110.125.241}"
 PORT="${PORT:-22}"
 
 yp_need_ssh() {
   if [[ -n "${SSHPASS:-}" ]]; then return 0; fi
   if [[ -n "${SSH_IDENTITY:-}" && -f "${SSH_IDENTITY}" ]]; then return 0; fi
-  if [[ -f "${HOME}/.ssh/id_ed25519" || -f "${HOME}/.ssh/id_rsa" || -f "${HOME}/.ssh/id_ed25519_yp" ]]; then
+  if [[ -f "${HOME}/.ssh/id_ed25519_cursor_site" || -f "${HOME}/.ssh/id_ed25519_yp" || -f "${HOME}/.ssh/id_ed25519" || -f "${HOME}/.ssh/id_rsa" ]]; then
     return 0
   fi
   echo "Set SSHPASS, SSH_IDENTITY, or configure an SSH key." >&2
@@ -27,6 +27,9 @@ yp_init_ssh() {
   yp_need_ssh || return 1
   local opts=(-o StrictHostKeyChecking=accept-new -o ConnectTimeout=25)
   local id="${SSH_IDENTITY:-}"
+  if [[ -z "$id" && -f "${HOME}/.ssh/id_ed25519_cursor_site" ]]; then
+    id="${HOME}/.ssh/id_ed25519_cursor_site"
+  fi
   if [[ -z "$id" && -f "${HOME}/.ssh/id_ed25519_yp" ]]; then
     id="${HOME}/.ssh/id_ed25519_yp"
   fi
