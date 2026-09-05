@@ -31,7 +31,15 @@ export default function HomeHeroMedia({
         />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="svc-hero__img" src={poster} alt="" />
+        <img
+          className="svc-hero__img"
+          src={poster}
+          alt=""
+          width={1600}
+          height={900}
+          decoding="async"
+          fetchPriority="high"
+        />
       )}
     </div>
   );

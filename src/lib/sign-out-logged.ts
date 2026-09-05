@@ -2,6 +2,7 @@
 
 import { signOut } from 'next-auth/react';
 import { pingSecurity } from '@/lib/device-fingerprint';
+import { persistSessionHint } from '@/lib/session-hint';
 
 /** Record LOGOUT then end the NextAuth session. */
 export async function signOutLogged(opts?: { callbackUrl?: string }) {
@@ -12,5 +13,6 @@ export async function signOutLogged(opts?: { callbackUrl?: string }) {
     new Promise<void>((resolve) => setTimeout(resolve, 800)),
   ]).catch(() => undefined);
 
+  persistSessionHint(false);
   await signOut({ callbackUrl: opts?.callbackUrl ?? '/' });
 }

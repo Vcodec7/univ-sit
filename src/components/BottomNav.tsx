@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
+import { persistSessionHint } from '@/lib/session-hint';
 
 type Tab = {
   href: string;
@@ -131,6 +132,7 @@ export default function BottomNav() {
     }
     setDockClass(true);
     persistDock(true);
+    persistSessionHint(true);
   }, [visible, status]);
 
   if (!visible) {

@@ -1,4 +1,4 @@
-const CACHE = "sochi-shell-v38-cls";
+const CACHE = "sochi-shell-v39-nav";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/offline.html",
@@ -62,7 +62,6 @@ function offlinePage() {
 }
 
 self.addEventListener("install", (event) => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).catch(() => undefined)
   );
@@ -82,7 +81,6 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
       )
-      .then(() => self.clients.claim())
   );
 });
 
@@ -153,27 +151,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (path.startsWith("/_next/static/")) {
-    event.respondWith(
-      caches.match(req).then(
-        (cached) =>
-          cached ||
-          fetch(req).then((res) => {
-            if (res.ok && res.status === 200 && res.type !== "opaque") {
-              const copy = res.clone();
-              caches.open(CACHE).then((c) => {
-                c.put(req, copy).catch(() => undefined);
-              });
-            }
-            return res;
-          })
-      )
-    );
-    return;
-  }
-
   if (path.startsWith("/_next/")) {
-    event.respondWith(fetch(req));
     return;
   }
 

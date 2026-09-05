@@ -68,6 +68,7 @@ import { encodeRouteParam } from '@/lib/route-id';
 import { isPrimaryHeaderSlug } from '@/lib/nav-catalog';
 import { fetchProfileCached } from '@/lib/user-data-client';
 import { requestOpenQuickAccess } from '@/lib/quick-access';
+import { persistSessionHint } from '@/lib/session-hint';
 
 type OpenMenu = 'projects' | 'clubs' | 'spaces' | 'more' | 'account' | null;
 
@@ -90,6 +91,11 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   const isTech = userRole === 'TECH';
   const isStaff = userRole === 'ADMIN' || userRole === 'MODERATOR';
   const [publicCode, setPublicCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    persistSessionHint(status === 'authenticated' && Boolean(session));
+  }, [status, session]);
 
   useEffect(() => {
     if (!session?.user?.id || isScanner) {
@@ -347,9 +353,9 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   );
 
   // Guest links must stay visible during session resolve — never leave empty ghost placeholders.
-  // Authenticated chrome only after status === 'authenticated'.
+  // Authenticated chrome only after status === 'authenticated' (has-session CSS reserves width).
   const isAuthenticated = status === 'authenticated' && Boolean(session);
-  const authIconCount = isAuthenticated ? (isScanner ? 2 : 2) : 0;
+  const authIconCount = isAuthenticated ? 2 : 3;
 
   const renderAuthIcons = () => (
     <div

@@ -173,6 +173,7 @@ button {
   top: 0;
   z-index: 10100; /* above cookie/onboarding sheets so «Вход» stays clickable */
   overflow: visible;
+  contain: layout;
   min-height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
 }
 
@@ -193,16 +194,16 @@ button {
 }
 
 
-/* --- Navbar: grow with two-line brand; never clip Unbounded glyphs --- */
+/* --- Navbar: reserved height so the bar does not jump on hydrate / font swap --- */
 .glass-nav-inner {
   display: grid;
   grid-template-columns: minmax(0, min(24rem, 34vw)) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   min-height: var(--nav-h);
-  height: auto;
-  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
-  padding-bottom: 0.5rem;
+  height: var(--nav-h);
+  padding-top: max(0.45rem, env(safe-area-inset-top, 0px));
+  padding-bottom: 0.45rem;
   min-width: 0;
   box-sizing: border-box;
   overflow: visible;
@@ -439,7 +440,11 @@ button {
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
-  min-width: calc(var(--nav-auth-slots, 5) * 38px + (var(--nav-auth-slots, 5) - 1) * 0.3rem);
+  min-width: 15.5rem;
+}
+
+html.has-session .nav-auth-slot {
+  min-width: 7.25rem;
 }
 
 .nav-auth-icons--placeholder {
@@ -595,6 +600,7 @@ button {
   flex: 1 1 auto;
   min-width: 0;
   justify-content: flex-start !important;
+  overflow: hidden;
 }
 
 .desktop-nav a {
@@ -652,6 +658,8 @@ button {
   display: none;
   align-items: center;
   flex-shrink: 0;
+  min-width: 7.5rem;
+  min-height: 2rem;
 }
 .nav-auth-mobile__row {
   display: flex;
@@ -736,7 +744,7 @@ button {
   position: relative;
   z-index: 210;
   background: #ffffff;
-  height: auto;
+  height: var(--nav-h);
   min-height: var(--nav-h);
 }
 
@@ -2108,8 +2116,6 @@ img.site-brand-logo {
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Reserve paint space — reduces jump while decoding */
-  content-visibility: auto;
 }
 
 /* Compact event cards (home /events) */
