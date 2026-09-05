@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Award, Download, Eye, FileText, Loader2, Search } from 'lucide-react';
+import { Award, Download, Eye, Loader2, Search } from 'lucide-react';
 import { OFFICIAL_DOC_TYPE_META, OFFICIAL_DOC_TEMPLATES, type OfficialDocType } from '@/lib/official-documents-shared';
 import { AWARD_OCCASIONS, type AwardOccasionId } from '@/lib/award-occasions';
 
