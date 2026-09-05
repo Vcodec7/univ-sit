@@ -95,6 +95,7 @@ type PublicProfile = {
     clubs: { id: string; title: string; href: string }[];
     projects: { id: string; title: string; href: string }[];
   };
+  contestWins?: { place: number; title: string; kind: string; href: string }[];
   mutualTrust: {
     score: number;
     label: string;
@@ -637,6 +638,23 @@ function PublicUserPageInner() {
               ) : null}
             </div>
           )}
+
+          {profile.contestWins && profile.contestWins.length > 0 ? (
+            <div className="yp-profile__card">
+              <h2>
+                <Award size={16} /> Победы в конкурсах
+              </h2>
+              <ul className="yp-profile__wins">
+                {profile.contestWins.map((w) => (
+                  <li key={`${w.href}-${w.place}`}>
+                    <Link href={w.href}>
+                      {w.place === 1 ? '1 место' : `${w.place} место`} · {w.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {user.about ? (
             <div className="yp-profile__card">

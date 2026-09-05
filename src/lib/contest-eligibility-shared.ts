@@ -36,3 +36,28 @@ export const CONTEST_KIND_RU: Record<string, string> = {
   SUBMISSION: 'Конкурс работ',
   RAFFLE: 'Розыгрыш',
 };
+
+export function contestPhase(c: {
+  status: string;
+  endsAt?: string | Date | null;
+  voteEndsAt?: string | Date | null;
+  allowVoting?: boolean | null;
+}) {
+  const now = Date.now();
+  const ended = Boolean(c.endsAt && new Date(c.endsAt).getTime() < now);
+  const voteEnded = Boolean(c.voteEndsAt && new Date(c.voteEndsAt).getTime() < now);
+  const canSubmit = c.status === 'OPEN' && !ended;
+  const votingOn =
+    c.allowVoting !== false &&
+    ((c.status === 'VOTING' && !voteEnded) || (c.status === 'OPEN' && !ended));
+  let displayStatus = c.status;
+  if (c.status === 'OPEN' && ended) displayStatus = 'CLOSED';
+  if (c.status === 'VOTING' && voteEnded) displayStatus = 'CLOSED';
+  return {
+    canSubmit,
+    canVote: votingOn,
+    displayStatus,
+    label: CONTEST_STATUS_RU[displayStatus] || CONTEST_STATUS_RU[c.status] || c.status,
+    expired: (c.status === 'OPEN' && ended) || (c.status === 'VOTING' && voteEnded),
+  };
+}

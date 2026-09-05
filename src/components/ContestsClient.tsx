@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Trophy, Gift, Clock, Sparkles } from 'lucide-react';
 import EtaCountdown from '@/components/EtaCountdown';
-import { CONTEST_KIND_RU, CONTEST_STATUS_RU } from '@/lib/contest-eligibility-shared';
+import { CONTEST_KIND_RU, contestPhase } from '@/lib/contest-eligibility-shared';
 
 type Item = {
   id: string;
@@ -129,18 +129,22 @@ export default function ContestsClient() {
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          {items.map((c) => (
+          {items.map((c) => {
+            const phase = contestPhase(c);
+            return (
             <Link
               key={c.id}
               href={`/contests/${c.id}`}
-              className="card-surface yp-engage__card"
+              className={`card-surface yp-engage__card${phase.expired ? ' is-expired' : ''}`}
             >
               <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                 {c.kind === 'RAFFLE' ? <Gift size={22} /> : <Trophy size={22} />}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="yp-engage__card-top">
                     <strong style={{ fontSize: '1.1rem' }}>{c.title}</strong>
-                    <span className="yp-engage__badge">{CONTEST_STATUS_RU[c.status] || "Неизвестно"}</span>
+                    <span className={`yp-engage__badge${phase.expired ? ' is-done' : ''}`}>
+                      {phase.expired ? 'Срок истёк' : phase.label}
+                    </span>
                   </div>
                   <div style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 4 }}>
                     {CONTEST_KIND_RU[c.kind] || c.kind}
@@ -174,7 +178,8 @@ export default function ContestsClient() {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

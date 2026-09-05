@@ -8,7 +8,7 @@ import EtaCountdown from '@/components/EtaCountdown';
 import toast from 'react-hot-toast';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
 import { safeHttpUrl } from '@/lib/safe-url';
-import { CONTEST_KIND_RU, CONTEST_STATUS_RU } from '@/lib/contest-eligibility-shared';
+import { CONTEST_KIND_RU, contestPhase } from '@/lib/contest-eligibility-shared';
 import { Upload } from 'lucide-react';
 
 type Contest = {
@@ -198,10 +198,10 @@ export default function ContestDetailClient() {
     );
   }
 
+  const phase = contestPhase(contest);
   const canVote =
-    contest.allowVoting &&
-    (contest.status === 'OPEN' || contest.status === 'VOTING') &&
-    !(contest.eligibility?.oneVotePerContest && myVoteCount > 0);
+    phase.canVote && !(contest.eligibility?.oneVotePerContest && myVoteCount > 0);
+  const canSubmit = contest.kind === 'SUBMISSION' && phase.canSubmit;
 
   return (
     <div className="container yp-engage" style={{ padding: '1.5rem 1rem 3rem', maxWidth: 760 }}>
@@ -210,7 +210,8 @@ export default function ContestDetailClient() {
       </Link>
       <h1 style={{ margin: '0.75rem 0 0.35rem', fontWeight: 800 }}>{contest.title}</h1>
       <p style={{ color: 'var(--muted)', margin: '0 0 1rem' }}>
-        {CONTEST_KIND_RU[contest.kind] || "Конкурс"} · {CONTEST_STATUS_RU[contest.status] || "Неизвестно"}
+        {CONTEST_KIND_RU[contest.kind] || 'Конкурс'} · {phase.label}
+        {phase.expired ? ' · срок истёк' : ''}
         {contest.prizeText ? ` · приз: ${contest.prizeText}` : ''}
         {contest.booking ? ` · ${contest.booking.title}` : ''}
       </p>
@@ -267,7 +268,7 @@ export default function ContestDetailClient() {
         </div>
       )}
 
-      {contest.kind === 'SUBMISSION' && contest.status === 'OPEN' && (
+      {canSubmit && (
         <div className="card-surface" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
           <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Подать работу</h2>
           {elig && !elig.ok ? (

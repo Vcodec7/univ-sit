@@ -232,7 +232,7 @@ export async function GET(
       });
     }
 
-    const [portfolio, achievementRows, applications] = await Promise.all([
+    const [portfolio, achievementRows, applications, contestWins] = await Promise.all([
       full || isSelf || isStaff
         ? prisma.userPortfolio.findUnique({
             where: { userId: id },
@@ -258,6 +258,17 @@ export async function GET(
             select: {
               club: { select: { id: true, title: true } },
               project: { select: { id: true, title: true } },
+            },
+          })
+        : Promise.resolve([]),
+      full
+        ? prisma.contestWinner.findMany({
+            where: { userId: id },
+            orderBy: { place: 'asc' },
+            take: 12,
+            select: {
+              place: true,
+              contest: { select: { id: true, title: true, kind: true } },
             },
           })
         : Promise.resolve([]),
@@ -388,6 +399,12 @@ export async function GET(
           })()
         : [],
       memberships: { clubs, projects },
+      contestWins: contestWins.map((w) => ({
+        place: w.place,
+        title: w.contest.title,
+        kind: w.contest.kind,
+        href: `/contests/${w.contest.id}`,
+      })),
       mutualTrust,
       friendship,
       presence,

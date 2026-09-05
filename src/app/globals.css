@@ -17229,6 +17229,19 @@ body.has-bottom-nav {
   align-items: center;
   gap: 0.4rem;
 }
+.yp-profile__wins {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.yp-profile__wins a {
+  color: inherit;
+  font-weight: 650;
+  text-decoration: none;
+}
+.yp-profile__wins a:hover { color: var(--primary); }
 
 .yp-profile__about {
   margin: 0;
@@ -23040,6 +23053,10 @@ button.profile-hero__bio-cta {
   color: #6e4bc4;
   font-size: 0.72rem;
   font-weight: 750;
+}
+.yp-engage__badge.is-done {
+  background: rgba(180, 83, 9, 0.12);
+  color: #b45309;
 }
 .yp-engage__mine {
   color: #6e4bc4;

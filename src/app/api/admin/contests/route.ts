@@ -84,6 +84,21 @@ export async function POST(req: Request) {
         }).catch(() => null);
         await bumpSocialScore(row.userId, 2, 'contest_approved').catch(() => null);
         await evaluateAchievements(row.userId).catch(() => null);
+        await createUserNotification({
+          userId: row.userId,
+          type: 'CONTEST',
+          title: 'Работа принята на конкурс',
+          body: 'Модератор одобрил вашу работу — она в галерее.',
+          meta: { href: `/contests/${row.contestId}` },
+        }).catch(() => null);
+      } else {
+        await createUserNotification({
+          userId: row.userId,
+          type: 'CONTEST',
+          title: 'Работа не прошла модерацию',
+          body: body.rejectReason ? String(body.rejectReason) : 'Попробуйте другую работу или уточните у организаторов.',
+          meta: { href: `/contests/${row.contestId}` },
+        }).catch(() => null);
       }
       return NextResponse.json({ submission: row });
     }
@@ -105,7 +120,7 @@ export async function POST(req: Request) {
           userId,
           type: 'CONTEST',
           title: 'Вы выиграли розыгрыш!',
-          body: 'Поздравляем — проверьте раздел конкурсов',
+          body: 'Поздравляем — приз и М-баллы уже в кабинете. Смотрите конкурс.',
           meta: { href: `/contests/${contestId}` },
         }).catch(() => null);
       }
@@ -114,6 +129,11 @@ export async function POST(req: Request) {
 
     if (action === 'declareSubmissionWinners') {
       const contestId = String(body.contestId || '');
+      const contest = await prisma.contest.findUnique({
+        where: { id: contestId },
+        select: { id: true, title: true },
+      });
+      if (!contest) return NextResponse.json({ message: 'Конкурс не найден' }, { status: 404 });
       const top = await prisma.contestSubmission.findMany({
         where: { contestId, status: 'APPROVED' },
         orderBy: [{ voteCount: 'desc' }, { createdAt: 'asc' }],
@@ -136,6 +156,13 @@ export async function POST(req: Request) {
         }).catch(() => null);
         await bumpSocialScore(top[i].userId, 4, 'contest_win').catch(() => null);
         await evaluateAchievements(top[i].userId).catch(() => null);
+        await createUserNotification({
+          userId: top[i].userId,
+          type: 'CONTEST',
+          title: i === 0 ? 'Вы победили в конкурсе!' : `Вы в призёрах: ${i + 1} место`,
+          body: `«${contest.title}» — победа в профиле, М-баллы начислены.`,
+          meta: { href: `/contests/${contestId}` },
+        }).catch(() => null);
       }
       await prisma.contest.update({
         where: { id: contestId },
