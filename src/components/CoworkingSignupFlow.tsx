@@ -381,7 +381,7 @@ export default function CoworkingSignupFlow({
         footer={
           <>
             <Link href="/dashboard" className="btn btn-primary" onClick={() => setSuccessOpen(false)}>
-              {qrUrl ? 'Показать QR на входе' : 'В кабинет'}
+              {qrUrl ? 'QR на входе' : 'В кабинет'}
             </Link>
             <button type="button" className="btn btn-secondary" onClick={() => setSuccessOpen(false)}>
               Закрыть

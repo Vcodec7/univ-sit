@@ -624,7 +624,7 @@ function PublicUserPageInner() {
                         {c.glyph}
                       </span>
                       <strong>{c.title}</strong>
-                      <small style={{ color: c.rarityColor }}>{c.rarityLabel}</small>
+                      <small className="yp-profile__collectible-rarity">{c.rarityLabel}</small>
                       <em>{c.tagline}</em>
                     </article>
                   ))}
