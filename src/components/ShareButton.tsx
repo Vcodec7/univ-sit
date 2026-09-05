@@ -3,7 +3,15 @@
 import { Share2, Check } from 'lucide-react';
 import { useState } from 'react';
 
-export default function ShareButton({ title, inverse = true }: { title?: string, inverse?: boolean }) {
+export default function ShareButton({
+  title,
+  inverse = true,
+  className,
+}: {
+  title?: string;
+  inverse?: boolean;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
@@ -30,6 +38,8 @@ export default function ShareButton({ title, inverse = true }: { title?: string,
 
   return (
     <button 
+      type="button"
+      className={className}
       onClick={handleShare}
       style={{ 
         display: 'inline-flex', 

@@ -237,17 +237,11 @@ const SEED_PROGRAMS: Array<{
     title: 'Молодёжный совет при главе города',
     summary: 'Представляйте интересы сверстников и продвигайте городские инициативы.',
     description: `
-<p>Совет собирает обратную связь от молодых жителей, готовит предложения по молодёжной политике и сопровождает проекты.</p>
-<ul>
-<li>Возраст 16–35 лет</li>
-<li>Регулярные заседания и рабочие группы</li>
-<li>Возможность выносить темы на уровень администрации</li>
-</ul>
-<p>В заявке расскажите о себе и направлениях, которые хотите курировать.</p>
+<p>Совет собирает обратную связь молодых жителей, готовит предложения по молодёжной политике и ведёт рабочие группы. Это не разовая акция: нужны люди, которые доводят темы до заседания.</p>
 `.trim(),
     status: 'OPEN',
     organizer: 'Администрация г. Сочи / Дом молодёжи',
-    place: 'г. Сочи',
+    place: 'Дом молодёжи, ул. Навагинская, 9',
     bodyType: 'COUNCIL',
     tags: 'совет,политика',
     seats: 25,
@@ -261,10 +255,12 @@ const SEED_PROGRAMS: Array<{
     title: 'Молодёжный парламент Сочи',
     summary: 'Законотворческие практики, дебаты и проекты нормативных инициатив.',
     description: `
-<p>Площадка для тех, кто интересуется правом, публичными выступлениями и городским управлением. Участники готовят резолюции и проводят открытые слушания.</p>
+<p>Площадка для тех, кто хочет пробовать законотворчество на практике: не лекция «про власть», а регламент, комитеты и тексты, которые можно вынести на слушания.</p>
+<p>Собираемся в Доме молодёжи. Набор в созыв идёт через заявку на портале — администратор смотрит мотивацию и возраст.</p>
 `.trim(),
     status: 'OPEN',
-    organizer: 'Молодёжный парламент',
+    organizer: 'Дом молодёжи Сочи',
+    place: 'ул. Навагинская, 9',
     bodyType: 'PARLIAMENT',
     tags: 'парламент,дебаты',
     seats: 40,
@@ -278,10 +274,11 @@ const SEED_PROGRAMS: Array<{
     title: 'Ученическое самоуправление — кураторы школ',
     summary: 'Связь школьных советов с городскими программами и наборами.',
     description: `
-<p>Набор кураторов от школ: трансляция афиши, помощь одноклассникам с заявками на портале, организация школьных инициатив.</p>
+<p>Кураторы связывают школьные советы с городскими наборами: афиша, заявки, школьные инициативы, которые можно вынести на уровень Центра.</p>
 `.trim(),
     status: 'OPEN',
     organizer: 'Дом молодёжи Сочи',
+    place: 'Школа + встречи в Доме молодёжи',
     bodyType: 'SCHOOL',
     tags: 'школа,куратор',
     seats: 50,
@@ -367,6 +364,29 @@ export async function ensurePrograms() {
     } catch (e) {
       console.warn('ensurePrograms seed', seed.id, e);
     }
+  }
+
+  try {
+    for (const seed of SEED_PROGRAMS) {
+      if (seed.kind !== 'SELF_GOV') continue;
+      const row = await prisma.portalProgram.findUnique({
+        where: { id: seed.id },
+        select: { isDemoData: true },
+      });
+      if (!row?.isDemoData) continue;
+      await prisma.portalProgram.update({
+        where: { id: seed.id },
+        data: {
+          summary: seed.summary,
+          description: seed.description,
+          organizer: seed.organizer ?? null,
+          place: seed.place ?? null,
+          bodyType: seed.bodyType ?? null,
+        },
+      });
+    }
+  } catch (e) {
+    console.warn('ensurePrograms self-gov copy', e);
   }
 
   // Soft-upgrade: fill missing/stock covers on existing programs

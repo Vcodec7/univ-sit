@@ -36,3 +36,10 @@ test('dobro pages use hub/detail classes and status helper', () => {
   assert.match(catalog, /prog-hub--/);
   assert.match(detail, /Добро\.ру/);
 });
+
+test('self-gov detail fills parliament page with duties and meeting format', () => {
+  assert.match(ui, /SELF_GOV_GUIDE/);
+  assert.match(ui, /открытые слушания/);
+  assert.match(detail, /Чем предстоит заниматься/);
+  assert.match(detail, /Орган/);
+});

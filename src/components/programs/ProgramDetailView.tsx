@@ -12,6 +12,7 @@ import {
   programStatusLabel,
   type ProgramKind,
 } from '@/lib/programs';
+import { SELF_GOV_GUIDE } from '@/lib/programs-ui';
 import { programCover } from '@/lib/theme-covers';
 
 type Program = {
@@ -51,6 +52,7 @@ export default function ProgramDetailView({
   const ends = formatProgramDate(program.endsAt);
   const starts = formatProgramDate(program.startsAt);
   const body = program.bodyType ? BODY_TYPE_LABELS[program.bodyType] : null;
+  const guide = kind === 'SELF_GOV' && program.bodyType ? SELF_GOV_GUIDE[program.bodyType] : null;
 
   const cover = programCover(program, 0);
 
@@ -63,7 +65,7 @@ export default function ProgramDetailView({
             {kind === 'DOBRO' ? <HeartHandshake size={16} aria-hidden /> : <ArrowLeft size={18} />}
             {meta.title}
           </Link>
-          <ShareButton title={program.title} />
+          <ShareButton title={program.title} className="prog-hero__share" />
         </div>
         <div className="container prog-hero__copy">
           <span className={`prog-pill${canApply ? ' is-open' : ' is-closed'}`}>{statusLabel}</span>
@@ -76,6 +78,34 @@ export default function ProgramDetailView({
         <div className="prog-detail__grid">
           <div className="prog-article">
             <ContentRenderer content={program.description} template="DEFAULT" />
+            {guide ? (
+              <div className="prog-guide">
+                <section>
+                  <h2>Чем предстоит заниматься</h2>
+                  <ul>
+                    {guide.duties.map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ul>
+                </section>
+                <section>
+                  <h2>Кому подходит</h2>
+                  <ul>
+                    {guide.who.map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ul>
+                </section>
+                <section>
+                  <h2>Что даёт участие</h2>
+                  <ul>
+                    {guide.offer.map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ul>
+                </section>
+              </div>
+            ) : null}
           </div>
 
           <aside className="prog-aside">
@@ -110,7 +140,14 @@ export default function ProgramDetailView({
               ) : null}
               {body ? (
                 <li>
-                  <strong>Формат</strong> {body}
+                  <strong>Орган</strong>
+                  <span>{body}</span>
+                </li>
+              ) : null}
+              {guide?.format ? (
+                <li>
+                  <strong>Формат</strong>
+                  <span>{guide.format}</span>
                 </li>
               ) : null}
               {typeof program.seats === 'number' ? (
