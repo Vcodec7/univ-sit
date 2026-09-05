@@ -276,13 +276,13 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.02em;
+  gap: 0.15em;
   font-family: var(--font-unbounded), 'Unbounded', sans-serif;
   font-weight: 700;
   font-size: clamp(0.82rem, 1.05vw + 0.52rem, 0.98rem);
   letter-spacing: -0.03em;
-  line-height: 1.22;
-  padding-top: 0.1em;
+  line-height: 1.28;
+  padding-top: 0;
   color: var(--primary, #8562d8);
   min-width: 0;
   overflow: visible;
@@ -316,10 +316,11 @@ button {
 }
 
 .site-brand-nav .site-brand-name {
-  line-height: 1.22;
+  line-height: 1.28;
   align-self: center;
-  padding-top: 0.08em;
+  padding-top: 0;
   font-size: 0.9rem;
+  gap: 0.18em;
 }
 
 .site-brand-games-backdrop {
@@ -24792,22 +24793,23 @@ html.has-session .nav-auth-mobile {
 }
 .svc-hero--banner .svc-hero__content {
   width: 100%;
-  padding: clamp(2.25rem, 6vw, 4.25rem) 0 clamp(2rem, 5vw, 3.25rem);
+  max-width: none;
+  padding: clamp(2.25rem, 6vw, 4.25rem) 0 clamp(1.5rem, 4vw, 2.5rem);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
   align-items: end;
 }
-@media (min-width: 860px) {
+@media (min-width: 1100px) {
   .svc-hero--banner .svc-hero__content {
-    grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
-    gap: 2rem;
+    grid-template-columns: minmax(24rem, 1fr) 17.5rem;
+    gap: 2.25rem;
   }
 }
 .svc-hero__aside {
   display: none;
 }
-@media (min-width: 860px) {
+@media (min-width: 1100px) {
   .svc-hero__aside {
     display: grid;
     gap: 0.65rem;
@@ -24842,7 +24844,12 @@ html.has-session .nav-auth-mobile {
 }
 .svc-hero--banner .svc-hero__title {
   color: #fff;
-  max-width: none;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  line-height: 1.12;
+  padding-right: 0.15rem;
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
 }
 .svc-hero--banner .svc-hero__lead {
@@ -26321,16 +26328,12 @@ button.svc-hero__switch-btn {
   background: rgba(255, 255, 255, 0.16) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
 }
-.svc-hero--banner::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 5.5rem;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(250, 251, 244, 0) 0%, #fafbf4 92%);
+.svc-hero.svc-hero--banner {
+  border-radius: 0;
+}
+.svc-hero.svc-hero--banner::after {
+  content: none;
+  display: none;
 }
 .svc-hero--banner .svc-hero__overlay {
   z-index: 1;
