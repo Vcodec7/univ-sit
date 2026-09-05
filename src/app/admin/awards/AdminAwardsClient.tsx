@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Award, Download, Eye, FileText, Loader2, Search } from 'lucide-react';
-import { OFFICIAL_DOC_TYPE_META, type OfficialDocType } from '@/lib/official-documents-shared';
+import { OFFICIAL_DOC_TYPE_META, OFFICIAL_DOC_TEMPLATES, type OfficialDocType } from '@/lib/official-documents-shared';
+import { AWARD_OCCASIONS, type AwardOccasionId } from '@/lib/award-occasions';
 
 type UserHit = { id: string; name: string | null; email: string };
 type DocRow = {
@@ -32,6 +33,8 @@ export default function AdminAwardsClient() {
     body: '',
     recipientName: '',
     issuerName: '',
+    template: 'classic',
+    occasion: 'custom' as AwardOccasionId,
     linkToPortfolio: true,
   });
 
@@ -81,7 +84,10 @@ export default function AdminAwardsClient() {
       const res = await fetch('/api/admin/awards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          achievementCode: AWARD_OCCASIONS.find((o) => o.id === form.occasion)?.achievementCode || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Ошибка');
@@ -102,7 +108,7 @@ export default function AdminAwardsClient() {
           <Award size={22} /> Награды и документы
         </h1>
         <p style={{ margin: '0.35rem 0 0', color: 'var(--muted)', fontSize: '0.9rem' }}>
-          Дипломы, сертификаты, благодарности и почётные грамоты — PDF на сайте и в портфолио участника.
+          Как в жизни: диплом за конкурс, благодарность волонтёру, грамота активу клуба. PDF сразу в кабинете и портфолио.
         </p>
       </div>
 
@@ -158,8 +164,35 @@ export default function AdminAwardsClient() {
           ) : null}
         </label>
 
+        <div>
+          <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>За что — жизнь портала</span>
+          <div className="yp-award-occasions">
+            {AWARD_OCCASIONS.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={`yp-award-occasion${form.occasion === o.id ? ' is-on' : ''}`}
+                onClick={() => {
+                  setForm((f) => ({
+                    ...f,
+                    occasion: o.id,
+                    type: o.type,
+                    template: o.template,
+                    title: o.id === 'custom' ? f.title : o.title,
+                    subtitle: o.id === 'custom' ? f.subtitle : o.subtitle,
+                    body: o.id === 'custom' ? f.body : o.body,
+                  }));
+                }}
+              >
+                <strong>{o.label}</strong>
+                <em>{o.hint}</em>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>Тип</span>
+          <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>Тип документа</span>
           <select
             className="settings-input"
             value={form.type}
@@ -168,6 +201,20 @@ export default function AdminAwardsClient() {
             {TYPES.map((t) => (
               <option key={t} value={t}>
                 {OFFICIAL_DOC_TYPE_META[t].label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label style={{ display: 'grid', gap: 4 }}>
+          <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>Бланк PDF</span>
+          <select
+            className="settings-input"
+            value={form.template}
+            onChange={(e) => setForm((f) => ({ ...f, template: e.target.value }))}
+          >
+            {OFFICIAL_DOC_TEMPLATES.map((t) => (
+              <option key={t} value={t}>
+                {t === 'classic' ? 'Классика' : t === 'modern' ? 'Современный' : 'Официальный'}
               </option>
             ))}
           </select>

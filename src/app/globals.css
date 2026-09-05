@@ -1984,6 +1984,101 @@ a.home-hero-btn.btn-secondary {
   flex-wrap: wrap;
   gap: 0.45rem;
 }
+.yp-award-occasions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+.yp-award-occasion {
+  appearance: none;
+  text-align: left;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+  padding: 0.5rem 0.55rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.15rem;
+}
+.yp-award-occasion strong {
+  font-size: 0.78rem;
+}
+.yp-award-occasion em {
+  font-style: normal;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+.yp-award-occasion.is-on {
+  border-color: rgba(133, 98, 216, 0.55);
+  box-shadow: 0 8px 18px rgba(133, 98, 216, 0.12);
+  background: linear-gradient(160deg, rgba(133, 98, 216, 0.1), #fff);
+}
+.yp-award-empty {
+  position: relative;
+  overflow: hidden;
+  padding: 1.35rem 1.15rem 1.2rem;
+  border-radius: 22px;
+  border: 1px solid rgba(133, 98, 216, 0.16);
+  background:
+    radial-gradient(90% 80% at 100% 0%, rgba(251, 191, 36, 0.16), transparent 50%),
+    radial-gradient(80% 70% at 0% 100%, rgba(133, 98, 216, 0.12), transparent 48%),
+    #fff;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+}
+.yp-award-empty__seal {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, #8562d8, #0ea5e9);
+  box-shadow: 0 10px 22px rgba(133, 98, 216, 0.35);
+  margin-bottom: 0.75rem;
+}
+.yp-award-empty h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+.yp-award-empty p {
+  margin: 0 0 0.85rem;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  max-width: 42rem;
+}
+.yp-award-card--luxe {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(133, 98, 216, 0.1), transparent 55%),
+    #fff;
+}
+.yp-award-card__foil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+  opacity: 0.5;
+}
+.yp-award-card[data-type='DIPLOMA'] { border-color: rgba(14, 116, 144, 0.35); }
+.yp-award-card[data-type='CERTIFICATE'] { border-color: rgba(37, 99, 235, 0.28); }
+.yp-award-card[data-type='GRATITUDE'] { border-color: rgba(180, 83, 9, 0.3); }
+.yp-award-card[data-type='HONORARY'] { border-color: rgba(185, 28, 28, 0.28); }
+.yp-award-card[data-type='AWARD'] { border-color: rgba(13, 148, 136, 0.32); }
+.yp-award-card__occasion {
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6e4bc4;
+}
+.yp-award-card__meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
 
 /* Fixed-size brand mark — ignore global img height:auto / max-width */
 img.site-brand-logo {

@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Award, Download, Eye } from 'lucide-react';
+import { Award, Download, Eye, Sparkles } from 'lucide-react';
 import { OFFICIAL_DOC_TYPE_META } from '@/lib/official-documents-shared';
 
 type AwardItem = {
   id: string;
   type: string;
   title: string;
+  subtitle?: string | null;
   serialNumber: string;
   issuedAt: string;
+  occasionLabel?: string | null;
 };
 
 export default function AwardsPanel() {
@@ -44,12 +46,18 @@ export default function AwardsPanel() {
   }
   if (items.length === 0) {
     return (
-      <div className="profile-empty">
-        <Award size={22} aria-hidden />
-        <p>Пока нет официальных документов. Их выдаёт администрация портала.</p>
+      <div className="yp-award-empty">
+        <div className="yp-award-empty__seal" aria-hidden>
+          <Award size={28} />
+        </div>
+        <h2>Ваша витрина наград</h2>
+        <p>
+          Администрация выдаёт дипломы, сертификаты, благодарности и почётные грамоты за конкурсы,
+          волонтёрство, клуб, экоакции и другие дела сообщества — как бумажные, только сразу в кабинете.
+        </p>
         <div className="yp-award-actions">
-          <Link href="/dashboard/achievements" className="btn btn-secondary btn-sm">
-            Достижения
+          <Link href="/dashboard/achievements" className="btn btn-primary btn-sm">
+            <Sparkles size={14} /> Достижения
           </Link>
           <Link href="/dashboard/portfolio" className="btn btn-secondary btn-sm">
             Портфолио
@@ -60,14 +68,16 @@ export default function AwardsPanel() {
   }
 
   return (
-    <div className="yp-award-grid">
+    <div className="yp-award-grid yp-award-grid--luxe">
       {items.map((d) => (
-        <article key={d.id} className="yp-award-card">
+        <article key={d.id} className="yp-award-card yp-award-card--luxe" data-type={d.type}>
+          <div className="yp-award-card__foil" aria-hidden />
           <div className="yp-award-card__type">
             {(OFFICIAL_DOC_TYPE_META as Record<string, { label?: string }>)[d.type]?.label || d.type}
           </div>
           <strong>{d.title}</strong>
-          <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
+          {d.occasionLabel ? <em className="yp-award-card__occasion">{d.occasionLabel}</em> : null}
+          <div className="yp-award-card__meta">
             {d.serialNumber} ·{' '}
             {new Date(d.issuedAt).toLocaleDateString('ru-RU', {
               day: 'numeric',

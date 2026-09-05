@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { issueOfficialDocument } from '@/lib/issue-official-document';
 import { OFFICIAL_DOC_TYPE_META, type OfficialDocType } from '@/lib/official-documents';
+import { AWARD_OCCASION_BY_ID } from '@/lib/award-occasions';
 import { requirePermission, aclJsonError } from '@/lib/acl';
 import { assertSameOrigin } from '@/lib/csrf-origin';
 
@@ -56,6 +57,8 @@ export async function POST(req: Request) {
   if (!OFFICIAL_DOC_TYPE_META[type]) {
     return NextResponse.json({ error: 'Неизвестный тип' }, { status: 400 });
   }
+  const occasionId = body.occasion ? String(body.occasion) : '';
+  const occasion = occasionId ? AWARD_OCCASION_BY_ID[occasionId] : undefined;
   try {
     const doc = await issueOfficialDocument({
       userId: String(body.userId),
@@ -65,11 +68,14 @@ export async function POST(req: Request) {
       body: body.body ? String(body.body) : null,
       recipientName: body.recipientName ? String(body.recipientName) : null,
       issuerName: body.issuerName ? String(body.issuerName) : null,
-      template: body.template ? String(body.template) : 'classic',
-      achievementCode: body.achievementCode ? String(body.achievementCode) : null,
+      template: body.template ? String(body.template) : occasion?.template || 'classic',
+      achievementCode: body.achievementCode
+        ? String(body.achievementCode)
+        : occasion?.achievementCode || null,
       issuedById: session.user.id || null,
       linkToPortfolio: body.linkToPortfolio !== false,
       issuedAt: body.issuedAt ? new Date(body.issuedAt) : undefined,
+      occasion: occasion?.id || null,
     });
     return NextResponse.json({ ok: true, document: doc });
   } catch (e: unknown) {

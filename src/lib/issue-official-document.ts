@@ -22,6 +22,7 @@ export type IssueOfficialInput = {
   achievementCode?: string | null;
   issuedById?: string | null;
   linkToPortfolio?: boolean;
+  occasion?: string | null;
 };
 
 export async function issueOfficialDocument(input: IssueOfficialInput) {
@@ -96,6 +97,9 @@ export async function issueOfficialDocument(input: IssueOfficialInput) {
       template: input.template || 'classic',
       serialNumber,
       achievementCode: input.achievementCode || null,
+      metaJson: JSON.stringify({
+        occasion: input.occasion || null,
+      }),
       portfolioCertId,
       pdfPath,
       status: 'ISSUED',

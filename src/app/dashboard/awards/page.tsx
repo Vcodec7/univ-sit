@@ -7,7 +7,7 @@ export default function DashboardAwardsPage() {
   return (
     <CabinetSubpage
       title="Награды"
-      lead="Официальные дипломы, сертификаты и грамоты портала."
+      lead="Официальные дипломы и грамоты за жизнь портала: конкурсы, волонтёрство, клуб, экоакции."
     >
       <AwardsPanel />
     </CabinetSubpage>
