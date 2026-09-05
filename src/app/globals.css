@@ -27,7 +27,7 @@
   --radius-lg: 1.5rem;
   --radius-xl: 1.75rem;
   --radius-pill: 999px;
-  --nav-h: 3.75rem;
+  --nav-h: 4.15rem;
 }
 
 * {
@@ -193,23 +193,27 @@ button {
 }
 
 
-/* --- Navbar stability: fixed height so the bar does not jump on hydrate / menu --- */
+/* --- Navbar: grow with two-line brand; never clip Unbounded glyphs --- */
 .glass-nav-inner {
   display: grid;
   grid-template-columns: minmax(0, min(24rem, 34vw)) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   min-height: var(--nav-h);
-  height: var(--nav-h);
-  padding-top: 0.35rem;
-  padding-bottom: 0.35rem;
+  height: auto;
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  padding-bottom: 0.5rem;
   min-width: 0;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .site-brand-nav {
   max-width: none;
   width: 100%;
+  min-width: min-content;
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 .site-brand {
@@ -272,16 +276,18 @@ button {
   font-weight: 700;
   font-size: clamp(0.82rem, 1.05vw + 0.52rem, 0.98rem);
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  line-height: 1.22;
+  padding-top: 0.1em;
   color: var(--primary, #6a42c2);
   min-width: 0;
+  overflow: visible;
 }
 
 .site-brand-name:not(.is-stacked) {
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .site-brand-name:not(.is-stacked) .site-brand-name__line {
@@ -291,9 +297,9 @@ button {
 .site-brand-name__line {
   display: block;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: none;
 }
 
 .site-brand--footer .site-brand-name {
@@ -305,9 +311,9 @@ button {
 }
 
 .site-brand-nav .site-brand-name {
-  line-height: 1.12;
+  line-height: 1.22;
   align-self: center;
-  padding-top: 0;
+  padding-top: 0.08em;
   font-size: 0.9rem;
 }
 
@@ -532,16 +538,20 @@ button {
 
 
 @media (max-width: 1199px) {
+  :root {
+    --nav-h: 4.7rem;
+  }
   .glass-nav-inner {
-    grid-template-columns: minmax(8.5rem, 1fr) auto;
+    grid-template-columns: minmax(min-content, 1fr) auto;
   }
   .site-brand-nav {
     max-width: 100%;
-    min-width: 0;
+    min-width: min-content;
   }
   .site-brand-nav .site-brand-link {
     flex: 1 1 auto;
-    min-width: 5.5rem;
+    min-width: min-content;
+    overflow: visible;
   }
   .site-brand-nav .site-brand-name {
     font-size: clamp(0.68rem, 2.8vw, 0.86rem);
@@ -726,7 +736,7 @@ button {
   position: relative;
   z-index: 210;
   background: #ffffff;
-  height: var(--nav-h);
+  height: auto;
   min-height: var(--nav-h);
 }
 
@@ -13565,7 +13575,7 @@ pre {
     display: grid !important;
   }
   .glass-nav-inner {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(min-content, 1fr) auto;
   }
   .glass-nav-end {
     box-shadow: none;
@@ -24758,12 +24768,12 @@ fieldset.svc-form-group,
 @media (max-width: 640px) {
   .site-brand--header .site-brand-name,
   .site-brand-nav .site-brand-name {
-    max-width: min(12rem, 44vw);
-    overflow: hidden;
+    max-width: none;
+    overflow: visible;
     font-size: 0.86rem !important;
-    line-height: 1.15;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    line-height: 1.22;
+    white-space: normal;
+    text-overflow: clip;
     visibility: visible;
     opacity: 1;
   }
@@ -24896,10 +24906,10 @@ main,
   /* Keep full brand name visible on phones */
   .site-brand-nav .site-brand-name {
     display: flex !important;
-    max-width: min(11.5rem, 42vw);
-    overflow: hidden;
+    max-width: none;
+    overflow: visible;
     font-size: 0.82rem !important;
-    line-height: 1.15 !important;
+    line-height: 1.22 !important;
     white-space: normal;
   }
   .site-brand-nav .site-brand-name.is-stacked {
@@ -24909,10 +24919,10 @@ main,
   }
   .site-brand-nav .site-brand-name__line {
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
     white-space: nowrap;
-    max-width: 100%;
+    max-width: none;
   }
   .site-brand-nav .site-brand-mark,
   .site-brand-nav .site-brand-logo {
@@ -25569,7 +25579,7 @@ html[data-eco-banner] .profile-hero--cabinet {
   }
   .glass-nav-inner {
     max-width: 100%;
-    overflow-x: auto;
+    overflow: visible;
   }
 }
 

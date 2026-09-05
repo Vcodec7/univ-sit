@@ -42,9 +42,11 @@ function brandNameLines(raw) {
   const name = String(raw || '').trim() || 'Молодёжь Сочи';
   const crm = name.match(/^(Центр развития)\s+(молод[её]жи\s+Сочи)$/iu);
   if (crm) return [crm[1], crm[2]];
-  if (name.length <= 24) return [name];
+  const youth = name.match(/^(Молод[её]жь)\s+(Сочи)$/iu);
+  if (youth) return [youth[1], youth[2]];
+  if (name.length <= 18) return [name];
   const parts = name.split(/\s+/).filter(Boolean);
-  if (parts.length < 3) return [name];
+  if (parts.length < 2) return [name];
   const mid = Math.ceil(parts.length / 2);
   return [parts.slice(0, mid).join(' '), parts.slice(mid).join(' ')].filter(Boolean);
 }
@@ -89,9 +91,9 @@ test('capacity join race invariant (logical)', () => {
   assert.equal(count, 2);
 });
 
-test('short portal name stays on one header line', () => {
-  assert.deepEqual(brandNameLines('Молодёжь Сочи'), ['Молодёжь Сочи']);
-  assert.deepEqual(brandNameLines('Молодежь Сочи'), ['Молодежь Сочи']);
+test('header brand name splits so the full title fits on a phone', () => {
+  assert.deepEqual(brandNameLines('Молодёжь Сочи'), ['Молодёжь', 'Сочи']);
+  assert.deepEqual(brandNameLines('Молодежь Сочи'), ['Молодежь', 'Сочи']);
   assert.deepEqual(brandNameLines('Центр развития молодёжи Сочи'), [
     'Центр развития',
     'молодёжи Сочи',

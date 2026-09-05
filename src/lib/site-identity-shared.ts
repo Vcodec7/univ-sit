@@ -10,17 +10,18 @@ export function normalizeDisplaySiteName(raw?: string | null) {
 }
 
 /**
- * Soft line breaks for long official titles in the header brand.
- * Short names like «Молодёжь Сочи» stay on one line — splitting them
- * made the sticky header jump and look like a two-line stack.
+ * Soft line breaks for the header brand so the full title stays visible
+ * next to Запись / profile / menu on a narrow phone.
  */
 export function brandNameLines(raw?: string | null): string[] {
   const name = normalizeDisplaySiteName(raw);
   const crm = name.match(/^(Центр развития)\s+(молод[её]жи\s+Сочи)$/iu);
   if (crm) return [crm[1], crm[2]];
-  if (name.length <= 24) return [name];
+  const youth = name.match(/^(Молод[её]жь)\s+(Сочи)$/iu);
+  if (youth) return [youth[1], youth[2]];
+  if (name.length <= 18) return [name];
   const parts = name.split(/\s+/).filter(Boolean);
-  if (parts.length < 3) return [name];
+  if (parts.length < 2) return [name];
   const mid = Math.ceil(parts.length / 2);
   return [parts.slice(0, mid).join(' '), parts.slice(mid).join(' ')].filter(Boolean);
 }
