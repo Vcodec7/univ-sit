@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Building2, CalendarDays, CalendarPlus } from 'lucide-react';
+import { Building2, CalendarDays, Landmark } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import HomeHeroMedia from '@/components/HomeHeroMedia';
 
@@ -32,6 +32,7 @@ export default function HomeServiceHero({
   const video = (videoUrl || '').trim();
   const wantVideo = mediaKind === 'video' && Boolean(video);
   const brand = (siteName || 'Молодёжь Сочи').trim();
+  const showAfishaChip = primary?.href !== '/events' && secondary?.href !== '/events';
 
   return (
     <section className="svc-hero svc-hero--banner" aria-label="Главный баннер">
@@ -49,12 +50,12 @@ export default function HomeServiceHero({
                 {primary ? (
                   needsAuth(primary.href) ? (
                     <GuestAuthPrompt href={primary.href} className="svc-hero__switch-btn is-on" asButton>
-                      <CalendarPlus size={18} aria-hidden />
+                      <Landmark size={17} aria-hidden />
                       {primary.label}
                     </GuestAuthPrompt>
                   ) : (
                     <Link href={primary.href} className="svc-hero__switch-btn is-on" prefetch>
-                      <CalendarPlus size={18} aria-hidden />
+                      <Landmark size={17} aria-hidden />
                       {primary.label}
                     </Link>
                   )
@@ -62,22 +63,24 @@ export default function HomeServiceHero({
                 {secondary ? (
                   needsAuth(secondary.href) ? (
                     <GuestAuthPrompt href={secondary.href} className="svc-hero__switch-btn" asButton>
-                      <Building2 size={18} aria-hidden />
+                      <Building2 size={17} aria-hidden />
                       {secondary.label}
                     </GuestAuthPrompt>
                   ) : (
                     <Link href={secondary.href} className="svc-hero__switch-btn" prefetch>
-                      <Building2 size={18} aria-hidden />
+                      <Building2 size={17} aria-hidden />
                       {secondary.label}
                     </Link>
                   )
                 ) : null}
+                {showAfishaChip ? (
+                <Link href="/events" className="svc-hero__switch-btn" prefetch>
+                  <CalendarDays size={17} aria-hidden />
+                  Афиша
+                </Link>
+                ) : null}
               </div>
             )}
-            <Link href="/events" className="svc-hero__afisha" prefetch>
-              <CalendarDays size={16} aria-hidden />
-              Афиша
-            </Link>
           </div>
         </div>
       </div>
