@@ -10282,8 +10282,9 @@ a.yp-modal-close {
   min-height: 2.45rem;
 }
 
-.catalog-card__interactive {
-  min-height: 2.45rem;
+.home-feed-grid .catalog-card__interactive {
+  margin-top: auto;
+  padding-top: 0.4rem;
 }
 
 .catalog-card-title-inline {
@@ -23185,7 +23186,8 @@ body.yp-scroll-locked {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.45rem;
-  margin-top: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.45rem;
 }
 .free-now-actions .btn {
   justify-content: center;
@@ -24103,9 +24105,10 @@ fieldset.svc-form-group,
 /* Space catalog — service cards (round photo + pill CTA) */
 .svc-space-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.5rem), 1fr));
   gap: 1.15rem;
   width: 100%;
+  align-items: stretch;
 }
 .svc-space-card {
   display: flex;
@@ -24117,6 +24120,7 @@ fieldset.svc-form-group,
   border: 1px solid var(--line);
   border-radius: 1.15rem;
   min-width: 0;
+  height: 100%;
   overflow: hidden;
 }
 .svc-space-card__photo {
@@ -24157,7 +24161,12 @@ fieldset.svc-form-group,
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.3;
+  min-height: calc(1.3em * 2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .svc-space-card__body h3 a {
   color: inherit;
@@ -24177,17 +24186,18 @@ fieldset.svc-form-group,
   white-space: nowrap;
 }
 .svc-space-card__status {
-  margin: 0.15rem 0 0.35rem;
+  margin: 0.15rem 0 0;
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--primary-hover);
+  min-height: 1.35em;
 }
 .svc-space-card__status.is-cowork {
   color: var(--success);
 }
 .svc-space-card__cta {
-  align-self: flex-start;
-  margin-top: 0.2rem;
+  align-self: stretch;
+  margin-top: 0;
   text-decoration: none;
   font-size: 0.88rem !important;
   padding: 0.45rem 0.95rem !important;
@@ -24196,7 +24206,11 @@ fieldset.svc-form-group,
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.4rem;
-  margin-top: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  min-height: 2.55rem;
+  width: 100%;
+}
   width: 100%;
 }
 .svc-space-card__cta-row.is-dual {
