@@ -126,7 +126,7 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
                     <div className={`svc-space-card__cta-row${coworking && hall ? ' is-dual' : ''}`}>
                       {hall ? (
                         <GuestAuthPrompt
-                          href={`${href}/book`}
+                          href={`${href}/book?from=list`}
                           className="svc-pill svc-pill--brand svc-space-card__cta"
                           asButton
                         >

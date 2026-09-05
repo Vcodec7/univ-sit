@@ -1,19 +1,29 @@
-/* Immersive games chrome — hide site nav/footer/FAB when playing */
-body:has(.games-root) .glass-nav,
-body:has(.games-root) .site-footer,
-body:has(.games-root) footer.site-footer,
-body:has(.games-root) body > footer,
-body:has(.games-root) [data-yp-pwa-install],
-body:has(.games-root) .pwa-install-banner,
-body:has(.games-root) .qa-fab {
+/* Immersive games chrome — only while a game is open, not on the hub */
+body:has(.games-root.is-play) .glass-nav,
+body:has(.games-root.is-play) .site-footer,
+body:has(.games-root.is-play) footer.site-footer,
+body:has(.games-root.is-play) body > footer,
+body:has(.games-root.is-play) [data-yp-pwa-install],
+body:has(.games-root.is-play) .pwa-install-banner,
+body:has(.games-root.is-play) .qa-fab,
+body:has(.games-root.is-play) .qa-edge-tab,
+body:has(.games-root.is-play) .yp-bottom-nav {
   display: none !important;
 }
 
-body:has(.games-root) {
+body:has(.games-root.is-hub) .games-topbar {
+  display: none;
+}
+
+body:has(.games-root.is-play) {
   overflow: hidden;
 }
 
-body:has(.games-root) .main-content {
+body:has(.games-root.is-hub) {
+  overflow: auto;
+}
+
+body:has(.games-root.is-play) .main-content {
   flex: 1;
   min-height: 0;
   height: 100dvh;
@@ -25,8 +35,8 @@ body:has(.games-root) .main-content {
 }
 
 /* Next.js template (framer-motion) wrapper must pass height through */
-body:has(.games-root) .main-content > .page-template,
-body:has(.games-root) .main-content > div {
+body:has(.games-root.is-play) .main-content > .page-template,
+body:has(.games-root.is-play) .main-content > div {
   flex: 1 1 0;
   min-height: 0;
   height: 100%;
@@ -40,7 +50,20 @@ body:has(.games-root) .animated-bg {
   opacity: 0.28;
 }
 
-.games-root {
+.games-root.is-hub {
+  overflow: visible;
+  height: auto;
+  max-height: none;
+  flex: none;
+}
+
+.games-root.is-hub .games-main {
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.games-root.is-play {
   flex: 1 1 0;
   min-height: 0;
   height: 100%;
@@ -2928,8 +2951,18 @@ body:has(.games-root) .animated-bg {
 .games-hub__kpi strong,
 .games-hub__stat-main strong,
 .games-hub__an-head strong,
-.games-hub__leader-head strong {
+.games-hub__leader-card .game-hof,
+.games-hub__leader-card .game-hof-name,
+.games-hub__leader-card .game-hof-score,
+.games-hub__leader-card .game-hof-list,
+.games-hub__leader-card .game-hof-list li {
   color: #0a0c2a !important;
+}
+.games-hub__leader-card .game-hof-name em {
+  color: #5c5670 !important;
+}
+.games-hub__leader-card .game-hof-name em.is-leader {
+  color: #b45309 !important;
 }
 
 .games-hub__stat-vals a,

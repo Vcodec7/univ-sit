@@ -65,8 +65,9 @@ export default function BottomNav() {
 
   const role = (session?.user as { role?: string } | undefined)?.role;
   const hideForRole = role === 'SCANNER' || role === 'TECH';
+  const onGamesHub = pathname === '/games' || pathname === '/games/';
   const immersive =
-    pathname.startsWith('/games') ||
+    (pathname.startsWith('/games') && !onGamesHub) ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/ops') ||
     pathname.startsWith('/scanner') ||

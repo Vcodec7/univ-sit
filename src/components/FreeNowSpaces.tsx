@@ -128,7 +128,7 @@ export default async function FreeNowSpaces({ limit = 8 }: { limit?: number }) {
                   </GuestAuthPrompt>
                 ) : (
                   <GuestAuthPrompt
-                    href={`/spaces/${encodeRouteParam(space.id)}/book`}
+                    href={`/spaces/${encodeRouteParam(space.id)}/book?from=list`}
                     className="btn btn-primary"
                     asButton
                   >

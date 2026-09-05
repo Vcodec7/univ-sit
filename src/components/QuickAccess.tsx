@@ -25,6 +25,7 @@ import {
   User,
   Users,
   X,
+  Zap,
 } from 'lucide-react';
 import {
   QUICK_ACCESS_OPEN_EVENT,
@@ -39,7 +40,7 @@ import {
   type HotkeyDef,
 } from '@/lib/quick-access-hotkeys';
 import { QuickAccessTutorial } from '@/components/QuickAccessTutorial';
-import { attachVGesture } from '@/lib/v-gesture';
+import { attachEdgeSwipe } from '@/lib/v-gesture';
 
 function itemIcon(item: HotkeyDef): ReactNode {
   const props = { size: 22, strokeWidth: 1.85, 'aria-hidden': true as const };
@@ -138,7 +139,7 @@ export function QuickAccess() {
     pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/reset-password') ||
     pathname.startsWith('/maintenance') ||
-    pathname.startsWith('/games');
+    (pathname.startsWith('/games/') && pathname !== '/games/');
 
   const items = useMemo(() => filterHotkeysForRole(role), [role]);
 
@@ -206,7 +207,7 @@ export function QuickAccess() {
 
   useEffect(() => {
     if (hideChrome) return;
-    return attachVGesture(() => setOpen(true));
+    return attachEdgeSwipe(() => setOpen(true));
   }, [hideChrome]);
 
   useEffect(() => {
@@ -361,6 +362,18 @@ export function QuickAccess() {
           Ждём вторую клавишу: <kbd>{chord}</kbd> …
         </div>
       )}
+
+      {!hideChrome && !open ? (
+        <button
+          type="button"
+          className="qa-edge-tab"
+          aria-label="Быстрый доступ"
+          title="Быстрый доступ"
+          onClick={() => setOpen(true)}
+        >
+          <Zap size={16} aria-hidden />
+        </button>
+      ) : null}
 
       <QuickAccessTutorial forceOpen={tutorialForce} restartKey={tutorialNonce} />
     </>

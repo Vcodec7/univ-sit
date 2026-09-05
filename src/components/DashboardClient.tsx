@@ -584,8 +584,8 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                         )
                       }
                       onStatClick={(key) => openRepModal(key)}
-                      showRatings={false}
-                      showEco={false}
+                      showRatings
+                      showEco
                       revealContacts
                     />
                     <PersonalQrPanel />

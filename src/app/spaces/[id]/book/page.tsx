@@ -1,14 +1,21 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import BookingCalendar from '@/components/BookingCalendar';
+import BookBackLink from '@/components/BookBackLink';
 import { decodeRouteParam } from '@/lib/route-id';
 
 export const dynamic = 'force-dynamic';
 
-export default async function BookSpacePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function BookSpacePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ from?: string }>;
+}) {
   const resolvedParams = await params;
+  const q = (await searchParams) || {};
+  const fromList = q.from === 'list';
   const id = decodeRouteParam(resolvedParams.id);
   const [space, settings] = await Promise.all([
     prisma.space.findUnique({
@@ -34,9 +41,7 @@ export default async function BookSpacePage({ params }: { params: Promise<{ id: 
   return (
     <div className="container" style={{ padding: '2rem 1rem', minHeight: '60vh' }}>
       <div>
-        <Link href={`/spaces/${encodeURIComponent(space.id)}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--muted)', fontWeight: 500, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '1.5rem' }}>
-          <ArrowLeft size={16} /> Вернуться к пространству
-        </Link>
+        <BookBackLink spaceId={space.id} fromList={fromList} />
 
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)' }}>
           Бронирование: {space.title}

@@ -1,19 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
-import { Maximize2, RefreshCw, Wallet } from 'lucide-react';
-
-type Scores = {
-  mBall: number;
-  ecoBall: number;
-  ecoPoints?: number;
-  ecoBallPublic: boolean;
-  mLevel: { label: string; toNext: number; progress: number; nextLabel: string | null };
-  ecoLevel: { label: string; toNext: number; progress: number; nextLabel: string | null };
-};
+import { History, Maximize2, RefreshCw } from 'lucide-react';
 
 type HistoryItem = {
   id: string;
@@ -27,13 +17,12 @@ type HistoryItem = {
 export default function PersonalQrPanel() {
   const [url, setUrl] = useState('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
-  const [scores, setScores] = useState<Scores | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [fullscreen, setFullscreen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showQr, setShowQr] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const load = useCallback(async (force = false) => {
     if (!force) setLoading(true);
@@ -49,7 +38,6 @@ export default function PersonalQrPanel() {
       const qr = data.qr || {};
       setUrl(qr.url || '');
       setExpiresAt(qr.expiresAt || null);
-      if (data.scores) setScores(data.scores);
       if (data.history) setHistory(data.history);
       setError(null);
     } catch (e) {
@@ -68,11 +56,6 @@ export default function PersonalQrPanel() {
   }, [load]);
 
   useEffect(() => {
-    const t = window.setTimeout(() => setShowQr(true), 120);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
     if (!fullscreen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setFullscreen(false);
@@ -86,9 +69,6 @@ export default function PersonalQrPanel() {
   }, [fullscreen]);
 
   const qrSize = mounted && window.matchMedia('(max-width: 700px)').matches ? 148 : 188;
-  const reputation = scores?.mBall ?? 0;
-  const wallet = scores?.ecoPoints ?? 0;
-  const level = scores?.mLevel;
 
   const fs =
     mounted && fullscreen && url
@@ -127,45 +107,31 @@ export default function PersonalQrPanel() {
       : null;
 
   return (
-    <section className="presence-panel yp-pass-block" aria-label="Пропуск и счета">
-      <div className="yp-accounts" aria-label="Счета">
-        <div className="yp-accounts__row">
-          <div>
-            <p className="yp-accounts__label">Репутация</p>
-            <p className="yp-accounts__hint">
-              {level?.label || 'Новичок'}
-              {level?.nextLabel ? ` · ещё ${level.toNext} до «${level.nextLabel}»` : ''}
-            </p>
-          </div>
-          <strong className="yp-accounts__value">{reputation.toLocaleString('ru-RU')}</strong>
-        </div>
-        <Link href="/dashboard/shop" className="yp-accounts__row yp-accounts__row--link">
-          <div>
-            <p className="yp-accounts__label">
-              <Wallet size={14} aria-hidden /> Кошелёк · М-баллы
-            </p>
-            <p className="yp-accounts__hint">М-баллы: тратятся на рамки и оформление</p>
-          </div>
-          <strong className="yp-accounts__value">{wallet.toLocaleString('ru-RU')}</strong>
-        </Link>
-      </div>
-
+    <section className="presence-panel yp-pass-block" id="pass" aria-label="Пропуск">
       <div className="presence-qr-card">
         <div className="presence-qr-head">
           <h2>Пропуск</h2>
-          <p>QR на входе, обновляется раз в сутки</p>
+          <p>QR на входе. Покажите с телефона.</p>
         </div>
         {loading && !url ? <p className="presence-muted">Готовим QR…</p> : null}
         {error ? <p className="presence-error">{error}</p> : null}
-        {url && showQr ? (
+        {url ? (
           <div className="presence-qr-wrap">
             <QRCodeDisplay value={url} size={qrSize} />
             <div className="presence-qr-actions">
               <button type="button" className="btn btn-primary" onClick={() => setFullscreen(true)}>
-                <Maximize2 size={16} /> На весь экран
+                <Maximize2 size={16} /> На вход
               </button>
               <button type="button" className="btn btn-secondary" onClick={() => load(true)}>
                 <RefreshCw size={16} /> Обновить
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary presence-history-btn"
+                onClick={() => setShowHistory(true)}
+                aria-label="История баллов"
+              >
+                <History size={16} /> История
               </button>
             </div>
             {expiresAt ? (
@@ -174,30 +140,43 @@ export default function PersonalQrPanel() {
               </p>
             ) : null}
           </div>
-        ) : url ? (
-          <p className="presence-muted">QR…</p>
         ) : null}
       </div>
 
-      {history.length > 0 ? (
-        <div className="presence-history">
-          <h3>История</h3>
-          <ul>
-            {history.slice(0, 5).map((h) => (
-              <li key={h.id}>
-                <span className={`presence-delta ${h.delta >= 0 ? 'is-plus' : 'is-minus'}`}>
-                  {h.delta >= 0 ? '+' : ''}
-                  {h.delta} {h.kind === 'ECO_POINTS' || h.kind === 'ECO' ? 'кошелёк' : 'репутация'}
-                </span>
-                <span className="presence-reason">{h.reason}</span>
-                <time dateTime={h.createdAt}>
-                  {new Date(h.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
-                </time>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {mounted && showHistory
+        ? createPortal(
+            <div className="presence-history-sheet" role="dialog" aria-modal="true" aria-label="История">
+              <button type="button" className="presence-history-sheet__back" aria-label="Закрыть" onClick={() => setShowHistory(false)} />
+              <div className="presence-history-sheet__card">
+                <div className="presence-history-sheet__head">
+                  <h3>История</h3>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowHistory(false)}>
+                    Закрыть
+                  </button>
+                </div>
+                {history.length === 0 ? (
+                  <p className="presence-muted">Пока нет записей.</p>
+                ) : (
+                  <ul className="presence-history-list">
+                    {history.slice(0, 30).map((h) => (
+                      <li key={h.id}>
+                        <span className={`presence-delta ${h.delta >= 0 ? 'is-plus' : 'is-minus'}`}>
+                          {h.delta >= 0 ? '+' : ''}
+                          {h.delta} {h.kind === 'ECO_POINTS' || h.kind === 'ECO' ? 'М-баллы' : 'репутация'}
+                        </span>
+                        <span className="presence-reason">{h.reason}</span>
+                        <time dateTime={h.createdAt}>
+                          {new Date(h.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
+                        </time>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
 
       {fs}
     </section>

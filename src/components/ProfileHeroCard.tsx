@@ -45,10 +45,8 @@ import toast from 'react-hot-toast';
 import { useVoice, useVoiceCopy } from '@/components/VoiceProvider';
 import {
   ACHIEVEMENTS,
-  TIER_META,
   type AchievementDef,
 } from '@/lib/achievements';
-import { PlayerProgressPanel } from '@/components/RatingProgressIcons';
 import {
   SHOWCASE_MAX,
   parseShowcaseBadges,
@@ -360,10 +358,6 @@ export default function ProfileHeroCard({
     objectFit: 'cover',
   };
 
-  const levelNum = levelMeta?.level ?? 1;
-  const levelColor = levelMeta?.color ?? '#94a3b8';
-  const levelTitle = levelMeta?.title ?? 'Новичок';
-  const levelPct = levelMeta?.pct ?? 0;
   const showHud = showRatings || showEco;
 
   return (
@@ -371,7 +365,7 @@ export default function ProfileHeroCard({
       <div className="profile-hero__main">
         <div className="profile-hero__avatar-col">
           <div
-            className={`profile-hero__avatar${legend ? ' avatar-legend-frame' : ''}${onAvatarPick ? ' is-editable' : ''}${frameLook ? ' has-eco-frame' : ''}`}
+            className={`profile-hero__avatar${legend ? ' avatar-legend-frame' : ''}${onAvatarPick ? ' is-editable' : ''}${frameLook ? ' has-eco-frame' : ''}${stableImage ? ' has-photo' : ' is-fallback'}`}
             title={frameLook ? 'Рамка из магазина' : undefined}
           >
             <div className={legend ? 'avatar-legend-inner' : 'profile-hero__avatar-inner'}>
@@ -463,33 +457,65 @@ export default function ProfileHeroCard({
 
       <div className="profile-hero__toolbar" role="group" aria-label="Действия профиля">
         {openEdit ? (
-          <button type="button" className="profile-hero__tool" onClick={openEdit}>
-            <Pencil size={13} aria-hidden /> Правка
+          <button type="button" className="profile-hero__tool is-primary" onClick={openEdit}>
+            <Pencil size={14} aria-hidden /> Правка
           </button>
         ) : (
-          <a href={editSectionHref} className="profile-hero__tool">
-            <Pencil size={13} aria-hidden /> Правка
+          <a href={editSectionHref} className="profile-hero__tool is-primary">
+            <Pencil size={14} aria-hidden /> Правка
           </a>
         )}
-        {onSettings ? (
-          <button type="button" className="profile-hero__tool" onClick={onSettings}>
-            <Settings size={13} aria-hidden /> Ещё
-          </button>
-        ) : settingsHref ? (
-          <Link href={settingsHref} className="profile-hero__tool">
-            <Settings size={13} aria-hidden /> Ещё
-          </Link>
-        ) : null}
         {onPreview ? (
           <button type="button" className="profile-hero__tool" onClick={onPreview}>
-            <UserCircle size={13} aria-hidden /> Вид
+            <UserCircle size={14} aria-hidden /> Как видят
           </button>
         ) : publicHref ? (
           <Link href={publicHref} className="profile-hero__tool">
-            <UserCircle size={13} aria-hidden /> Вид
+            <UserCircle size={14} aria-hidden /> Как видят
+          </Link>
+        ) : null}
+        {onSettings ? (
+          <button type="button" className="profile-hero__tool is-icon" onClick={onSettings} aria-label="Настройки">
+            <Settings size={16} aria-hidden />
+          </button>
+        ) : settingsHref ? (
+          <Link href={settingsHref} className="profile-hero__tool is-icon" aria-label="Настройки">
+            <Settings size={16} aria-hidden />
           </Link>
         ) : null}
       </div>
+
+      {showHud ? (
+        <div className="profile-hero__meters" aria-label="Пропуск, репутация и М-баллы">
+          <a className="profile-hero__meter" href="#pass">
+            <QrCode size={18} aria-hidden />
+            <span>
+              <small>Пропуск</small>
+              <strong>QR</strong>
+            </span>
+          </a>
+          <button
+            type="button"
+            className="profile-hero__meter"
+            onClick={() => onStatClick?.('AUTHORITY')}
+          >
+            <Shield size={18} aria-hidden />
+            <span>
+              <small>Репутация</small>
+              <strong>{authority == null ? '—' : authorityLabel || `${authority}%`}</strong>
+            </span>
+          </button>
+          {showEco ? (
+            <button type="button" className="profile-hero__meter" onClick={() => onStatClick?.('ECO')}>
+              <Leaf size={18} aria-hidden />
+              <span>
+                <small>М-баллы</small>
+                <strong>{Number(ecoPoints || 0).toLocaleString('ru-RU')}</strong>
+              </span>
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="profile-hero__loadout-wrap">
       <details className="profile-hero__loadout-details">
@@ -530,41 +556,17 @@ export default function ProfileHeroCard({
       </Link>
       </div>
 
-      {showHud ? (
-        <div className="profile-hero__stats" aria-label="Уровень и рейтинги">
-          <PlayerProgressPanel
-            level={levelNum}
-            title={levelTitle}
-            blurb={levelMeta?.blurb}
-            color={levelColor}
-            pct={levelPct}
-            bandTitle={levelMeta?.bandTitle}
-            bandId={levelMeta?.bandId}
-            toNext={levelMeta?.toNext}
-            nextReward={levelMeta?.nextReward}
-            prestige={levelMeta?.prestige}
-            authority={authority}
-            authorityLabel={authorityLabel}
-            social={social}
-            ecoPoints={ecoPoints}
-            showRatings={showRatings}
-            showEco={showEco}
-            onSelect={(key) => onStatClick?.(key)}
-          />
-        </div>
-      ) : null}
-
       {showShowcase ? (
-      <div className="profile-hero__showcase profile-hero__showcase--link">
+      <div className="profile-hero__showcase profile-hero__showcase--shelf">
         <div className="profile-hero__showcase-head">
           <div className="profile-hero__showcase-label">
-            Витрина
+            Витрина значков
             <span>
               {achLoading ? '…' : `${activeCodes.length}/${SHOWCASE_MAX}`}
             </span>
           </div>
           <Link href={showcaseHref} className="profile-hero__edit-btn">
-            Открыть
+            Собрать
           </Link>
         </div>
         <div className="profile-hero__showcase-body" aria-busy={achLoading}>
