@@ -71,6 +71,10 @@ export default function ProgramCatalog({
             <p className="prog-hub__kicker">
               <HeartHandshake size={15} aria-hidden /> Добро.Центр Сочи
             </p>
+          ) : kind === 'GRANT' ? (
+            <p className="prog-hub__kicker prog-hub__kicker--grant">
+              <Wallet size={15} aria-hidden /> Поддержка инициатив
+            </p>
           ) : null}
           <h1 className="text-gradient">{meta.title}</h1>
           <p>{meta.listDescription}</p>

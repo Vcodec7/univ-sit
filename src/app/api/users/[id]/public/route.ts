@@ -232,7 +232,7 @@ export async function GET(
       });
     }
 
-    const [portfolio, achievementRows, applications, contestWins] = await Promise.all([
+    const [portfolio, achievementRows, applications, contestWins, programWins] = await Promise.all([
       full || isSelf || isStaff
         ? prisma.userPortfolio.findUnique({
             where: { userId: id },
@@ -269,6 +269,20 @@ export async function GET(
             select: {
               place: true,
               contest: { select: { id: true, title: true, kind: true } },
+            },
+          })
+        : Promise.resolve([]),
+      full
+        ? prisma.application.findMany({
+            where: {
+              userId: id,
+              status: 'APPROVED',
+              programId: { not: null },
+            },
+            take: 12,
+            orderBy: { updatedAt: 'desc' },
+            select: {
+              program: { select: { id: true, title: true, kind: true } },
             },
           })
         : Promise.resolve([]),
@@ -405,6 +419,20 @@ export async function GET(
         kind: w.contest.kind,
         href: `/contests/${w.contest.id}`,
       })),
+      programWins: programWins
+        .filter((w) => w.program)
+        .map((w) => {
+          const kind = w.program!.kind;
+          const href =
+            kind === 'DOBRO'
+              ? `/dobro/${w.program!.id}`
+              : kind === 'SELF_GOV'
+                ? `/self-gov/${w.program!.id}`
+                : `/grants/${w.program!.id}`;
+          const kindLabel =
+            kind === 'DOBRO' ? 'Добро' : kind === 'SELF_GOV' ? 'Самоуправление' : 'Грант';
+          return { title: w.program!.title, kind, kindLabel, href };
+        }),
       mutualTrust,
       friendship,
       presence,

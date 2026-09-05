@@ -136,6 +136,19 @@ export async function POST(req: Request) {
     await evaluateAchievements(userId).catch(() => null);
 
     try {
+      const { createUserNotification } = await import('@/lib/security');
+      await createUserNotification({
+        userId,
+        type: 'APPLICATION',
+        title: 'Заявка отправлена',
+        body: 'Администратор рассмотрит её. Статус — в кабинете → Заявки.',
+        meta: { href: '/dashboard/applications', applicationId: application.id },
+      }).catch(() => null);
+    } catch {
+      /* optional */
+    }
+
+    try {
       voidLogUserAction({
         userId: session.user.id,
         action: 'APPLICATION_CREATE',

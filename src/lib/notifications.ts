@@ -281,7 +281,7 @@ export async function notifyStaffPendingRegistration(opts: {
 }
 
 export async function notifyApplicationStatus(opts: {
-  to: string;
+  to?: string | null;
   userId?: string;
   targetName: string;
   status: 'APPROVED' | 'REJECTED';
@@ -300,12 +300,12 @@ export async function notifyApplicationStatus(opts: {
     approved ? 'Заявка одобрена' : 'Заявка отклонена',
     `<p>Ваша заявка на участие в «${opts.targetName}» ${approved ? 'одобрена' : 'отклонена'}.</p>
      ${reasonHtml}
-     <p><a href="${publicOrigin}/dashboard">Личный кабинет</a></p>`
+     <p><a href="${publicOrigin}/dashboard/applications">Личный кабинет · заявки</a></p>`
   );
 
   if (opts.userId) {
     const notifBody = approved
-      ? `Ваша заявка на «${opts.targetName}» одобрена`
+      ? `Ваша заявка на «${opts.targetName}» одобрена. Статус в кабинете.`
       : `Заявка на «${opts.targetName}» отклонена${opts.rejectReason ? `: ${opts.rejectReason.slice(0, 120)}` : ''}`;
     void createUserNotification({
       userId: opts.userId,
@@ -316,7 +316,10 @@ export async function notifyApplicationStatus(opts: {
     }).catch(() => null);
   }
 
-  return sendEmail(opts.to, subject, html);
+  if (opts.to) {
+    return sendEmail(opts.to, subject, html);
+  }
+  return { skippedEmail: true };
 }
 
 export async function notifyEventJoined(opts: {

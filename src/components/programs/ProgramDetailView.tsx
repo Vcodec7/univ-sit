@@ -43,13 +43,14 @@ export default function ProgramDetailView({
 }) {
   const kind = program.kind as ProgramKind;
   const meta = PROGRAM_KIND_META[kind];
-  const canApply = programIsApplyOpen(program.status, program.endsAt);
-  const statusLabel = programStatusLabel(program.status, program.endsAt);
+  const seatsLeft =
+    typeof program.seats === 'number' ? Math.max(0, program.seats - approvedCount) : null;
+  const seatsGone = seatsLeft === 0;
+  const canApply = programIsApplyOpen(program.status, program.endsAt) && !seatsGone;
+  const statusLabel = seatsGone ? 'Мест нет' : programStatusLabel(program.status, program.endsAt);
   const ends = formatProgramDate(program.endsAt);
   const starts = formatProgramDate(program.startsAt);
   const body = program.bodyType ? BODY_TYPE_LABELS[program.bodyType] : null;
-  const seatsLeft =
-    typeof program.seats === 'number' ? Math.max(0, program.seats - approvedCount) : null;
 
   const cover = programCover(program, 0);
 
@@ -151,7 +152,8 @@ export default function ProgramDetailView({
             </div>
 
             <p className="prog-aside__note">
-              Заявки рассматривает администратор портала. Статус появится в личном кабинете.
+              Заявки рассматривает администратор. Статус — в{' '}
+              <Link href="/dashboard/applications">кабинете → Заявки</Link>.
             </p>
           </aside>
         </div>

@@ -57,23 +57,29 @@ async function updateStatus(formData: FormData) {
 
     if (status === 'APPROVED') {
       await promoteToParticipant(application.userId);
+      const { evaluateAchievements } = await import('@/lib/award-achievements');
+      await evaluateAchievements(application.userId).catch(() => null);
+      if (application.program?.kind === 'GRANT') {
+        const { bumpEcoPoints, ECO } = await import('@/lib/eco-points');
+        await bumpEcoPoints(application.userId, ECO.APPLICATION_APPROVED || 8, 'grant_approved', {
+          applicationId: application.id,
+          programId: application.programId,
+        }).catch(() => null);
+      }
     }
 
-    // Don't block UI on SMTP — fire-and-forget after DB commit
     const targetName =
       application.project?.title ||
       application.club?.title ||
       application.program?.title ||
       'Программа';
-    if (application.user?.email) {
-      void notifyApplicationStatus({
-        to: application.user.email,
-        userId: application.user.id,
-        targetName,
-        status,
-        rejectReason: application.rejectReason,
-      }).catch(() => null);
-    }
+    void notifyApplicationStatus({
+      to: application.user?.email || null,
+      userId: application.user.id,
+      targetName,
+      status,
+      rejectReason: application.rejectReason,
+    }).catch(() => null);
 
     void import('@/lib/moderation-outcome')
       .then(({ publishModerationOutcome }) =>
