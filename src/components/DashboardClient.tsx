@@ -3,42 +3,10 @@
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import {
-  User,
-  UserCircle,
-  Settings,
-  Shield,
-  FileText,
-  Ticket,
-  Pencil,
-  ImagePlus,
-  Crown,
-  Award,
-  Medal,
-  Zap,
-  Briefcase,
-  FolderKanban,
-  Users,
-  CalendarDays,
-  Building2,
-  HandHeart,
-  Ban,
-  ChevronRight,
-  LayoutDashboard,
-  ShoppingBag,
-  Home,
-  LogOut,
-  Gamepad2,
-  Gift,
-  BookOpen,
-  LayoutGrid,
-  MessageCircle,
-  Leaf,
-} from 'lucide-react';
+import { User, ImagePlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EventSoonNotifier from '@/components/EventSoonNotifier';
 import TagPicker from '@/components/TagPicker';
@@ -47,9 +15,6 @@ import ProfileHeroCard from '@/components/ProfileHeroCard';
 import PersonalQrPanel from '@/components/PersonalQrPanel';
 import CoworkingCabinetList from '@/components/CoworkingCabinetList';
 import { zodiacFromDate } from '@/lib/profile-meta';
-import { formatMskDate, formatMskDateTime, formatMskTime } from '@/lib/booking-hours';
-import { fairyTaleAvatarUrl, fairyTaleDisplayName } from '@/lib/privacy-alias';
-import UserAvatar from '@/components/UserAvatar';
 import {
   QUICK_ACCESS_TUTORIAL_DONE_EVENT,
 } from '@/lib/quick-access';
@@ -57,29 +22,13 @@ import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import { fetchProfileCached, fetchEcoCached } from '@/lib/user-data-client';
 import { cabinetGet, readCabinetJson } from '@/lib/cabinet-fetch';
 import { roleLabelRu } from '@/lib/role-labels';
-import { signOutLogged } from '@/lib/sign-out-logged';
+import CabinetMenu from '@/components/CabinetMenu';
 
-const QRCodeDisplay = dynamic(() => import('@/components/QRCodeDisplay'), { ssr: false });
-const AddToCalendarButton = dynamic(() => import('@/components/AddToCalendarButton'), { ssr: false });
-const EditBookingDetails = dynamic(() => import('@/components/EditBookingDetails'), { ssr: false });
-const DashboardSettingsHub = dynamic(() => import('@/components/DashboardSettingsHub'), { ssr: false });
 const ProfilePreviewModal = dynamic(() => import('@/components/ProfilePreviewModal'), { ssr: false });
 const PersonalGalleryEditor = dynamic(() => import('@/components/PersonalGalleryEditor'), { ssr: false });
 const ReputationHistoryModal = dynamic(() => import('@/components/ReputationHistoryModal'), { ssr: false });
 
-export type DashboardView =
-  | 'overview'
-  | 'achievements'
-  | 'portfolio'
-  | 'awards'
-  | 'applications'
-  | 'edit'
-  | 'settings'
-  | 'shop'
-  | 'referrals'
-  | 'guides'
-  | 'games'
-  | 'showcase';
+export type DashboardView = 'overview' | 'edit';
 
 type DashboardClientProps = {
   view?: DashboardView;
@@ -89,13 +38,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const searchParams = useSafeSearchParams();
-  const activeTab =
-    view === 'overview' || view === 'edit' || view === 'settings'
-      ? 'profile'
-      : view;
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [applications, setApplications] = useState<any[]>([]);
-  const [vacancyApplications, setVacancyApplications] = useState<any[]>([]);
   const [participations, setParticipations] = useState<any[]>([]);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profile, setProfile] = useState<{
@@ -146,8 +88,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     maxUserId?: string | null;
     maxUrl?: string | null;
   } | null>(null);
-  const [ticketBusy, setTicketBusy] = useState(false);
-  const [bookingBusyId, setBookingBusyId] = useState<string | null>(null);
   const [profileHobbies, setProfileHobbies] = useState<string[]>([]);
   const [profileInterests, setProfileInterests] = useState<string[]>([]);
   const [profileBirthDate, setProfileBirthDate] = useState('');
@@ -155,11 +95,9 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   const [profileVisibility, setProfileVisibility] = useState<'PUBLIC' | 'FRIENDS' | 'PRIVATE'>('PUBLIC');
   const [onlineVisibility, setOnlineVisibility] = useState<'FRIENDS' | 'PUBLIC' | 'HIDDEN'>('FRIENDS');
   const [inviteBusy, setInviteBusy] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarName, setAvatarName] = useState('');
-  const [appsSubTab, setAppsSubTab] = useState<'projects' | 'clubs' | 'programs' | 'events' | 'spaces'>('projects');
   const [achievementLegend, setAchievementLegend] = useState(false);
   const [modernUserBadge, setModernUserBadge] = useState(false);
   const [repModalOpen, setRepModalOpen] = useState(false);
@@ -244,18 +182,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     }
   }, [status, session?.user?.role, router]);
 
-  // If dedicated view is off in Ops — bounce to overview
-  useEffect(() => {
-    if (!moduleFlags) return;
-    if (view === 'achievements' && moduleFlags.achievements === false) router.replace('/dashboard');
-    if (view === 'awards' && moduleFlags.achievements === false) router.replace('/dashboard');
-    if (view === 'portfolio' && moduleFlags.portfolio === false) router.replace('/dashboard');
-    if (view === 'shop' && moduleFlags.eco === false) router.replace('/dashboard');
-    if (view === 'games' && moduleFlags.games === false) router.replace('/dashboard');
-    if (view === 'applications' && moduleFlags.applications === false) router.replace('/dashboard');
-    if (view === 'referrals' && moduleFlags.referrals === false) router.replace('/dashboard');
-  }, [moduleFlags, view, router]);
-
 
 
   // Thin compatibility redirects from legacy ?tab= / ?section= query URLs
@@ -293,19 +219,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     }
   }, [searchParams, router, view]);
 
-  const projectApplications = useMemo(
-    () => applications.filter((app) => app.project),
-    [applications]
-  );
-  const clubApplications = useMemo(
-    () => applications.filter((app) => app.club && !app.project),
-    [applications]
-  );
-  const programApplications = useMemo(
-    () => applications.filter((app) => app.program),
-    [applications]
-  );
-
   useEffect(() => {
     return () => {
       if (avatarPreview?.startsWith('blob:')) URL.revokeObjectURL(avatarPreview);
@@ -337,22 +250,8 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     const loadCabinetLists = async () => {
       if (cancelled) return;
       if (on('events')) {
-        const data = await cabinetGet('/api/user/bookings');
-        if (!cancelled && Array.isArray(data)) setBookings(data);
-      }
-      if (on('events')) {
         const data = await cabinetGet('/api/user/participations');
         if (!cancelled && Array.isArray(data)) setParticipations(data);
-      }
-      if (view === 'applications') {
-        if (on('vacancies')) {
-          const d = await cabinetGet('/api/vacancies/apply');
-          if (!cancelled) setVacancyApplications(Array.isArray(d?.items) ? d.items : []);
-        }
-        if (on('applications')) {
-          const data = await cabinetGet('/api/user/applications');
-          if (!cancelled && Array.isArray(data)) setApplications(data);
-        }
       }
     };
 
@@ -379,7 +278,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       } catch {
         /* toast handled in cabinet-fetch */
       }
-      if (on('achievements') && (view === 'overview' || view === 'achievements' || view === 'awards' || view === 'showcase' || view === 'edit')) {
+      if (on('achievements') && (view === 'overview' || view === 'edit')) {
         const data = await cabinetGet('/api/user/achievements?lite=1');
         if (cancelled) return;
         if (data?.progress?.complete || data?.legend) setAchievementLegend(true);
@@ -389,10 +288,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
         setModernUserBadge(hasModern);
       }
 
-      if (view === 'applications') {
-        await loadCabinetLists();
-        return;
-      }
       if (view !== 'overview') return;
       const later = (cb: () => void) => {
         const ric = (window as Window & { requestIdleCallback?: (fn: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
@@ -492,63 +387,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       );
   }, [participations]);
 
-  useEffect(() => {
-    if (!selectedTicket && upcomingTickets[0]?.ticketCode) {
-      setSelectedTicket(upcomingTickets[0].ticketCode);
-    }
-  }, [upcomingTickets, selectedTicket]);
-
-  const refreshParticipations = async () => {
-    const res = await fetch('/api/user/participations');
-    const data = await res.json();
-    if (Array.isArray(data)) setParticipations(data);
-  };
-
-  const refreshBookings = async () => {
-    const res = await fetch('/api/user/bookings');
-    const data = await res.json();
-    if (Array.isArray(data)) setBookings(data);
-  };
-
-  const cancelParticipation = async (bookingId: string) => {
-    if (!bookingId || ticketBusy) return;
-    if (!window.confirm('Отменить участие в мероприятии? Билет станет недействительным.')) return;
-    setTicketBusy(true);
-    try {
-      const res = await fetch(`/api/bookings/${bookingId}/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: '{}',
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || 'Не удалось отменить');
-      toast.success(data.message || 'Участие отменено');
-      setSelectedTicket(null);
-      await refreshParticipations();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Ошибка');
-    } finally {
-      setTicketBusy(false);
-    }
-  };
-
-  const cancelSpaceBooking = async (bookingId: string) => {
-    if (!bookingId || bookingBusyId) return;
-    if (!window.confirm('Отменить бронь пространства?')) return;
-    setBookingBusyId(bookingId);
-    try {
-      const res = await fetch(`/api/user/bookings/${bookingId}/cancel`, { method: 'POST' });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || 'Не удалось отменить');
-      toast.success(data.message || 'Бронь отменена');
-      await refreshBookings();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Ошибка');
-    } finally {
-      setBookingBusyId(null);
-    }
-  };
-
   // Must stay above any early return — otherwise React #310 when session finishes loading
   // (admin/user landing on /dashboard after login → «Упс»).
   useEffect(() => {
@@ -630,39 +468,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
     );
   }
 
-  const goTab = (tab: string, section?: 'overview' | 'edit' | 'settings') => {
-    if (tab === 'tickets') {
-      router.push('/tickets');
-      return;
-    }
-    if (tab === 'applications') {
-      router.push('/dashboard/applications');
-      return;
-    }
-    if (tab === 'achievements') {
-      router.push('/dashboard/achievements');
-      return;
-    }
-    if (tab === 'portfolio') {
-      router.push('/dashboard/portfolio');
-      return;
-    }
-    if (tab === 'profile') {
-      if (section === 'edit') {
-        setEditOpen(true);
-        router.push('/dashboard#profile-edit');
-        return;
-      }
-      if (section === 'settings') {
-        router.push('/dashboard/settings');
-        return;
-      }
-      router.push('/dashboard');
-    }
-  };
-
-  const selected = upcomingTickets.find((p) => p.ticketCode === selectedTicket) || upcomingTickets[0];
-
   const legalName = (profile?.name || session?.user?.name || '').trim();
   const pendingModeration = Boolean(session?.user?.moderationPending);
   const roleBadge = pendingModeration
@@ -672,8 +477,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       : null;
 
   const isOverview = view === 'overview';
-  const isSettings = view === 'settings';
-  const hideAsideOnMobile = true;
 
   return (
     <div className="container dashboard-page">
@@ -695,705 +498,27 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
         </div>
       ) : null}
       {isOverview ? <h1 className="sr-only">Кабинет</h1> : null}
+      <CabinetMenu
+        variant="strip"
+        current="overview"
+        upcomingCount={upcomingTickets.length}
+        unreadMessages={unreadMessages}
+        achievementLegend={achievementLegend}
+        ecoPoints={profile?.ecoPoints ?? 0}
+        role={session.user?.role}
+      />
       <div>
-        <div
-          className={`dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''}${
-            isSettings ? ' is-settings' : ''
-          }${hideAsideOnMobile ? ' hide-aside-mobile' : ''}`}
-        >
-          <aside className="glass dashboard-aside dashboard-aside--nav" aria-label="Профиль">
-            <nav className="dashboard-menu" aria-label="Меню профиля">
-              {(
-                [
-                  {
-                    group: 'Профиль',
-                    items: [
-                      { id: 'overview' as const, label: 'Профиль', icon: User, href: '/dashboard' },
-                      { id: 'showcase' as const, label: 'Витрина', icon: LayoutGrid, href: '/dashboard/showcase' },
-                      { id: 'settings' as const, label: 'Настройки', icon: Settings, href: '/dashboard/settings' },
-                    ],
-                  },
-                  {
-                    group: 'Кабинет',
-                    items: [
-                      { id: 'friends' as const, label: 'Друзья', icon: Users, href: '/friends', module: 'friends' },
-                      { id: 'messages' as const, label: 'Сообщения', icon: MessageCircle, href: '/messages', module: 'messaging' },
-                      { id: 'tickets' as const, label: 'Билеты', icon: Ticket, href: '/tickets', module: 'events' },
-                      { id: 'applications' as const, label: 'Заявки', icon: FileText, href: '/dashboard/applications', module: 'applications' },
-                      { id: 'portfolio' as const, label: 'Портфолио', icon: Briefcase, href: '/dashboard/portfolio', module: 'portfolio' },
-                      { id: 'referrals' as const, label: 'Рефералы', icon: Gift, href: '/dashboard/referrals', module: 'referrals' },
-                      { id: 'guides' as const, label: 'Инструктажи', icon: BookOpen, href: '/dashboard/guides' },
-                      { id: 'games' as const, label: 'Игры', icon: Gamepad2, href: '/dashboard/games', module: 'games' },
-                    ],
-                  },
-                  {
-                    group: 'Прогресс',
-                    items: [
-                      { id: 'shop' as const, label: 'Магазин', icon: ShoppingBag, href: '/dashboard/shop', module: 'eco' },
-                      { id: 'achievements' as const, label: 'Достижения', icon: Award, href: '/dashboard/achievements', module: 'achievements' },
-                      { id: 'awards' as const, label: 'Награды', icon: Medal, href: '/dashboard/awards', module: 'achievements' },
-                    ],
-                  },
-                ] as const
-              ).map((section) => {
-                const items = section.items.filter(
-                  (item) => !('module' in item && item.module) || modOn((item as { module?: string }).module || '')
-                );
-                if (!items.length) return null;
-                return (
-                  <div key={section.group} className="dashboard-menu__group">
-                    <p className="dashboard-aside-nav-label">{section.group}</p>
-                    <div className="dashboard-nav dashboard-nav--labeled">
-                      {items.map((item) => {
-                        const active =
-                          item.id === 'overview'
-                            ? view === 'overview' || view === 'edit'
-                            : item.id !== 'tickets' &&
-                              item.id !== 'messages' &&
-                              item.id !== 'friends' &&
-                              view === item.id;
-                        const className = `dashboard-nav-btn${active ? ' is-active' : ''}${
-                          item.id === 'achievements' ? ' is-achievements' : ''
-                        }`;
-                        return (
-                          <Link
-                            key={item.id}
-                            href={item.href}
-                            title={item.label}
-                            aria-label={item.label}
-                            className={className}
-                          >
-                            <span className="dashboard-nav-icon-wrap">
-                              <item.icon size={17} />
-                              {item.id === 'tickets' && upcomingTickets.length > 0 && (
-                                <span className="dashboard-nav-badge">
-                                  {upcomingTickets.length > 999 ? '999+' : upcomingTickets.length}
-                                </span>
-                              )}
-                              {item.id === 'messages' && unreadMessages > 0 && (
-                                <span className="dashboard-nav-badge">
-                                  {unreadMessages > 99 ? '99+' : unreadMessages}
-                                </span>
-                              )}
-                              {item.id === 'achievements' && achievementLegend && (
-                                <Crown size={11} color="#ca8a04" className="dashboard-nav-crown" aria-hidden />
-                              )}
-                            </span>
-                            <span className="dashboard-nav-label">{item.label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </nav>
-
-            <div className="dashboard-aside-foot">
-              {modOn('eco') ? (
-                <Link href="/dashboard/shop" className="dashboard-aside-eco" title="Кошелёк магазина">
-                  <Leaf size={15} />
-                  <span>кошелёк</span>
-                  <strong>{(profile?.ecoPoints ?? 0).toLocaleString('ru-RU')}</strong>
-                </Link>
-              ) : null}
-              <Link href="/" className="dashboard-aside-foot-link dashboard-aside-foot-link--home">
-                <Home size={16} /> На главную
-              </Link>
-              {(session.user?.role === 'ADMIN' || session.user?.role === 'MODERATOR') && (
-                <Link href="/admin" className="dashboard-admin-btn">
-                  <Shield size={16} /> Панель
-                </Link>
-              )}
-              <button
-                type="button"
-                className="dashboard-aside-foot-link dashboard-aside-foot-link--logout"
-                onClick={() => void signOutLogged({ callbackUrl: '/' })}
-              >
-                <LogOut size={16} /> Выйти
-              </button>
-            </div>
-          </aside>
+        <div className={`dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''} hide-aside-mobile`}>
+          <CabinetMenu
+            current="overview"
+            upcomingCount={upcomingTickets.length}
+            unreadMessages={unreadMessages}
+            achievementLegend={achievementLegend}
+            ecoPoints={profile?.ecoPoints ?? 0}
+            role={session.user?.role}
+          />
 
                     <div className="dashboard-main">
-            {view === 'applications' && (
-              <>
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.85rem', fontWeight: 700 }}>Мои заявки</h2>
-                {vacancyApplications.length > 0 && (
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <h3 style={{ fontSize: '1.05rem', marginBottom: '0.5rem' }}>Мои отклики на вакансии</h3>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 8 }}>
-                      {vacancyApplications.map((va: any) => (
-                        <li key={va.id} className="card-surface" style={{ padding: '0.75rem 1rem' }}>
-                          <a href={`/vacancies/${va.vacancy?.id}`} style={{ fontWeight: 700 }}>
-                            {va.vacancy?.title || 'Вакансия'}
-                          </a>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-                            {va.vacancy?.employer?.title} ·{' '}
-                            {{
-                              PENDING: 'Черновик',
-                              SCREENING: 'Предотбор',
-                              PENDING_REVIEW: 'На рассмотрении',
-                              APPROVED: 'Принято',
-                              REJECTED: 'Отклонено',
-                              WITHDRAWN: 'Отозвано',
-                            }[va.status as string] || 'Неизвестно'}
-                            {va.autoScore != null ? ` · предотбор ${va.autoScore}%` : ''}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {(() => {
-                  const statusBadge = (status: string) => {
-                    const pending = status === 'PENDING';
-                    const approved = status === 'APPROVED';
-                    return (
-                      <span
-                        style={{
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          backgroundColor: pending ? '#fef3c7' : approved ? '#dcfce7' : '#fee2e2',
-                          color: pending ? '#d97706' : approved ? '#166534' : '#991b1b',
-                        }}
-                      >
-                        {pending ? 'На модерации' : approved ? 'Одобрено' : 'Отклонено'}
-                      </span>
-                    );
-                  };
-
-                  const rejectNote = (reason?: string | null) =>
-                    reason ? (
-                      <p
-                        style={{
-                          margin: '0.65rem 0 0',
-                          padding: '0.55rem 0.7rem',
-                          borderRadius: 8,
-                          background: '#fef2f2',
-                          border: '1px solid rgba(153,27,27,0.15)',
-                          color: '#991b1b',
-                          fontSize: '0.85rem',
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        <span style={{ fontWeight: 700 }}>Причина: </span>
-                        {reason}
-                      </p>
-                    ) : null;
-
-                  const emptyBox = (text: string, href?: string, linkLabel?: string) => (
-                    <div
-                      style={{
-                        padding: '1.25rem',
-                        borderRadius: 'var(--radius-md)',
-                        backgroundColor: 'rgba(0,0,0,0.02)',
-                        textAlign: 'center',
-                      }}
-                    >
-                      <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: href ? '0 0 0.85rem' : 0 }}>
-                        {text}
-                      </p>
-                      {href && linkLabel && (
-                        <a href={href} className="btn btn-primary" style={{ display: 'inline-block' }}>
-                          {linkLabel}
-                        </a>
-                      )}
-                    </div>
-                  );
-
-                  const subTabs = [
-                    {
-                      id: 'projects' as const,
-                      label: 'Проекты',
-                      icon: FolderKanban,
-                      count: projectApplications.length,
-                    },
-                    { id: 'clubs' as const, label: 'Клубы', icon: Users, count: clubApplications.length },
-                    {
-                      id: 'programs' as const,
-                      label: 'Программы',
-                      icon: HandHeart,
-                      count: programApplications.length,
-                    },
-                    {
-                      id: 'events' as const,
-                      label: 'Афиша',
-                      icon: CalendarDays,
-                      count: participations.length,
-                    },
-                    { id: 'spaces' as const, label: 'Брони', icon: Building2, count: bookings.length },
-                  ];
-
-                  return (
-                    <>
-                      <div role="tablist" aria-label="Тип заявок" className="dashboard-apps-tabs">
-                        {subTabs.map((tab) => {
-                          const active = appsSubTab === tab.id;
-                          const Icon = tab.icon;
-                          const tip =
-                            tab.id === 'spaces'
-                              ? 'Бронирование пространств'
-                              : tab.id === 'events'
-                                ? 'Мероприятия афиши'
-                                : tab.id === 'programs'
-                                  ? 'Гранты, добро, самоуправление'
-                                  : tab.label;
-                          return (
-                            <button
-                              key={tab.id}
-                              type="button"
-                              role="tab"
-                              aria-selected={active}
-                              aria-label={tip}
-                              title={tip}
-                              onClick={() => setAppsSubTab(tab.id)}
-                              className={`dashboard-apps-tab is-icon-only${active ? ' is-active' : ''}`}
-                            >
-                              <span className="dashboard-apps-tab-icon">
-                                <Icon size={18} aria-hidden />
-                                {tab.count > 0 && (
-                                  <span
-                                    className="dashboard-apps-tab-count"
-                                    style={{
-                                      background: active ? 'var(--primary)' : 'rgba(15,23,42,0.08)',
-                                      color: active ? '#fff' : '#475569',
-                                    }}
-                                  >
-                                    {tab.count > 99 ? '99+' : tab.count}
-                                  </span>
-                                )}
-                              </span>
-                              <span className="dashboard-apps-tab-label">{tab.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="dashboard-apps-tabs-hint" aria-live="polite">
-                        {subTabs.find((t) => t.id === appsSubTab)?.label ?? 'Заявки'}
-                      </p>
-
-                      {appsSubTab === 'projects' &&
-                        (projectApplications.length === 0
-                          ? emptyBox('Пока нет заявок в проекты', '/projects', 'Смотреть проекты')
-                          : (
-                            <div className="dashboard-apps-grid">
-                              {projectApplications.map((app) => (
-                                <a
-                                  key={app.id}
-                                  href={`/projects/${encodeURIComponent(app.project.id)}`}
-                                  style={{
-                                    padding: '1.25rem',
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: 'var(--radius-md)',
-                                    backgroundColor: 'white',
-                                    textDecoration: 'none',
-                                    color: 'inherit',
-                                  }}
-                                >
-                                  <h4 style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '0.5rem' }}>
-                                    {app.project.title}
-                                  </h4>
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      justifyContent: 'space-between',
-                                      alignItems: 'center',
-                                      gap: '0.5rem',
-                                    }}
-                                  >
-                                    <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-                                      {new Date(app.createdAt).toLocaleDateString()}
-                                    </span>
-                                    {statusBadge(app.status)}
-                                  </div>
-                                  {app.status === 'REJECTED' ? rejectNote(app.rejectReason) : null}
-                                </a>
-                              ))}
-                            </div>
-                          ))}
-
-                      {appsSubTab === 'clubs' &&
-                        (clubApplications.length === 0
-                          ? emptyBox('Пока нет заявок в клубы', '/clubs', 'Смотреть клубы')
-                          : (
-                            <div className="dashboard-apps-grid">
-                              {clubApplications.map((app) => (
-                                <a
-                                  key={app.id}
-                                  href={`/clubs/${encodeURIComponent(app.club.id)}`}
-                                  style={{
-                                    padding: '1.25rem',
-                                    border: '1px solid rgba(0,0,0,0.08)',
-                                    borderRadius: 'var(--radius-md)',
-                                    backgroundColor: 'white',
-                                    textDecoration: 'none',
-                                    color: 'inherit',
-                                  }}
-                                >
-                                  <h4 style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '0.5rem' }}>
-                                    {app.club.title}
-                                  </h4>
-                                  <div
-                                    style={{
-                                      display: 'flex',
-                                      justifyContent: 'space-between',
-                                      alignItems: 'center',
-                                      gap: '0.5rem',
-                                    }}
-                                  >
-                                    <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-                                      {new Date(app.createdAt).toLocaleDateString()}
-                                    </span>
-                                    {statusBadge(app.status)}
-                                  </div>
-                                  {app.status === 'REJECTED' ? rejectNote(app.rejectReason) : null}
-                                </a>
-                              ))}
-                            </div>
-                          ))}
-
-                      {appsSubTab === 'programs' &&
-                        (programApplications.length === 0
-                          ? emptyBox('Пока нет заявок в гранты, добро и самоуправление', '/grants', 'Смотреть гранты')
-                          : (
-                            <div className="dashboard-apps-grid">
-                              {programApplications.map((app) => {
-                                const kind = app.program?.kind;
-                                const href =
-                                  kind === 'DOBRO'
-                                    ? `/dobro/${app.program.id}`
-                                    : kind === 'SELF_GOV'
-                                      ? `/self-gov/${app.program.id}`
-                                      : `/grants/${app.program.id}`;
-                                const kindLabel =
-                                  kind === 'DOBRO'
-                                    ? 'Добро'
-                                    : kind === 'SELF_GOV'
-                                      ? 'Самоуправление'
-                                      : 'Грант';
-                                return (
-                                  <a
-                                    key={app.id}
-                                    href={href}
-                                    style={{
-                                      padding: '1.25rem',
-                                      border: '1px solid rgba(0,0,0,0.08)',
-                                      borderRadius: 'var(--radius-md)',
-                                      backgroundColor: 'white',
-                                      textDecoration: 'none',
-                                      color: 'inherit',
-                                    }}
-                                  >
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: 4 }}>
-                                      {kindLabel}
-                                    </div>
-                                    <h4 style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '0.5rem' }}>
-                                      {app.program.title}
-                                    </h4>
-                                    <div
-                                      style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                      }}
-                                    >
-                                      <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-                                        {new Date(app.createdAt).toLocaleDateString()}
-                                      </span>
-                                      {statusBadge(app.status)}
-                                    </div>
-                                    {app.status === 'REJECTED' ? rejectNote(app.rejectReason) : null}
-                                  </a>
-                                );
-                              })}
-                            </div>
-                          ))}
-
-                      {appsSubTab === 'events' &&
-                        (participations.length === 0
-                          ? emptyBox('Пока нет записей на мероприятия', '/events', 'Открыть афишу')
-                          : (
-                            <div>
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  justifyContent: 'flex-end',
-                                  marginBottom: '0.85rem',
-                                }}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => router.push('/tickets')}
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '0.85rem', padding: '0.4rem 0.75rem' }}
-                                >
-                                  Открыть билеты
-                                </button>
-                              </div>
-                              <div className="dashboard-apps-grid">
-                                {participations.map((part: any) => {
-                                  const b = part.booking;
-                                  const ended = b?.endTime && new Date(b.endTime).getTime() < Date.now();
-                                  return (
-                                    <div
-                                      key={part.id}
-                                      style={{
-                                        padding: '1.25rem',
-                                        border: '1px solid rgba(0,0,0,0.08)',
-                                        borderRadius: 'var(--radius-md)',
-                                        backgroundColor: 'white',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '0.85rem',
-                                      }}
-                                    >
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectedTicket(part.ticketCode);
-                                          router.push('/tickets');
-                                        }}
-                                        style={{
-                                          display: 'flex',
-                                          justifyContent: 'space-between',
-                                          gap: '1rem',
-                                          textAlign: 'left',
-                                          cursor: 'pointer',
-                                          border: 'none',
-                                          background: 'transparent',
-                                          padding: 0,
-                                          font: 'inherit',
-                                          color: 'inherit',
-                                          width: '100%',
-                                        }}
-                                      >
-                                        <div style={{ minWidth: 0 }}>
-                                          <h4
-                                            style={{
-                                              fontWeight: 600,
-                                              fontSize: '1rem',
-                                              marginBottom: '0.25rem',
-                                            }}
-                                          >
-                                            {b.title}
-                                          </h4>
-                                          <p
-                                            style={{
-                                              color: 'var(--primary)',
-                                              fontSize: '0.85rem',
-                                              marginBottom: '0.75rem',
-                                              fontWeight: 500,
-                                            }}
-                                          >
-                                            {b.space?.title || 'Без площадки'}
-                                          </p>
-                                          <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-                                            {formatMskDate(b.startTime, { day: 'numeric', month: 'short' })}{' '}
-                                            {formatMskTime(b.startTime)} (МСК)
-                                          </span>
-                                          <div
-                                            style={{
-                                              marginTop: 8,
-                                              fontSize: '0.78rem',
-                                              fontWeight: 600,
-                                              color: 'var(--primary)',
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              gap: 4,
-                                            }}
-                                          >
-                                            Открыть билет <ChevronRight size={14} />
-                                          </div>
-                                        </div>
-                                        <div style={{ flexShrink: 0, textAlign: 'center' }}>
-                                          <QRCodeDisplay value={part.ticketCode || ''} />
-                                          <div
-                                            style={{
-                                              fontSize: '0.7rem',
-                                              color: 'var(--muted)',
-                                              marginTop: '0.25rem',
-                                            }}
-                                          >
-                                            Билет
-                                          </div>
-                                        </div>
-                                      </button>
-                                      {!ended && (
-                                        <button
-                                          type="button"
-                                          onClick={() => cancelParticipation(b.id)}
-                                          disabled={ticketBusy}
-                                          style={{
-                                            alignSelf: 'flex-start',
-                                            border: '1px solid rgba(185,28,28,0.25)',
-                                            background: 'rgba(254,226,226,0.45)',
-                                            color: '#b91c1c',
-                                            borderRadius: 10,
-                                            padding: '0.45rem 0.75rem',
-                                            fontSize: '0.82rem',
-                                            fontWeight: 700,
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 6,
-                                          }}
-                                        >
-                                          <Ban size={14} />
-                                          Отменить запись
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-
-                      {appsSubTab === 'spaces' &&
-                        (bookings.length === 0
-                          ? emptyBox(
-                              'Пока нет бронирований пространств',
-                              '/spaces',
-                              'Смотреть пространства'
-                            )
-                          : (
-                            <div className="dashboard-apps-grid">
-                              {bookings.map((booking) => {
-                                const canCancel =
-                                  booking.status !== 'REJECTED' &&
-                                  booking.endTime &&
-                                  new Date(booking.endTime).getTime() >= Date.now();
-                                return (
-                                  <div
-                                    key={booking.id}
-                                    style={{
-                                      padding: '1.25rem',
-                                      border: '1px solid rgba(0,0,0,0.08)',
-                                      borderRadius: 'var(--radius-md)',
-                                      backgroundColor: 'white',
-                                    }}
-                                  >
-                                    <h4
-                                      style={{
-                                        fontWeight: 600,
-                                        fontSize: '1rem',
-                                        marginBottom: '0.25rem',
-                                      }}
-                                    >
-                                      {booking.title}
-                                    </h4>
-                                    <p
-                                      style={{
-                                        color: 'var(--primary)',
-                                        fontSize: '0.85rem',
-                                        marginBottom: '0.75rem',
-                                        fontWeight: 500,
-                                      }}
-                                    >
-                                      {booking.space?.title}
-                                    </p>
-                                    <div
-                                      style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        flexWrap: 'wrap',
-                                      }}
-                                    >
-                                      <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
-                                        {formatMskDate(booking.startTime, { day: 'numeric', month: 'short' })}{' '}
-                                        {formatMskTime(booking.startTime)} (МСК)
-                                      </span>
-                                      {statusBadge(booking.status)}
-                                    </div>
-                                    {booking.status === 'REJECTED' ? rejectNote(booking.rejectReason) : null}
-                                    {booking.description ? (
-                                      <p
-                                        style={{
-                                          margin: '0.65rem 0 0',
-                                          fontSize: '0.82rem',
-                                          color: '#64748b',
-                                          lineHeight: 1.4,
-                                          display: '-webkit-box',
-                                          WebkitLineClamp: 2,
-                                          WebkitBoxOrient: 'vertical',
-                                          overflow: 'hidden',
-                                        }}
-                                      >
-                                        {booking.description}
-                                      </p>
-                                    ) : (
-                                      <p style={{ margin: '0.65rem 0 0', fontSize: '0.78rem', color: '#b45309' }}>
-                                        Добавьте анонс — в афише пока только название
-                                      </p>
-                                    )}
-                                    {canCancel && (
-                                      <>
-                                        <EditBookingDetails
-                                          booking={booking}
-                                          onSaved={(next) => {
-                                            setBookings((prev) =>
-                                              prev.map((b) => (b.id === next.id ? { ...b, ...next } : b))
-                                            );
-                                          }}
-                                        />
-                                        <button
-                                          type="button"
-                                          onClick={() => cancelSpaceBooking(booking.id)}
-                                          disabled={bookingBusyId === booking.id}
-                                          style={{
-                                            marginTop: 8,
-                                            border: '1px solid rgba(185,28,28,0.25)',
-                                            background: 'rgba(254,226,226,0.45)',
-                                            color: '#b91c1c',
-                                            borderRadius: 10,
-                                            padding: '0.45rem 0.75rem',
-                                            fontSize: '0.82rem',
-                                            fontWeight: 700,
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 6,
-                                          }}
-                                        >
-                                          <Ban size={14} />
-                                          {bookingBusyId === booking.id ? 'Отмена…' : 'Отменить бронь'}
-                                        </button>
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ))}
-                    </>
-                  );
-                })()}
-              </>
-            )}
-
-            {view === 'settings' && (
-              <div className="profile-view svc-settings-page">
-                <DashboardSettingsHub
-                  profile={profile}
-                  profileVisibility={profileVisibility}
-                  onlineVisibility={onlineVisibility}
-                  profileSaving={profileSaving}
-                  setProfileVisibility={setProfileVisibility}
-                  setOnlineVisibility={setOnlineVisibility}
-                  setProfileSaving={setProfileSaving}
-                  setProfile={setProfile}
-                  readJsonSafe={readJsonSafe}
-                />
-              </div>
-            )}
-
             {(view === 'overview' || view === 'edit') && (
               <div className="dashboard-stack" style={{ maxWidth: "100%", width: "100%", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
                 <div className="profile-overview-top" id="profile-hub">
@@ -2197,11 +1322,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
       />
     </div>
   );
-}
-
-
-async function readJsonSafe(res: Response) {
-  return readCabinetJson(res);
 }
 
 export default function DashboardClient({ view = 'overview' }: DashboardClientProps) {
