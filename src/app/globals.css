@@ -26237,12 +26237,16 @@ button.btn,
     width: min(28vw, 20rem) !important;
     max-width: min(28vw, 20rem) !important;
   }
+  .home-page .home-rail-wrap {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+    align-items: center;
+    gap: 0.45rem;
+  }
   .home-rail-nav {
     display: grid;
     place-items: center;
-    position: absolute;
-    top: 42%;
-    z-index: 3;
+    position: static;
     width: 2.35rem;
     height: 2.35rem;
     border: 1px solid rgba(15, 23, 42, 0.1);
@@ -26252,11 +26256,18 @@ button.btn,
     cursor: pointer;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
     padding: 0;
+    flex-shrink: 0;
   }
-  .home-rail-nav--prev { left: 0.15rem; }
-  .home-rail-nav--next { right: 0.15rem; }
+  .home-rail-nav--prev,
+  .home-rail-nav--next {
+    left: auto;
+    right: auto;
+    top: auto;
+  }
   .home-page .home-rail {
-    padding-inline: 2.4rem 2.4rem;
+    min-width: 0;
+    margin-inline: 0;
+    padding: 0.2rem 0.15rem 0.9rem;
   }
 }
 
@@ -27400,11 +27411,23 @@ html.is-admin .main-content {
 }
 
 @media (min-width: 900px) {
-  .home-page .home-rail {
-    padding-inline: 2.85rem !important;
+  .home-page .home-rail-wrap {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+    align-items: center;
+    gap: 0.45rem;
   }
-  .home-rail-nav--prev { left: 0 !important; }
-  .home-rail-nav--next { right: 0 !important; }
+  .home-rail-nav {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+  }
+  .home-page .home-rail {
+    min-width: 0;
+    margin-inline: 0 !important;
+    padding-inline: 0.15rem !important;
+  }
 }
 .event-carousel {
   padding-inline: 0;

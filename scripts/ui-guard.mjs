@@ -67,6 +67,11 @@ if (/font-size:\s*1\.12rem !important/.test(css) && /page-hero-title/.test(css))
   if (tinyTitle) fails.push('page titles still forced to 1.12rem on mobile');
 }
 
+const lastRailNav = lastMatch(css, /\.home-rail-nav\s*\{[^}]+\}/g);
+if (lastRailNav && /position\s*:\s*absolute/i.test(lastRailNav) && !/static/i.test(lastRailNav)) {
+  fails.push('home-rail-nav is absolutely over cards');
+}
+
 if (fails.length) {
   console.error('ui-guard FAIL');
   for (const f of fails) console.error(' -', f);
