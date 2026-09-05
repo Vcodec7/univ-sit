@@ -14,7 +14,7 @@ export default function HomeGallery({
   title = 'Деятельность портала',
 }: Props) {
   if (!enabled) return null;
-  const items = parseGalleryItems(orgGalleryJson, 36);
+  const items = parseGalleryItems(orgGalleryJson, 8);
   const urls = galleryUrls(items);
   if (!urls.length) return null;
 

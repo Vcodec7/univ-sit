@@ -10220,10 +10220,11 @@ a.yp-modal-close {
   margin-left: auto;
 }
 
-.home-feed-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.25rem), 1fr));
-  gap: 1rem;
+.home-deferred-skel {
+  min-height: 7.5rem;
+  border-radius: 1.15rem;
+  background: color-mix(in srgb, var(--line, #e2e8f0) 55%, #fff);
+  margin-bottom: 1.5rem;
 }
 
 .home-feed-grid .catalog-card {

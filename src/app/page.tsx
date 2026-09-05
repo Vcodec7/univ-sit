@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import HomeServiceHero from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import { getSiteIdentity } from '@/lib/site-identity';
@@ -16,7 +17,6 @@ import EntityCoverImage from '@/components/EntityCoverImage';
 import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import { ruCount } from '@/lib/catalog-query';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,10 +37,8 @@ function stripHtml(html: string) {
 }
 
 export default async function Home() {
-  const [{ latestProjects, latestClubs, latestSpaces, latestNews, siteSettings }, modules] =
-    await Promise.all([getHomeCatalog(), getModuleFlags()]);
-
-  const { siteName } = await getSiteIdentity();
+  const [{ latestProjects, latestClubs, latestSpaces, latestNews, siteSettings }, modules, { siteName }] =
+    await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentity()]);
   const heroUrl = (siteSettings?.heroImageUrl || '').trim() || '/brand/hero-cover.jpg';
   // Both assets may be stored; display mode is exclusive (image | video).
   const heroVideo = (siteSettings?.heroVideoUrl || '').trim() || null;
@@ -93,7 +91,11 @@ export default async function Home() {
       />
 
       <div className="container home-sections">
-        {showSpaces ? <FreeNowSpaces /> : null}
+        {showSpaces ? (
+          <Suspense fallback={<div className="home-deferred-skel" aria-hidden />}>
+            <FreeNowSpaces limit={6} />
+          </Suspense>
+        ) : null}
 
         {showProjects && (
         <section className="home-section">
@@ -123,6 +125,7 @@ export default async function Home() {
                       fallback={projectCover(project, idx + 3)}
                       className="catalog-img"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      priority={idx < 2}
                     />
                   </div>
                   <div className="catalog-card-body">
@@ -234,14 +237,13 @@ export default async function Home() {
                       <span className="catalog-card-more">Подробнее</span>
                     </div>
                     <div className="catalog-card__interactive" style={{ marginTop: '0.65rem' }}>
-                      <GuestAuthPrompt
+                      <Link
                         href={`/spaces/${encodeURIComponent(space.id)}/book`}
                         className="btn btn-primary"
                         title="Забронировать зал"
-                        asButton
                       >
                         Забронировать
-                      </GuestAuthPrompt>
+                      </Link>
                     </div>
                   </div>
                 </article>
@@ -263,7 +265,9 @@ export default async function Home() {
             </Link>
           </div>
           {siteSettings?.publicEventsVisibility ? (
-            <UpcomingEvents hideTitle />
+            <Suspense fallback={<div className="home-deferred-skel" aria-hidden />}>
+              <UpcomingEvents hideTitle compact withinDays={21} mode="carousel" />
+            </Suspense>
           ) : (
             <AuthAfishaSection hideTitle />
           )}
@@ -271,11 +275,13 @@ export default async function Home() {
         )}
 
         {galleryPublic ? (
-          <HomeGallery
-            enabled
-            orgGalleryJson={siteSettings?.orgGalleryJson}
-            title="Деятельность портала"
-          />
+          <Suspense fallback={null}>
+            <HomeGallery
+              enabled
+              orgGalleryJson={siteSettings?.orgGalleryJson}
+              title="Деятельность портала"
+            />
+          </Suspense>
         ) : galleryAuthOnly ? (
           <HomeGalleryAuth homepageEnabled title="Деятельность портала" />
         ) : null}

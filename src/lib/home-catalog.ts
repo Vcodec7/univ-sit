@@ -3,6 +3,17 @@ import { prisma } from '@/lib/prisma';
 import { publishedNonDemoWhere, publicCatalogWhere } from '@/lib/publish';
 import { isNextBuildPhase } from '@/lib/build-phase';
 
+export const HOME_FEED_TAKE = 8;
+
+function homeExcerpt(html: string | null | undefined, n = 180): string {
+  const t = String(html || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (t.length <= n) return t;
+  return `${t.slice(0, n).replace(/\s+\S*$/, '')}…`;
+}
+
 /** Cached homepage catalog + hero settings (ISR, same window as public pages). */
 export const getHomeCatalog = unstable_cache(
   async () => {
@@ -15,14 +26,12 @@ export const getHomeCatalog = unstable_cache(
           title: string;
           description: string;
           image: string | null;
-          _count: { applications: number };
         }>,
         latestClubs: [] as Array<{
           id: string;
           title: string;
           description: string;
           image: string | null;
-          _count: { applications: number };
         }>,
         latestSpaces: [] as Array<{
           id: string;
@@ -61,31 +70,29 @@ export const getHomeCatalog = unstable_cache(
       prisma.project.findMany({
         where: { ...publicCatalogWhere(), status: 'ACTIVE' },
         orderBy: { createdAt: 'desc' },
-        take: 24,
+        take: HOME_FEED_TAKE,
         select: {
           id: true,
           title: true,
           description: true,
           image: true,
-          _count: { select: { applications: true } },
         },
       }),
       prisma.club.findMany({
         where: publicCatalogWhere(),
         orderBy: { createdAt: 'desc' },
-        take: 24,
+        take: HOME_FEED_TAKE,
         select: {
           id: true,
           title: true,
           description: true,
           image: true,
-          _count: { select: { applications: true } },
         },
       }),
       prisma.space.findMany({
         where: { ...publicCatalogWhere(), status: { notIn: ['INACTIVE', 'COMPLETED'] } },
         orderBy: { createdAt: 'desc' },
-        take: 24,
+        take: HOME_FEED_TAKE,
         select: {
           id: true,
           title: true,
@@ -98,7 +105,7 @@ export const getHomeCatalog = unstable_cache(
       prisma.news.findMany({
         where: publishedNonDemoWhere(),
         orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-        take: 24,
+        take: HOME_FEED_TAKE,
         select: {
           id: true,
           title: true,
@@ -130,11 +137,21 @@ export const getHomeCatalog = unstable_cache(
     // Serialize dates: unstable_cache JSON-encodes Date → string; callers must not assume Date.
     const news = latestNews.map((n) => ({
       ...n,
+      text: homeExcerpt(n.text, 200),
       publishedAt: n.publishedAt ? n.publishedAt.toISOString() : null,
       createdAt: n.createdAt.toISOString(),
     }));
-    return { latestProjects, latestClubs, latestSpaces, latestNews: news, siteSettings };
+    return {
+      latestProjects: latestProjects.map((p) => ({ ...p, description: homeExcerpt(p.description) })),
+      latestClubs: latestClubs.map((c) => ({ ...c, description: homeExcerpt(c.description) })),
+      latestSpaces: latestSpaces.map((s) => ({
+        ...s,
+        description: s.description ? homeExcerpt(s.description) : s.description,
+      })),
+      latestNews: news,
+      siteSettings,
+    };
   },
-  ['home-catalog-v8'],
+  ['home-catalog-v9'],
   { revalidate: 60, tags: ['yp-home-catalog', 'home-catalog'] }
 );

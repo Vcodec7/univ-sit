@@ -23,10 +23,10 @@ import { POINTS } from '@/lib/points-labels';
 type Props = {
   spaceId?: string;
   hideTitle?: boolean;
-  /** grid (default on /events) | carousel (home) */
   mode?: 'grid' | 'carousel';
-  /** Limit to events starting within the next N days (weekly afisha). */
   withinDays?: number;
+  /** Home: fewer events, slimmer Prisma payload. */
+  compact?: boolean;
 };
 
 function contactHref(kind: 'phone' | 'telegram' | 'vk' | 'max', value: string) {
@@ -47,12 +47,20 @@ function contactHref(kind: 'phone' | 'telegram' | 'vk' | 'max', value: string) {
 
 type EventRow = Awaited<ReturnType<typeof loadEvents>>[number];
 
-async function loadEvents(spaceId: string | undefined, withinDays: number | undefined, userId: string | undefined) {
+async function loadEvents(
+  spaceId: string | undefined,
+  withinDays: number | undefined,
+  userId: string | undefined,
+  compact = false
+) {
   const startFrom = new Date();
   const endBefore =
     typeof withinDays === 'number' && withinDays > 0
       ? new Date(startFrom.getTime() + withinDays * 24 * 60 * 60 * 1000)
       : undefined;
+
+  const take = compact ? 8 : 40;
+  const keep = compact ? 8 : 20;
 
   return prisma.booking.findMany({
     where: {
@@ -65,18 +73,22 @@ async function loadEvents(spaceId: string | undefined, withinDays: number | unde
       ...(spaceId ? { spaceId } : {}),
     },
     include: {
-      space: true,
+      space: compact
+        ? { select: { id: true, title: true, address: true, image: true, capacity: true } }
+        : true,
       user: {
-        select: {
-          id: true,
-          name: true,
-          nickname: true,
-          publicCode: true,
-          phone: true,
-          vkUrl: true,
-          telegramUrl: true,
-          maxUrl: true,
-        },
+        select: compact
+          ? { id: true, name: true, nickname: true, publicCode: true }
+          : {
+              id: true,
+              name: true,
+              nickname: true,
+              publicCode: true,
+              phone: true,
+              vkUrl: true,
+              telegramUrl: true,
+              maxUrl: true,
+            },
       },
       _count: { select: { participants: true } },
       ...(userId
@@ -89,8 +101,8 @@ async function loadEvents(spaceId: string | undefined, withinDays: number | unde
         : {}),
     },
     orderBy: { startTime: 'asc' },
-    take: 40,
-  }).then((rows) => rows.filter((e) => !isJunkEventTitle(e.title)).slice(0, 20));
+    take,
+  }).then((rows) => rows.filter((e) => !isJunkEventTitle(e.title)).slice(0, keep));
 }
 
 function EventCard({
@@ -99,12 +111,14 @@ function EventCard({
   userId,
   spaceId,
   iconActions,
+  compact,
 }: {
   event: EventRow;
   index: number;
   userId?: string;
   spaceId?: string;
   iconActions?: boolean;
+  compact?: boolean;
 }) {
   const participantsCount = event._count?.participants ?? 0;
   const availableSeats = event.space.capacity - participantsCount;
@@ -123,11 +137,18 @@ function EventCard({
     : null;
 
   const contacts: { label: string; href: string }[] = [];
+  const user = event.user as {
+    phone?: string | null;
+    telegramUrl?: string | null;
+    vkUrl?: string | null;
+    maxUrl?: string | null;
+  };
+  if (!compact) {
   if (contactMode === 'PROFILE') {
-    const phone = contactHref('phone', event.user.phone || '');
-    const tg = contactHref('telegram', event.user.telegramUrl || '');
-    const vk = contactHref('vk', event.user.vkUrl || '');
-    const max = contactHref('max', event.user.maxUrl || '');
+    const phone = contactHref('phone', user.phone || '');
+    const tg = contactHref('telegram', user.telegramUrl || '');
+    const vk = contactHref('vk', user.vkUrl || '');
+    const max = contactHref('max', user.maxUrl || '');
     if (phone) contacts.push({ label: 'Телефон', href: phone });
     if (tg) contacts.push({ label: 'Telegram', href: tg });
     if (vk) contacts.push({ label: 'VK', href: vk });
@@ -141,6 +162,7 @@ function EventCard({
     if (tg) contacts.push({ label: 'Telegram', href: tg });
     if (vk) contacts.push({ label: 'VK', href: vk });
     if (max) contacts.push({ label: 'MAX', href: max });
+  }
   }
 
   const desc = (event.description || '').trim();
@@ -262,13 +284,13 @@ function EventCard({
   );
 }
 
-export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, mode }: Props = {}) {
+export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, mode, compact }: Props = {}) {
   const useCarousel =
     mode === 'carousel' || (Boolean(hideTitle) && mode !== 'grid' && !spaceId);
 
   let events: EventRow[] = [];
   try {
-    events = await loadEvents(spaceId, withinDays, undefined);
+    events = await loadEvents(spaceId, withinDays, undefined, compact);
   } catch {
     events = [];
   }
@@ -292,6 +314,7 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
       index={index}
       spaceId={spaceId}
       iconActions={useCarousel}
+      compact={compact}
     />
   ));
 
