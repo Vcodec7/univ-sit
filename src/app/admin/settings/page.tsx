@@ -536,11 +536,6 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
         <input type="hidden" name="settingsTab" value={activeTab} />
         {/* Page Header */}
         <div className="settings-page-header" style={{ marginBottom: '1.25rem' }}>
-          <div className="admin-escape">
-            <Link href="/">← Главная</Link>
-            <Link href="/dashboard">Профиль</Link>
-            <Link href="/admin">Панель</Link>
-          </div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.25rem' }}>
             Настройки сайта
           </h1>

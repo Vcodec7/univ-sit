@@ -47,6 +47,26 @@ if (!css.includes('qa-edge-tab')) {
   fails.push('globals.css missing .qa-edge-tab styles');
 }
 
+const navEndSmear = lastMatch(
+  css,
+  /@media \(min-width: 901px\)\s*\{\s*\.glass-nav-end\s*\{[^}]+\}/g
+);
+if (navEndSmear && /#fff/.test(navEndSmear) && /box-shadow/.test(navEndSmear)) {
+  fails.push('desktop .glass-nav-end still paints a white smear over header icons');
+}
+
+if (!/html\.is-admin \.glass-nav/.test(css)) {
+  fails.push('html.is-admin must hide public glass-nav before body exists');
+}
+
+if (/font-size:\s*1\.12rem !important/.test(css) && /page-hero-title/.test(css)) {
+  const tinyTitle = lastMatch(
+    css,
+    /\.page-hero-title[\s\S]{0,220}font-size:\s*1\.12rem !important/g
+  );
+  if (tinyTitle) fails.push('page titles still forced to 1.12rem on mobile');
+}
+
 if (fails.length) {
   console.error('ui-guard FAIL');
   for (const f of fails) console.error(' -', f);
