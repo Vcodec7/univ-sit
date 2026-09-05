@@ -1,10 +1,10 @@
 'use client';
 
 import { Search, X, SlidersHorizontal, Check } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { usePathname } from 'next/navigation';
+import { useSafeSearchParams, pushCatalogUrl } from '@/lib/use-safe-search-params';
 import { catalogFiltersKey } from '@/lib/catalog-query';
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SPACE_CATEGORIES, SPACE_AMENITIES } from '@/lib/spaces';
 
 type Props = {
@@ -16,10 +16,8 @@ export default function SpaceFilterBar({
   placeholder = 'Поиск пространств…',
   categories = [...SPACE_CATEGORIES],
 }: Props) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSafeSearchParams();
-  const [, startTransition] = useTransition();
   const panelRef = useRef<HTMLDivElement>(null);
   const skipFirst = useRef(true);
 
@@ -51,12 +49,10 @@ export default function SpaceFilterBar({
       }
       if (nextKey === curKey) return;
       const qs = params.toString();
-      startTransition(() => {
-        router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-      });
+      pushCatalogUrl(qs ? `${pathname}?${qs}` : pathname);
     }, 280);
     return () => clearTimeout(handler);
-  }, [query, status, category, amenity, router, pathname, searchParams]);
+  }, [query, status, category, amenity, pathname, searchParams]);
 
   useEffect(() => {
     if (!open) return;

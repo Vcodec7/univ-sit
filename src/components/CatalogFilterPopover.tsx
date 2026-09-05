@@ -4,8 +4,8 @@
  * Compact one-row catalog toolbar: search + status/sort/category in a popover.
  */
 import { Filter, Search, X } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { usePathname } from 'next/navigation';
+import { useSafeSearchParams, pushCatalogUrl } from '@/lib/use-safe-search-params';
 import { catalogFiltersKey } from '@/lib/catalog-query';
 import { useEffect, useId, useRef, useState } from 'react';
 
@@ -38,7 +38,6 @@ export default function CatalogFilterPopover({
   categoryParam?: string;
   hideStatus?: boolean;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSafeSearchParams();
   const panelId = useId();
@@ -74,7 +73,7 @@ export default function CatalogFilterPopover({
       }
       if (nextKey === curKey) return;
       const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      pushCatalogUrl(qs ? `${pathname}?${qs}` : pathname, { replace: true });
     }, 220);
     return () => clearTimeout(t);
   }, [
@@ -82,7 +81,6 @@ export default function CatalogFilterPopover({
     status,
     sort,
     cat,
-    router,
     pathname,
     searchParams,
     hideStatus,

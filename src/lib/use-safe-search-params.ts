@@ -29,6 +29,10 @@ function ensureHistoryPatch() {
   history.pushState = wrap(history.pushState.bind(history));
   history.replaceState = wrap(history.replaceState.bind(history));
   window.addEventListener('popstate', notify);
+  const nav = (window as unknown as { navigation?: EventTarget }).navigation;
+  if (nav) {
+    nav.addEventListener('navigate', () => queueMicrotask(notify));
+  }
 }
 
 function subscribe(onStoreChange: () => void) {
@@ -47,7 +51,21 @@ function getServerSnapshot() {
   return '';
 }
 
-/** Drop-in for the common `.get()` / `.toString()` usage of useSearchParams. */
+/** Client catalog navigations that Next's static Link would not re-render. */
+export function pushCatalogUrl(href: string, { replace = false }: { replace?: boolean } = {}) {
+  if (typeof window === 'undefined') return;
+  ensureHistoryPatch();
+  const url = new URL(href, window.location.href);
+  const next = `${url.pathname}${url.search}`;
+  const cur = `${window.location.pathname}${window.location.search}`;
+  if (next === cur) {
+    notify();
+    return;
+  }
+  if (replace) window.history.replaceState(window.history.state, '', next);
+  else window.history.pushState(window.history.state, '', next);
+}
+
 export function useSafeSearchParams(): URLSearchParams {
   const search = useSyncExternalStore(subscribe, getSearchSnapshot, getServerSnapshot);
   return useMemo(() => {

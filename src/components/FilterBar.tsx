@@ -1,8 +1,8 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { usePathname } from 'next/navigation';
+import { useSafeSearchParams, pushCatalogUrl } from '@/lib/use-safe-search-params';
 import { catalogFiltersKey } from '@/lib/catalog-query';
 import { useEffect, useRef, useState } from 'react';
 
@@ -41,7 +41,6 @@ export default function FilterBar({
   categoryOptions?: CategoryOption[];
   categoryParam?: string;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSafeSearchParams();
   const skipFirstPush = useRef(true);
@@ -79,11 +78,11 @@ export default function FilterBar({
       }
       if (nextKey === curKey) return;
       const qs = params.toString();
-      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      pushCatalogUrl(qs ? `${pathname}?${qs}` : pathname);
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [query, status, sort, cat, router, pathname, hideStatus, searchParams, sorts, cats, categoryParam]);
+  }, [query, status, sort, cat, pathname, hideStatus, searchParams, sorts, cats, categoryParam]);
 
   void totalCount;
 

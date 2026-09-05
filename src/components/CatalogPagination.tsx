@@ -1,4 +1,7 @@
-import Link from "next/link";
+'use client';
+
+import type { MouseEvent, ReactNode } from 'react';
+import { pushCatalogUrl } from '@/lib/use-safe-search-params';
 
 type Props = {
   page: number;
@@ -7,16 +10,44 @@ type Props = {
   query?: Record<string, string | undefined>;
 };
 
-function hrefFor(basePath: string, page: number, query?: Record<string, string | undefined>) {
+export function catalogPageHref(
+  basePath: string,
+  page: number,
+  query?: Record<string, string | undefined>
+) {
   const params = new URLSearchParams();
   if (query) {
     for (const [k, v] of Object.entries(query)) {
       if (v) params.set(k, v);
     }
   }
-  if (page > 1) params.set("page", String(page));
+  if (page > 1) params.set('page', String(page));
   const qs = params.toString();
   return qs ? `${basePath}?${qs}` : basePath;
+}
+
+function PageLink({
+  href,
+  className,
+  rel,
+  children,
+}: {
+  href: string;
+  className: string;
+  rel?: string;
+  children: ReactNode;
+}) {
+  const go = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    pushCatalogUrl(href);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  return (
+    <a href={href} className={className} rel={rel} onClick={go}>
+      {children}
+    </a>
+  );
 }
 
 export default function CatalogPagination({ page, totalPages, basePath, query }: Props) {
@@ -32,18 +63,18 @@ export default function CatalogPagination({ page, totalPages, basePath, query }:
   return (
     <nav className="catalog-pagination" aria-label="Страницы">
       {prev ? (
-        <Link href={hrefFor(basePath, prev, query)} className="catalog-pagination__btn" rel="prev">
+        <PageLink href={catalogPageHref(basePath, prev, query)} className="catalog-pagination__btn" rel="prev">
           ← Назад
-        </Link>
+        </PageLink>
       ) : (
         <span className="catalog-pagination__btn is-disabled">← Назад</span>
       )}
       <div className="catalog-pagination__pages">
         {windowStart > 1 && (
           <>
-            <Link href={hrefFor(basePath, 1, query)} className="catalog-pagination__num">
+            <PageLink href={catalogPageHref(basePath, 1, query)} className="catalog-pagination__num">
               1
-            </Link>
+            </PageLink>
             {windowStart > 2 ? <span className="catalog-pagination__dots">…</span> : null}
           </>
         )}
@@ -53,24 +84,24 @@ export default function CatalogPagination({ page, totalPages, basePath, query }:
               {p}
             </span>
           ) : (
-            <Link key={p} href={hrefFor(basePath, p, query)} className="catalog-pagination__num">
+            <PageLink key={p} href={catalogPageHref(basePath, p, query)} className="catalog-pagination__num">
               {p}
-            </Link>
+            </PageLink>
           )
         )}
         {windowEnd < totalPages && (
           <>
             {windowEnd < totalPages - 1 ? <span className="catalog-pagination__dots">…</span> : null}
-            <Link href={hrefFor(basePath, totalPages, query)} className="catalog-pagination__num">
+            <PageLink href={catalogPageHref(basePath, totalPages, query)} className="catalog-pagination__num">
               {totalPages}
-            </Link>
+            </PageLink>
           </>
         )}
       </div>
       {next ? (
-        <Link href={hrefFor(basePath, next, query)} className="catalog-pagination__btn" rel="next">
+        <PageLink href={catalogPageHref(basePath, next, query)} className="catalog-pagination__btn" rel="next">
           Далее →
-        </Link>
+        </PageLink>
       ) : (
         <span className="catalog-pagination__btn is-disabled">Далее →</span>
       )}

@@ -475,6 +475,8 @@ html.has-session .nav-auth-slot {
   margin: 2rem 0 0.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid rgba(15, 23, 42, 0.06);
+  position: relative;
+  z-index: 3;
 }
 
 .catalog-pagination__btn {
@@ -10179,23 +10181,29 @@ a.yp-modal-close {
 
 .catalog-page-header__intro {
   min-width: 0;
-  flex: 1 1 16rem;
+  flex: 0 1 auto;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.35rem 0.75rem;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem 0.8rem;
 }
 
 .catalog-page-header__intro .page-hero-title {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: min(100%, 22rem);
   margin: 0 !important;
 }
 
 .catalog-page-header__count {
   margin: 0 !important;
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   padding: 0.18rem 0.7rem;
   border-radius: 999px;
+  white-space: nowrap;
   background: color-mix(in srgb, var(--primary, #8562d8) 12%, #fff);
   color: var(--primary-hover, #5b3fa8) !important;
   font-size: 0.82rem !important;
@@ -10206,9 +10214,9 @@ a.yp-modal-close {
 .catalog-page-header__search {
   display: flex;
   align-items: center;
-  flex: 1 1 18rem;
+  flex: 1 1 16rem;
   min-width: 0;
-  max-width: 32rem;
+  max-width: 28rem;
   margin-left: auto;
 }
 

@@ -31,3 +31,10 @@ test('catalogFiltersKey ignores page', () => {
 test('catalogFiltersKey treats filter change as different', () => {
   assert.notEqual(catalogFiltersKey('q=a&page=2'), catalogFiltersKey('q=b&page=2'));
 });
+
+test('pagination and catalog URL helpers exist', () => {
+  const pag = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/CatalogPagination.tsx'), 'utf8');
+  const hook = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/lib/use-safe-search-params.ts'), 'utf8');
+  assert.match(pag, /pushCatalogUrl/);
+  assert.match(hook, /export function pushCatalogUrl/);
+});
