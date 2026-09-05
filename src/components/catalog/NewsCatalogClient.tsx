@@ -10,6 +10,7 @@ import CatalogPagination from '@/components/CatalogPagination';
 import { NEWS_PAGE_SIZE, catalogSlice, totalPages } from '@/lib/pagination';
 import { formatRuDate } from '@/lib/format-date';
 import type { PublicNewsCard } from '@/lib/public-catalogs';
+import { ruCount } from '@/lib/catalog-query';
 
 function excerpt(text: string, max = 220) {
   const clean = text.replace(/\s+/g, ' ').trim();
@@ -25,13 +26,15 @@ export default function NewsCatalogClient({ items }: { items: PublicNewsCard[] }
   const pages = totalPages(items.length, NEWS_PAGE_SIZE);
 
   return (
-    <div className="container" style={{ padding: '1rem', minHeight: 'auto' }}>
-      <h1 className="page-hero-title" style={{ textAlign: 'center' }}>
-        Новости
-      </h1>
-      <p className="page-hero-subtitle" style={{ textAlign: 'center' }}>
-        Все самые свежие события и посты из нашей группы ВКонтакте
-      </p>
+    <div className="container catalog-page">
+      <div className="catalog-page-header">
+        <div className="catalog-page-header__intro">
+          <h1 className="page-hero-title">Новости</h1>
+          <p className="catalog-page-header__count">
+            {items.length ? ruCount(items.length, 'материал', 'материала', 'материалов') : 'Лента новостей'}
+          </p>
+        </div>
+      </div>
 
       {news.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--muted)' }}>

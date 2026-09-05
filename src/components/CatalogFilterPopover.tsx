@@ -6,6 +6,7 @@
 import { Filter, Search, X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { catalogFiltersKey } from '@/lib/catalog-query';
 import { useEffect, useId, useRef, useState } from 'react';
 
 type Opt = { key: string; label: string };
@@ -59,28 +60,21 @@ export default function CatalogFilterPopover({
 
   useEffect(() => {
     const t = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (query.trim()) params.set('q', query.trim());
+      if (!hideStatus && status && status !== 'ALL') params.set('status', status);
+      const defSort = sortOptions[0]?.key || 'title';
+      if (sort && sort !== defSort) params.set('sort', sort);
+      if (categoryOptions?.length && cat && cat !== 'ALL') params.set(categoryParam, cat);
+      const nextKey = catalogFiltersKey(params);
+      const curKey = catalogFiltersKey(searchParams);
       if (skip.current) {
         skip.current = false;
         return;
       }
-      const params = new URLSearchParams(searchParams.toString());
-      if (query.trim()) params.set('q', query.trim());
-      else params.delete('q');
-      if (!hideStatus) {
-        if (status && status !== 'ALL') params.set('status', status);
-        else params.delete('status');
-      }
-      const defSort = sortOptions[0]?.key || 'title';
-      if (sort && sort !== defSort) params.set('sort', sort);
-      else params.delete('sort');
-      if (categoryOptions?.length) {
-        if (cat && cat !== 'ALL') params.set(categoryParam, cat);
-        else params.delete(categoryParam);
-      }
-      params.delete('page');
-      const next = params.toString();
-      const cur = searchParams.toString();
-      if (next !== cur) router.replace(`${pathname}${next ? `?${next}` : ''}`, { scroll: false });
+      if (nextKey === curKey) return;
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 220);
     return () => clearTimeout(t);
   }, [

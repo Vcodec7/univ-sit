@@ -6,7 +6,7 @@ import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 import { useSession } from 'next-auth/react';
 import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 import EntityCoverImage from '@/components/EntityCoverImage';
-import FilterBar from '@/components/FilterBar';
+import CatalogFilterPopover from '@/components/CatalogFilterPopover';
 import { parseClubTags, stripHtml } from '@/lib/clubs';
 import YandexDirections from '@/components/YandexDirections';
 import { encodeRouteParam } from '@/lib/route-id';
@@ -14,6 +14,7 @@ import { clubCover } from '@/lib/theme-covers';
 import CatalogPagination from '@/components/CatalogPagination';
 import { CATALOG_PAGE_SIZE, catalogSlice, totalPages } from '@/lib/pagination';
 import type { PublicClubCard } from '@/lib/public-catalogs';
+import { ruCount } from '@/lib/catalog-query';
 
 type SortKey = 'title' | 'new' | 'popular';
 
@@ -101,17 +102,12 @@ export default function ClubsCatalogClient({ items }: { items: PublicClubCard[] 
         <div className="catalog-page-header__intro">
           <h1 className="page-hero-title">Молодёжные клубы</h1>
           <p className="catalog-page-header__count">
-            {total ? `${total} ${total === 1 ? 'клуб' : total < 5 ? 'клуба' : 'клубов'}` : 'Каталог клубов'}
+            {total ? ruCount(total, 'клуб', 'клуба', 'клубов') : 'Каталог клубов'}
           </p>
         </div>
         <div className="catalog-page-header__search">
-          <FilterBar
+          <CatalogFilterPopover
             placeholder="Поиск по названию или тегу…"
-            sortOptions={[
-              { key: 'title', label: 'По названию' },
-              { key: 'new', label: 'Сначала новые' },
-              { key: 'popular', label: 'Популярные' },
-            ]}
             categoryOptions={categoryOptions.length ? categoryOptions : undefined}
           />
         </div>

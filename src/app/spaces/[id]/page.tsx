@@ -193,12 +193,11 @@ export default async function SpaceDetail({ params }: { params: Promise<{ id: st
           </div>
 
           {space.status !== 'COMPLETED' && (
-            <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <div className="space-hero-cta">
               {isCoworkingSpace(space) ? (
                 <Link
                   href={`/coworking?space=${encodeURIComponent(space.id)}`}
                   className="btn btn-secondary"
-                  style={{ padding: '0.75rem 1.25rem', fontWeight: 600 }}
                 >
                   Коворкинг
                 </Link>

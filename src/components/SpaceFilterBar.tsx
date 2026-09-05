@@ -1,8 +1,9 @@
 'use client';
 
 import { Search, X, SlidersHorizontal, Check } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { catalogFiltersKey } from '@/lib/catalog-query';
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { SPACE_CATEGORIES, SPACE_AMENITIES } from '@/lib/spaces';
 
@@ -16,9 +17,11 @@ export default function SpaceFilterBar({
   categories = [...SPACE_CATEGORIES],
 }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSafeSearchParams();
   const [, startTransition] = useTransition();
   const panelRef = useRef<HTMLDivElement>(null);
+  const skipFirst = useRef(true);
 
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [status, setStatus] = useState(searchParams.get('status') || 'ALL');
@@ -40,13 +43,20 @@ export default function SpaceFilterBar({
       if (status && status !== 'ALL') params.set('status', status);
       if (category && category !== 'ALL') params.set('category', category);
       if (amenity && amenity !== 'ALL') params.set('amenity', amenity);
+      const nextKey = catalogFiltersKey(params);
+      const curKey = catalogFiltersKey(searchParams);
+      if (skipFirst.current) {
+        skipFirst.current = false;
+        return;
+      }
+      if (nextKey === curKey) return;
       const qs = params.toString();
       startTransition(() => {
-        router.push(qs ? `?${qs}` : '?', { scroll: false });
+        router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
       });
     }, 280);
     return () => clearTimeout(handler);
-  }, [query, status, category, amenity, router]);
+  }, [query, status, category, amenity, router, pathname, searchParams]);
 
   useEffect(() => {
     if (!open) return;

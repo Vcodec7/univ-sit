@@ -10,28 +10,23 @@ type Props = {
   className?: string;
   title?: string;
   children: ReactNode;
-  /** Prefer button semantics when styling matches a CTA pill */
   asButton?: boolean;
-  /** Use the destination link before NextAuth finishes (stable header chrome). */
   preferLink?: boolean;
 };
 
 /**
- * For guests: open a compact prompt with login + register.
- * For signed-in users: navigate to `href` as a normal link.
+ * Always the same <a> so the CTA does not jump when session hydrates.
+ * Guests get a login/register sheet instead of navigating.
  */
 export default function GuestAuthPrompt({
   href = '/coworking',
   className,
   title,
   children,
-  asButton = false,
-  preferLink = false,
 }: Props) {
   const { status } = useSession();
   const [open, setOpen] = useState(false);
   const titleId = useId();
-  const authed = status === 'authenticated' || preferLink;
   const loginHref = `/login?callbackUrl=${encodeURIComponent(href)}`;
   const registerHref = `/register?callbackUrl=${encodeURIComponent(href)}`;
 
@@ -48,29 +43,21 @@ export default function GuestAuthPrompt({
     };
   }, [open]);
 
-  if (authed) {
-    return (
-      <Link href={href} className={className} title={title}>
-        {children}
-      </Link>
-    );
-  }
-
   return (
     <>
-      <button
-        type="button"
+      <Link
+        href={href}
         className={className}
         title={title}
-        aria-busy={status === 'loading' ? true : undefined}
         onClick={(e) => {
+          if (status !== 'unauthenticated') return;
           e.preventDefault();
           e.stopPropagation();
           setOpen(true);
         }}
       >
         {children}
-      </button>
+      </Link>
 
       {open ? (
         <div className="svc-modal is-open yp-guest-prompt" role="presentation" onClick={() => setOpen(false)}>

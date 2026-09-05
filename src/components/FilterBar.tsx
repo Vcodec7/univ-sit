@@ -3,6 +3,7 @@
 import { Search, X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { catalogFiltersKey } from '@/lib/catalog-query';
 import { useEffect, useRef, useState } from 'react';
 
 type StatusOption = { key: string; label: string };
@@ -61,40 +62,24 @@ export default function FilterBar({
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams();
       if (query.trim()) params.set('q', query.trim());
-      else params.delete('q');
-
-      if (hideStatus) {
-        /* keep URL status if bar doesn't own it */
-      } else if (status && status !== 'ALL') {
-        params.set('status', status);
-      } else {
-        params.delete('status');
-      }
-
+      if (!hideStatus && status && status !== 'ALL') params.set('status', status);
       if (sorts) {
         const defaultSort = sorts[0]?.key || 'title';
         if (sort && sort !== defaultSort) params.set('sort', sort);
-        else params.delete('sort');
       }
+      if (cats && cat && cat !== 'ALL') params.set(categoryParam, cat);
 
-      if (cats) {
-        if (cat && cat !== 'ALL') params.set(categoryParam, cat);
-        else params.delete(categoryParam);
-      }
-
-      params.delete('page');
-
-      const qs = params.toString();
-      const next = qs ? `${pathname}?${qs}` : pathname;
-      const current = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+      const nextKey = catalogFiltersKey(params);
+      const curKey = catalogFiltersKey(searchParams);
       if (skipFirstPush.current) {
         skipFirstPush.current = false;
-        if (next === current) return;
+        return;
       }
-      if (next === current) return;
-      router.push(next, { scroll: false });
+      if (nextKey === curKey) return;
+      const qs = params.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 300);
 
     return () => clearTimeout(handler);

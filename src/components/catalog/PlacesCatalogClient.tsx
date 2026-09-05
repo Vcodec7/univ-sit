@@ -17,6 +17,7 @@ import PlaceCategoryChips from '@/components/places/PlaceCategoryChips';
 import CatalogPagination from '@/components/CatalogPagination';
 import { CATALOG_PAGE_SIZE, catalogSlice, totalPages } from '@/lib/pagination';
 import type { PublicPlaceCard } from '@/lib/public-catalogs';
+import { ruCount } from '@/lib/catalog-query';
 
 export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[] }) {
   const sp = useSafeSearchParams();
@@ -76,7 +77,13 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
       </header>
 
       <div className="container places-catalog">
-        <div className="places-toolbar places-toolbar--stack">
+        <div className="places-toolbar catalog-page-header">
+          <div className="catalog-page-header__intro">
+            <p className="catalog-page-header__count">
+              {total ? ruCount(total, 'место', 'места', 'мест') : 'Каталог мест'}
+            </p>
+          </div>
+          <div className="catalog-page-header__search">
           <form className="places-search" method="get" action="/places" role="search">
             {categoryFilter ? <input type="hidden" name="category" value={categoryFilter} /> : null}
             <input
@@ -102,6 +109,7 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
               </button>
             </div>
           </form>
+          </div>
           <PlaceCategoryChips />
         </div>
 

@@ -16,11 +16,22 @@ const PHOTO = {
   quiz: '/covers/photo/quiz.jpg',
   film: '/covers/photo/film.jpg',
   hall: '/covers/photo/hall.jpg',
+  hallConcert: '/covers/photo/hall-concert.jpg',
+  hallLecture: '/covers/photo/hall-lecture.jpg',
+  hallYouth: '/covers/photo/hall-youth.jpg',
+  hallConference: '/covers/photo/hall-conference.jpg',
   gym: '/covers/photo/gym.jpg',
 } as const;
 
 /** Large variety pool — used with index so list cards do not all share one stock photo. */
 const PHOTO_POOL = Object.values(PHOTO);
+const HALL_POOL = [
+  PHOTO.hall,
+  PHOTO.hallConcert,
+  PHOTO.hallLecture,
+  PHOTO.hallYouth,
+  PHOTO.hallConference,
+];
 
 const AFISHA_BY_ID: Record<string, string> = {
   gym: PHOTO.gym,
@@ -160,7 +171,14 @@ export function clubCover(club: CoverEntity, index = 0): string {
 }
 
 export function spaceCover(space: CoverEntity, index = 0): string {
-  return entityCover(space, index, 'spaces');
+  const img = String(space.image || '').trim();
+  if (img && !isWeakCover(img)) return resolveEntityCover(img, sectionCover('spaces', index));
+  const title = String(space.title || '');
+  const hallish = /зал|павильон|дом|аудитор|сцен|конференц|репетиц/i.test(title);
+  const pool = hallish ? HALL_POOL : PHOTO_POOL;
+  const seed = `spaces:${space.id || title || index}:${titlePhoto(title) || ''}`;
+  const h = hashSeed(`${seed}::${index}`);
+  return pool[h % pool.length];
 }
 
 export function placeCover(place: CoverEntity, index = 0): string {

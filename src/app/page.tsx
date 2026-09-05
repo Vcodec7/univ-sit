@@ -17,7 +17,7 @@ import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
-import HomeSlideRail from '@/components/HomeSlideRail';
+import { ruCount } from '@/lib/catalog-query';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
@@ -100,7 +100,11 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Свежие проекты</h2>
-              <p className="home-section-sub">Актуальные инициативы, к которым можно присоединиться</p>
+              <p className="home-section-sub">
+                {latestProjects.length
+                  ? ruCount(latestProjects.length, 'проект на главной', 'проекта на главной', 'проектов на главной')
+                  : 'Актуальные инициативы, к которым можно присоединиться'}
+              </p>
             </div>
             <Link href="/projects" className="home-section-link">
               Смотреть все <ArrowRight size={18} />
@@ -109,7 +113,7 @@ export default async function Home() {
           {latestProjects.length === 0 ? (
             <p className="home-empty">Пока нет опубликованных проектов.</p>
           ) : (
-            <HomeSlideRail label="Свежие проекты">
+            <div className="home-feed-grid">
               {latestProjects.map((project, idx) => (
                 <Link key={project.id} href={`/projects/${encodeURIComponent(project.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -131,7 +135,7 @@ export default async function Home() {
                   </div>
                 </Link>
               ))}
-            </HomeSlideRail>
+            </div>
           )}
         </section>
         )}
@@ -141,7 +145,11 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Клубы по интересам</h2>
-              <p className="home-section-sub">Найди сообщество и занимайся тем, что близко</p>
+              <p className="home-section-sub">
+                {latestClubs.length
+                  ? ruCount(latestClubs.length, 'клуб на главной', 'клуба на главной', 'клубов на главной')
+                  : 'Найди сообщество и занимайся тем, что близко'}
+              </p>
             </div>
             <Link href="/clubs" className="home-section-link">
               Все клубы <ArrowRight size={18} />
@@ -150,7 +158,7 @@ export default async function Home() {
           {latestClubs.length === 0 ? (
             <p className="home-empty">Клубы скоро появятся в каталоге.</p>
           ) : (
-            <HomeSlideRail label="Клубы по интересам">
+            <div className="home-feed-grid">
               {latestClubs.map((club, idx) => (
                 <Link key={club.id} href={`/clubs/${encodeURIComponent(club.id)}`} className="catalog-card">
                   <div className="catalog-img-wrap" style={{ position: 'relative' }}>
@@ -174,7 +182,7 @@ export default async function Home() {
                   </div>
                 </Link>
               ))}
-            </HomeSlideRail>
+            </div>
           )}
         </section>
         )}
@@ -184,7 +192,11 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Пространства</h2>
-              <p className="home-section-sub">Площадки для встреч, репетиций и своих мероприятий</p>
+              <p className="home-section-sub">
+                {latestSpaces.length
+                  ? ruCount(latestSpaces.length, 'площадка на главной', 'площадки на главной', 'площадок на главной')
+                  : 'Площадки для встреч, репетиций и своих мероприятий'}
+              </p>
             </div>
             <Link href="/spaces" className="home-section-link">
               Все пространства <ArrowRight size={18} />
@@ -193,7 +205,7 @@ export default async function Home() {
           {latestSpaces.length === 0 ? (
             <p className="home-empty">Свободных пространств пока нет в каталоге.</p>
           ) : (
-            <HomeSlideRail label="Пространства">
+            <div className="home-feed-grid">
               {latestSpaces.map((space, idx) => (
                 <article key={space.id} className="catalog-card catalog-card--hit" style={{ position: 'relative' }}>
                   <Link
@@ -234,7 +246,7 @@ export default async function Home() {
                   </div>
                 </article>
               ))}
-            </HomeSlideRail>
+            </div>
           )}
         </section>
         )}
@@ -273,7 +285,11 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Новости</h2>
-              <p className="home-section-sub">Что происходит в молодёжной повестке</p>
+              <p className="home-section-sub">
+                {latestNews.length
+                  ? ruCount(latestNews.length, 'новость на главной', 'новости на главной', 'новостей на главной')
+                  : 'Что происходит в молодёжной повестке'}
+              </p>
             </div>
             <Link href="/news" className="home-section-link">
               Все новости <ArrowRight size={18} />
@@ -282,7 +298,7 @@ export default async function Home() {
           {latestNews.length === 0 ? (
             <p className="home-empty">Новостей пока нет — загляните позже.</p>
           ) : (
-            <HomeSlideRail label="Новости">
+            <div className="home-feed-grid">
               {latestNews.map((item) => {
                 const when = item.publishedAt || item.createdAt;
                 const title = item.title?.trim() || stripHtml(item.text).slice(0, 80) || 'Новость';
@@ -311,7 +327,7 @@ export default async function Home() {
                   </Link>
                 );
               })}
-            </HomeSlideRail>
+            </div>
           )}
         </section>
         )}

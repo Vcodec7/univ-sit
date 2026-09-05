@@ -17,6 +17,7 @@ import CatalogPagination from '@/components/CatalogPagination';
 import { CATALOG_PAGE_SIZE, catalogSlice, totalPages } from '@/lib/pagination';
 import type { PublicSpaceCard } from '@/lib/public-catalogs';
 import { isCoworkingSpace, isHallBookable } from '@/lib/coworking';
+import { ruCount } from '@/lib/catalog-query';
 
 export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[] }) {
   const sp = useSafeSearchParams();
@@ -54,13 +55,17 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
 
   return (
     <div className="container catalog-page">
-      <div className="catalog-page-header" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-        <h1 className="page-hero-title">Молодёжные пространства</h1>
-        <p className="page-hero-subtitle">
-          Одна площадка может быть и залом под бронь, и коворкингом — смотрите кнопки на карточке.
-        </p>
+      <div className="catalog-page-header">
+        <div className="catalog-page-header__intro">
+          <h1 className="page-hero-title">Молодёжные пространства</h1>
+          <p className="catalog-page-header__count">
+            {total ? ruCount(total, 'площадка', 'площадки', 'площадок') : 'Каталог площадок'}
+          </p>
+        </div>
+        <div className="catalog-page-header__search">
+          <SpaceFilterBar placeholder="Поиск пространств…" categories={usedCategories} />
+        </div>
       </div>
-      <SpaceFilterBar placeholder="Поиск пространств…" categories={usedCategories} />
 
       {spaces.length === 0 ? (
         <div className="svc-empty">

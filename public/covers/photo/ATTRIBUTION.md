@@ -20,4 +20,8 @@ License varies by file (CC BY / CC BY-SA / public domain) — see each file page
 | quiz.jpg | library students |
 | film.jpg | cinema screen |
 | hall.jpg | auditorium |
+| hall-concert.jpg | Empty concert hall in Katowice (Unsplash) — CC0, Radek Grzybowski |
+| hall-lecture.jpg | Lecture hall — CC BY-SA 3.0, Wikimedia Commons |
+| hall-youth.jpg | Interiors Youth center, Kazan (2023-06-06) — CC BY-SA 4.0, Wikimedia Commons |
+| hall-conference.jpg | Banquet / conference hall — CC BY-SA 4.0, Wikimedia Commons |
 | gym.jpg | gymnastics |
