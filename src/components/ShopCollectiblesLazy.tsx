@@ -31,16 +31,16 @@ export default function ShopCollectiblesLazy({ onBalanceChange }: Props) {
 
   return (
     <details
-      className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3"
+      className="shop-cards-fold"
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
     >
-      <summary className="cursor-pointer list-none font-bold text-[var(--fg)]">
-        Коллекционные карты
-        <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
-          Откройте, чтобы загрузить карты и обмены. Магазин косметики выше работает независимо.
+      <summary>
+        <span className="shop-cards-fold__title">Коллекционные карты</span>
+        <span className="shop-cards-fold__hint">
+          Паки, витрина профиля и инвентарь. Косметика выше работает отдельно.
         </span>
       </summary>
-      <div className="mt-3">
+      <div className="shop-cards-fold__body">
         {mounted ? <CollectiblesPanel onBalanceChange={onBalanceChange} /> : null}
       </div>
     </details>

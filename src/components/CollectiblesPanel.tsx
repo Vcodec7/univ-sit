@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Layers, Sparkles, PackageOpen, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchCollectiblesCached, invalidateCollectiblesCache } from '@/lib/user-data-client';
+import { RARITY_META, type CardRarity } from '@/lib/collectibles';
 
 type Pack = {
   id: 'starter' | 'sochi' | 'keeper' | 'night' | 'legend';
@@ -58,6 +59,7 @@ export default function CollectiblesPanel({
   const [pity, setPity] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [drops, setDrops] = useState<Drop[] | null>(null);
+  const [seriesFilter, setSeriesFilter] = useState('all');
   const onBalanceRef = useRef(onBalanceChange);
   onBalanceRef.current = onBalanceChange;
   const lastReportedEco = useRef<number | null>(null);
@@ -152,9 +154,21 @@ export default function CollectiblesPanel({
     () => showcase.map((id) => inventory.find((c) => c.id === id)).filter(Boolean) as InvCard[],
     [showcase, inventory]
   );
+  const showcaseSlots = useMemo(
+    () => Array.from({ length: 5 }, (_, i) => showcaseCards[i] ?? null),
+    [showcaseCards]
+  );
+  const seriesList = useMemo(
+    () => Array.from(new Set(inventory.map((c) => c.series))),
+    [inventory]
+  );
+  const visibleInventory = useMemo(
+    () => (seriesFilter === 'all' ? inventory : inventory.filter((c) => c.series === seriesFilter)),
+    [inventory, seriesFilter]
+  );
 
   return (
-    <section className="yp-cards" aria-label="Коллекционные карточки">
+    <section className="yp-cards yp-cards--luxe" aria-label="Коллекционные карточки">
       <div className="yp-cards__head">
         <h4>
           <Layers size={15} aria-hidden /> Карточки коллекции
@@ -203,10 +217,13 @@ export default function CollectiblesPanel({
             disabled={!!busy || ecoPoints < p.cost}
             onClick={() => void openPack(p.id)}
           >
-            <PackageOpen size={18} aria-hidden />
+            <span className="yp-pack__foil" aria-hidden />
+            <span className="yp-pack__icon">
+              <PackageOpen size={20} aria-hidden />
+            </span>
             <strong>{p.label}</strong>
             <span>{p.blurb}</span>
-            <em>{busy === p.id ? 'Открываем…' : `${p.cost} мб`}</em>
+            <em>{busy === p.id ? 'Открываем…' : `${p.cost} мб · ${p.cards} карт`}</em>
           </button>
         ))}
       </div>
@@ -226,6 +243,10 @@ export default function CollectiblesPanel({
                 className={`yp-card yp-card--${d.rarity} is-drop`}
                 style={{ ['--card-accent' as string]: d.accent }}
               >
+                <span className="yp-card__foil" aria-hidden />
+                <span className="yp-card__rarity">
+                  {RARITY_META[d.rarity as CardRarity]?.label || d.rarity}
+                </span>
                 <span className="yp-card__glyph">{d.glyph}</span>
                 <strong>{d.title}</strong>
                 <em>{d.series}</em>
@@ -235,13 +256,13 @@ export default function CollectiblesPanel({
         </div>
       ) : null}
 
-      {showcaseCards.length > 0 ? (
-        <div className="yp-cards__showcase">
-          <h5>
-            <Star size={13} aria-hidden /> Витрина
-          </h5>
-          <div className="yp-cards__grid">
-            {showcaseCards.map((c) => (
+      <div className="yp-cards__showcase">
+        <h5>
+          <Star size={13} aria-hidden /> Витрина профиля · {showcaseCards.length}/5
+        </h5>
+        <div className="yp-cards__vitrine">
+          {showcaseSlots.map((c, i) =>
+            c ? (
               <article
                 key={c.id}
                 className={`yp-card yp-card--${c.rarity} is-show`}
@@ -250,22 +271,48 @@ export default function CollectiblesPanel({
                   ['--card-glow' as string]: c.rarityMeta.glow,
                 }}
               >
+                <span className="yp-card__foil" aria-hidden />
                 <span className="yp-card__rarity">{c.rarityMeta.label}</span>
                 <span className="yp-card__glyph">{c.glyph}</span>
                 <strong>{c.title}</strong>
                 <em>{c.tagline}</em>
               </article>
-            ))}
-          </div>
+            ) : (
+              <div key={`empty-${i}`} className="yp-card yp-card--empty" aria-hidden>
+                <span>слот {i + 1}</span>
+              </div>
+            )
+          )}
         </div>
-      ) : null}
+      </div>
 
       <h5 className="yp-cards__inv-title">Инвентарь</h5>
+      {seriesList.length > 1 ? (
+        <div className="yp-cards__series" role="tablist" aria-label="Серии">
+          <button
+            type="button"
+            className={seriesFilter === 'all' ? 'is-on' : undefined}
+            onClick={() => setSeriesFilter('all')}
+          >
+            Все
+          </button>
+          {seriesList.map((s) => (
+            <button
+              key={s}
+              type="button"
+              className={seriesFilter === s ? 'is-on' : undefined}
+              onClick={() => setSeriesFilter(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {inventory.length === 0 ? (
         <p className="yp-cards__empty">Пока пусто — откройте первый пак.</p>
       ) : (
         <div className="yp-cards__grid">
-          {inventory.map((c) => (
+          {visibleInventory.map((c) => (
             <article
               key={c.id}
               className={`yp-card yp-card--${c.rarity}${c.inShowcase ? ' is-show' : ''}`}
@@ -274,6 +321,7 @@ export default function CollectiblesPanel({
                 ['--card-glow' as string]: c.rarityMeta.glow,
               }}
             >
+              <span className="yp-card__foil" aria-hidden />
               <span className="yp-card__rarity">{c.rarityMeta.label}</span>
               <span className="yp-card__count">×{c.count}</span>
               <span className="yp-card__glyph">{c.glyph}</span>

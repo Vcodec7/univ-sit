@@ -268,6 +268,17 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
     return Array.from(map.entries());
   }, [catalog]);
 
+  const equippedLook = useMemo(
+    () =>
+      catalog
+        .filter((c) => c.equipped)
+        .map((item) => ({
+          ...item,
+          preview: COSMETIC_PREVIEW[item.id] || { glyph: '◈', tint: '#8562d8' },
+        })),
+    [catalog]
+  );
+
   if (resolvedMode === 'card') {
     return (
       <section className="eco-card" aria-label={POINTS.shop.wallet}>
@@ -308,7 +319,7 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
   return (
     <section
       id={resolvedMode === 'shop' || resolvedMode === 'full' ? 'eco-shop' : undefined}
-      className={`eco-panel${resolvedMode === 'shop' ? ' eco-panel--shop' : ''}`}
+      className={`eco-panel${resolvedMode === 'shop' ? ' eco-panel--shop eco-panel--luxe' : ''}`}
       aria-label={POINTS.shop.wallet}
     >
       <div className="eco-panel__head">
@@ -360,6 +371,33 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
 
       <EcoPoolHint variant="shop" />
 
+      {equippedLook.length > 0 ? (
+        <div className="eco-look" aria-label="Текущий образ">
+          <span className="eco-look__label">Ваш образ</span>
+          <ul className="eco-look__list">
+            {equippedLook.map((item) => (
+              <li
+                key={item.id}
+                className="eco-look__chip"
+                style={{ ['--preview' as string]: item.preview.tint }}
+              >
+                <span className="eco-look__glyph" aria-hidden>
+                  {item.preview.glyph}
+                </span>
+                <span>
+                  <strong>{item.label}</strong>
+                  <em>{SLOT_LABELS[item.slot] || item.slot}</em>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : resolvedMode === 'shop' ? (
+        <p className="eco-look eco-look--empty">
+          Пока без образа — купите рамку или тему, и они сразу появятся в профиле.
+        </p>
+      ) : null}
+
       {resolvedMode === 'full' ? (
         <div className="eco-panel__shop-head">
           <p className="eco-panel__lead">
@@ -383,6 +421,7 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
             <details
               key={slot}
               className="eco-panel__slot-group"
+              data-slot={slot}
               open={openSlot === slot}
             >
               <summary
@@ -427,7 +466,11 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
                     <div className="eco-shop-card__body">
                       <strong>{item.label}</strong>
                       <span className="eco-shop-card__meta">
-                        {item.owned ? (item.equipped ? 'Надето · видно в профиле' : 'В инвентаре') : `${item.cost} мб`}
+                        {item.owned
+                          ? item.equipped
+                            ? 'Надето · видно в профиле'
+                            : 'В инвентаре'
+                          : `${item.cost} мб`}
                       </span>
                     </div>
                     <div className="eco-shop-card__actions">

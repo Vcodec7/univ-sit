@@ -10,10 +10,12 @@ export default function DashboardShopPage() {
   return (
     <CabinetSubpage
       title="Магазин"
-      lead="Тратьте М-баллы на рамки, ауры, темы и голос. Покупка сразу надевается на профиль."
+      lead="Соберите свой образ: рамки, ауры, темы и голос сразу видны в профиле. Карты — отдельная коллекция."
     >
-      <EcoPointsPanel mode="shop" onBalanceChange={setEco} />
-      <ShopCollectiblesLazy onBalanceChange={setEco} />
+      <div className="shop-stage">
+        <EcoPointsPanel mode="shop" onBalanceChange={setEco} />
+        <ShopCollectiblesLazy onBalanceChange={setEco} />
+      </div>
     </CabinetSubpage>
   );
 }
