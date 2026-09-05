@@ -8302,9 +8302,33 @@ a.dashboard-nav-btn {
   align-items: center;
   gap: 0.25rem;
 }
-.places-card__rating {
-  color: var(--places-amber) !important;
+.places-card__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: #475569;
+}
+.places-card__facts span {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+  line-height: 1.35;
+}
+.places-card__price {
+  color: #166534;
   font-weight: 650;
+}
+.places-price-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #64748b;
+  max-width: 40rem;
+}
+.places-price-note--detail {
+  margin: 0.15rem 0 1.1rem;
 }
 .places-empty {
   padding: 2.5rem 1rem;

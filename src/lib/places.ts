@@ -33,6 +33,10 @@ export const PLACE_CATEGORY_META: Record<
   FAMILY: { label: 'Семья', color: '#d97706', bg: 'rgba(217,119,6,0.14)' },
 };
 
+/** Shown on catalog and place pages — never treat card prices as a live ticket office. */
+export const PLACE_PRICE_DISCLAIMER =
+  'Цены на карточках — примерные ориентиры. Стоимость может меняться по сезону и тарифам площадки; перед поездкой сверьте актуальный прайс.';
+
 export const PLACE_STATUS_LABELS: Record<PlaceStatusCode, string> = {
   DRAFT: 'Черновик',
   PUBLISHED: 'Опубликовано',

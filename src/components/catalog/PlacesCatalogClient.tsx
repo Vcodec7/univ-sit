@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, Clock, Wallet } from 'lucide-react';
 import {
   PLACE_CATEGORIES,
   PLACE_CATEGORY_META,
+  PLACE_PRICE_DISCLAIMER,
   normalizePlaceCategory,
   placeCategoryCodesFor,
   type PlaceCategoryCode,
@@ -39,7 +40,10 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
           String(p.summary || '').toLowerCase().includes(query) ||
           p.description.toLowerCase().includes(query) ||
           String(p.address || '').toLowerCase().includes(query) ||
-          String(p.district || '').toLowerCase().includes(query)
+          String(p.district || '').toLowerCase().includes(query) ||
+          String(p.priceHint || '').toLowerCase().includes(query) ||
+          String(p.visitTime || '').toLowerCase().includes(query) ||
+          String(p.bestSeason || '').toLowerCase().includes(query)
       );
     }
     if (categoryFilter) {
@@ -72,7 +76,9 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
         <div className="places-hero__veil" aria-hidden />
         <div className="container places-hero__inner">
           <h1 className="places-title">Куда сходить</h1>
-          <p className="places-lead">Пляжи, горы, парки и смотровые — с маршрутом и советами.</p>
+          <p className="places-lead">
+            Пляжи, горы, парки и смотровые Большого Сочи — сколько гулять, как примерно выйдет по деньгам и что взять с собой.
+          </p>
         </div>
       </header>
 
@@ -82,6 +88,7 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
             <p className="catalog-page-header__count">
               {total ? ruCount(total, 'место', 'места', 'мест') : 'Каталог мест'}
             </p>
+            <p className="places-price-note">{PLACE_PRICE_DISCLAIMER}</p>
           </div>
           <div className="catalog-page-header__search">
           <form className="places-search" method="get" action="/places" role="search">
@@ -139,6 +146,19 @@ export default function PlacesCatalogClient({ items }: { items: PublicPlaceCard[
                   <div className="places-card__body">
                     <h2>{place.title}</h2>
                     {place.summary ? <p>{place.summary}</p> : null}
+                    <div className="places-card__facts">
+                      {place.visitTime ? (
+                        <span>
+                          <Clock size={13} /> {place.visitTime}
+                        </span>
+                      ) : null}
+                      {place.bestSeason ? <span>{place.bestSeason}</span> : null}
+                      {place.priceHint ? (
+                        <span className="places-card__price">
+                          <Wallet size={13} /> {place.priceHint}
+                        </span>
+                      ) : null}
+                    </div>
                     <div className="places-card__meta">
                       {place.district ? (
                         <span>

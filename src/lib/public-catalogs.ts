@@ -77,6 +77,9 @@ export type PublicPlaceCard = {
   category: string;
   image: string | null;
   tips: string | null;
+  visitTime: string | null;
+  priceHint: string | null;
+  bestSeason: string | null;
   ratingAvg: number;
   ratingCount: number;
   sortOrder: number;
@@ -283,6 +286,9 @@ export const getCachedPublicPlaces = unstable_cache(
         category: true,
         image: true,
         tips: true,
+        visitTime: true,
+        priceHint: true,
+        bestSeason: true,
         ratingAvg: true,
         ratingCount: true,
         sortOrder: true,
@@ -299,12 +305,15 @@ export const getCachedPublicPlaces = unstable_cache(
       category: p.category,
       image: p.image,
       tips: p.tips,
+      visitTime: p.visitTime,
+      priceHint: p.priceHint,
+      bestSeason: p.bestSeason,
       ratingAvg: p.ratingAvg,
       ratingCount: p.ratingCount,
       sortOrder: p.sortOrder,
     }));
   },
-  ['public-places-catalog-v1'],
+  ['public-places-catalog-v2'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 

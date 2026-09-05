@@ -326,8 +326,11 @@ export default async function AdminPlaces({
           <input type="text" name="visitTime" defaultValue={item?.visitTime || ''} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
         </div>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Цены</label>
-          <input type="text" name="priceHint" defaultValue={item?.priceHint || ''} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Цены (ориентир)</label>
+          <input type="text" name="priceHint" defaultValue={item?.priceHint || ''} placeholder="например: вход примерно 300–400 ₽" style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
+          <p style={{ margin: '0.35rem 0 0', fontSize: '0.78rem', color: 'var(--muted)' }}>
+            Пишите «примерно». На сайте всегда есть пометка, что цены могут меняться.
+          </p>
         </div>
       </div>
       <div>

@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { findPlaceByRouteId } from '@/lib/resolve-entity';
 import {
   PLACE_CATEGORY_META,
+  PLACE_PRICE_DISCLAIMER,
   normalizePlaceCategory,
   parseGalleryJson,
   placeCategoryCodesFor,
@@ -172,6 +173,7 @@ export default async function PlaceDetailPage({ params }: { params: Promise<{ id
             </div>
           ) : null}
         </div>
+        <p className="places-price-note places-price-note--detail">{PLACE_PRICE_DISCLAIMER}</p>
 
         <section className="places-section places-section--features">
           <h2>Особенности</h2>
