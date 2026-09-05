@@ -27108,6 +27108,147 @@ html.yp-booting .qa-edge-tab {
   visibility: hidden;
 }
 
+/* Admin settings: compact mobile chrome, chip scroller instead of a tall tab stack */
+.settings-page-header {
+  margin: 0 0 0.65rem;
+}
+.settings-page-header h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0 0 0.15rem;
+  letter-spacing: -0.03em;
+}
+.settings-page-header p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+  line-height: 1.35;
+}
+.settings-tab-group-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.settings-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  white-space: nowrap;
+}
+@media (max-width: 1100px) {
+  .admin-mobile-bar ~ .admin-main .admin-escape-bar,
+  .admin-layout-wrapper:has(.admin-mobile-bar) .admin-escape-bar {
+    display: none !important;
+  }
+  .settings-tabs {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 0 0.75rem !important;
+    padding: 0.2rem 0 0.45rem !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  }
+  .settings-tab-group {
+    flex-wrap: nowrap !important;
+    width: auto !important;
+    flex: 0 0 auto;
+    gap: 0.28rem !important;
+  }
+  .settings-tab-group + .settings-tab-group {
+    margin-left: 0.15rem !important;
+    padding-left: 0.45rem !important;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+    border-left: 1px solid rgba(15, 23, 42, 0.1) !important;
+  }
+  .settings-tab-group-label {
+    min-width: 0 !important;
+    font-size: 0.58rem;
+    opacity: 0.85;
+  }
+  .ops-flags__head {
+    display: grid;
+    gap: 0.35rem;
+    margin-bottom: 0.7rem;
+  }
+  .ops-flags__title {
+    font-size: 1.05rem !important;
+    margin: 0 !important;
+    font-weight: 800;
+  }
+  .ops-flags__sub {
+    font-size: 0.78rem !important;
+    margin: 0 !important;
+    color: var(--muted);
+  }
+  .ops-flags__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.75rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .ops-flags__refresh {
+    padding: 0.28rem 0.65rem !important;
+    font-size: 0.78rem !important;
+    min-height: 0;
+  }
+  .ops-flags__bulk {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    margin-bottom: 0.75rem;
+  }
+  .ops-flags__bulk .btn {
+    width: 100%;
+    font-size: 0.78rem !important;
+    padding: 0.55rem 0.4rem !important;
+    white-space: normal;
+    line-height: 1.2;
+  }
+}
+@media (min-width: 1101px) {
+  .ops-flags__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .ops-flags__title {
+    margin: 0 0 0.35rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+  }
+  .ops-flags__sub {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .ops-flags__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .ops-flags__bulk {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+}
+
 /* F5 staff: boot script can set html.is-admin before <body> exists */
 html.is-admin .glass-nav,
 html.is-admin .site-footer,

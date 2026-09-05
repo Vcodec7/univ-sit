@@ -190,38 +190,36 @@ export default function OpsFlagsClient({
   };
 
   return (
-    <div style={embedded ? undefined : { maxWidth: 860, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginBottom: '1rem' }}>
+    <div className={`ops-flags${embedded ? ' ops-flags--embedded' : ''}`} style={embedded ? undefined : { maxWidth: 860, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
+      <div className="ops-flags__head">
         <div>
-          <h1 style={{ margin: '0 0 0.35rem', fontWeight: 800, fontSize: embedded ? '1.25rem' : '1.5rem' }}>
-            {title}
-          </h1>
-          <p style={{ color: 'var(--muted)', margin: 0, fontSize: '0.9rem' }}>
-            {subtitle}
-          </p>
+          <h1 className="ops-flags__title">{title}</h1>
+          <p className="ops-flags__sub">{subtitle}</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, fontSize: '0.82rem', color: 'var(--muted)' }}>
+        <div className="ops-flags__meta">
           <span>
             Выкл: <strong style={{ color: offCount ? '#b45309' : 'inherit' }}>{offCount}</strong>
             {publicOff ? ` · публичных ${publicOff}` : ''}
           </span>
           {loadedAt ? <span>Обновлено {loadedAt}</span> : null}
-          <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void load()} style={{ padding: '0.35rem 0.7rem', fontSize: '0.8rem' }}>
+          <button type="button" className="btn btn-secondary ops-flags__refresh" disabled={busy} onClick={() => void load()}>
             Обновить
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: '1rem' }}>
+      <div className="ops-flags__bulk">
         <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void bulk(false)}>
-          Выключить всё публичное
+          Выключить публичное
         </button>
         <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void bulk(true)}>
-          Включить всё публичное
+          Включить публичное
         </button>
-        <a href="/" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-          На сайт
-        </a>
+        {embedded ? null : (
+          <a href="/" className="btn btn-secondary ops-flags__tosite">
+            На сайт
+          </a>
+        )}
       </div>
 
       <div

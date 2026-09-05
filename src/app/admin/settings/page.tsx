@@ -494,7 +494,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
   };
 
   return (
-    <div className="admin-page-shell" style={{ paddingBottom: '6rem' }}>
+    <div className="admin-page-shell admin-settings-page" style={{ paddingBottom: '6rem' }}>
       <style dangerouslySetInnerHTML={{ __html: `
         .settings-tab { display:flex; align-items:center; gap:0.4rem; padding:0.4rem 0.65rem; border-radius:100px; font-weight:600; font-size:0.85rem; transition:all 0.2s; color:var(--muted); text-decoration:none; white-space:nowrap; }
         .settings-tab:hover:not(.active) { background:rgba(59,130,246,0.06); color:var(--foreground); }
@@ -535,12 +535,10 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
       <form id="yp-settings-form" action={updateSettings} encType="multipart/form-data">
         <input type="hidden" name="settingsTab" value={activeTab} />
         {/* Page Header */}
-        <div className="settings-page-header" style={{ marginBottom: '1.25rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.25rem' }}>
-            Настройки сайта
-          </h1>
-          <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>
-            Параметры портала. Не путать с настройками аккаунта в профиле.
+        <div className="settings-page-header">
+          <h1>Настройки сайта</h1>
+          <p>
+            Параметры портала, не аккаунта.
           </p>
         </div>
 
@@ -555,8 +553,8 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
             else last.items.push(tab);
           }
           return groups.map((g) => (
-            <div key={g.name} className="settings-tab-group" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-              <span className="settings-tab-group-label" style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', marginRight: 2 }}>{g.name}</span>
+            <div key={g.name} className="settings-tab-group">
+              <span className="settings-tab-group-label">{g.name}</span>
               {g.items.map((tab) => {
                 const Icon = tab.icon;
                 const off = Boolean((tab as { moduleOff?: boolean }).moduleOff);
