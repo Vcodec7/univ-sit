@@ -315,7 +315,7 @@ const FAQ_HTML = `
 `.trim();
 
 const PRAVILA_DM_HTML = `
-<p><strong>Правила посещения Дома молодёжи</strong> (ул. Навагинская, 9) и площадок Центра развития молодёжи Сочи.</p>
+<p>В Доме молодёжи (ул. Навагинская, 9) и на площадках центра — свои правила. Коротко: уважаем друг друга, приходим по записи, слушаем сотрудников.</p>
 <p>Полный текст памятки публикуется в официальном канале и группе: <a href="https://t.me/crm_sochi/26243" target="_blank" rel="noopener">Telegram · правила ДМ</a>, хештег <strong>#правилаДМ</strong> в <a href="https://vk.ru/crm.sochi" target="_blank" rel="noopener">VK crm.sochi</a>.</p>
 <h2>Кратко</h2>
 <ul>
@@ -328,7 +328,7 @@ const PRAVILA_DM_HTML = `
 `.trim();
 
 const MEDIA_HTML = `
-<p>Медиа-направление Центра развития молодёжи Сочи: блоги, видео, фотоотчёты, участие в конкурсах и премиях.</p>
+<p>Снимаем, пишем, монтируем: блоги, видео, фотоотчёты и участие в медиаконкурсах центра.</p>
 <h2>Премия «ШУМ»</h2>
 <p>Всероссийская молодёжная премия в сфере медиа и журналистики. Регистрация и номинации — на <a href="https://premiyashum.ru/" target="_blank" rel="noopener">premiyashum.ru</a>. Анонсы набора публикуются в группе VK и в новостях портала.</p>
 <h2>Медиафорум и проекты</h2>
@@ -510,7 +510,7 @@ async function main() {
     where: { slug: 'pravila-dm' },
     create: {
       slug: 'pravila-dm',
-      title: 'Правила Дома молодёжи',
+      title: 'Правила в доме',
       content: PRAVILA_DM_HTML,
       images: '[]',
       menuPosition: 'HEADER_SUB',
@@ -519,7 +519,7 @@ async function main() {
       publishedAt: new Date(),
     },
     update: {
-      title: 'Правила Дома молодёжи',
+      title: 'Правила в доме',
       content: PRAVILA_DM_HTML,
       menuPosition: 'HEADER_SUB',
       status: 'PUBLISHED',
@@ -532,7 +532,7 @@ async function main() {
     where: { slug: 'media' },
     create: {
       slug: 'media',
-      title: 'Медиа-направление',
+      title: 'Медиапроекты',
       content: MEDIA_HTML,
       images: '[]',
       menuPosition: 'HEADER_SUB',
@@ -541,7 +541,7 @@ async function main() {
       publishedAt: new Date(),
     },
     update: {
-      title: 'Медиа-направление',
+      title: 'Медиапроекты',
       content: MEDIA_HTML,
       menuPosition: 'HEADER_SUB',
       status: 'PUBLISHED',

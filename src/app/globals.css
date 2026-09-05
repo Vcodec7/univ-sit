@@ -27445,5 +27445,42 @@ html.is-admin .main-content {
   .event-carousel__nav--next { right: 0; }
 }
 
+.cms-page-lead {
+  margin: 0 0 1.35rem;
+  max-width: 36rem;
+  color: #5a5670;
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.mobile-menu__row--sub {
+  margin: 0.28rem 0;
+  padding: 0.78rem 0.8rem !important;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+  font-weight: 750 !important;
+  font-size: 1.02rem !important;
+}
+.mobile-menu__row--sub svg:first-child {
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0.38rem;
+  border-radius: 0.7rem;
+  box-sizing: border-box;
+  color: #3f4a00 !important;
+  background: rgba(175, 202, 3, 0.28);
+}
+.mobile-menu__row--media svg:first-child {
+  color: #4c1d95 !important;
+  background: rgba(133, 98, 216, 0.18);
+}
+.mobile-menu__row--sub svg:last-child {
+  color: #94a3b8;
+}
+.dropdown-item--page {
+  font-weight: 700;
+}
+
 
 

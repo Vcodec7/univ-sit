@@ -22,6 +22,7 @@ function modOn(settings: any, key: string) {
 
 
 import Link from 'next/link';
+import { publicCmsTitle } from '@/lib/cms-page-copy';
 import {
   User,
   Menu,
@@ -48,6 +49,8 @@ import {
   MapPin,
   Newspaper,
   Sparkles,
+  Camera,
+  ScrollText,
   Phone,
   Home,
   Shield,
@@ -807,11 +810,11 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   <Link
                     key={page.id}
                     href={publicPagePath(page.slug)}
-                    className="dropdown-item"
+                    className="dropdown-item dropdown-item--page"
                     role="menuitem"
                     onClick={closeDesktopMenus}
                   >
-                    {page.title}
+                    {publicCmsTitle(page.slug, page.title)}
                   </Link>
                 ))}
               </>,
@@ -1183,10 +1186,16 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                       <Link
                         href={publicPagePath(page.slug)}
                         onClick={closeMenu}
-                        className="mobile-menu__row mobile-menu__row--sub"
+                        className={`mobile-menu__row mobile-menu__row--sub mobile-menu__row--${page.slug === 'media' ? 'media' : page.slug === 'pravila-dm' ? 'rules' : 'page'}`}
                       >
-                        <Sparkles size={20} aria-hidden />
-                        <span>{page.title}</span>
+                        {page.slug === 'media' ? (
+                          <Camera size={20} aria-hidden />
+                        ) : page.slug === 'pravila-dm' ? (
+                          <ScrollText size={20} aria-hidden />
+                        ) : (
+                          <Sparkles size={20} aria-hidden />
+                        )}
+                        <span>{publicCmsTitle(page.slug, page.title)}</span>
                         <ChevronRight size={16} aria-hidden />
                       </Link>
                     </li>

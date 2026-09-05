@@ -6,6 +6,7 @@ import AboutTeamAuth from '@/components/AboutTeamAuth';
 import { Metadata } from 'next';
 import { publishedWhere } from '@/lib/publish';
 import { staticCmsPageParams } from '@/lib/generate-public-static-params';
+import { publicCmsTitle } from '@/lib/cms-page-copy';
 
 export const revalidate = 60;
 export const dynamic = 'force-static';
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   return {
-    title: withSiteBrand(page.title, siteName),
+    title: withSiteBrand(publicCmsTitle(page.slug, page.title), siteName),
   };
 }
 

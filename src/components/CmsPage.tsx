@@ -1,9 +1,11 @@
 import React from 'react';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
 import { applySitePlaceholders, DEFAULT_SITE_NAME } from '@/lib/site-identity-shared';
+import { publicCmsLead, publicCmsTitle } from '@/lib/cms-page-copy';
 
 interface CmsPageProps {
   page: {
+    slug?: string;
     title: string;
     content: string;
     images: string;
@@ -21,6 +23,8 @@ interface CmsPageProps {
  */
 export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsPageProps) {
   const cover = page.images || '';
+  const heading = publicCmsTitle(page.slug, page.title);
+  const lead = publicCmsLead(page.slug);
   const safeContent = sanitizeCmsHtml(
     applySitePlaceholders(page.content, {
       siteName: siteName || DEFAULT_SITE_NAME,
@@ -32,9 +36,10 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
 
   const renderDefault = () => (
     <div className="cms-page-shell" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
-      <h1 className="page-hero-title" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-        {page.title}
+      <h1 className="page-hero-title" style={{ marginBottom: lead ? '0.4rem' : '1.5rem', textAlign: 'left' }}>
+        {heading}
       </h1>
+      {lead ? <p className="cms-page-lead">{lead}</p> : null}
       {cover ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -79,7 +84,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
             МКУ города Сочи
           </p>
           <h1 style={{ fontSize: 'clamp(2.35rem, 5.5vw, 3.75rem)', fontWeight: 800, margin: 0, lineHeight: 1.12, maxWidth: '22ch' }}>
-            {page.title}
+            {heading}
           </h1>
         </div>
       </section>
@@ -146,7 +151,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
         }}
       >
         <div className="cms-page-shell">
-          <h1 className="page-hero-title" style={{ margin: 0 }}>{page.title}</h1>
+          <h1 className="page-hero-title" style={{ margin: 0 }}>{heading}</h1>
           <p style={{ margin: '0.75rem 0 0', opacity: 0.9, maxWidth: '42rem' }}>
             Команда и направления работы Центра.
           </p>
@@ -187,7 +192,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
   const renderGallery = () => (
     <div className="cms-page-shell" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
       <h1 className="page-hero-title" style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
-        {page.title}
+        {heading}
       </h1>
       <div style={{ width: '100%' }}>
         <p style={{ color: 'var(--muted)', marginBottom: '2rem' }}>Фотоотчеты и моменты нашей жизни</p>
@@ -215,7 +220,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
   const renderFAQ = () => (
     <div className="cms-page-shell" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
       <h1 className="page-hero-title" style={{ marginBottom: '2rem', textAlign: 'left' }}>
-        {page.title}
+        {heading}
       </h1>
       <div className="prose faq-content cms-page-prose" dangerouslySetInnerHTML={{ __html: safeContent }} />
       <style
