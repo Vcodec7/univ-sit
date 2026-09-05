@@ -200,7 +200,6 @@
   min-height: 2.65rem;
   padding: 0.5rem 0.85rem;
   border-radius: 14px !important;
-  color: #fff !important;
   font-weight: 750 !important;
   font-size: 0.88rem !important;
   line-height: 1.2 !important;
@@ -213,10 +212,13 @@
   box-shadow: none !important;
 }
 .svc-hero__switch-btn.is-on {
-  background: #8562d8 !important;
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
 }
 .svc-hero__switch-btn:not(.is-on) {
-  background: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
 }
 
 .yp-feed-card,
@@ -881,4 +883,13 @@ button.nav-pill--solid {
 }
 .site-brand-name {
   color: var(--primary) !important;
+}
+.places-search__btn,
+.places-search button[type='submit'] {
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
+}
+.mobile-menu__login.btn-primary,
+.mobile-menu__login {
+  color: var(--foreground) !important;
 }

@@ -2969,6 +2969,7 @@ img.site-brand-logo {
   gap: 0.5rem;
   font-size: 1.05rem;
   margin: 0;
+  color: var(--foreground) !important;
 }
 
 .nav-item {
@@ -17698,10 +17699,10 @@ button.yp-more__row {
 }
 .yp-cookie-banner button.btn-primary,
 .yp-cookie-banner .btn.btn-primary {
-  background: #8b6fd4 !important;
-  border-color: #8b6fd4 !important;
-  color: #042f2e !important;
-  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.35);
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 8px 24px rgba(175, 202, 3, 0.35);
   border-radius: 999px !important;
 }
 
@@ -23984,13 +23985,13 @@ fieldset.svc-form-group,
   border: none;
   border-radius: var(--radius-pill);
   padding: 0.65rem 1.15rem;
-  background: var(--primary);
-  color: #fff;
+  background: var(--accent);
+  color: var(--foreground);
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
 }
-.places-search__btn:hover { background: var(--primary-hover); }
+.places-search__btn:hover { background: var(--accent-hover, #8fa502); color: var(--foreground); }
 .places-toolbar--stack .places-chips {
   flex-wrap: wrap;
   overflow: visible;
