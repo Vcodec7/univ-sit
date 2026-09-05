@@ -1,7 +1,15 @@
 'use client';
 
-import DashboardClient from '@/components/DashboardClient';
+import CabinetSubpage from '@/components/CabinetSubpage';
+import ProfileGuides from '@/components/ProfileGuides';
 
 export default function DashboardGuidesPage() {
-  return <DashboardClient view="guides" />;
+  return (
+    <CabinetSubpage
+      title="Инструктажи"
+      lead="Как пользоваться порталом и обязательные инструкции."
+    >
+      <ProfileGuides />
+    </CabinetSubpage>
+  );
 }

@@ -26423,6 +26423,14 @@ body:has(.dashboard-page) .main-content {
   flex-grow: 0;
 }
 
+.cabinet-subpage {
+  padding-top: 0.7rem !important;
+  padding-bottom: 1rem !important;
+}
+.cabinet-subpage .profile-subhead {
+  margin-bottom: 0.75rem;
+}
+
 @media (max-width: 899px) {
   .profile-view--guides {
     padding: 0.15rem 0.15rem 0;

@@ -487,7 +487,7 @@ export default function AchievementsPanel({ compact, onProgress }: Props) {
       ) : (
         <div className="ach-groups">
           {groups.map((group) => {
-            const collapsed = collapsedCats[group.category] === true;
+            const collapsed = collapsedCats[group.category] !== false;
             const unlockedIn = group.items.filter((i) => i.unlocked).length;
             return (
               <section key={group.category} className="ach-group">
@@ -497,7 +497,7 @@ export default function AchievementsPanel({ compact, onProgress }: Props) {
                   onClick={() =>
                     setCollapsedCats((prev) => ({
                       ...prev,
-                      [group.category]: !collapsed,
+                      [group.category]: collapsed ? false : true,
                     }))
                   }
                   aria-expanded={!collapsed}

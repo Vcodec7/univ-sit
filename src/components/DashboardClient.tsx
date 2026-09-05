@@ -38,7 +38,6 @@ import {
   LayoutGrid,
   MessageCircle,
   Leaf,
-  ArrowLeft,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EventSoonNotifier from '@/components/EventSoonNotifier';
@@ -62,21 +61,11 @@ import { signOutLogged } from '@/lib/sign-out-logged';
 
 const QRCodeDisplay = dynamic(() => import('@/components/QRCodeDisplay'), { ssr: false });
 const AddToCalendarButton = dynamic(() => import('@/components/AddToCalendarButton'), { ssr: false });
-const AchievementsPanel = dynamic(() => import('@/components/AchievementsPanel'), { ssr: false });
-const PortfolioEditor = dynamic(() => import('@/components/PortfolioEditor'), { ssr: false });
 const EditBookingDetails = dynamic(() => import('@/components/EditBookingDetails'), { ssr: false });
 const DashboardSettingsHub = dynamic(() => import('@/components/DashboardSettingsHub'), { ssr: false });
-const ShowcaseStudio = dynamic(() => import('@/components/ShowcaseStudio'), { ssr: false });
-const ProfileGameScores = dynamic(() => import('@/components/ProfileGameScores'), { ssr: false });
 const ProfilePreviewModal = dynamic(() => import('@/components/ProfilePreviewModal'), { ssr: false });
-const ProfileGuides = dynamic(() => import('@/components/ProfileGuides'), { ssr: false });
 const PersonalGalleryEditor = dynamic(() => import('@/components/PersonalGalleryEditor'), { ssr: false });
 const ReputationHistoryModal = dynamic(() => import('@/components/ReputationHistoryModal'), { ssr: false });
-const EcoPointsPanel = dynamic(() => import('@/components/EcoPointsPanel'), { ssr: false });
-const ReferralPanel = dynamic(() => import('@/components/ReferralPanel'), { ssr: false });
-const CollectiblesPanel = dynamic(() => import('@/components/CollectiblesPanel'), { ssr: false });
-const ShopCollectiblesLazy = dynamic(() => import('@/components/ShopCollectiblesLazy'), { ssr: false });
-const AwardsPanel = dynamic(() => import('@/components/AwardsPanel'), { ssr: false });
 
 export type DashboardView =
   | 'overview'
@@ -1387,164 +1376,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
                   );
                 })()}
               </>
-            )}
-
-            {view === 'achievements' && (
-              <div style={{ maxWidth: "100%", width: "100%" }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'baseline', marginBottom: '0.75rem' }}>
-                  <h2 style={{ fontSize: '1.25rem', margin: 0, fontWeight: 800 }}>Достижения</h2>
-                  <button
-                    type="button"
-                    onClick={() => goTab('profile', 'edit')}
-                    style={{ border: 0, background: 'transparent', color: 'var(--muted)', fontSize: '0.78rem', fontWeight: 650, cursor: 'pointer' }}
-                  >
-                    Профиль →
-                  </button>
-                </div>
-                <AchievementsPanel
-                  onProgress={(p) => {
-                    if (p.complete || p.legend) setAchievementLegend(true);
-                  }}
-                />
-              </div>
-            )}
-
-            {view === 'showcase' && (
-              <div className="profile-view">
-                <div className="profile-page-head">
-                  <div>
-                    <h2 className="profile-view__title">Витрина профиля</h2>
-                    <p className="profile-view__lead">
-                      Значки и коллекционные карты, которые видят другие на вашей публичной странице.
-                    </p>
-                  </div>
-                  <Link href="/dashboard" className="btn btn-secondary">К профилю</Link>
-                </div>
-                <ShowcaseStudio
-                  showcaseStored={profile?.showcaseBadges}
-                  onSaved={(codes) =>
-                    setProfile((prev) => (prev ? { ...prev, showcaseBadges: codes } : prev))
-                  }
-                />
-                <div style={{ marginTop: '1rem' }}>
-                  <CollectiblesPanel onBalanceChange={setEcoBalance} />
-                </div>
-                {profile?.publicCode || session.user?.id ? (
-                  <p className="settings-hub-foot" style={{ marginTop: '1rem' }}>
-                    Публичный вид:{' '}
-                    <Link
-                      href={`/u/${encodeURIComponent(String(profile?.publicCode || session.user?.id))}`}
-                    >
-                      открыть профиль
-                    </Link>
-                  </p>
-                ) : null}
-              </div>
-            )}
-
-            {view === 'referrals' && (
-              <div className="profile-view">
-                <div className="profile-page-head">
-                  <div>
-                    <h2 className="profile-view__title">Рефералы</h2>
-                    <p className="profile-view__lead">Приглашайте друзей и получайте бонусы за регистрации и визиты.</p>
-                  </div>
-                  <Link href="/dashboard" className="btn btn-secondary">К профилю</Link>
-                </div>
-                <ReferralPanel />
-              </div>
-            )}
-
-            {view === 'guides' && (
-              <div className="profile-view profile-view--guides">
-                <header className="profile-subhead">
-                  <Link href="/dashboard" className="profile-subhead__back" aria-label="К профилю">
-                    <ArrowLeft size={18} />
-                  </Link>
-                  <div className="profile-subhead__copy">
-                    <h2 className="profile-view__title">Инструктажи</h2>
-                    <p className="profile-view__lead">Как пользоваться порталом и обязательные инструкции.</p>
-                  </div>
-                </header>
-                <ProfileGuides
-                  instructionsVersion={profile?.instructionsVersion}
-                  instructionsCompletedAt={profile?.instructionsCompletedAt}
-                  onInstructionsSync={(state) => {
-                    setProfile((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            instructionsVersion: state.completed ? state.version : null,
-                            instructionsCompletedAt: state.completedAt ?? null,
-                          }
-                        : prev
-                    );
-                    if (state.completed) {
-                      setModernUserBadge(true);
-                      fetch('/api/user/achievements?lite=1')
-                        .then((r) => readCabinetJson(r))
-                        .then((data) => {
-                          if (data?.legend) setAchievementLegend(true);
-                        })
-                        .catch(() => undefined);
-                    }
-                  }}
-                />
-              </div>
-            )}
-
-            {view === 'games' && (
-              <div className="profile-view">
-                <div className="profile-page-head">
-                  <div>
-                    <h2 className="profile-view__title">Игры и рекорды</h2>
-                    <p className="profile-view__lead">Ваши результаты в мини-играх портала.</p>
-                  </div>
-                  <Link href="/dashboard" className="btn btn-secondary">К профилю</Link>
-                </div>
-                <ProfileGameScores />
-              </div>
-            )}
-
-            {view === 'shop' && (
-              <div className="profile-view profile-shop">
-                <h2 className="profile-view__title">Магазин</h2>
-                <p className="profile-view__lead">
-                  Тратьте М-баллы из кошелька на рамки, ауры, темы и голос. Покупка сразу надевается на профиль.
-                </p>
-                <EcoPointsPanel
-                  mode="shop"
-                  onBalanceChange={setEcoBalance}
-                />
-                <ShopCollectiblesLazy onBalanceChange={setEcoBalance} />
-              </div>
-            )}
-
-            {view === 'awards' && (
-              <div className="profile-view">
-                <h2 className="profile-view__title">Награды</h2>
-                <p className="profile-view__lead">
-                  Официальные дипломы, сертификаты и грамоты портала.
-                </p>
-                <AwardsPanel />
-              </div>
-            )}
-
-            {view === 'portfolio' && (
-              <div style={{ maxWidth: "100%", width: "100%" }}>
-                <div className="profile-portfolio-head">
-                  <div>
-                    <h2 style={{ fontSize: '1.35rem', marginBottom: '0.35rem', fontWeight: 800 }}>Портфолио</h2>
-                    <p style={{ color: 'var(--muted)', marginBottom: 0, fontSize: '0.9rem' }}>
-                      Витрина опыта и грамот — часть вашего профиля. После проверки модератором можно скачать с подписью портала.
-                    </p>
-                  </div>
-                  <button type="button" className="btn btn-secondary" onClick={() => goTab('profile', 'overview')}>
-                    К профилю
-                  </button>
-                </div>
-                <PortfolioEditor />
-              </div>
             )}
 
             {view === 'settings' && (

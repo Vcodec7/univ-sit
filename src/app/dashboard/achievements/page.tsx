@@ -1,7 +1,15 @@
 'use client';
 
-import DashboardClient from '@/components/DashboardClient';
+import CabinetSubpage from '@/components/CabinetSubpage';
+import AchievementsPanel from '@/components/AchievementsPanel';
 
 export default function DashboardAchievementsPage() {
-  return <DashboardClient view="achievements" />;
+  return (
+    <CabinetSubpage
+      title="Достижения"
+      lead="Собирайте значки по разделам портала. Прогресс считается в фильтрах ниже."
+    >
+      <AchievementsPanel />
+    </CabinetSubpage>
+  );
 }

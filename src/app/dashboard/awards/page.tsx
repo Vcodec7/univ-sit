@@ -1,7 +1,15 @@
 'use client';
 
-import DashboardClient from '@/components/DashboardClient';
+import CabinetSubpage from '@/components/CabinetSubpage';
+import AwardsPanel from '@/components/AwardsPanel';
 
 export default function DashboardAwardsPage() {
-  return <DashboardClient view="awards" />;
+  return (
+    <CabinetSubpage
+      title="Награды"
+      lead="Официальные дипломы, сертификаты и грамоты портала."
+    >
+      <AwardsPanel />
+    </CabinetSubpage>
+  );
 }
