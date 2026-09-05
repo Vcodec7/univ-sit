@@ -7,6 +7,12 @@
   max-width: 40rem;
   padding: 0.55rem 0.8rem 5.75rem !important;
   color: var(--fr-ink);
+  box-sizing: border-box;
+}
+.friends-page *,
+.friends-page *::before,
+.friends-page *::after {
+  box-sizing: border-box;
 }
 
 .friends-page .friends-head {
@@ -97,6 +103,8 @@
   position: relative;
   display: block;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .friends-field > svg {
