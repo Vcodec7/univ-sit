@@ -3,11 +3,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import CaptchaField from '@/components/CaptchaField';
 import EtaCountdown from '@/components/EtaCountdown';
 import toast from 'react-hot-toast';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
 import { VACANCY_APP_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
+import {
+  VACANCY_EMPLOYMENT_RU,
+  VACANCY_FORMAT_RU,
+  paidLabel,
+  type VacancyEmployment,
+} from '@/lib/vacancy-content';
 
 type Question = {
   id: string;
@@ -31,7 +36,15 @@ type Vacancy = {
   closesAt: string | null;
   seats: number | null;
   seatsTaken: number;
+  applyOpen?: boolean;
+  phaseLabel?: string;
   requirements: string[];
+  salaryText: string | null;
+  paid: boolean | null;
+  employmentType: VacancyEmployment | null;
+  duties: string[];
+  offer: string[];
+  about: string | null;
   employer: { title: string; isInternal: boolean; description: string | null };
   questions: Question[];
 };
@@ -44,12 +57,6 @@ type MyApp = {
   createdAt: string;
 } | null;
 
-const FORMAT_RU: Record<string, string> = {
-  offline: 'Очно',
-  hybrid: 'Гибрид',
-  remote: 'Удалённо',
-};
-
 const APP_RU = VACANCY_APP_STATUS_RU;
 
 export default function VacancyDetailClient() {
@@ -59,7 +66,6 @@ export default function VacancyDetailClient() {
   const [myApp, setMyApp] = useState<MyApp>(null);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [cover, setCover] = useState('');
-  const [token, setToken] = useState('');
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [needAuth, setNeedAuth] = useState(false);
@@ -86,10 +92,6 @@ export default function VacancyDetailClient() {
   }, [load]);
 
   const submit = async () => {
-    if (!token) {
-      toast.error('Пройдите проверку');
-      return;
-    }
     setBusy(true);
     try {
       const res = await fetch('/api/vacancies/apply', {
@@ -99,7 +101,6 @@ export default function VacancyDetailClient() {
           vacancyId: id,
           coverLetter: cover,
           answers,
-          captchaToken: token,
           website: '',
         }),
       });
@@ -110,7 +111,6 @@ export default function VacancyDetailClient() {
       void load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Ошибка');
-      setToken('');
     } finally {
       setBusy(false);
     }
@@ -164,24 +164,45 @@ export default function VacancyDetailClient() {
   const activeApp =
     myApp && ['PENDING_REVIEW', 'APPROVED', 'SCREENING', 'PENDING'].includes(myApp.status) ? myApp : null;
   const rejectedApp = myApp?.status === 'REJECTED' ? myApp : null;
-  const canApply = elig?.ok && !activeApp;
+  const applyOpen = vacancy.applyOpen !== false;
+  const canApply = Boolean(elig?.ok && !activeApp && applyOpen);
+  const pay = paidLabel(vacancy.paid, vacancy.salaryText);
+  const empLabel = vacancy.employmentType ? VACANCY_EMPLOYMENT_RU[vacancy.employmentType] : null;
+  const seatsLeft =
+    vacancy.seats != null ? Math.max(0, vacancy.seats - (vacancy.seatsTaken || 0)) : null;
 
   return (
-    <div className="container yp-engage" style={{ padding: '1.5rem 1rem 3rem', maxWidth: 720 }}>
+    <div className="container yp-engage yp-vac" style={{ padding: '1.5rem 1rem 3rem', maxWidth: 760 }}>
       <Link href="/vacancies" style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
         ← Все вакансии
       </Link>
-      <h1 style={{ margin: '0.75rem 0 0.35rem', fontWeight: 800 }}>{vacancy.title}</h1>
-      <p style={{ color: 'var(--muted)', margin: '0 0 1rem' }}>
-        {vacancy.employer.title}
-        {vacancy.employer.isInternal ? ' · Центр' : ''}
-        {vacancy.city ? ` · ${vacancy.city}` : ''} · {FORMAT_RU[vacancy.workFormat] || vacancy.workFormat}
-      </p>
+      <header className="yp-vac__hero">
+        <div>
+          <p className="yp-vac__kicker">
+            {empLabel || 'Вакансия'}
+            {vacancy.employer.isInternal ? ' · Центр' : ''}
+          </p>
+          <h1 className="yp-vac__title">{vacancy.title}</h1>
+          <p className="yp-vac__meta">
+            {vacancy.employer.title}
+            {vacancy.city ? ` · ${vacancy.city}` : ''} · {VACANCY_FORMAT_RU[vacancy.workFormat] || vacancy.workFormat}
+          </p>
+        </div>
+        <div className="yp-vac__pay">
+          {pay ? <strong>{pay}</strong> : <span>Оплата по итогам собеседования</span>}
+          <em className={applyOpen ? '' : 'is-closed'}>{vacancy.phaseLabel || (applyOpen ? 'Идёт набор' : 'Набор закрыт')}</em>
+        </div>
+      </header>
 
-      <ul className="yp-engage__reqs">
+      <ul className="yp-engage__reqs yp-vac__chips">
+        {seatsLeft != null ? (
+          <li className={seatsLeft === 0 ? 'is-warn' : 'is-key'}>
+            {seatsLeft === 0 ? 'Мест нет' : `Осталось мест: ${seatsLeft} из ${vacancy.seats}`}
+          </li>
+        ) : null}
         {(vacancy.ageMin != null || vacancy.ageMax != null) && (
           <li>
-            Возраст:{' '}
+            Возраст{' '}
             {vacancy.ageMin != null && vacancy.ageMax != null
               ? `${vacancy.ageMin}–${vacancy.ageMax}`
               : vacancy.ageMin != null
@@ -191,38 +212,67 @@ export default function VacancyDetailClient() {
         )}
         {vacancy.minReliability > 0 ? <li>Авторитет от {vacancy.minReliability}</li> : null}
         {vacancy.minSocial > 0 ? <li>Соцрейтинг от {vacancy.minSocial}</li> : null}
-        {vacancy.needInstructions ? <li>Нужен пройденный инструктаж</li> : null}
-        {vacancy.seats != null ? (
-          <li>
-            Мест: {Math.max(0, vacancy.seats - (vacancy.seatsTaken || 0))} из {vacancy.seats}
-          </li>
-        ) : null}
+        {vacancy.needInstructions ? <li>Нужен инструктаж</li> : null}
         {vacancy.closesAt ? (
-          <li>
+          <li className="yp-vac__eta">
             <EtaCountdown eta={vacancy.closesAt} prefix="Приём до" doneLabel="Приём закрыт" />
           </li>
         ) : null}
       </ul>
 
+      {vacancy.about || vacancy.employer.description ? (
+        <section className="card-surface yp-vac__block">
+          <h2>О месте</h2>
+          {vacancy.about ? <p>{vacancy.about}</p> : null}
+          {vacancy.employer.description ? (
+            <div
+              className="prose"
+              dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(vacancy.employer.description) }}
+            />
+          ) : null}
+        </section>
+      ) : null}
+
+      {vacancy.duties?.length ? (
+        <section className="card-surface yp-vac__block">
+          <h2>Чем предстоит заниматься</h2>
+          <ul>
+            {vacancy.duties.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {vacancy.offer?.length ? (
+        <section className="card-surface yp-vac__block">
+          <h2>Что получите</h2>
+          <ul>
+            {vacancy.offer.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {vacancy.requirements?.length ? (
-        <div className="card-surface" style={{ padding: '1rem', marginBottom: '1rem' }}>
-          <strong>Что важно</strong>
-          <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.1rem' }}>
+        <section className="card-surface yp-vac__block">
+          <h2>Что важно</h2>
+          <ul>
             {vacancy.requirements.map((r) => (
               <li key={r}>{r}</li>
             ))}
           </ul>
-        </div>
+        </section>
       ) : null}
 
       <div
-        className="prose card-surface"
-        style={{ padding: '1.15rem', marginBottom: '1.25rem' }}
+        className="prose card-surface yp-vac__block"
         dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(vacancy.description) }}
       />
 
       {activeApp || result ? (
-        <div className="card-surface" style={{ padding: '1.25rem', display: 'grid', gap: '0.75rem' }}>
+        <div className="card-surface yp-vac__block" style={{ display: 'grid', gap: '0.75rem' }}>
           <strong>
             {result || `Статус: ${statusRu(APP_RU, activeApp!.status)}`}
           </strong>
@@ -243,8 +293,11 @@ export default function VacancyDetailClient() {
           </div>
         </div>
       ) : (
-        <div className="card-surface" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="card-surface yp-vac__block" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Отклик</h2>
+          {!applyOpen ? (
+            <p style={{ color: '#b45309', margin: 0 }}>{vacancy.phaseLabel || 'Набор закрыт'}</p>
+          ) : null}
           {elig && !elig.ok && (
             <div>
               <p style={{ color: '#b45309', margin: '0 0 0.75rem' }}>{elig.message}</p>
@@ -272,6 +325,7 @@ export default function VacancyDetailClient() {
                 value={cover}
                 onChange={(e) => setCover(e.target.value)}
                 rows={3}
+                placeholder="Коротко: почему вы, какой опыт, когда можете выйти"
                 style={{ width: '100%', padding: 10, borderRadius: 10, border: '1px solid rgba(15,23,42,0.12)' }}
               />
               {vacancy.questions.map((q) => {
@@ -321,7 +375,9 @@ export default function VacancyDetailClient() {
                   </div>
                 );
               })}
-              <CaptchaField onToken={setToken} />
+              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--muted)' }}>
+                Вы уже в аккаунте — проверка картинками не нужна. Отклик уйдёт в кабинет заявок.
+              </p>
               <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void submit()}>
                 {busy ? 'Отправка…' : 'Отправить отклик'}
               </button>

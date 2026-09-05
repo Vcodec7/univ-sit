@@ -9,12 +9,13 @@ import { checkVacancyEligibility, scoreVacancyAnswers } from '@/lib/vacancy-elig
 import { bumpEcoPoints, ECO } from '@/lib/eco-points';
 import { evaluateAchievements } from '@/lib/award-achievements';
 import { assertSameOrigin } from '@/lib/csrf-origin';
+import { createUserNotification } from '@/lib/security';
 
 const bodySchema = z.object({
   vacancyId: z.string().min(1),
   coverLetter: z.string().max(2000).optional(),
   answers: z.record(z.string(), z.unknown()).default({}),
-  captchaToken: z.string().min(10),
+  captchaToken: z.string().optional(),
   website: z.string().optional(),
 });
 
@@ -38,9 +39,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: parsed.error.issues[0]?.message || 'Некорректные данные' }, { status: 400 });
     }
 
-    const cap = await consumeCaptchaToken(parsed.data.captchaToken, parsed.data.website);
-    if (!cap.ok) {
-      return NextResponse.json({ message: cap.message }, { status: 400 });
+    const token = parsed.data.captchaToken?.trim() || '';
+    if (token) {
+      const cap = await consumeCaptchaToken(token, parsed.data.website);
+      if (!cap.ok) {
+        return NextResponse.json({ message: cap.message }, { status: 400 });
+      }
     }
 
     const elig = await checkVacancyEligibility(session.user.id, parsed.data.vacancyId);
@@ -99,6 +103,16 @@ export async function POST(req: Request) {
       }).catch(() => null);
       await evaluateAchievements(session.user.id).catch(() => null);
     }
+
+    await createUserNotification({
+      userId: session.user.id,
+      type: 'VACANCY',
+      title: autoPassed ? 'Отклик отправлен' : 'Скрининг не пройден',
+      body: autoPassed
+        ? `Заявка на «${vacancy.title}» на рассмотрении. Статус — в кабинете.`
+        : `По вакансии «${vacancy.title}» автопредотбор не пройден.`,
+      meta: { href: `/vacancies/${parsed.data.vacancyId}`, vacancyId: parsed.data.vacancyId, status },
+    }).catch(() => null);
 
     return NextResponse.json({
       ok: true,

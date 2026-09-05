@@ -34,8 +34,18 @@ export default function AdminVacanciesClient() {
   const [empTitle, setEmpTitle] = useState('Центр развития молодежи Сочи');
   const [vacTitle, setVacTitle] = useState('');
   const [vacEmployerId, setVacEmployerId] = useState('');
-  const [vacDesc, setVacDesc] = useState('<p>Описание вакансии</p>');
-  const [qPrompt, setQPrompt] = useState('Готовы работать офлайн в Сочи?');
+  const [vacDesc, setVacDesc] = useState(
+    '<p>Стажировка у партнёра Центра. React/Node, менторство, разбор реальных задач.</p>'
+  );
+  const [vacPay, setVacPay] = useState('Стипендия 25 000 ₽ / мес');
+  const [vacEmp, setVacEmp] = useState('internship');
+  const [vacPaid, setVacPaid] = useState('yes');
+  const [vacDuties, setVacDuties] = useState('Верстка экранов с наставником\nПравки по ревью\nУчастие в стендапах команды');
+  const [vacOffer, setVacOffer] = useState('Ментор и разбор кода\nРекомендация в портфолио\nГибкий график 20 ч/нед');
+  const [vacAbout, setVacAbout] = useState('IT-партнёр Центра в Сочи: продуктовая команда, гибрид с офисом у моря.');
+  const [vacReqs, setVacReqs] = useState('Инструктаж в профиле\nАккаунт без блокировки\nГотовность выходить в Сочи 2 дня в неделю');
+  const [vacAge, setVacAge] = useState('14');
+  const [qPrompt, setQPrompt] = useState('Основной стек?');
   const [qCorrect, setQCorrect] = useState('Да');
 
   const load = useCallback(async () => {
@@ -141,6 +151,34 @@ export default function AdminVacanciesClient() {
           </select>
           <input placeholder="Название" value={vacTitle} onChange={(e) => setVacTitle(e.target.value)} />
           <textarea rows={3} value={vacDesc} onChange={(e) => setVacDesc(e.target.value)} />
+          <input placeholder="Оплата / стипендия" value={vacPay} onChange={(e) => setVacPay(e.target.value)} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <select value={vacEmp} onChange={(e) => setVacEmp(e.target.value)}>
+              <option value="internship">Стажировка</option>
+              <option value="part_time">Подработка</option>
+              <option value="full_time">Полная занятость</option>
+              <option value="project">Проект / смена</option>
+              <option value="volunteer">Волонтёрство</option>
+            </select>
+            <select value={vacPaid} onChange={(e) => setVacPaid(e.target.value)} aria-label="Оплата">
+              <option value="yes">Оплачивается</option>
+              <option value="no">Без оплаты</option>
+              <option value="unk">Не указано</option>
+            </select>
+            <input
+              type="number"
+              min={14}
+              max={35}
+              value={vacAge}
+              onChange={(e) => setVacAge(e.target.value)}
+              aria-label="Возраст от"
+              style={{ width: 96 }}
+            />
+          </div>
+          <textarea rows={2} placeholder="О работодателе" value={vacAbout} onChange={(e) => setVacAbout(e.target.value)} />
+          <textarea rows={3} placeholder="Чем заниматься (по строке)" value={vacDuties} onChange={(e) => setVacDuties(e.target.value)} />
+          <textarea rows={3} placeholder="Что получите (по строке)" value={vacOffer} onChange={(e) => setVacOffer(e.target.value)} />
+          <textarea rows={3} placeholder="Что важно (по строке)" value={vacReqs} onChange={(e) => setVacReqs(e.target.value)} />
           <input placeholder="Вопрос скрининга" value={qPrompt} onChange={(e) => setQPrompt(e.target.value)} />
           <input placeholder="Правильный ответ" value={qCorrect} onChange={(e) => setQCorrect(e.target.value)} />
           <button
@@ -153,18 +191,26 @@ export default function AdminVacanciesClient() {
                 title: vacTitle,
                 description: vacDesc,
                 status: 'OPEN',
-                workFormat: 'offline',
+                workFormat: 'hybrid',
                 city: 'Сочи',
+                ageMin: Number(vacAge) || 14,
                 needInstructions: true,
                 screenPassScore: 70,
+                salaryText: vacPay,
+                paid: vacPaid === 'unk' ? null : vacPaid === 'yes',
+                employmentType: vacEmp,
+                about: vacAbout,
+                duties: vacDuties.split('\n').map((s) => s.trim()).filter(Boolean),
+                offer: vacOffer.split('\n').map((s) => s.trim()).filter(Boolean),
+                requirements: vacReqs.split('\n').map((s) => s.trim()).filter(Boolean),
                 questions: [
                   {
                     kind: 'single',
                     prompt: qPrompt,
-                    options: ['Да', 'Нет'],
+                    options: ['React', 'Node', 'Другое'],
                     correct: qCorrect,
                     weight: 1,
-                    knockout: true,
+                    knockout: false,
                   },
                 ],
               })

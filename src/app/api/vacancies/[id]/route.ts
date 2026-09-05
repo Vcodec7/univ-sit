@@ -5,6 +5,12 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { checkVacancyEligibility } from '@/lib/vacancy-eligibility';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
+import {
+  filterAgeDuplicateItems,
+  parseVacancyRequirements,
+  vacancyIsApplyOpen,
+  vacancyPhaseLabel,
+} from '@/lib/vacancy-content';
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   {
@@ -39,7 +45,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       },
     },
   });
-  if (!vacancy || vacancy.status !== 'OPEN' || vacancy.employer.status !== 'APPROVED') {
+  if (!vacancy || vacancy.status === 'DRAFT' || vacancy.employer.status !== 'APPROVED') {
     return NextResponse.json({ message: 'Вакансия недоступна' }, { status: 404 });
   }
 
@@ -60,13 +66,15 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     },
   });
 
-  const requirements: string[] = [];
-  try {
-    const raw = vacancy.requirementsJson ? JSON.parse(vacancy.requirementsJson) : [];
-    if (Array.isArray(raw)) requirements.push(...raw.map(String).filter(Boolean));
-  } catch {
-    /* ignore */
-  }
+  const content = parseVacancyRequirements(vacancy.requirementsJson);
+  const requirements = filterAgeDuplicateItems(content.items, vacancy.ageMin, vacancy.ageMax);
+  const seatsTaken = vacancy._count.applications;
+  const applyOpen = vacancyIsApplyOpen({
+    status: vacancy.status,
+    closesAt: vacancy.closesAt,
+    seats: vacancy.seats,
+    seatsTaken,
+  });
 
   return NextResponse.json({
     vacancy: {
@@ -82,8 +90,21 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       needInstructions: vacancy.needInstructions,
       closesAt: vacancy.closesAt,
       seats: vacancy.seats,
-      seatsTaken: vacancy._count.applications,
+      seatsTaken,
+      applyOpen,
+      phaseLabel: vacancyPhaseLabel({
+        status: vacancy.status,
+        closesAt: vacancy.closesAt,
+        seats: vacancy.seats,
+        seatsTaken,
+      }),
       requirements,
+      salaryText: content.salaryText,
+      paid: content.paid,
+      employmentType: content.employmentType,
+      duties: content.duties,
+      offer: content.offer,
+      about: content.about,
       employer: {
         ...vacancy.employer,
         description: vacancy.employer.description

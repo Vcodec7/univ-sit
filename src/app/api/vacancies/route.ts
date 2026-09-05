@@ -3,6 +3,12 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import {
+  parseVacancyRequirements,
+  paidLabel,
+  vacancyIsApplyOpen,
+  vacancyPhaseLabel,
+} from '@/lib/vacancy-content';
 
 /** Open vacancies — members only */
 export async function GET(req: Request) {
@@ -74,18 +80,37 @@ export async function GET(req: Request) {
   });
 
   return NextResponse.json({
-    items: items.map((v) => ({
-      id: v.id,
-      title: v.title,
-      city: v.city,
-      workFormat: v.workFormat,
-      closesAt: v.closesAt,
-      seats: v.seats,
-      seatsTaken: v._count.applications,
-      employer: v.employer,
-      _count: { questions: v._count.questions },
-      mine: mine[v.id] || null,
-    })),
+    items: items.map((v) => {
+      const content = parseVacancyRequirements(v.requirementsJson);
+      const seatsTaken = v._count.applications;
+      const applyOpen = vacancyIsApplyOpen({
+        status: v.status,
+        closesAt: v.closesAt,
+        seats: v.seats,
+        seatsTaken,
+      });
+      return {
+        id: v.id,
+        title: v.title,
+        city: v.city,
+        workFormat: v.workFormat,
+        closesAt: v.closesAt,
+        seats: v.seats,
+        seatsTaken,
+        applyOpen,
+        phaseLabel: vacancyPhaseLabel({
+          status: v.status,
+          closesAt: v.closesAt,
+          seats: v.seats,
+          seatsTaken,
+        }),
+        pay: paidLabel(content.paid, content.salaryText),
+        employmentType: content.employmentType,
+        employer: v.employer,
+        _count: { questions: v._count.questions },
+        mine: mine[v.id] || null,
+      };
+    }),
     cities: cities.map((c) => c.city).filter(Boolean) as string[],
   });
 }

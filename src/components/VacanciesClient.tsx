@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Briefcase, Building2, MapPin, Clock } from 'lucide-react';
 import EtaCountdown from '@/components/EtaCountdown';
 import { VACANCY_APP_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
+import { VACANCY_EMPLOYMENT_RU, VACANCY_FORMAT_RU, type VacancyEmployment } from '@/lib/vacancy-content';
 
 type Item = {
   id: string;
@@ -14,19 +15,16 @@ type Item = {
   closesAt: string | null;
   seats: number | null;
   seatsTaken: number;
+  applyOpen?: boolean;
+  phaseLabel?: string;
+  pay?: string | null;
+  employmentType?: VacancyEmployment | null;
   employer: { title: string; isInternal: boolean };
   _count: { questions: number };
   mine: { id: string; status: string; autoScore: number | null } | null;
 };
 
-const FORMAT_RU: Record<string, string> = {
-  offline: 'Очно',
-  hybrid: 'Гибрид',
-  remote: 'Удалённо',
-};
-
 const APP_STATUS_RU = VACANCY_APP_STATUS_RU;
-
 
 export default function VacanciesClient() {
   const [items, setItems] = useState<Item[]>([]);
@@ -74,8 +72,8 @@ export default function VacanciesClient() {
             <Briefcase size={28} /> Вакансии
           </h1>
           <p style={{ color: 'var(--muted)', margin: '0.5rem 0 0' }}>
-            Стажировки и предложения Центра и проверенных партнёров. Отклик проходит авто-предотбор, затем
-            рассмотрение.
+            Стажировки, подработка и первые роли у Центра и партнёров. Сразу видно оплату, формат и остаток мест.
+            Отклик — из аккаунта, без лишней капчи.
           </p>
         </div>
         <Link href="/vacancies/employer" className="btn btn-secondary">
@@ -166,13 +164,16 @@ export default function VacanciesClient() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {items.map((v) => (
-            <Link key={v.id} href={`/vacancies/${v.id}`} className="card-surface yp-engage__card">
+          {items.map((v) => {
+            const seatsLeft = v.seats != null ? Math.max(0, v.seats - (v.seatsTaken || 0)) : null;
+            const closed = v.applyOpen === false;
+            return (
+            <Link key={v.id} href={`/vacancies/${v.id}`} className={`card-surface yp-engage__card${closed ? ' is-closed' : ''}`}>
               <div className="yp-engage__card-top">
                 <strong style={{ fontSize: '1.05rem' }}>{v.title}</strong>
-                {v.mine ? (
-                  <span className="yp-engage__badge">{statusRu(APP_STATUS_RU, v.mine.status)}</span>
-                ) : null}
+                <span className={`yp-engage__badge${closed ? ' is-done' : ''}`}>
+                  {v.mine ? statusRu(APP_STATUS_RU, v.mine.status) : v.phaseLabel || (closed ? 'Набор закрыт' : 'Идёт набор')}
+                </span>
               </div>
               <div style={{ color: 'var(--muted)', fontSize: '0.88rem', marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: '0.55rem' }}>
                 <span>{v.employer.title}{v.employer.isInternal ? ' · Центр' : ''}</span>
@@ -181,11 +182,13 @@ export default function VacanciesClient() {
                     <MapPin size={12} /> {v.city}
                   </span>
                 ) : null}
-                <span>{FORMAT_RU[v.workFormat] || v.workFormat}</span>
+                <span>{VACANCY_FORMAT_RU[v.workFormat] || v.workFormat}</span>
+                {v.employmentType ? <span>{VACANCY_EMPLOYMENT_RU[v.employmentType]}</span> : null}
+                {v.pay ? <span className="yp-vac__list-pay">{v.pay}</span> : null}
                 {v._count.questions ? <span>Предотбор: {v._count.questions} вопр.</span> : null}
-                {v.seats != null ? (
+                {seatsLeft != null ? (
                   <span>
-                    Мест: {Math.max(0, v.seats - (v.seatsTaken || 0))} / {v.seats}
+                    {seatsLeft === 0 ? 'Мест нет' : `Мест: ${seatsLeft} / ${v.seats}`}
                   </span>
                 ) : null}
               </div>
@@ -196,7 +199,8 @@ export default function VacanciesClient() {
                 </div>
               ) : null}
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

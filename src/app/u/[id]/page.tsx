@@ -97,6 +97,7 @@ type PublicProfile = {
   };
   contestWins?: { place: number; title: string; kind: string; href: string }[];
   programWins?: { title: string; kind: string; kindLabel: string; href: string }[];
+  vacancyWins?: { title: string; href: string }[];
   mutualTrust: {
     score: number;
     label: string;
@@ -639,6 +640,21 @@ function PublicUserPageInner() {
               ) : null}
             </div>
           )}
+
+          {profile.vacancyWins && profile.vacancyWins.length > 0 ? (
+            <div className="yp-profile__card">
+              <h2>
+                <Briefcase size={16} /> Офферы и стажировки
+              </h2>
+              <ul className="yp-profile__wins">
+                {profile.vacancyWins.map((w) => (
+                  <li key={w.href}>
+                    <Link href={w.href}>{w.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {profile.programWins && profile.programWins.length > 0 ? (
             <div className="yp-profile__card">

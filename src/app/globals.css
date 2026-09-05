@@ -23078,6 +23078,91 @@ button.profile-hero__bio-cta {
   font-size: 0.78rem;
   color: #475569;
 }
+.yp-engage__reqs li.is-key {
+  background: rgba(133, 98, 216, 0.1);
+  border-color: rgba(133, 98, 216, 0.22);
+  color: #5b3dad;
+  font-weight: 700;
+}
+.yp-engage__reqs li.is-warn {
+  background: rgba(180, 83, 9, 0.1);
+  border-color: rgba(180, 83, 9, 0.2);
+  color: #b45309;
+  font-weight: 700;
+}
+.yp-engage__card.is-closed {
+  opacity: 0.88;
+}
+.yp-vac__list-pay {
+  color: #166534;
+  font-weight: 700;
+}
+.yp-vac__hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.75rem 0 1rem;
+  align-items: flex-start;
+}
+.yp-vac__kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6e4bc4;
+}
+.yp-vac__title {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  line-height: 1.15;
+}
+.yp-vac__meta {
+  color: var(--muted);
+  margin: 0.4rem 0 0;
+}
+.yp-vac__pay {
+  min-width: 11rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 16px;
+  background: linear-gradient(165deg, #f7f3ff, #fff);
+  border: 1px solid rgba(133, 98, 216, 0.18);
+  display: grid;
+  gap: 0.2rem;
+}
+.yp-vac__pay strong {
+  font-size: 0.98rem;
+}
+.yp-vac__pay span,
+.yp-vac__pay em {
+  font-size: 0.78rem;
+  font-style: normal;
+  color: #64748b;
+}
+.yp-vac__pay em.is-closed {
+  color: #b45309;
+  font-weight: 700;
+}
+.yp-vac__block {
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 0.85rem;
+}
+.yp-vac__block h2 {
+  margin: 0 0 0.55rem;
+  font-size: 1.02rem;
+}
+.yp-vac__block p {
+  margin: 0 0 0.5rem;
+}
+.yp-vac__block ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+.yp-vac__chips {
+  margin-bottom: 1.1rem;
+}
 
 
 /* ========== Unified Modal / Dialog ========== */

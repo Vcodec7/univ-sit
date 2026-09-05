@@ -8,6 +8,7 @@ import { bumpSocialScore } from '@/lib/reputation';
 import { evaluateAchievements } from '@/lib/award-achievements';
 import { createUserNotification } from '@/lib/security';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
+import { parseVacancyRequirements, serializeVacancyRequirements } from '@/lib/vacancy-content';
 
 export async function GET() {
   try {
@@ -69,11 +70,42 @@ export async function POST(req: Request) {
       const id = body.id ? String(body.id) : null;
       const employerId = String(body.employerId || '');
       if (!employerId) return NextResponse.json({ message: 'Работодатель обязателен' }, { status: 400 });
+      const prev = id
+        ? parseVacancyRequirements(
+            (
+              await prisma.vacancy.findUnique({
+                where: { id },
+                select: { requirementsJson: true },
+              })
+            )?.requirementsJson
+          )
+        : parseVacancyRequirements(null);
+      const items = Array.isArray(body.requirements)
+        ? body.requirements.map((x: unknown) => String(x).trim()).filter(Boolean)
+        : typeof body.requirements === 'string'
+          ? String(body.requirements)
+              .split('\n')
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : prev.items;
       const data = {
         employerId,
         title: String(body.title || '').trim(),
         description: sanitizeCmsHtml(String(body.description || '')),
-        requirementsJson: body.requirements ? JSON.stringify(body.requirements) : null,
+        requirementsJson: serializeVacancyRequirements({
+          items,
+          salaryText: body.salaryText !== undefined ? String(body.salaryText || '') : prev.salaryText,
+          paid: body.paid === undefined ? prev.paid : body.paid === null ? null : Boolean(body.paid),
+          employmentType:
+            body.employmentType !== undefined ? String(body.employmentType || '') : prev.employmentType,
+          duties: Array.isArray(body.duties)
+            ? body.duties.map((x: unknown) => String(x).trim()).filter(Boolean)
+            : prev.duties,
+          offer: Array.isArray(body.offer)
+            ? body.offer.map((x: unknown) => String(x).trim()).filter(Boolean)
+            : prev.offer,
+          about: body.about !== undefined ? String(body.about || '') : prev.about,
+        }),
         workFormat: String(body.workFormat || 'offline'),
         city: body.city ? String(body.city) : null,
         ageMin: body.ageMin != null ? Number(body.ageMin) : null,
@@ -139,6 +171,16 @@ export async function POST(req: Request) {
           type: 'VACANCY',
           title: 'Отклик одобрен',
           body: 'Вас пригласили на следующий этап по вакансии',
+          meta: { href: `/vacancies/${app.vacancyId}` },
+        }).catch(() => null);
+      } else {
+        await createUserNotification({
+          userId: app.userId,
+          type: 'VACANCY',
+          title: 'Отклик не принят',
+          body: body.rejectReason
+            ? String(body.rejectReason).slice(0, 180)
+            : 'По этой вакансии пока другое решение. Можно смотреть новые предложения.',
           meta: { href: `/vacancies/${app.vacancyId}` },
         }).catch(() => null);
       }
