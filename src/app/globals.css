@@ -24114,8 +24114,48 @@ fieldset.svc-form-group,
 
 .nav-pill--mobile-cta {
   height: 2.15rem;
-  padding: 0 0.9rem;
+  min-width: 5.2rem;
+  width: 5.2rem;
+  padding: 0 0.35rem;
   font-size: 0.82rem;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+button.nav-pill,
+a.nav-pill {
+  font-family: inherit;
+  line-height: 1;
+  margin: 0;
+  box-sizing: border-box;
+}
+button.nav-pill {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.nav-auth-mobile__profile {
+  width: 2.15rem;
+  height: 2.15rem;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+.nav-auth-mobile__profile.is-spacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+html:not(.has-session) .nav-auth-mobile__profile.is-spacer {
+  display: none;
+}
+html.has-session .nav-auth-mobile {
+  min-width: 7.55rem;
+}
+.nav-icon-btn--reserve {
+  width: 38px;
+  height: 38px;
+  visibility: hidden;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 /* Presence / cabinet QR — airy service layout */
@@ -24800,7 +24840,9 @@ fieldset.svc-form-group,
   }
   .nav-pill--mobile-cta {
     height: 2rem;
-    padding: 0 0.7rem;
+    min-width: 5.2rem;
+    width: 5.2rem;
+    padding: 0 0.35rem;
     font-size: 0.78rem;
   }
   .glass-nav-end {

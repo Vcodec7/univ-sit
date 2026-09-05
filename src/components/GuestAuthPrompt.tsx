@@ -12,6 +12,8 @@ type Props = {
   children: ReactNode;
   /** Prefer button semantics when styling matches a CTA pill */
   asButton?: boolean;
+  /** Use the destination link before NextAuth finishes (stable header chrome). */
+  preferLink?: boolean;
 };
 
 /**
@@ -24,11 +26,12 @@ export default function GuestAuthPrompt({
   title,
   children,
   asButton = false,
+  preferLink = false,
 }: Props) {
   const { status } = useSession();
   const [open, setOpen] = useState(false);
   const titleId = useId();
-  const authed = status === 'authenticated';
+  const authed = status === 'authenticated' || preferLink;
   const loginHref = `/login?callbackUrl=${encodeURIComponent(href)}`;
   const registerHref = `/register?callbackUrl=${encodeURIComponent(href)}`;
 

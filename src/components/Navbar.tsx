@@ -57,7 +57,7 @@ import {
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import SiteBrand from '@/components/SiteBrand';
 import NavProfileCard from '@/components/NavProfileCard';
@@ -68,7 +68,7 @@ import { encodeRouteParam } from '@/lib/route-id';
 import { isPrimaryHeaderSlug } from '@/lib/nav-catalog';
 import { fetchProfileCached } from '@/lib/user-data-client';
 import { requestOpenQuickAccess } from '@/lib/quick-access';
-import { persistSessionHint } from '@/lib/session-hint';
+import { persistSessionHint, readSessionHint } from '@/lib/session-hint';
 
 type OpenMenu = 'projects' | 'clubs' | 'spaces' | 'more' | 'account' | null;
 
@@ -90,7 +90,12 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   const isScanner = userRole === 'SCANNER';
   const isTech = userRole === 'TECH';
   const isStaff = userRole === 'ADMIN' || userRole === 'MODERATOR';
+  const [sessionHint, setSessionHint] = useState(false);
   const [publicCode, setPublicCode] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    setSessionHint(readSessionHint());
+  }, [status]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -353,16 +358,17 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   );
 
   // Guest links must stay visible during session resolve — never leave empty ghost placeholders.
-  // Authenticated chrome only after status === 'authenticated' (has-session CSS reserves width).
+  // Authenticated chrome after session OR first-paint yp-session hint (stops Запись from jumping).
   const isAuthenticated = status === 'authenticated' && Boolean(session);
-  const authIconCount = isAuthenticated ? 2 : 3;
+  const showAuthedNav = isAuthenticated || (status === 'loading' && sessionHint);
+  const authIconCount = showAuthedNav ? 2 : 3;
 
   const renderAuthIcons = () => (
     <div
       className="nav-auth-slot"
       style={{ ['--nav-auth-slots' as string]: authIconCount }}
     >
-      {!isAuthenticated ? (
+      {!showAuthedNav ? (
         <div className="nav-auth-icons nav-auth-guest">
           <GuestAuthPrompt
             href="/coworking"
@@ -383,7 +389,11 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         </div>
       ) : (
         <div className="nav-auth-icons nav-auth-icons--compact">
-          {modOn(siteSettings, 'notifications') ? <NotificationsBell compact useNavStyle /> : null}
+          {isAuthenticated && modOn(siteSettings, 'notifications') ? (
+            <NotificationsBell compact useNavStyle />
+          ) : (
+            <span className="nav-icon-btn nav-icon-btn--reserve" aria-hidden />
+          )}
           <div className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}>
             <button
               type="button"
@@ -401,11 +411,11 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
               <div className="dropdown nav-account-menu" role="menu">
                 <div className="nav-account-menu__head">
                   <strong>
-                    {(session.user as { nickname?: string | null })?.nickname ||
-                      session.user?.name ||
+                    {(session?.user as { nickname?: string | null } | undefined)?.nickname ||
+                      session?.user?.name ||
                       'Аккаунт'}
                   </strong>
-                  <span>{session.user?.email}</span>
+                  <span>{session?.user?.email}</span>
                 </div>
                 <Link href={profileHref} className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
                   <UserCircle size={16} aria-hidden />
@@ -572,31 +582,21 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   }, [headerMainPages.length, projects.length, clubs.length, spaces.length]);
 
 
-  /** Mobile: CTA + burger only — search lives inside the menu (no header crush). */
-  const renderMobileHeaderActions = () => {
-    if (!isAuthenticated) {
-      return (
-        <div className="nav-auth-mobile__row nav-auth-mobile__row--guest">
-          <GuestAuthPrompt
-            href="/coworking"
-            className="nav-pill nav-pill--solid nav-pill--mobile-cta"
-            title="Записаться"
-            asButton
-          >
-            Запись
-          </GuestAuthPrompt>
-        </div>
-      );
-    }
-    return (
-      <div className="nav-auth-mobile__row nav-auth-mobile__row--session">
-        <GuestAuthPrompt
-          href="/coworking"
-          className="nav-pill nav-pill--solid nav-pill--mobile-cta"
-          title="Записаться"
-        >
-          Запись
-        </GuestAuthPrompt>
+  /** Mobile: CTA always the same width; profile slot reserved so refresh does not shove Запись. */
+  const renderMobileHeaderActions = () => (
+    <div
+      className={`nav-auth-mobile__row${showAuthedNav ? ' nav-auth-mobile__row--session' : ' nav-auth-mobile__row--guest'}`}
+    >
+      <GuestAuthPrompt
+        href="/coworking"
+        className="nav-pill nav-pill--solid nav-pill--mobile-cta"
+        title="Записаться"
+        preferLink={showAuthedNav}
+        asButton={!showAuthedNav}
+      >
+        Запись
+      </GuestAuthPrompt>
+      {showAuthedNav ? (
         <Link
           href={profileHref}
           className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
@@ -606,9 +606,11 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         >
           <UserCircle size={18} aria-hidden />
         </Link>
-      </div>
-    );
-  };
+      ) : (
+        <span className="nav-auth-mobile__profile is-spacer" aria-hidden />
+      )}
+    </div>
+  );
 
 
   return (
@@ -830,7 +832,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             {/* Search moves into burger menu on narrow screens to avoid logo crush */}
           </div>
           <div
-            className={`nav-auth-desktop${isAuthenticated ? ' nav-auth-desktop--session' : ' nav-auth-desktop--guest'}`}
+            className={`nav-auth-desktop${showAuthedNav ? ' nav-auth-desktop--session' : ' nav-auth-desktop--guest'}`}
           >
             {renderAuthIcons()}
           </div>

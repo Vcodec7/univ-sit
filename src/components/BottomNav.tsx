@@ -56,6 +56,11 @@ export default function BottomNav() {
   const pathname = usePathname() || '/';
   const [unread, setUnread] = useState(0);
   const [modules, setModules] = useState<Record<string, boolean> | null>(null);
+  const [dockHint, setDockHint] = useState(false);
+
+  useLayoutEffect(() => {
+    setDockHint(document.documentElement.classList.contains('has-bottom-nav'));
+  }, []);
 
   const role = (session?.user as { role?: string } | undefined)?.role;
   const hideForRole = role === 'SCANNER' || role === 'TECH';
@@ -71,7 +76,9 @@ export default function BottomNav() {
     pathname.startsWith('/maintenance');
 
   const visible =
-    status === 'authenticated' && !!session?.user && !hideForRole && !immersive;
+    !immersive &&
+    !hideForRole &&
+    ((status === 'authenticated' && !!session?.user) || (status === 'loading' && dockHint));
 
   useEffect(() => {
     let cancelled = false;

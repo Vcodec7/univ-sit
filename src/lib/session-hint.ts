@@ -12,3 +12,8 @@ export function persistSessionHint(on: boolean) {
   }
   document.documentElement.classList.toggle('has-session', on);
 }
+
+export function readSessionHint(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.documentElement.classList.contains('has-session');
+}
