@@ -1,28 +1,29 @@
 /* Brand tokens bundled via src/app/layout.tsx (single CSS payload).
    Keep this file as the source of live tokens; do not also <link> it from HTML. */
 :root {
-  --yp-purple: #6a42c2;
-  --yp-purple-deep: #53339c;
-  --yp-lime: #c1d92e;
-  --yp-lime-deep: #a8c116;
-  --background: #f7f6fb;
-  --foreground: #1b1430;
-  --primary: #6a42c2;
-  --primary-hover: #53339c;
-  --secondary: #53339c;
-  --accent: #c1d92e;
-  --muted: #5c5670;
+  --yp-purple: #8562d8;
+  --yp-purple-deep: #6e4bc4;
+  --yp-lime: #afca03;
+  --yp-lime-deep: #8fa502;
+  --background: #fafbf4;
+  --foreground: #0a0c2a;
+  --primary: #8562d8;
+  --primary-hover: #6e4bc4;
+  --secondary: #6e4bc4;
+  --accent: #afca03;
+  --accent-hover: #8fa502;
+  --muted: #5a5670;
   --card-bg: #ffffff;
-  --card-border: #e4dff2;
+  --card-border: #e6e2f2;
   --surface: #ffffff;
-  --surface-elevated: #efe8fb;
-  --ink-soft: #1b1430;
-  --brand-soft: #efe8fb;
-  --brand-pill: #f3f8d4;
-  --line: #e4dff2;
-  --shadow-sm: 0 4px 16px rgba(106, 66, 194, 0.08);
-  --shadow-md: 0 8px 28px rgba(106, 66, 194, 0.1);
-  --shadow-lg: 0 16px 40px rgba(106, 66, 194, 0.12);
+  --surface-elevated: #eee9fb;
+  --ink-soft: #0a0c2a;
+  --brand-soft: #eee9fb;
+  --brand-pill: #f3f8c4;
+  --line: #e6e2f2;
+  --shadow-sm: 0 4px 16px rgba(133, 98, 216, 0.08);
+  --shadow-md: 0 8px 28px rgba(133, 98, 216, 0.1);
+  --shadow-lg: 0 16px 40px rgba(133, 98, 216, 0.12);
   --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px));
 }
 
@@ -41,7 +42,7 @@
   min-height: var(--yp-hero-h) !important;
   height: var(--yp-hero-h) !important;
   overflow: hidden !important;
-  background: #1b1430 !important;
+  background: #0a0c2a !important;
   border-radius: 0 !important;
 }
 .svc-hero::after {
@@ -51,8 +52,8 @@
   z-index: 2;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(27, 20, 48, 0.88) 0%, rgba(27, 20, 48, 0.42) 48%, rgba(27, 20, 48, 0.12) 100%),
-    linear-gradient(180deg, rgba(27, 20, 48, 0.08) 18%, rgba(27, 20, 48, 0.52) 100%);
+    linear-gradient(90deg, rgba(10, 12, 42, 0.88) 0%, rgba(10, 12, 42, 0.42) 48%, rgba(10, 12, 42, 0.12) 100%),
+    linear-gradient(180deg, rgba(10, 12, 42, 0.08) 18%, rgba(10, 12, 42, 0.52) 100%);
 }
 .svc-hero .container.svc-hero__grid,
 .svc-hero .svc-hero__grid.container {
@@ -143,7 +144,7 @@
 .svc-hero .svc-hero__lead { color: rgba(255, 255, 255, 0.92) !important; max-width: min(36rem, 100%) !important; }
 .svc-hero .svc-hero__eyebrow {
   display: inline-flex !important;
-  color: #c1d92e !important;
+  color: #afca03 !important;
   background: rgba(0, 0, 0, 0.38) !important;
   border-radius: 999px !important;
   padding: 0.22rem 0.7rem !important;
@@ -212,7 +213,7 @@
   box-shadow: none !important;
 }
 .svc-hero__switch-btn.is-on {
-  background: #6a42c2 !important;
+  background: #8562d8 !important;
 }
 .svc-hero__switch-btn:not(.is-on) {
   background: rgba(255, 255, 255, 0.14) !important;
@@ -241,11 +242,11 @@
   position: relative !important;
   padding-bottom: 2.75rem !important;
   isolation: isolate;
-  background-color: #f4f1fa !important;
+  background-color: #fafbf4 !important;
   background-image:
-    radial-gradient(1180px 540px at 8% -12%, rgba(106, 66, 194, 0.12), transparent 62%),
-    radial-gradient(900px 460px at 100% 12%, rgba(193, 217, 46, 0.11), transparent 58%),
-    radial-gradient(780px 420px at 70% 100%, rgba(106, 66, 194, 0.07), transparent 55%),
+    radial-gradient(1180px 540px at 8% -12%, rgba(133, 98, 216, 0.12), transparent 62%),
+    radial-gradient(900px 460px at 100% 12%, rgba(175, 202, 3, 0.11), transparent 58%),
+    radial-gradient(780px 420px at 70% 100%, rgba(133, 98, 216, 0.07), transparent 55%),
     linear-gradient(180deg, #f8f6fc 0%, #f3eef9 48%, #f5f7ee 100%) !important;
 }
 .home-page::before {
@@ -337,11 +338,15 @@
 }
 
 .btn-primary {
-  box-shadow: 0 4px 14px rgba(106, 66, 194, 0.28) !important;
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 4px 14px rgba(175, 202, 3, 0.32) !important;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 8px 22px rgba(106, 66, 194, 0.28) !important;
+  background: var(--yp-lime-deep) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 8px 22px rgba(175, 202, 3, 0.36) !important;
 }
 
 .qa-fab {
@@ -350,15 +355,15 @@
 
 /* Site-wide brand canvas + auth (applies without Docker rebuild) */
 body:not(.is-admin) {
-  background-color: #f4f1fa !important;
+  background-color: #fafbf4 !important;
   background-image:
-    radial-gradient(1180px 540px at 8% -12%, rgba(106, 66, 194, 0.1), transparent 62%),
-    radial-gradient(900px 460px at 100% 8%, rgba(193, 217, 46, 0.08), transparent 58%),
-    linear-gradient(180deg, #f8f6fc 0%, #f4f1fa 55%, #f6f8f0 100%) !important;
+    radial-gradient(1180px 540px at 8% -12%, rgba(133, 98, 216, 0.1), transparent 62%),
+    radial-gradient(900px 460px at 100% 8%, rgba(175, 202, 3, 0.08), transparent 58%),
+    linear-gradient(180deg, #f8f6fc 0%, #fafbf4 55%, #f6f8f0 100%) !important;
   background-attachment: fixed !important;
 }
 body.is-admin {
-  background: #f4f1fa !important;
+  background: #fafbf4 !important;
   background-image: none !important;
 }
 .yp-auth-shell {
@@ -383,7 +388,7 @@ body.is-admin {
   background: #fff !important;
   border: 1px solid #e4dff2 !important;
   border-radius: 1.5rem !important;
-  box-shadow: 0 16px 40px rgba(106, 66, 194, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(133, 98, 216, 0.12) !important;
   padding: 1.5rem 1.35rem 1.6rem !important;
 }
 .yp-auth-stage {
@@ -396,7 +401,7 @@ body.is-admin {
   background: #fff !important;
   border: 1px solid #e4dff2 !important;
   border-radius: 1.75rem !important;
-  box-shadow: 0 16px 40px rgba(106, 66, 194, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(133, 98, 216, 0.12) !important;
   overflow: hidden !important;
 }
 .yp-auth-stage > .yp-auth-card {
@@ -410,13 +415,13 @@ body.is-admin {
 .yp-auth-aside {
   display: none;
   position: relative;
-  background: #1b1430 url('/brand/hero-cover.jpg') center / cover no-repeat;
+  background: #0a0c2a url('/brand/hero-cover.jpg') center / cover no-repeat;
   color: #fff;
 }
 .yp-auth-aside__veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(27, 20, 48, 0.2) 0%, rgba(27, 20, 48, 0.82) 100%);
+  background: linear-gradient(180deg, rgba(10, 12, 42, 0.2) 0%, rgba(10, 12, 42, 0.82) 100%);
 }
 .yp-auth-aside__copy {
   position: relative;
@@ -439,24 +444,24 @@ body.is-admin {
 .yp-field textarea:focus,
 .yp-field select:focus,
 .modern-input:focus {
-  border-color: #6a42c2 !important;
-  box-shadow: 0 0 0 3px rgba(106, 66, 194, 0.16) !important;
+  border-color: #8562d8 !important;
+  box-shadow: 0 0 0 3px rgba(133, 98, 216, 0.16) !important;
 }
 .btn-secondary {
-  background: rgba(106, 66, 194, 0.1) !important;
-  color: #53339c !important;
-  border: 1px solid rgba(106, 66, 194, 0.2) !important;
+  background: rgba(133, 98, 216, 0.1) !important;
+  color: #6e4bc4 !important;
+  border: 1px solid rgba(133, 98, 216, 0.2) !important;
 }
 .btn-secondary:hover {
-  background: rgba(106, 66, 194, 0.16) !important;
-  color: #53339c !important;
+  background: rgba(133, 98, 216, 0.16) !important;
+  color: #6e4bc4 !important;
 }
 .glass {
   background: rgba(255, 255, 255, 0.92) !important;
   border-color: #e4dff2 !important;
 }
 .text-gradient {
-  background: linear-gradient(135deg, #6a42c2 0%, #53339c 100%) !important;
+  background: linear-gradient(135deg, #8562d8 0%, #6e4bc4 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   color: transparent !important;
@@ -480,9 +485,9 @@ body.is-admin {
 html[data-eco-theme] .profile-hero--cabinet,
 html[data-eco-banner] .profile-hero--cabinet {
   background: #fff !important;
-  color: #1b1430 !important;
+  color: #0a0c2a !important;
   border: 1px solid #e4dff2 !important;
-  box-shadow: 0 8px 28px rgba(106, 66, 194, 0.08) !important;
+  box-shadow: 0 8px 28px rgba(133, 98, 216, 0.08) !important;
   padding: 1.2rem 1.3rem 1.15rem !important;
   border-radius: 1.5rem !important;
 }
@@ -496,12 +501,12 @@ html[data-eco-banner] .profile-hero--cabinet {
   margin: 0 !important;
   font-size: clamp(1.35rem, 3vw, 1.8rem) !important;
   font-weight: 800 !important;
-  color: #1b1430 !important;
+  color: #0a0c2a !important;
 }
 .profile-hero--cabinet .profile-hero__role {
   margin: 0 !important;
   background: #efe8fb !important;
-  color: #53339c !important;
+  color: #6e4bc4 !important;
   border: 1px solid #e4dff2 !important;
 }
 .profile-hero--cabinet .profile-hero__contacts {
@@ -517,11 +522,11 @@ html[data-eco-banner] .profile-hero--cabinet {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.92rem;
-  color: #1b1430;
+  color: #0a0c2a;
 }
 .profile-hero--cabinet .profile-hero__contacts a,
 .profile-hero--cabinet .profile-hero__id {
-  color: #1b1430 !important;
+  color: #0a0c2a !important;
   font-weight: 650;
   text-decoration: none;
   background: none;
@@ -544,7 +549,7 @@ html[data-eco-banner] .profile-hero--cabinet {
 }
 .profile-hero--cabinet .profile-hero__tool,
 .dashboard-page .profile-hero__tool {
-  background: #6a42c2 !important;
+  background: #8562d8 !important;
   color: #fff !important;
   border: 0 !important;
   border-radius: 999px !important;
@@ -596,7 +601,7 @@ html[data-eco-banner] .profile-hero--cabinet {
 .dashboard-page .profile-hero,
 .dashboard-page .cw-cabinet {
   border-color: #e4dff2 !important;
-  box-shadow: 0 8px 28px rgba(106, 66, 194, 0.08) !important;
+  box-shadow: 0 8px 28px rgba(133, 98, 216, 0.08) !important;
 }
 .dashboard-main {
   background: transparent !important;
@@ -612,7 +617,7 @@ html[data-eco-banner] .profile-hero--cabinet {
   position: fixed !important;
   inset: 0 !important;
   z-index: 40000 !important;
-  background: rgba(27, 20, 48, 0.96) !important;
+  background: rgba(10, 12, 42, 0.96) !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -624,7 +629,7 @@ html[data-eco-banner] .profile-hero--cabinet {
   height: auto !important;
 }
 .profile-hero__email a {
-  color: #6a42c2 !important;
+  color: #8562d8 !important;
   font-weight: 700;
   text-decoration: none;
 }
@@ -670,7 +675,7 @@ html[data-eco-banner] .profile-hero--cabinet {
 .yp-accounts__value {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #6a42c2;
+  color: #8562d8;
 }
 @media (pointer: coarse), (max-width: 900px) {
   html[data-eco-ticket] .yp-ticket-qr,
@@ -771,14 +776,14 @@ button.btn {
   padding: 0.2rem 1.35rem 0.9rem 0.15rem !important;
   margin: 0 -0.35rem !important;
   scrollbar-width: thin;
-  scrollbar-color: rgba(106, 66, 194, 0.45) transparent;
+  scrollbar-color: rgba(133, 98, 216, 0.45) transparent;
 }
 .home-page .home-rail::-webkit-scrollbar {
   height: 8px;
   display: block;
 }
 .home-page .home-rail::-webkit-scrollbar-thumb {
-  background: rgba(106, 66, 194, 0.4);
+  background: rgba(133, 98, 216, 0.4);
   border-radius: 999px;
 }
 .home-page .home-rail__slide {
@@ -849,4 +854,31 @@ button.btn {
   .home-page .home-rail {
     padding-inline: 2.4rem !important;
   }
+}
+
+/* Youth Spaces Sochi — lime CTAs, lavender identity, navy type */
+.nav-pill--solid,
+a.nav-pill--solid,
+button.nav-pill--solid {
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
+}
+.nav-pill--solid:hover {
+  background: var(--yp-lime-deep) !important;
+  color: var(--foreground) !important;
+}
+.yp-bottom-nav {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-top: 1px solid var(--line) !important;
+}
+.yp-bottom-nav__item.is-active {
+  color: var(--primary) !important;
+}
+.catalog-card,
+.yp-feed-card,
+.free-now-card {
+  border-color: var(--line) !important;
+}
+.site-brand-name {
+  color: var(--primary) !important;
 }

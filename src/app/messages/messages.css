@@ -41,12 +41,12 @@ body:has(.messages-root) .main-content > div {
 }
 
 .messages-root {
-  --msg-accent: #6a42c2;
-  --msg-accent-soft: rgba(106, 66, 194, 0.12);
-  --msg-accent-strong: #53339c;
-  --msg-mine: linear-gradient(145deg, #7b54d4 0%, #6a42c2 100%);
+  --msg-accent: #8562d8;
+  --msg-accent-soft: rgba(133, 98, 216, 0.12);
+  --msg-accent-strong: #6e4bc4;
+  --msg-mine: linear-gradient(145deg, #7b54d4 0%, #8562d8 100%);
   --msg-theirs: #ffffff;
-  --msg-ink: #1b1430;
+  --msg-ink: #0a0c2a;
   --msg-muted: #5c5670;
   --msg-surface: rgba(255, 255, 255, 0.9);
   font-family: var(--font-manrope), 'Manrope', sans-serif;
@@ -59,7 +59,7 @@ body:has(.messages-root) .main-content > div {
   background:
     radial-gradient(900px 420px at -10% -20%, rgba(45, 212, 191, 0.18), transparent 55%),
     radial-gradient(680px 360px at 110% 8%, rgba(14, 165, 233, 0.08), transparent 52%),
-    linear-gradient(180deg, #f4f1fa 0%, #f7f6fb 42%, #efe8fb 100%);
+    linear-gradient(180deg, #fafbf4 0%, #fafbf4 42%, #efe8fb 100%);
 }
 
 .messages-top {
@@ -409,7 +409,7 @@ body:has(.messages-root) .main-content > div {
   background: var(--msg-mine);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 6px 16px rgba(106, 66, 194, 0.22);
+  box-shadow: 0 6px 16px rgba(133, 98, 216, 0.22);
 }
 
 .msg-bubble.is-group-mid,
@@ -1154,12 +1154,12 @@ body:has(.messages-root) .main-content > div {
   gap: 0.55rem;
   padding: 0.35rem 0.85rem 0.45rem;
   background: rgba(255, 255, 255, 0.72);
-  border-bottom: 1px solid rgba(106, 66, 194, 0.08);
+  border-bottom: 1px solid rgba(133, 98, 216, 0.08);
 }
 .messages-tone__label {
   font-size: 0.72rem;
   font-weight: 750;
-  color: #53339c;
+  color: #6e4bc4;
   white-space: nowrap;
 }
 .messages-tone__track {
@@ -1173,7 +1173,7 @@ body:has(.messages-root) .main-content > div {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #c4b5fd, #6a42c2 55%, #c1d92e);
+  background: linear-gradient(90deg, #c4b5fd, #8562d8 55%, #afca03);
 }
 .messages-share-bar {
   display: flex;
@@ -1190,19 +1190,19 @@ body:has(.messages-root) .main-content > div {
   gap: 0.3rem;
   min-height: 2rem;
   padding: 0.25rem 0.7rem;
-  border: 1px solid rgba(106, 66, 194, 0.18);
+  border: 1px solid rgba(133, 98, 216, 0.18);
   border-radius: 999px;
   background: #fff;
-  color: #53339c;
+  color: #6e4bc4;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
 }
 .messages-share-chip.is-on {
-  background: #6a42c2;
+  background: #8562d8;
   color: #fff;
-  border-color: #6a42c2;
+  border-color: #8562d8;
 }
 
 /* ===== 1.6.12 thread chrome ===== */
@@ -1213,17 +1213,17 @@ body:has(.messages-root) .main-content > div {
 .messages-attach-menu__item:hover {
   background: var(--msg-accent-soft);
   color: var(--msg-accent-strong);
-  border-color: rgba(106, 66, 194, 0.2);
+  border-color: rgba(133, 98, 216, 0.2);
 }
 .messages-conv.is-active {
   background: var(--msg-accent-soft);
-  box-shadow: inset 0 0 0 1px rgba(106, 66, 194, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(133, 98, 216, 0.22);
 }
 .messages-tab.is-active {
-  box-shadow: 0 6px 14px rgba(106, 66, 194, 0.22);
+  box-shadow: 0 6px 14px rgba(133, 98, 216, 0.22);
 }
 .messages-conv__badge {
-  box-shadow: 0 4px 10px rgba(106, 66, 194, 0.22);
+  box-shadow: 0 4px 10px rgba(133, 98, 216, 0.22);
 }
 .messages-conv__entity-ico {
   color: var(--msg-accent-strong);
@@ -1233,30 +1233,30 @@ body:has(.messages-root) .main-content > div {
   font-size: 0.78rem;
 }
 .messages-search {
-  border-color: rgba(106, 66, 194, 0.14);
+  border-color: rgba(133, 98, 216, 0.14);
 }
 .messages-composer textarea:focus {
-  border-color: rgba(106, 66, 194, 0.45);
-  box-shadow: 0 0 0 3px rgba(106, 66, 194, 0.12);
+  border-color: rgba(133, 98, 216, 0.45);
+  box-shadow: 0 0 0 3px rgba(133, 98, 216, 0.12);
 }
 .messages-send {
-  box-shadow: 0 8px 18px rgba(106, 66, 194, 0.28);
+  box-shadow: 0 8px 18px rgba(133, 98, 216, 0.28);
 }
 .messages-ctx {
-  background: #1b1430;
-  border-color: rgba(193, 217, 46, 0.18);
+  background: #0a0c2a;
+  border-color: rgba(175, 202, 3, 0.18);
 }
 .messages-ctx__item:hover,
 .messages-ctx__item:focus-visible {
-  background: rgba(106, 66, 194, 0.28);
+  background: rgba(133, 98, 216, 0.28);
 }
 .messages-top__friends {
-  border-color: rgba(106, 66, 194, 0.18);
+  border-color: rgba(133, 98, 216, 0.18);
 }
 
 .messages-thread {
   background:
-    radial-gradient(circle at 1px 1px, rgba(106, 66, 194, 0.06) 1px, transparent 0) 0 0 / 18px 18px,
+    radial-gradient(circle at 1px 1px, rgba(133, 98, 216, 0.06) 1px, transparent 0) 0 0 / 18px 18px,
     linear-gradient(180deg, #f7f5fc 0%, #f3eefb 100%);
 }
 .messages-thread-head {
@@ -1297,7 +1297,7 @@ body:has(.messages-root) .main-content > div {
 .messages-thread-head__back {
   width: 2rem;
   height: 2rem;
-  background: rgba(106, 66, 194, 0.08);
+  background: rgba(133, 98, 216, 0.08);
   color: var(--msg-accent-strong);
 }
 .messages-thread-actions {
@@ -1360,11 +1360,11 @@ body:has(.messages-root) .main-content > div {
 .messages-scroll {
   padding: 0.65rem 0.7rem 0.4rem;
   scrollbar-width: thin;
-  scrollbar-color: rgba(106, 66, 194, 0.35) transparent;
+  scrollbar-color: rgba(133, 98, 216, 0.35) transparent;
 }
 .messages-scroll::-webkit-scrollbar { width: 6px; }
 .messages-scroll::-webkit-scrollbar-thumb {
-  background: rgba(106, 66, 194, 0.35);
+  background: rgba(133, 98, 216, 0.35);
   border-radius: 999px;
 }
 
@@ -1388,7 +1388,7 @@ body:has(.messages-root) .main-content > div {
 }
 .msg-bubble.is-mine {
   border-radius: 16px 16px 5px 16px;
-  box-shadow: 0 4px 12px rgba(106, 66, 194, 0.18);
+  box-shadow: 0 4px 12px rgba(133, 98, 216, 0.18);
 }
 .msg-bubble__from {
   font-size: 0.68rem;
@@ -1412,7 +1412,7 @@ body:has(.messages-root) .main-content > div {
   opacity: 0.85;
 }
 .msg-ticks.is-read {
-  color: #c1d92e;
+  color: #afca03;
   opacity: 1;
 }
 .msg-bubble:not(.is-mine) .msg-ticks.is-read {
@@ -1438,7 +1438,7 @@ body:has(.messages-root) .main-content > div {
   max-height: 240px;
   width: 100%;
   object-fit: cover;
-  background: #1b1430;
+  background: #0a0c2a;
 }
 .msg-bubble.is-media .msg-bubble__meta {
   position: absolute;
@@ -1465,7 +1465,7 @@ body:has(.messages-root) .main-content > div {
   place-items: center;
   margin: 0;
   border-radius: inherit;
-  background: rgba(27, 20, 48, 0.45);
+  background: rgba(10, 12, 42, 0.45);
   color: #fff;
   font-size: 0.72rem;
   backdrop-filter: blur(2px);
@@ -1475,12 +1475,12 @@ body:has(.messages-root) .main-content > div {
   max-width: min(88%, 20rem);
   background: #fff !important;
   color: var(--msg-ink);
-  box-shadow: 0 8px 22px rgba(27, 20, 48, 0.08);
+  box-shadow: 0 8px 22px rgba(10, 12, 42, 0.08);
 }
 .msg-invite__banner {
   color: var(--msg-accent-strong);
-  background: linear-gradient(90deg, rgba(106, 66, 194, 0.12), rgba(193, 217, 46, 0.1));
-  border-bottom-color: rgba(106, 66, 194, 0.1);
+  background: linear-gradient(90deg, rgba(133, 98, 216, 0.12), rgba(175, 202, 3, 0.1));
+  border-bottom-color: rgba(133, 98, 216, 0.1);
 }
 .msg-invite__actions {
   display: grid;
@@ -1498,12 +1498,12 @@ body:has(.messages-root) .main-content > div {
   box-sizing: border-box;
 }
 .msg-invite__actions .is-primary {
-  background: linear-gradient(145deg, #7b54d4, #6a42c2);
-  box-shadow: 0 4px 12px rgba(106, 66, 194, 0.22);
+  background: linear-gradient(145deg, #7b54d4, #8562d8);
+  box-shadow: 0 4px 12px rgba(133, 98, 216, 0.22);
 }
 .msg-invite__actions .is-primary.is-place {
-  background: linear-gradient(145deg, #7b54d4, #6a42c2);
-  box-shadow: 0 4px 12px rgba(106, 66, 194, 0.22);
+  background: linear-gradient(145deg, #7b54d4, #8562d8);
+  box-shadow: 0 4px 12px rgba(133, 98, 216, 0.22);
 }
 
 .messages-composer {
@@ -1522,13 +1522,13 @@ body:has(.messages-root) .main-content > div {
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: rgba(106, 66, 194, 0.1);
-  color: #53339c;
+  background: rgba(133, 98, 216, 0.1);
+  color: #6e4bc4;
   cursor: pointer;
   padding: 0;
 }
 .messages-attach-btn.is-on {
-  background: #6a42c2;
+  background: #8562d8;
   color: #fff;
 }
 .messages-attach-menu {
@@ -1604,7 +1604,7 @@ body:has(.messages-root) .main-content > div {
   max-height: 200px;
 }
 .msg-bubble.is-mine .msg-body-link {
-  color: #f4f1fa;
+  color: #fafbf4;
 }
 
 @media (max-width: 420px) {

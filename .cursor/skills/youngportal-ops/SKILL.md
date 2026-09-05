@@ -27,7 +27,7 @@ Nginx отдаёт `/brand/` с диска staging: `/opt/sochi-portal-staging/p
 
 ## Фирменные цвета
 
-Фиолетовый `#6A42C2`, лайм `#C1D92E`. Токены: `--primary`, `--accent` в `src/app/globals.css` и override в `public/brand/theme.css`.
+Фирменные цвета с логотипа «Молодёжные пространства Сочи»: лаванда `#8562D8`, лайм `#AFCA03`, чернила `#0A0C2A`. Токены `--primary` / `--accent` в `src/app/globals.css` и `public/brand/theme.css`. CTA — лайм с тёмным текстом.
 
 ## Герой главной
 
