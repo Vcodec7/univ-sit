@@ -18,6 +18,7 @@ import AdminReplicaClient, { AdminEcoPoolPanel } from '@/components/admin/AdminR
 import AdminLoadPanel from '@/components/admin/AdminLoadPanel';
 import SettingsVkSync from '@/components/SettingsVkSync';
 import LogoImageField from '@/components/admin/LogoImageField';
+import BrandHeroMediaField from '@/components/admin/BrandHeroMediaField';
 import SettingsSaveBar from '@/components/admin/SettingsSaveBar';
 import { saveUploadedImage, saveUploadedVideo } from '@/lib/uploads';
 import { DEFAULT_LOGO } from '@/components/SiteBrand';
@@ -548,13 +549,11 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
         {/* Page Header */}
         <div className="settings-page-header">
           <h1>Настройки сайта</h1>
-          <p>
-            Параметры портала, не аккаунта.
-          </p>
+          <p>Параметры портала · {tabs.length} разделов</p>
         </div>
 
       {/* Tab Bar */}
-      <div className="settings-tabs">
+      <div className="settings-tabs settings-tabs--full" aria-label="Разделы настроек">
         {(() => {
           const groups: { name: string; items: typeof tabs }[] = [];
           for (const tab of tabs) {
@@ -608,14 +607,12 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
             <div style={cardStyle}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '1rem' }}>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Название сайта</label>
-                  <input name="siteName" type="text" defaultValue={settings?.siteName || 'Центр развития молодежи Сочи'} className="settings-input" placeholder="Центр развития молодежи Сочи" />
-                  <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                    Шапка, подвал, вкладки браузера, письма, PWA-манифест, юр. тексты (плейсхолдеры).
-                  </p>
+                  <label style={labelStyle}>Название</label>
+                  <input name="siteName" type="text" defaultValue={settings?.siteName || 'Центр развития молодежи Сочи'} className="settings-input" placeholder="Молодёжь Сочи" />
+                  <p className="settings-help">В шапке, письмах и на вкладке браузера.</p>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Публичный адрес сайта (домен)</label>
+                  <label style={labelStyle}>Адрес сайта</label>
                   <input
                     name="publicSiteUrl"
                     type="url"
@@ -623,93 +620,33 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                     className="settings-input"
                     placeholder="https://py.idivles.ru"
                   />
-                  <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                    Используется в письмах, .ics, приглашениях, проверке политики, sitemap.
-                    Пусто — берётся <code>NEXTAUTH_URL</code> из окружения сервера.
-                    При смене домена на VPS обновите также <code>NEXTAUTH_URL</code> в docker-compose / .env (cookies авторизации).
-                  </p>
+                  <details className="settings-more">
+                    <summary>Зачем это поле</summary>
+                    <p>
+                      Письма, календарь, приглашения и карта сайта. Если пусто — берётся адрес сервера.
+                      После смены домена на VPS обновите ещё <code>NEXTAUTH_URL</code> в .env.
+                    </p>
+                  </details>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <LogoImageField currentLogo={settings?.logoUrl || DEFAULT_LOGO} />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Фон главной — режим показа</label>
-                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.65rem' }}>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="heroMediaKind"
-                        value="image"
-                        defaultChecked={((settings as any)?.heroMediaKind || '').trim() !== 'video'}
-                      />
-                      <span>Фото (по умолчанию)</span>
-                    </label>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="heroMediaKind"
-                        value="video"
-                        defaultChecked={((settings as any)?.heroMediaKind || '').trim() === 'video'}
-                      />
-                      <span>Только видео</span>
-                    </label>
-                  </div>
-                  <p style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                    На главной всегда одно: либо фото, либо видео — переключатель выше. По умолчанию фото.
-                    Файлы можно держать оба, второй просто не показывается.
-                  </p>
-                  <label style={labelStyle}>Картинка (режим по умолчанию)</label>
-                  <input type="hidden" name="heroImageUrl" defaultValue={(settings as any)?.heroImageUrl || '/brand/hero-cover.jpg'} />
-                  <div
-                    style={{
-                      width: '100%',
-                      maxWidth: 480,
-                      height: 140,
-                      borderRadius: 14,
-                      marginBottom: '0.75rem',
-                      backgroundImage: `linear-gradient(rgba(15,23,42,0.35), rgba(15,23,42,0.55)), url(${(settings as any)?.heroImageUrl || '/brand/hero-cover.jpg'})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      border: '1px solid rgba(15,23,42,0.08)',
-                    }}
-                  />
-                  <input
-                    type="file"
-                    name="heroFile"
-                    accept="image/*"
-                    className="settings-input"
-                    style={{ padding: '0.55rem' }}
+                  <BrandHeroMediaField
+                    currentImage={(settings as any)?.heroImageUrl || '/brand/templates/section-events.svg'}
+                    currentVideo={(settings as any)?.heroVideoUrl || ''}
+                    heroKind={(settings as any)?.heroMediaKind}
                   />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Видео (mp4) — хранится отдельно от режима показа</label>
-                  <input
-                    type="file"
-                    name="heroVideoFile"
-                    accept="video/mp4,video/quicktime,.mp4,.mov"
-                    className="settings-input"
-                    style={{ padding: '0.55rem' }}
-                  />
-                  <p style={{ margin: '0.4rem 0 0.35rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                    Зацикленное беззвучное видео. Режим «Только фото» не удаляет файл — просто не показывает его.
-                    Очистите URL ниже, если нужно убрать видео из хранилища настроек.
-                  </p>
-                  <input
-                    name="heroVideoUrl"
-                    className="settings-input"
-                    defaultValue={(settings as any)?.heroVideoUrl || ''}
-                    placeholder="Пусто = без видео"
-                  />
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Анимация фото (только в режиме «Только фото»)</label>
+                  <label style={labelStyle}>Движение фото</label>
                   <select
                     name="heroAnimationMode"
                     defaultValue={(settings as any)?.heroAnimationMode || 'animated'}
                     className="settings-input"
                   >
-                    <option value="animated">Анимированный Ken Burns</option>
-                    <option value="static">Статичный</option>
+                    <option value="animated">Живое (медленный наезд)</option>
+                    <option value="static">Стоит на месте</option>
                   </select>
                 </div>
               </div>
