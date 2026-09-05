@@ -7474,8 +7474,8 @@ a.dashboard-nav-btn {
   height: 1.1rem;
   padding: 0 0.3rem;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.12);
-  color: #1d4ed8;
+  background: rgba(133, 98, 216, 0.14);
+  color: #6e4bc4;
   font-size: 0.68rem;
   font-weight: 800;
   display: inline-grid;
@@ -20102,7 +20102,7 @@ a.score-ring-link:hover {
 /* ===== Mobile full-bleed cabinet (screenshot fix) ===== */
 @media (max-width: 899px) {
   .dashboard-page.container {
-    padding: 0 0 4.75rem !important;
+    padding: 0.85rem 0.8rem 1rem !important;
     max-width: 100% !important;
     width: 100% !important;
   }
@@ -26377,5 +26377,57 @@ button.svc-hero__switch-btn {
     display: contents;
   }
 }
+
+/* Cabinet subpages: back + title, no competing «К профилю» pill */
+.profile-subhead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 0.65rem;
+  padding-top: 0.15rem;
+}
+.profile-subhead__back {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-top: 0.05rem;
+  border-radius: 11px;
+  background: rgba(10, 12, 42, 0.06);
+  color: #0a0c2a;
+  text-decoration: none;
+}
+.profile-subhead__copy {
+  min-width: 0;
+  flex: 1;
+}
+.profile-subhead .profile-view__title {
+  margin: 0 !important;
+  font-size: 1.12rem !important;
+  font-family: var(--font-unbounded), 'Unbounded', sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.profile-subhead .profile-view__lead {
+  margin: 0.2rem 0 0 !important;
+  font-size: 0.74rem !important;
+  line-height: 1.35;
+  color: #5c5670 !important;
+}
+.profile-view--guides {
+  gap: 0.55rem;
+  padding: 0 0 0.25rem;
+}
+body:has(.dashboard-page) .main-content {
+  flex-grow: 0;
+}
+
+@media (max-width: 899px) {
+  .profile-view--guides {
+    padding: 0.15rem 0.15rem 0;
+  }
+}
+
 
 

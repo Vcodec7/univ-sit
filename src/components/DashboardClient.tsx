@@ -38,6 +38,7 @@ import {
   LayoutGrid,
   MessageCircle,
   Leaf,
+  ArrowLeft,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EventSoonNotifier from '@/components/EventSoonNotifier';
@@ -1455,14 +1456,16 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
             )}
 
             {view === 'guides' && (
-              <div className="profile-view">
-                <div className="profile-page-head">
-                  <div>
+              <div className="profile-view profile-view--guides">
+                <header className="profile-subhead">
+                  <Link href="/dashboard" className="profile-subhead__back" aria-label="К профилю">
+                    <ArrowLeft size={18} />
+                  </Link>
+                  <div className="profile-subhead__copy">
                     <h2 className="profile-view__title">Инструктажи</h2>
-                    <p className="profile-view__lead">Обучение работе с порталом и обязательные инструкции.</p>
+                    <p className="profile-view__lead">Как пользоваться порталом и обязательные инструкции.</p>
                   </div>
-                  <Link href="/dashboard" className="btn btn-secondary">К профилю</Link>
-                </div>
+                </header>
                 <ProfileGuides
                   instructionsVersion={profile?.instructionsVersion}
                   instructionsCompletedAt={profile?.instructionsCompletedAt}

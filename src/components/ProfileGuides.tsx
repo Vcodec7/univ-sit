@@ -444,7 +444,7 @@ export default function ProfileGuides({
           onClick={() => setTab('new')}
         >
           Новые
-          {unseen.length > 0 ? <em>{unseen.length}</em> : null}
+          <em>{unseen.length}</em>
         </button>
         <button
           type="button"
@@ -454,7 +454,7 @@ export default function ProfileGuides({
           onClick={() => setTab('seen')}
         >
           Готово
-        </button>
+          <em>{seen.length}</em>
       </div>
 
       {list.length === 0 ? (
