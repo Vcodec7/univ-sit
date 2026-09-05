@@ -27099,6 +27099,9 @@ html:not(.has-session) .nav-auth-mobile__profile {
 .admin-layout-wrapper--boot .admin-main {
   min-height: 50vh;
 }
+html.yp-booting .qa-edge-tab {
+  visibility: hidden;
+}
 
 
 
