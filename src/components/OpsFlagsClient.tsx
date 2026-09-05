@@ -54,7 +54,7 @@ export default function OpsFlagsClient({
   subtitle = 'Kill-switch разделов сайта. Сессия TECH всегда проходит. Выключение режет UI и API.',
 }: {
   embedded?: boolean;
-  /** Override for admin settings: `/api/admin/modules` */
+  /** Kill-switches: TECH `/ops` only (`/api/ops/flags`). */
   apiPath?: string;
   title?: string;
   subtitle?: string;

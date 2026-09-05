@@ -374,9 +374,6 @@ export default function AdminSystemClient() {
                 <Link href="/admin/settings" className="btn btn-secondary">
                   Настройки
                 </Link>
-                <Link href="/admin/settings?tab=modules" className="btn btn-secondary">
-                  Модули
-                </Link>
               </div>
             </section>
 
@@ -423,10 +420,10 @@ export default function AdminSystemClient() {
             {data.modules ? (
               <section className="glass admin-system__card admin-system__card--wide">
                 <h2>
-                  <ShieldAlert size={18} /> Модули Ops
+                  <ShieldAlert size={18} /> Разделы сайта
                 </h2>
                 <p className="admin-system__hint" style={{ marginTop: 0 }}>
-                  Выключено: {data.modules.offCount} из {data.modules.total}
+                  Выключено: {data.modules.offCount} из {data.modules.total}. Переключает только техслужба.
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {data.modules.items
@@ -451,11 +448,6 @@ export default function AdminSystemClient() {
                   {!data.modules.offCount ? (
                     <span style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>Все модули включены</span>
                   ) : null}
-                </div>
-                <div className="admin-system__links">
-                  <Link href="/admin/settings?tab=modules" className="btn btn-secondary">
-                    Модули
-                  </Link>
                 </div>
               </section>
             ) : null}

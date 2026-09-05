@@ -597,6 +597,19 @@ export async function setModuleFlags(
     console.info('[ops-flags]', actorId, changed, (e as Error)?.message);
   }
 
+  if (changed.length) {
+    try {
+      const { notifySiteChange } = await import('@/lib/site-change-guard');
+      await notifySiteChange({
+        actorId,
+        action: 'modules.toggle',
+        detail: { changed: Object.fromEntries(changed.map((k) => [k, next[k]])) },
+      });
+    } catch (e) {
+      console.warn('[ops-flags] notify', (e as Error)?.message);
+    }
+  }
+
   const refreshed = await readCachedBundle();
   return { prev, next: refreshed.flags, offModes: refreshed.offModes };
 }

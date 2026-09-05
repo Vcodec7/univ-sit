@@ -11,7 +11,7 @@ import {
   Mail, Shield, Settings2, Share2, Globe,
   CheckCircle2, AlertTriangle,
   Database, Calendar, Building2, Zap, Construction, Scale, Landmark, ShieldAlert, Bell,
-  Leaf, Server, Activity, ToggleLeft,
+  Leaf, Server, Activity,
 } from 'lucide-react';
 import DemoSettingsPanel from '@/components/DemoSettingsPanel';
 import AdminReplicaClient, { AdminEcoPoolPanel } from '@/components/admin/AdminReplicaClient';
@@ -19,7 +19,6 @@ import AdminLoadPanel from '@/components/admin/AdminLoadPanel';
 import SettingsVkSync from '@/components/SettingsVkSync';
 import LogoImageField from '@/components/admin/LogoImageField';
 import SettingsSaveBar from '@/components/admin/SettingsSaveBar';
-import OpsFlagsClient from '@/components/OpsFlagsClient';
 import { saveUploadedImage, saveUploadedVideo } from '@/lib/uploads';
 import { DEFAULT_LOGO } from '@/components/SiteBrand';
 import {
@@ -77,7 +76,7 @@ async function testEmail(formData: FormData) {
 
 async function updateSettings(formData: FormData) {
   'use server';
-  await requireSuperAdmin();
+  const session = await requireSuperAdmin();
   const { assertCleanText } = await import('@/lib/censor');
 
   const tab = (formData.get('settingsTab') as string) || 'general';
@@ -351,6 +350,19 @@ async function updateSettings(formData: FormData) {
     revalidatePath('/spaces');
     revalidatePath('/documents');
     revalidatePath('/manifest.webmanifest');
+
+    try {
+      const { notifySiteChange } = await import('@/lib/site-change-guard');
+      await notifySiteChange({
+        actorId: session.user.id,
+        actorEmail: session.user.email,
+        actorRole: session.user.role,
+        action: `settings.${tab}`,
+        detail: { fields: Object.keys(data).slice(0, 40) },
+      });
+    } catch (e) {
+      console.warn('settings change notify', e);
+    }
   } catch (e) {
     if ((e as { digest?: string })?.digest?.startsWith('NEXT_REDIRECT')) throw e;
     console.error('Ошибка сохранения настроек', e);
@@ -459,7 +471,6 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
     { id: 'gov',        label: 'Госуслуги',       icon: Landmark, group: 'Правила' },
     { id: 'moderation', label: 'Модерация',       icon: ShieldAlert, group: 'Правила' },
     { id: 'maintenance', label: 'Работы', icon: Construction, group: 'Правила' },
-    { id: 'modules', label: 'Модули', icon: ToggleLeft, group: 'Правила' },
     { id: 'eco',        label: 'мбаллы',       icon: Leaf, group: 'Система' },
     { id: 'replica',    label: 'Репликация',      icon: Server, group: 'Система' },
     { id: 'load',       label: 'Нагрузка',        icon: Activity, group: 'Система' },
@@ -1661,12 +1672,11 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
 
       {activeTab === 'modules' ? (
         <div className="tab-content" style={{ ...cardStyle, marginTop: '0.5rem' }}>
-          <OpsFlagsClient
-            embedded
-            apiPath="/api/admin/modules"
-            title="Модули портала"
-            subtitle="Включайте и выключайте разделы сайта. Выключенный модуль скрывается у гостей и пользователей; администратор продолжает работать."
-          />
+          <h2 style={{ margin: '0 0 0.4rem', fontSize: '1.15rem' }}>Разделы сайта</h2>
+          <p style={{ color: 'var(--muted)', margin: 0, lineHeight: 1.45 }}>
+            Включать и выключать публичные разделы может только скрытая техслужба.
+            У администратора портала этой панели нет — так задумано.
+          </p>
         </div>
       ) : null}
 
