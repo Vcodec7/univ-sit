@@ -25,3 +25,5 @@ License varies by file (CC BY / CC BY-SA / public domain) — see each file page
 | hall-youth.jpg | Interiors Youth center, Kazan (2023-06-06) — CC BY-SA 4.0, Wikimedia Commons |
 | hall-conference.jpg | Banquet / conference hall — CC BY-SA 4.0, Wikimedia Commons |
 | gym.jpg | gymnastics |
+| sochi-navaginskaya.jpg | Navaginskaya street, Sochi — CC BY-SA 4.0, Sergei Kazantsev (street of Дом молодёжи; interiors of the four halls are not on Commons) |
+| sochi-city.jpg | Sochi cityscape 2019 — CC BY-SA 3.0, Aleksandr Veprev |

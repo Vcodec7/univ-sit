@@ -21,6 +21,8 @@ const PHOTO = {
   hallYouth: '/covers/photo/hall-youth.jpg',
   hallConference: '/covers/photo/hall-conference.jpg',
   gym: '/covers/photo/gym.jpg',
+  navaginskaya: '/covers/photo/sochi-navaginskaya.jpg',
+  sochiCity: '/covers/photo/sochi-city.jpg',
 } as const;
 
 /** Large variety pool — used with index so list cards do not all share one stock photo. */
@@ -146,7 +148,28 @@ export function sectionCover(section: string, index = 0): string {
   return photoBySeed(`section:${section}`, index);
 }
 
-type CoverEntity = { id?: string | null; title?: string | null; image?: string | null };
+type CoverEntity = {
+  id?: string | null;
+  title?: string | null;
+  image?: string | null;
+  address?: string | null;
+  category?: string | null;
+  meetingPlace?: string | null;
+};
+
+/** Real Sochi venues → CC street/theme photos (no press-kit interiors on Commons). */
+function matchVenuePhoto(entity: CoverEntity): string | null {
+  const blob = `${entity.id || ''} ${entity.title || ''} ${entity.address || ''} ${entity.meetingPlace || ''} ${entity.category || ''}`;
+  if (/навагин|дом молод/i.test(blob)) return PHOTO.navaginskaya;
+  if (/тимиряз/i.test(blob)) return PHOTO.cowork;
+  if (/партизан/i.test(blob)) return PHOTO.gym;
+  if (/ульянов/i.test(blob)) return PHOTO.sochiCity;
+  const cat = String(entity.category || '').toLowerCase();
+  if (/спорт/.test(cat)) return PHOTO.sport;
+  if (/коворк/.test(cat)) return PHOTO.cowork;
+  if (/зал|мероприят/.test(cat)) return PHOTO.hallYouth;
+  return null;
+}
 
 function entityCover(
   entity: CoverEntity,
@@ -167,14 +190,20 @@ export function projectCover(project: CoverEntity, index = 0): string {
 }
 
 export function clubCover(club: CoverEntity, index = 0): string {
+  const img = String(club.image || '').trim();
+  if (img && !isWeakCover(img)) return resolveEntityCover(img, sectionCover('clubs', index));
+  const venue = matchVenuePhoto(club);
+  if (venue) return venue;
   return entityCover(club, index, 'clubs');
 }
 
 export function spaceCover(space: CoverEntity, index = 0): string {
   const img = String(space.image || '').trim();
   if (img && !isWeakCover(img)) return resolveEntityCover(img, sectionCover('spaces', index));
+  const venue = matchVenuePhoto(space);
+  if (venue) return venue;
   const title = String(space.title || '');
-  const hallish = /зал|павильон|дом|аудитор|сцен|конференц|репетиц/i.test(title);
+  const hallish = /зал|павильон|аудитор|сцен|конференц|репетиц/i.test(title);
   const pool = hallish ? HALL_POOL : PHOTO_POOL;
   const seed = `spaces:${space.id || title || index}:${titlePhoto(title) || ''}`;
   const h = hashSeed(`${seed}::${index}`);
