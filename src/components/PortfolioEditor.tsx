@@ -1,9 +1,9 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, Upload } from 'lucide-react';
+import { Plus, Search, Trash2, Upload, Eye, FileText, Image as ImageIcon, Sparkles } from 'lucide-react';
 import {
   ACHIEVEMENTS,
   CATEGORY_META,
@@ -141,6 +141,10 @@ export default function PortfolioEditor() {
     !canSubmitNow ||
     (Boolean(nextSubmitAt) && new Date(nextSubmitAt!).getTime() > Date.now());
 
+  const statusKey = portfolio?.status || 'DRAFT';
+  const filledSections = sections.filter((s) => s.title.trim() || s.body.trim()).length;
+  const certsWithFile = certs.filter((c) => c.fileUrl).length;
+
   const upload = async (file: File, kind: 'cover' | 'certificate') => {
     const fd = new FormData();
     fd.set('kind', kind);
@@ -162,81 +166,76 @@ export default function PortfolioEditor() {
     return data as { url: string; fileName?: string; mimeType?: string };
   };
 
-  if (loading) return <div style={{ padding: '1rem', color: 'var(--muted)' }}>Загрузка портфолио…</div>;
+  if (loading) return <div className="pf-studio pf-studio--loading">Загрузка портфолио…</div>;
 
   return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      <div
-        style={{
-          padding: '1rem 1.1rem',
-          borderRadius: 14,
-          border: '1px solid rgba(15,23,42,0.08)',
-          background: 'rgba(248,250,252,0.95)',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div>
-            <strong style={{ fontSize: '1.05rem' }}>Моё портфолио</strong>
-            <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginTop: 4 }}>
-              Статус: {statusRu(PORTFOLIO_STATUS_RU, portfolio?.status || 'DRAFT')}
-              {portfolio?.status === 'REJECTED' && portfolio.rejectReason
-                ? ` — ${portfolio.rejectReason}`
-                : ''}
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {portfolio?.status === 'APPROVED' && portfolio.userId ? (
-              <>
-                <Link href={`/portfolio/${portfolio.userId}`} className="btn btn-secondary" style={{ padding: '0.45rem 0.8rem' }}>
-                  Открыть
-                </Link>
-                <a
-                  href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-                  className="btn btn-primary"
-                  style={{ padding: '0.45rem 0.8rem' }}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Скачать
-                </a>
-                <a
-                  href={`/api/portfolio/${portfolio.userId}/download?mode=print`}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.45rem 0.8rem' }}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Печать
-                </a>
-              </>
-            ) : null}
-            <button type="button" className="btn btn-secondary" disabled={saving} onClick={() => void save(false)}>
-              Сохранить
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={saving || submitBlocked}
-              onClick={() => void save(true)}
-              title={
-                portfolio?.status === 'PENDING'
-                  ? 'Уже на проверке'
-                  : submitBlocked && nextSubmitAt
-                    ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
-                    : undefined
-              }
-            >
-              На проверку
-            </button>
-          </div>
+    <div className="pf-studio">
+      <div className="pf-studio__head">
+        <div>
+          <span className={`pf-status pf-status--${statusKey.toLowerCase()}`}>
+            {statusRu(PORTFOLIO_STATUS_RU, statusKey)}
+          </span>
+          <h2>Моя витрина</h2>
+          <p>
+            Заголовок, история, разделы, грамоты и достижения портала. После одобрения страница открывается
+            публично и скачивается с подписью сайта.
+          </p>
+          {portfolio?.status === 'REJECTED' && portfolio.rejectReason ? (
+            <p className="pf-studio__reject">{portfolio.rejectReason}</p>
+          ) : null}
         </div>
-        <p style={{ margin: '0.75rem 0 0', fontSize: '0.84rem', color: 'var(--muted)', lineHeight: 1.45 }}>
-          Современное портфолио: краткий заголовок, рассказ о себе, блоки опыта, грамоты и достижения портала.
-          После одобрения модератором его можно скачать с электронной подписью сайта.
-        </p>
+        <div className="pf-studio__actions">
+          {portfolio?.status === 'APPROVED' && portfolio.userId ? (
+            <>
+              <Link href={`/portfolio/${portfolio.userId}`} className="btn btn-secondary btn-sm">
+                <Eye size={14} /> Открыть
+              </Link>
+              <a
+                href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
+                className="btn btn-primary btn-sm"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Скачать
+              </a>
+            </>
+          ) : null}
+          <button type="button" className="btn btn-secondary btn-sm" disabled={saving} onClick={() => void save(false)}>
+            Сохранить
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            disabled={saving || submitBlocked}
+            onClick={() => void save(true)}
+            title={
+              portfolio?.status === 'PENDING'
+                ? 'Уже на проверке'
+                : submitBlocked && nextSubmitAt
+                  ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
+                  : undefined
+            }
+          >
+            На проверку
+          </button>
+        </div>
+        <ul className="pf-studio__stats">
+          <li>
+            <strong>{filledSections}</strong>
+            <span>разделов</span>
+          </li>
+          <li>
+            <strong>{certs.length}</strong>
+            <span>грамот{certsWithFile ? ` · ${certsWithFile} с файлом` : ''}</span>
+          </li>
+          <li>
+            <strong>{achCodes.length}</strong>
+            <span>достижений</span>
+          </li>
+        </ul>
         {cooldownDays > 0 ? (
-          <p style={{ margin: '0.45rem 0 0', fontSize: '0.8rem', color: submitBlocked && nextSubmitAt ? '#92400e' : 'var(--muted)' }}>
-            Отправка на проверку — не чаще 1 раза в {cooldownDays}{' '}
+          <p className={`pf-studio__cool${submitBlocked && nextSubmitAt ? ' is-wait' : ''}`}>
+            Проверка — не чаще 1 раза в {cooldownDays}{' '}
             {cooldownDays === 1 ? 'день' : cooldownDays < 5 ? 'дня' : 'дней'}
             {submitBlocked && nextSubmitAt && portfolio?.status !== 'PENDING'
               ? ` · следующая с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
@@ -246,35 +245,51 @@ export default function PortfolioEditor() {
         ) : null}
       </div>
 
-      <label style={{ display: 'grid', gap: 6 }}>
-        <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>Заголовок</span>
-        <input
-          value={headline}
-          onChange={(e) => setHeadline(e.target.value)}
-          placeholder="Куратор проектов · волонтёр · медиа"
-          className="modern-input"
-          style={{ width: '100%', padding: '0.7rem 0.85rem', borderRadius: 10, border: '1px solid #e2e8f0' }}
+      <div className="pf-preview" aria-hidden>
+        <div
+          className="pf-preview__cover"
+          style={coverImage ? { backgroundImage: `url(${coverImage})` } : undefined}
         />
-      </label>
+        <div className="pf-preview__copy">
+          <em>Как увидят</em>
+          <strong>{headline.trim() || 'Ваш заголовок'}</strong>
+          <span>{summary.trim() || 'Короткий рассказ о себе появится здесь.'}</span>
+        </div>
+      </div>
 
-      <label style={{ display: 'grid', gap: 6 }}>
-        <span style={{ fontWeight: 650, fontSize: '0.85rem' }}>О себе</span>
-        <textarea
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          rows={4}
-          placeholder="Коротко расскажите, чем занимаетесь и чем гордитесь"
-          style={{ width: '100%', padding: '0.7rem 0.85rem', borderRadius: 10, border: '1px solid #e2e8f0', resize: 'vertical' }}
-        />
-      </label>
+      <div className="pf-grid">
+        <label className="pf-field">
+          <span>Заголовок</span>
+          <input
+            value={headline}
+            onChange={(e) => setHeadline(e.target.value)}
+            placeholder="Куратор проектов · волонтёр · медиа"
+            className="pf-input"
+          />
+        </label>
+        <label className="pf-field pf-field--wide">
+          <span>О себе</span>
+          <textarea
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows={4}
+            placeholder="Коротко: чем занимаетесь и чем гордитесь"
+            className="pf-input"
+          />
+        </label>
+      </div>
 
-      <div>
-        <div style={{ fontWeight: 650, fontSize: '0.85rem', marginBottom: 6 }}>Обложка</div>
+      <div className="pf-cover">
+        <div className="pf-cover__label">
+          <ImageIcon size={16} aria-hidden /> Обложка
+        </div>
         {coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={coverImage} alt="" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 12, marginBottom: 8 }} />
-        ) : null}
-        <label className="btn btn-secondary" style={{ display: 'inline-flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
+          <img src={coverImage} alt="" className="pf-cover__img" />
+        ) : (
+          <div className="pf-cover__empty">Фото зала, проекта или команды</div>
+        )}
+        <label className="btn btn-secondary btn-sm pf-cover__btn">
           <Upload size={16} /> Загрузить
           <input
             type="file"
@@ -296,97 +311,123 @@ export default function PortfolioEditor() {
             }}
           />
         </label>
-        <p style={{ margin: '0.45rem 0 0', fontSize: '0.75rem', color: 'var(--muted)' }}>
-          JPEG, PNG, WebP или GIF · до 15 МБ · автоматически сожмём в WebP без потери качества на экране
-        </p>
+        <p className="pf-hint">JPEG, PNG, WebP или GIF · до 15 МБ · сожмём в WebP для экрана</p>
       </div>
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+      <div className="pf-block">
+        <div className="pf-block__head">
           <strong>Разделы</strong>
           <button
             type="button"
-            className="btn btn-secondary"
-            style={{ padding: '0.35rem 0.65rem', display: 'inline-flex', gap: 4, alignItems: 'center' }}
+            className="btn btn-secondary btn-sm"
             onClick={() => setSections((s) => [...s, { title: 'Новый раздел', body: '', type: 'CUSTOM' }])}
           >
             <Plus size={14} /> Добавить
           </button>
         </div>
-        <div style={{ display: 'grid', gap: 10 }}>
+        <div className="pf-sections">
           {sections.map((s, idx) => (
-            <div key={idx} style={{ padding: '0.85rem', borderRadius: 12, border: '1px solid #e2e8f0', background: '#fff' }}>
-              <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <div key={idx} className="pf-section">
+              <div className="pf-section__row">
                 <input
                   value={s.title}
+                  className="pf-input"
                   onChange={(e) =>
                     setSections((rows) => rows.map((r, i) => (i === idx ? { ...r, title: e.target.value } : r)))
                   }
-                  style={{ flex: 1, padding: '0.5rem 0.65rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
                 />
                 <button
                   type="button"
                   aria-label="Удалить"
+                  className="pf-icon-btn"
                   onClick={() => setSections((rows) => rows.filter((_, i) => i !== idx))}
-                  style={{ border: 0, background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
+              <div className="pf-types">
+                {[
+                  { id: 'ABOUT', label: 'О себе' },
+                  { id: 'EXPERIENCE', label: 'Опыт' },
+                  { id: 'PROJECT', label: 'Проект' },
+                  { id: 'CUSTOM', label: 'Свой' },
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={s.type === t.id ? 'is-on' : undefined}
+                    onClick={() =>
+                      setSections((rows) => rows.map((r, i) => (i === idx ? { ...r, type: t.id } : r)))
+                    }
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
               <textarea
                 value={s.body}
+                className="pf-input"
+                rows={3}
                 onChange={(e) =>
                   setSections((rows) => rows.map((r, i) => (i === idx ? { ...r, body: e.target.value } : r)))
                 }
-                rows={3}
-                style={{ width: '100%', padding: '0.5rem 0.65rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
               />
             </div>
           ))}
         </div>
       </div>
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <strong>Грамоты, сертификаты, дипломы</strong>
-          <p style={{ margin: '0.25rem 0 0.5rem', fontSize: '0.85rem', color: 'var(--muted)' }}>
-            Можно загрузить свой файл или получить официальный документ от администрации —
-            см. раздел <a href="/dashboard/awards">Мои награды</a> (PDF на сайте).
-          </p>
+      <div className="pf-block">
+        <div className="pf-block__head">
+          <strong>Грамоты и дипломы</strong>
           <button
             type="button"
-            className="btn btn-secondary"
-            style={{ padding: '0.35rem 0.65rem' }}
+            className="btn btn-secondary btn-sm"
             onClick={() => setCerts((c) => [...c, { title: '', issuer: '', issuedAt: '' }])}
           >
             <Plus size={14} /> Добавить
           </button>
         </div>
-        <div style={{ display: 'grid', gap: 10 }}>
+        <p className="pf-hint">
+          Свой файл или официальный бланк из{' '}
+          <Link href="/dashboard/awards">наград</Link> — PDF остаётся на сайте.
+        </p>
+        <div className="pf-certs">
+          {certs.length === 0 ? (
+            <p className="pf-empty">Пока пусто — добавьте грамоту или дождитесь выдачи от администрации.</p>
+          ) : null}
           {certs.map((c, idx) => (
-            <div key={idx} style={{ padding: '0.85rem', borderRadius: 12, border: '1px solid #e2e8f0', background: '#fff', display: 'grid', gap: 8 }}>
+            <div key={idx} className="pf-cert">
+              <div className="pf-cert__thumb" aria-hidden>
+                {c.fileUrl && c.mimeType && /^image\//i.test(c.mimeType) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.fileUrl} alt="" />
+                ) : (
+                  <FileText size={22} />
+                )}
+              </div>
               <input
                 placeholder="Название"
+                className="pf-input"
                 value={c.title}
                 onChange={(e) => setCerts((rows) => rows.map((r, i) => (i === idx ? { ...r, title: e.target.value } : r)))}
-                style={{ padding: '0.5rem 0.65rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
               />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div className="pf-cert__row">
                 <input
                   placeholder="Кем выдано"
+                  className="pf-input"
                   value={c.issuer || ''}
                   onChange={(e) => setCerts((rows) => rows.map((r, i) => (i === idx ? { ...r, issuer: e.target.value } : r)))}
-                  style={{ padding: '0.5rem 0.65rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
                 />
                 <input
                   type="date"
+                  className="pf-input"
                   value={c.issuedAt || ''}
                   onChange={(e) => setCerts((rows) => rows.map((r, i) => (i === idx ? { ...r, issuedAt: e.target.value } : r)))}
-                  style={{ padding: '0.5rem 0.65rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
                 />
               </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <label className="btn btn-secondary" style={{ padding: '0.35rem 0.65rem', cursor: 'pointer' }}>
+              <div className="pf-cert__files">
+                <label className="btn btn-secondary btn-sm">
                   Файл
                   <input
                     type="file"
@@ -414,11 +455,12 @@ export default function PortfolioEditor() {
                     }}
                   />
                 </label>
-                {c.fileUrl ? <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{c.fileName || 'файл'}</span> : null}
+                {c.fileUrl ? <span>{c.fileName || 'файл'}</span> : null}
                 <button
                   type="button"
+                  className="pf-icon-btn"
+                  aria-label="Удалить"
                   onClick={() => setCerts((rows) => rows.filter((_, i) => i !== idx))}
-                  style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -428,9 +470,11 @@ export default function PortfolioEditor() {
         </div>
       </div>
 
-      <div className="portfolio-editor-achs">
+      <div className="portfolio-editor-achs pf-block">
         <div className="portfolio-editor-achs__head">
-          <strong>Достижения портала</strong>
+          <strong>
+            <Sparkles size={15} aria-hidden /> Достижения портала
+          </strong>
           <span>
             Выбрано {achCodes.length}
             {unlocked.length ? ` · доступно ${unlocked.length}` : ''}
@@ -502,13 +546,13 @@ export default function PortfolioEditor() {
       </div>
 
       {portfolio?.status === 'APPROVED' && portfolio.userId ? (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Link href={`/portfolio/${portfolio.userId}`} className="btn btn-secondary">
+        <div className="pf-studio__actions">
+          <Link href={`/portfolio/${portfolio.userId}`} className="btn btn-secondary btn-sm">
             Публичная страница
           </Link>
           <a
             href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-            className="btn btn-primary"
+            className="btn btn-primary btn-sm"
             target="_blank"
             rel="noreferrer"
           >
@@ -516,7 +560,7 @@ export default function PortfolioEditor() {
           </a>
           <a
             href={`/api/portfolio/${portfolio.userId}/download?mode=print`}
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-sm"
             target="_blank"
             rel="noreferrer"
           >

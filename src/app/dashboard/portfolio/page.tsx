@@ -7,7 +7,7 @@ export default function DashboardPortfolioPage() {
   return (
     <CabinetSubpage
       title="Портфолио"
-      lead="Витрина опыта и грамот — часть профиля. После проверки модератором можно скачать с подписью портала."
+      lead="Витрина опыта, проектов и грамот. После проверки можно открыть страницу и скачать с подписью портала."
     >
       <PortfolioEditor />
     </CabinetSubpage>

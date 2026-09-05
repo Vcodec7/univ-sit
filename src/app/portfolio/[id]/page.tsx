@@ -103,13 +103,13 @@ export default function PortfolioPublicPage() {
   const profileHref = `/u/${payload.user.publicCode || id}`;
 
   return (
-    <div className="portfolio-page">
+    <div className="portfolio-page portfolio-page--luxe">
       <section
         className="portfolio-hero"
         style={
           payload.coverImage
             ? {
-                backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.2), rgba(15,23,42,0.88)), url(${payload.coverImage})`,
+                backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.15), rgba(30,15,55,0.82)), url(${payload.coverImage})`,
               }
             : undefined
         }
@@ -193,6 +193,7 @@ export default function PortfolioPublicPage() {
                 const img = isImageCert(c);
                 return (
                   <article key={`${c.title}-${i}`} className="portfolio-cert glass">
+                    <span className="portfolio-cert__foil" aria-hidden />
                     {img && c.fileUrl ? (
                       <button
                         type="button"
