@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   images: {
     localPatterns: [

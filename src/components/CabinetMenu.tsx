@@ -97,6 +97,7 @@ export default function CabinetMenu({
         title={item.label}
         aria-label={item.label}
         aria-current={active ? 'page' : undefined}
+        prefetch
         className={`dashboard-nav-btn${active ? ' is-active' : ''}${
           item.id === 'achievements' ? ' is-achievements' : ''
         }${compact ? ' cabinet-rail-strip__btn' : ''}`}

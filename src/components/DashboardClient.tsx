@@ -32,9 +32,11 @@ export type DashboardView = 'overview' | 'edit';
 
 type DashboardClientProps = {
   view?: DashboardView;
+  /** Sidebar already provided by CabinetShell. */
+  embedded?: boolean;
 };
 
-function DashboardInner({ view = 'overview' }: DashboardClientProps) {
+function DashboardInner({ view = 'overview', embedded = false }: DashboardClientProps) {
   const { data: session, status, update } = useSession();
   const router = useRouter();
   const searchParams = useSafeSearchParams();
@@ -463,6 +465,15 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   }, [editOpen, previewOpen]);
 
   if (status === 'loading') {
+    if (embedded) {
+      return (
+        <div className="svc-skel" aria-busy="true" aria-label="Открываем кабинет">
+          <div className="svc-skel__pill" />
+          <div className="svc-skel__row" />
+          <div className="svc-skel__row" />
+        </div>
+      );
+    }
     return (
       <div className="container dashboard-shell dashboard-shell--boot" aria-busy="true">
         <div className="svc-skel" aria-hidden>
@@ -502,7 +513,7 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   const isOverview = view === 'overview';
 
   return (
-    <div className="container dashboard-page">
+    <div className={embedded ? undefined : 'container dashboard-page'}>
       <EventSoonNotifier tickets={upcomingTickets} />
       {pendingModeration ? (
         <div
@@ -521,27 +532,37 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
         </div>
       ) : null}
       {isOverview ? <h1 className="sr-only">Кабинет</h1> : null}
-      <CabinetMenu
-        variant="strip"
-        current="overview"
-        upcomingCount={upcomingTickets.length}
-        unreadMessages={unreadMessages}
-        achievementLegend={achievementLegend}
-        ecoPoints={profile?.ecoPoints ?? 0}
-        role={session.user?.role}
-      />
+      {embedded ? null : (
+        <CabinetMenu
+          variant="strip"
+          current="overview"
+          upcomingCount={upcomingTickets.length}
+          unreadMessages={unreadMessages}
+          achievementLegend={achievementLegend}
+          ecoPoints={profile?.ecoPoints ?? 0}
+          role={session.user?.role}
+        />
+      )}
       <div>
-        <div className={`dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''} hide-aside-mobile`}>
-          <CabinetMenu
-            current="overview"
-            upcomingCount={upcomingTickets.length}
-            unreadMessages={unreadMessages}
-            achievementLegend={achievementLegend}
-            ecoPoints={profile?.ecoPoints ?? 0}
-            role={session.user?.role}
-          />
+        <div
+          className={
+            embedded
+              ? undefined
+              : `dashboard-layout dashboard-shell${isOverview ? ' is-overview' : ''} hide-aside-mobile`
+          }
+        >
+          {embedded ? null : (
+            <CabinetMenu
+              current="overview"
+              upcomingCount={upcomingTickets.length}
+              unreadMessages={unreadMessages}
+              achievementLegend={achievementLegend}
+              ecoPoints={profile?.ecoPoints ?? 0}
+              role={session.user?.role}
+            />
+          )}
 
-                    <div className="dashboard-main">
+                    <div className={embedded ? undefined : 'dashboard-main'}>
             {(view === 'overview' || view === 'edit') && (
               <div className="dashboard-stack" style={{ maxWidth: "100%", width: "100%", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
                 <div className="profile-overview-top" id="profile-hub">
@@ -1348,6 +1369,6 @@ function DashboardInner({ view = 'overview' }: DashboardClientProps) {
   );
 }
 
-export default function DashboardClient({ view = 'overview' }: DashboardClientProps) {
-  return <DashboardInner view={view} />;
+export default function DashboardClient({ view = 'overview', embedded = false }: DashboardClientProps) {
+  return <DashboardInner view={view} embedded={embedded} />;
 }
