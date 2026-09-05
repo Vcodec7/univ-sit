@@ -22,37 +22,37 @@ const META: Record<
 > = {
   snake: {
     desc: "Свайп, комбо, таблица почёта.",
-    accent: "#22c55e",
+    accent: "#afca03",
     badge: "аркада",
     tips: "Тап — старт",
   },
   tetris: {
     desc: "Свайпы и превью фигуры.",
-    accent: "#3b82f6",
+    accent: "#8562d8",
     badge: "пазл",
     tips: "Тап — поворот",
   },
   checkers: {
     desc: "Три сложности, рекорд на время.",
-    accent: "#f59e0b",
+    accent: "#6e4bc4",
     badge: "дуэль",
     tips: "Выбери сложность",
   },
   breakout: {
     desc: "Уровни и жизни. ПК: мышь.",
-    accent: "#ef4444",
+    accent: "#3f6b00",
     badge: "аркада",
     tips: "Тап — старт",
   },
   memory: {
     desc: "Пары, комбо, бонус за скорость.",
-    accent: "#a855f7",
+    accent: "#8562d8",
     badge: "логика",
     tips: "Тап по карточкам",
   },
   fifteen: {
     desc: "3×3 / 4×4 / 5×5 — собери поле на время.",
-    accent: "#06b6d4",
+    accent: "#afca03",
     badge: "пазл",
     tips: "Выбери сложность",
   },
