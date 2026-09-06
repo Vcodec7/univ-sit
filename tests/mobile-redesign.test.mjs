@@ -36,4 +36,7 @@ test('profile card stacks identity then actions then extras', () => {
   assert.match(profile, /profile-hero__more/);
   assert.match(profile, /Контакты и ID/);
   assert.doesNotMatch(profile, /avatar-legend-frame/);
+  const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
+  assert.match(unify, /profile-hero--cabinet \.profile-hero__main/);
+  assert.match(unify, /0 0 0 5px #afca03/);
 });

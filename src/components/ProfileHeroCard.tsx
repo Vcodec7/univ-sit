@@ -403,7 +403,7 @@ export default function ProfileHeroCard({
             <h1 className="profile-hero__name">{displayName}</h1>
             {roleLabel ? <span className="profile-hero__role">{roleLabel}</span> : null}
           </div>
-          {showLegal ? <div className="profile-hero__sub">{name}</div> : null}
+          {showLegal ? <p className="profile-hero__sub">{name}</p> : null}
           {bio ? <p className="profile-hero__bio">{bio}</p> : null}
           {email || phone || publicCode ? (
             <details className="profile-hero__more">

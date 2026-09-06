@@ -647,3 +647,96 @@
     background: #f3f8c4 !important;
   }
 }
+
+/* Cabinet identity: Sochi sea card, lime ring, camera chip — no glow loops */
+.dashboard-page .profile-hero.profile-hero--cabinet,
+.dashboard-page .profile-hero {
+  background:
+    linear-gradient(165deg, #d7eef8 0%, #fff 46%, #f7faf4 100%) !important;
+  border: 1px solid rgba(120, 176, 206, 0.34) !important;
+  box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
+}
+.dashboard-page .profile-hero--cabinet .profile-hero__main {
+  align-items: center !important;
+  gap: 1rem !important;
+}
+.dashboard-page .profile-hero--cabinet .profile-hero__avatar,
+.dashboard-page .profile-hero__avatar {
+  width: 4.75rem !important;
+  height: 4.75rem !important;
+  overflow: visible !important;
+  background: #0a7aa8 !important;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px #afca03 !important;
+  filter: none !important;
+}
+html[data-eco-aura] .dashboard-page .profile-hero__avatar,
+html[data-eco-aura] .dashboard-page .profile-hero__avatar-inner,
+html[data-eco-frame='frame_neon'] .dashboard-page .profile-hero__avatar,
+html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px #afca03 !important;
+  filter: none !important;
+  animation: none !important;
+}
+.dashboard-page .profile-hero__avatar-inner {
+  overflow: hidden;
+  border-radius: 50%;
+}
+.dashboard-page .profile-hero__avatar-edit {
+  left: auto !important;
+  right: -0.12rem !important;
+  bottom: -0.08rem !important;
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  border-radius: 999px !important;
+  background: #afca03 !important;
+  color: #0a0c2a !important;
+  border: 2px solid #fff !important;
+  box-shadow: none !important;
+  display: grid !important;
+  place-items: center !important;
+}
+.dashboard-page .profile-hero--cabinet .profile-hero__name-row {
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 0.35rem 0.5rem !important;
+}
+.dashboard-page .profile-hero--cabinet .profile-hero__name {
+  flex: 0 1 auto;
+  font-size: 1.28rem !important;
+  letter-spacing: -0.045em;
+  color: #0a0c2a !important;
+}
+.dashboard-page .profile-hero--cabinet .profile-hero__role {
+  background: #f3f8c4 !important;
+  color: #0a0c2a !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 0.18rem 0.55rem !important;
+  font-size: 0.62rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dashboard-page .profile-hero__sub {
+  margin: 0.22rem 0 0 !important;
+  color: #5a5670 !important;
+  font-size: 0.82rem !important;
+  line-height: 1.35 !important;
+}
+.dashboard-page .profile-hero__more summary {
+  color: #0a7aa8 !important;
+  font-weight: 750 !important;
+}
+.dashboard-page .profile-hero__more summary::after {
+  content: '';
+  display: inline-block;
+  width: 0.34rem;
+  height: 0.34rem;
+  margin-left: 0.38rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+}
+.dashboard-page .profile-hero__more[open] summary::after {
+  transform: rotate(-135deg) translateY(-1px);
+}
