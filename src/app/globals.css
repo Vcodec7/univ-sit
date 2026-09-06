@@ -27077,6 +27077,7 @@ button.btn,
   margin-inline: 0 !important;
   gap: var(--rail-gap) !important;
   scroll-padding-inline: 0;
+  align-items: stretch !important;
 }
 .home-page--lift .home-rail::-webkit-scrollbar {
   height: 0 !important;
@@ -27086,13 +27087,14 @@ button.btn,
   flex: 0 0 calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   max-width: none !important;
-  height: auto !important;
+  height: unset !important;
   align-self: stretch;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 .home-page--lift .home-rail__slide > * {
-  height: 100% !important;
+  min-height: 100%;
+  height: auto !important;
   display: flex;
   flex-direction: column;
 }
