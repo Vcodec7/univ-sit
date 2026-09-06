@@ -1,0 +1,16 @@
+---
+description: YoungPortal — быстрый цикл, ty/py, UI и vis-QA без лишней работы
+alwaysApply: true
+---
+
+# YoungPortal — как работать быстро
+
+- Правки пакетом → один commit/push → один `bash scripts/apply-staging.sh` на ty. Не `docker compose --build` на VPS.
+- Прод `py.idivles.ru` только после явного «одобряю».
+- Проверка: `npm test` + `npm run ui:guard` + `bash scripts/smoke-sites.sh --staging-only`. Браузер — только если баг визуальный.
+- UI: контраст (тёмный текст на светлом, белый на фиолетовом CTA), видимый `:hover`, сетки на всю ширину, без 1px полоски у `.glass-nav`.
+- Быстрый доступ: вкладка `.qa-edge-tab` / свайп от правого края. Не вешать жест V на всю страницу — на телефоне уезжает скролл.
+- Площадки могут быть бронь и коворкинг сразу (`BOTH`). Из каталога бронь: `?from=list`, назад — к списку.
+- На хабе `/games` показывать шапку и нижнюю панель; прятать только в `/games/<id>`.
+- Не коммитить `.env` и пароли. Статусы в UI по-русски.
+- Скиллы: `.cursor/skills/youngportal-ops`, `.cursor/skills/youngportal-ui`.

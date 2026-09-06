@@ -1,0 +1,198 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import QRCodeDisplay from '@/components/QRCodeDisplay';
+import { History, Maximize2, RefreshCw, X } from 'lucide-react';
+
+type HistoryItem = {
+  id: string;
+  kind: string;
+  delta: number;
+  balanceAfter: number;
+  reason: string;
+  createdAt: string;
+};
+
+type Props = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export default function PersonalQrPanel({ open, onClose }: Props) {
+  const [url, setUrl] = useState('');
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const load = useCallback(async (force = false) => {
+    if (!force) setLoading(true);
+    try {
+      const r = await fetch('/api/presence-qr', {
+        method: force ? 'POST' : 'GET',
+        credentials: 'same-origin',
+        headers: force ? { 'Content-Type': 'application/json' } : undefined,
+        body: force ? JSON.stringify({ action: 'rotate' }) : undefined,
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.message || 'Ошибка');
+      const qr = data.qr || {};
+      setUrl(qr.url || '');
+      setExpiresAt(qr.expiresAt || null);
+      if (data.history) setHistory(data.history);
+      setError(null);
+    } catch (e) {
+      setError((e as Error).message || 'Не удалось загрузить QR');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      setFullscreen(false);
+      setShowHistory(false);
+      return;
+    }
+    load(false);
+  }, [open, load]);
+
+  useEffect(() => {
+    if (!open && !fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (fullscreen) setFullscreen(false);
+      else if (showHistory) setShowHistory(false);
+      else onClose();
+    };
+    document.body.style.overflow = open || fullscreen ? 'hidden' : '';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open, fullscreen, showHistory, onClose]);
+
+  if (!mounted || !open) return null;
+
+  const qrSize = window.matchMedia('(max-width: 700px)').matches ? 168 : 196;
+
+  const fs =
+    fullscreen && url
+      ? createPortal(
+          <div
+            className="presence-fs"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Пропуск на весь экран"
+            onClick={() => setFullscreen(false)}
+          >
+            <div className="presence-fs__card" onClick={(e) => e.stopPropagation()}>
+              <QRCodeDisplay value={url} size={Math.min(280, Math.floor(window.innerWidth * 0.62))} />
+              <p className="presence-fs__hint">Покажите QR на входе</p>
+              <button
+                type="button"
+                className="btn btn-primary presence-fs__done"
+                onClick={() => setFullscreen(false)}
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
+  return createPortal(
+    <>
+      <div className="presence-pass-sheet" role="dialog" aria-modal="true" aria-label="Пропуск">
+        <button type="button" className="presence-pass-sheet__back" aria-label="Закрыть" onClick={onClose} />
+        <div className="presence-pass-sheet__card">
+          <div className="presence-qr-head">
+            <h2>Пропуск</h2>
+            <button type="button" className="yp-modal-close" aria-label="Закрыть" onClick={onClose}>
+              <X size={16} strokeWidth={2.5} />
+            </button>
+          </div>
+          <p className="presence-pass-sheet__lead">QR на входе. Откройте, когда вас просят показать пропуск.</p>
+          {loading && !url ? <p className="presence-muted">Готовим QR…</p> : null}
+          {error ? <p className="presence-error">{error}</p> : null}
+          {url ? (
+            <div className="presence-qr-wrap">
+              <QRCodeDisplay value={url} size={qrSize} />
+              <div className="presence-qr-actions">
+                <button type="button" className="btn btn-primary" onClick={() => setFullscreen(true)}>
+                  <Maximize2 size={16} /> На вход
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => load(true)}>
+                  <RefreshCw size={16} /> Обновить
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary presence-history-btn"
+                  onClick={() => setShowHistory(true)}
+                  aria-label="История баллов"
+                >
+                  <History size={16} /> История
+                </button>
+              </div>
+              {expiresAt ? (
+                <p className="presence-muted">
+                  до {new Date(expiresAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {showHistory ? (
+        <div className="presence-history-sheet" role="dialog" aria-modal="true" aria-label="История">
+          <button
+            type="button"
+            className="presence-history-sheet__back"
+            aria-label="Закрыть"
+            onClick={() => setShowHistory(false)}
+          />
+          <div className="presence-history-sheet__card">
+            <div className="presence-history-sheet__head">
+              <h3>История</h3>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowHistory(false)}>
+                Закрыть
+              </button>
+            </div>
+            {history.length === 0 ? (
+              <p className="presence-muted">Пока нет записей.</p>
+            ) : (
+              <ul className="presence-history-list">
+                {history.slice(0, 30).map((h) => (
+                  <li key={h.id}>
+                    <span className={`presence-delta ${h.delta >= 0 ? 'is-plus' : 'is-minus'}`}>
+                      {h.delta >= 0 ? '+' : ''}
+                      {h.delta} {h.kind === 'ECO_POINTS' || h.kind === 'ECO' ? 'М-баллы' : 'репутация'}
+                    </span>
+                    <span className="presence-reason">{h.reason}</span>
+                    <time dateTime={h.createdAt}>
+                      {new Date(h.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}
+                    </time>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      {fs}
+    </>,
+    document.body
+  );
+}

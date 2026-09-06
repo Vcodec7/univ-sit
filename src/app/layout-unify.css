@@ -1,0 +1,650 @@
+/**
+ * Last-win layout: one shell, no overlapping chrome, aligned catalogs.
+ * Imported after globals.css from app/layout.tsx.
+ */
+
+.catalog-page {
+  padding-top: 1.15rem;
+  padding-bottom: 2.75rem;
+}
+
+.catalog-page-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem 1.15rem;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .catalog-page-header {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 28rem);
+    align-items: center;
+  }
+}
+
+.catalog-page-header__intro {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 0.4rem 0.65rem !important;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-page-header__intro .page-hero-title {
+  display: block !important;
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 100% !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.catalog-page-header__count {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+.catalog-page-header__search {
+  width: 100%;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  min-width: 0;
+}
+
+.grid-cards,
+.event-grid,
+.places-grid {
+  align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.25rem), 1fr));
+}
+
+.catalog-card,
+.event-card {
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-card-body,
+.catalog-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.catalog-card-meta {
+  margin-top: auto;
+}
+
+.main-content img:not(.site-brand-logo):not(.svc-hero__media img) {
+  max-width: 100%;
+}
+
+.admin-main,
+.admin-page-shell {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.admin-main table,
+.admin-page-shell table {
+  max-width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .glass-nav-inner {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+  .glass-nav-end {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0;
+    gap: 0.4rem !important;
+    min-width: 0 !important;
+    min-height: 2.25rem;
+    padding-left: 0.15rem !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .glass-nav-end .nav-auth-mobile,
+  .glass-nav-end .nav-auth-mobile__row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  .glass-nav-end .nav-pill--mobile-cta {
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    width: auto !important;
+    min-width: 5.1rem;
+    padding: 0 0.85rem !important;
+    font-size: 0.8rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+  .glass-nav-end .nav-icon-btn,
+  .glass-nav-end .mobile-menu-btn,
+  .glass-nav-end .nav-auth-mobile__profile {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    min-width: 2.25rem !important;
+    min-height: 2.25rem !important;
+    border-radius: 999px !important;
+    background: rgba(10, 12, 42, 0.06) !important;
+    color: #0a0c2a !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+  }
+  .glass-nav-end .nav-icon-btn svg,
+  .glass-nav-end .mobile-menu-btn svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    stroke-width: 2;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --yp-hero-h: min(22.5rem, 52svh);
+  }
+  html.has-bottom-nav,
+  body.has-bottom-nav {
+    --yp-hero-h: min(20.5rem, 46svh);
+  }
+  .svc-hero--banner,
+  .svc-hero--banner.svc-hero {
+    min-height: var(--yp-hero-h) !important;
+    height: auto !important;
+    max-height: var(--yp-hero-h);
+  }
+  .pwa-install-banner,
+  .yp-pwa-install,
+  [data-yp-pwa-install] {
+    bottom: calc(0.75rem + var(--yp-bottom-nav-h, 0px)) !important;
+    z-index: 9000 !important;
+  }
+  .yp-cookie-banner,
+  .consent-banner {
+    bottom: calc(0.5rem + var(--yp-bottom-nav-h, 0px));
+  }
+
+  /* Home phone: hero photo matches feed cards, first screen fits */
+  .home-page--lift {
+    background-color: #eef6fb;
+    background-image: radial-gradient(rgba(10, 12, 42, 0.04) 0.55px, transparent 0.7px);
+    background-size: 3px 3px;
+  }
+  .lift-hero {
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    padding: 0.55rem 0 0.15rem;
+  }
+  .lift-hero__stage {
+    position: relative;
+    margin: 0 1.15rem;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    aspect-ratio: 16 / 10;
+    border-radius: 1.15rem;
+    overflow: hidden;
+    border: 1px solid rgba(120, 176, 206, 0.28);
+    box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08);
+    background: #fff;
+  }
+  .lift-hero__veil,
+  .lift-hero__glow {
+    display: none !important;
+  }
+  .lift-hero__copy {
+    position: static !important;
+    text-align: center;
+    max-width: 22.5rem;
+    margin: 0 auto;
+    color: #0a0c2a !important;
+    padding: 0.85rem 1.15rem 0.15rem !important;
+  }
+  .lift-hero__eyebrow {
+    color: #5a5670 !important;
+    letter-spacing: 0.08em;
+    font-size: 0.62rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .lift-hero__title {
+    color: #0a0c2a !important;
+    text-shadow: none !important;
+    font-size: 1.32rem !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.04em !important;
+    justify-items: center;
+  }
+  .lift-hero__title span {
+    color: #0a0c2a !important;
+  }
+  .lift-hero__lead {
+    display: none !important;
+  }
+  .lift-hero__cta {
+    flex-direction: row;
+    align-items: stretch;
+    margin-top: 0.75rem !important;
+    gap: 0.45rem !important;
+    width: min(100%, 20rem);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .lift-hero__btn {
+    flex: 1 1 0;
+    width: auto;
+    border-radius: 999px !important;
+    min-height: 2.55rem !important;
+    font-size: 0.88rem;
+    padding: 0.45rem 0.7rem !important;
+  }
+  .lift-hero__btn--lime {
+    background: #0a0c2a !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+  .lift-hero__btn--ghost {
+    background: #e7e4de !important;
+    color: #0a0c2a !important;
+    border: 0 !important;
+    text-decoration: none !important;
+    backdrop-filter: none !important;
+    min-height: 2.55rem !important;
+    font-weight: 750 !important;
+  }
+  .lift-deck {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.55rem !important;
+    margin: 0.7rem 0 0.1rem !important;
+    padding: 0 1rem !important;
+    grid-template-columns: none !important;
+  }
+  .lift-deck__card {
+    width: 2.85rem;
+    height: 2.85rem;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background: #e7e4de !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #0a0c2a !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0 !important;
+  }
+  .lift-deck__glyph {
+    display: grid !important;
+    place-items: center;
+    color: #0a0c2a;
+  }
+  .lift-deck__kicker,
+  .lift-deck__card strong,
+  .lift-deck__card p,
+  .lift-deck__go {
+    display: none !important;
+  }
+  .lift-sochi {
+    display: none !important;
+  }
+}
+
+.faq-hub__chips,
+.places-chips,
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.lift-deck__glyph {
+  display: none;
+}
+
+@media (min-width: 861px) {
+  .lift-hero {
+    position: relative;
+  }
+  .lift-hero__copy {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 11.25rem;
+    z-index: 3;
+    color: #fff;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .lift-hero__title span {
+    color: #afca03;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-page .home-rail-wrap,
+  .home-page.home-page--lift .home-rail-wrap {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: center !important;
+  }
+  .home-page .home-rail-wrap:has(> .home-rail-nav),
+  .home-page.home-page--lift .home-rail-wrap:has(> .home-rail-nav) {
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem !important;
+  }
+  .home-rail-nav {
+    display: grid !important;
+    place-items: center;
+    place-self: center !important;
+    align-self: center !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 2.45rem;
+    height: 2.45rem;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #afca03 !important;
+    box-shadow: none !important;
+  }
+  .home-rail-nav svg {
+    color: #afca03;
+    stroke: #afca03;
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+}
+
+@media (min-width: 861px) {
+  .event-carousel__nav {
+    top: 50% !important;
+    transform: translateY(-50%);
+    background: transparent !important;
+    color: #afca03 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .event-carousel__nav svg {
+    color: #afca03;
+    stroke: #afca03;
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+}
+
+/* Home rails: light sea/sky Sochi cards (last-win) */
+.home-page.home-page--lift {
+  background-color: #eef6fb;
+  background-image:
+    radial-gradient(rgba(10, 12, 42, 0.04) 0.55px, transparent 0.7px),
+    linear-gradient(180deg, #d7eef8 0%, #eef6fb 32%, #f7faf4 100%);
+  background-size: 3px 3px, auto;
+}
+.home-page--lift .free-now-card,
+.home-page--lift .lift-feed-card,
+.home-page--lift .lift-feed-card.event-card {
+  height: auto !important;
+  background: #fff !important;
+  border: 1px solid rgba(120, 176, 206, 0.28) !important;
+  box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
+}
+.home-page--lift .free-now-body,
+.home-page--lift .lift-feed-card .event-card-body {
+  background: linear-gradient(180deg, #f5fbfe 0%, #fff 58%) !important;
+  color: #0a0c2a !important;
+}
+.home-page--lift .free-now-body h3,
+.home-page--lift .lift-feed-card .event-card-title {
+  color: #0a0c2a !important;
+}
+.home-page--lift .free-now-body p,
+.home-page--lift .lift-feed-card .event-card-facts,
+.home-page--lift .lift-feed-card .event-card-desc {
+  color: #5a5670 !important;
+}
+.home-page--lift .free-now-slot,
+.home-page--lift .lift-feed-card .event-card-seats,
+.home-page--lift .lift-feed-card .event-card-date {
+  color: #6e8f02 !important;
+}
+.home-page--lift .free-now-badge,
+.home-page--lift .lift-feed-card .event-card-category {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0a0c2a !important;
+  border: 1px solid rgba(10, 12, 42, 0.12) !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn--ghost,
+.home-page--lift .lift-feed-card .event-action-chip {
+  color: #0a0c2a !important;
+  background: #fff !important;
+  border: 1px solid rgba(10, 12, 42, 0.16) !important;
+}
+.home-page--lift .free-now-avatar::after {
+  display: none !important;
+}
+.home-page .event-empty {
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  min-height: 8rem;
+  display: grid;
+  place-content: center;
+  gap: 0.35rem;
+}
+
+/* Phone/touch: stop sticky-blur, glow loops and hover paints that hitch profile scroll */
+@media (max-width: 900px), (pointer: coarse) {
+  .glass-nav,
+  .yp-profile__top,
+  .yp-bottom-nav,
+  .glass,
+  .mobile-menu,
+  .samsung-sidebar,
+  .samsung-drawer__panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glass-nav,
+  .yp-profile__top {
+    background: #fff !important;
+  }
+  .dashboard-page .presence-panel,
+  .dashboard-page .profile-hero,
+  .dashboard-page .cw-cabinet {
+    content-visibility: visible !important;
+    contain: none !important;
+  }
+  .profile-hero__avatar-inner {
+    transform: none !important;
+  }
+  .nav-icon-btn--ghost,
+  .achievement-complete-ring,
+  .avatar-legend-frame,
+  .home-hero--animated .home-hero-media,
+  .home-hero--animated .home-hero-glow,
+  html[data-eco-aura] .profile-hero__avatar,
+  html[data-eco-aura] .profile-hero__avatar-inner,
+  html[data-eco-ticket] .yp-ticket-qr,
+  .yp-eco-surface[data-eco-aura] .yp-profile__avatar-wrap,
+  .yp-eco-surface[data-eco-aura] .user-avatar-wrap > span:first-child {
+    animation: none !important;
+  }
+  html[data-eco-aura] .profile-hero__avatar,
+  html[data-eco-aura] .profile-hero__avatar-inner,
+  html[data-eco-frame='frame_neon'] .profile-hero__avatar,
+  html[data-eco-frame='frame_cyber'] .profile-hero__avatar,
+  .yp-eco-surface[data-eco-aura] .yp-profile__avatar-wrap,
+  .yp-eco-surface[data-eco-aura] .user-avatar-wrap > span:first-child {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px #8562d8 !important;
+    filter: none !important;
+  }
+  .yp-profile__collectible-glyph {
+    filter: none !important;
+  }
+}
+
+@media (hover: none) {
+  .svc-space-card:hover,
+  .yp-feed-card:hover,
+  .catalog-card:hover,
+  .yp-profile__collectible:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Sochi youth 2026: sea/sky/lime, magazine home — last-win */
+.home-page.home-page--lift .home-section-title::after {
+  width: 3.2rem;
+  background: #afca03;
+}
+.home-page.home-page--lift .home-section-sub {
+  max-width: 28rem;
+  color: #5a5670;
+  font-size: 0.95rem;
+}
+.home-page.home-page--lift .home-section-link {
+  color: #0a7aa8;
+  font-weight: 750;
+}
+
+@media (min-width: 861px) {
+  .lift-hero {
+    border-radius: 0 0 2.35rem 2.35rem !important;
+    background:
+      linear-gradient(180deg, #06344a 0%, #0a0c2a 100%) !important;
+  }
+  .lift-hero__veil {
+    background:
+      linear-gradient(105deg, rgba(6, 52, 74, 0.72) 0%, rgba(10, 12, 42, 0.18) 46%, rgba(10, 122, 168, 0.08) 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(10, 12, 42, 0.08) 40%, rgba(10, 12, 42, 0.7) 100%) !important;
+  }
+  .lift-hero__glow {
+    background:
+      radial-gradient(ellipse at 86% 8%, rgba(175, 202, 3, 0.28), transparent 44%),
+      radial-gradient(ellipse at 12% 88%, rgba(126, 200, 227, 0.35), transparent 42%) !important;
+  }
+  .lift-hero__eyebrow {
+    color: #afca03 !important;
+    letter-spacing: 0.16em;
+  }
+  .lift-hero__title span {
+    color: #afca03 !important;
+  }
+  .lift-deck {
+    margin-top: -3.1rem;
+    padding-bottom: 2rem;
+  }
+  .lift-deck__card {
+    background: #fff !important;
+    color: #0a0c2a !important;
+    border: 1px solid rgba(120, 176, 206, 0.35) !important;
+    box-shadow: 0 18px 40px rgba(30, 90, 130, 0.12) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-top: 3px solid #afca03 !important;
+  }
+  .lift-deck__card:nth-child(2) {
+    border-top-color: #0a7aa8 !important;
+  }
+  .lift-deck__card:nth-child(3) {
+    border-top-color: #7ec8e3 !important;
+  }
+  .lift-deck__card:nth-child(4) {
+    border-top-color: #afca03 !important;
+  }
+  .lift-deck__card:hover {
+    background: #f5fbfe !important;
+    transform: translateY(-4px);
+  }
+  .lift-deck__kicker {
+    color: #0a7aa8 !important;
+  }
+  .lift-deck__card p {
+    color: #5a5670 !important;
+  }
+  .lift-deck__go {
+    color: #6e8f02;
+    font-weight: 800;
+    font-size: 0.82rem;
+  }
+  .lift-sochi__eyebrow {
+    color: #0a7aa8 !important;
+  }
+  .lift-sochi__card {
+    border-color: rgba(120, 176, 206, 0.32) !important;
+    box-shadow: 0 12px 28px rgba(30, 90, 130, 0.08) !important;
+    background:
+      linear-gradient(180deg, #f5fbfe 0%, #fff 55%) !important;
+  }
+  .home-page--lift .home-cta-split article {
+    background:
+      linear-gradient(165deg, #0a7aa8 0%, #06344a 100%) !important;
+    border: 0 !important;
+    box-shadow: 0 18px 40px rgba(30, 90, 130, 0.18) !important;
+  }
+  .home-page--lift .home-cta-split article:last-child {
+    background:
+      linear-gradient(165deg, #6e8f02 0%, #0a0c2a 88%) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .home-page.home-page--lift {
+    background-color: #e8f4fb;
+    background-image:
+      radial-gradient(rgba(10, 12, 42, 0.035) 0.55px, transparent 0.7px),
+      linear-gradient(180deg, #cfeaf6 0%, #eef6fb 28%, #f7faf4 100%);
+    background-size: 3px 3px, auto;
+  }
+  .lift-hero__stage {
+    border-radius: 1.25rem;
+    border-color: rgba(10, 122, 168, 0.22);
+    box-shadow: 0 16px 36px rgba(10, 122, 168, 0.12);
+  }
+  .lift-hero__eyebrow {
+    color: #0a7aa8 !important;
+    font-weight: 800 !important;
+  }
+  .lift-hero__title {
+    font-size: 1.42rem !important;
+  }
+  .lift-hero__btn--lime {
+    background: #afca03 !important;
+    color: #0a0c2a !important;
+  }
+  .lift-hero__btn--ghost {
+    background: #fff !important;
+    border: 1px solid rgba(10, 12, 42, 0.12) !important;
+  }
+  .lift-deck__card {
+    background: #fff !important;
+    border: 1px solid rgba(120, 176, 206, 0.4) !important;
+    box-shadow: 0 8px 18px rgba(30, 90, 130, 0.08) !important;
+  }
+  .lift-deck__card:nth-child(odd) {
+    background: #f3f8c4 !important;
+  }
+}
