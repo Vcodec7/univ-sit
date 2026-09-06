@@ -91,7 +91,7 @@ export default function EventHomeCarousel({ count, children }: Props) {
             onClick={prev}
             aria-label="Предыдущее мероприятие"
           >
-            <ChevronLeft size={20} aria-hidden />
+            <ChevronLeft size={28} strokeWidth={2.4} aria-hidden />
           </button>
           <button
             type="button"
@@ -99,7 +99,7 @@ export default function EventHomeCarousel({ count, children }: Props) {
             onClick={next}
             aria-label="Следующее мероприятие"
           >
-            <ChevronRight size={20} aria-hidden />
+            <ChevronRight size={28} strokeWidth={2.4} aria-hidden />
           </button>
           <div className="event-carousel__dots" role="tablist" aria-label="Слайды мероприятий">
             {Array.from({ length: count }, (_, i) => (
