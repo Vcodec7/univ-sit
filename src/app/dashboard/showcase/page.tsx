@@ -21,18 +21,16 @@ export default function DashboardShowcasePage() {
   return (
     <CabinetSubpage
       title="Витрина профиля"
-      lead="Значки и коллекционные карты, которые видят другие на вашей публичной странице."
+      lead="Значки и карты, которые видят на вашей странице."
     >
       {ready ? (
-        <>
+        <div className="dashboard-showcase">
           <ShowcaseStudio
             showcaseStored={codes}
             onSaved={(next) => setCodes(next)}
           />
-          <div style={{ marginTop: '1rem' }}>
-            <CollectiblesPanel />
-          </div>
-        </>
+          <CollectiblesPanel />
+        </div>
       ) : (
         <div className="svc-skel" aria-busy="true">
           <div className="svc-skel__row" />

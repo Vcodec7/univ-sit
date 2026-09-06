@@ -938,3 +938,307 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Showcase: compact light Sochi — no navy collection well */
+.dashboard-page:has(.dashboard-showcase) .profile-subhead {
+  margin-bottom: 0.45rem;
+}
+.dashboard-page:has(.dashboard-showcase) .profile-view__lead {
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: #5a5670;
+}
+.dashboard-showcase {
+  display: grid;
+  gap: 0.7rem;
+}
+.dashboard-page .dashboard-showcase .showcase-studio {
+  gap: 0.45rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: linear-gradient(165deg, #f5fbfe, #fff 55%);
+}
+.dashboard-page .dashboard-showcase .showcase-studio__title {
+  font-size: 0.95rem;
+  color: #0a0c2a;
+}
+.dashboard-page .dashboard-showcase .showcase-studio__lead {
+  margin: 0.12rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: #5a5670;
+}
+.dashboard-page .dashboard-showcase .showcase-studio__meta {
+  font-size: 0.75rem;
+}
+.dashboard-page .dashboard-showcase .showcase-studio__link {
+  color: #0a7aa8;
+  font-weight: 750;
+}
+.dashboard-page .dashboard-showcase .showcase-studio__stage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.dashboard-page .dashboard-showcase .showcase-badge-card,
+.dashboard-page .dashboard-showcase .showcase-pick-card {
+  flex: 1 1 calc(50% - 0.4rem);
+  min-width: 0;
+  gap: 0.45rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: #fff;
+  box-shadow: none;
+}
+.dashboard-page .dashboard-showcase .showcase-badge-card {
+  grid-template-columns: auto 1fr;
+}
+.dashboard-page .dashboard-showcase .showcase-badge-card__icon,
+.dashboard-page .dashboard-showcase .showcase-pick-card__icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.5rem;
+}
+.dashboard-page .dashboard-showcase .showcase-badge-card strong,
+.dashboard-page .dashboard-showcase .showcase-pick-card strong {
+  font-size: 0.78rem;
+  color: #0a0c2a;
+  line-height: 1.2;
+}
+.dashboard-page .dashboard-showcase .showcase-badge-card small,
+.dashboard-page .dashboard-showcase .showcase-pick-card small {
+  font-size: 0.68rem;
+  color: #5a5670;
+}
+.dashboard-page .dashboard-showcase .showcase-studio__empty {
+  padding: 0.55rem 0.65rem;
+  font-size: 0.8rem;
+  background: #f5fbfe;
+}
+.dashboard-page .dashboard-showcase .yp-cards,
+.dashboard-page .dashboard-showcase .yp-cards--sochi {
+  margin-top: 0;
+  padding: 0.7rem 0.75rem 0.85rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: linear-gradient(180deg, #eef6fb, #fff 42%);
+  color: #0a0c2a;
+  box-shadow: none;
+  overflow: hidden;
+}
+.dashboard-page .dashboard-showcase .yp-cards--sochi::after {
+  display: none;
+}
+.dashboard-page .dashboard-showcase .yp-cards__head {
+  margin-bottom: 0.45rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__head h4 {
+  font-size: 0.95rem;
+  color: #0a0c2a;
+}
+.dashboard-page .dashboard-showcase .yp-cards__balance {
+  color: #0a0c2a;
+  background: #afca03;
+  border: 1px solid #9bb502;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.55rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+  margin-bottom: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.32);
+}
+.dashboard-page .dashboard-showcase .yp-cards__level-badge {
+  color: #0a7aa8;
+  font-size: 0.8rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__level-bar {
+  flex: 1 1 8rem;
+  min-width: 6rem;
+  height: 0.28rem;
+  background: #e8f1f6;
+}
+.dashboard-page .dashboard-showcase .yp-cards__level small {
+  margin: 0;
+  width: 100%;
+  font-size: 0.7rem;
+  color: #5a5670;
+}
+.dashboard-page .dashboard-showcase .yp-cards__lead {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: #5a5670;
+}
+.dashboard-page .dashboard-showcase .yp-cards__setline {
+  margin-bottom: 0.45rem;
+  font-size: 0.75rem;
+  color: #5a5670;
+}
+.dashboard-page .dashboard-showcase .yp-cards__packs {
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.dashboard-page .dashboard-showcase .yp-pack,
+.dashboard-page .dashboard-showcase .yp-cards--sochi .yp-pack,
+.dashboard-page .dashboard-showcase .yp-pack--night,
+.dashboard-page .dashboard-showcase .yp-pack--legend,
+.dashboard-page .dashboard-showcase .yp-pack--keeper,
+.dashboard-page .dashboard-showcase .yp-pack--sochi,
+.dashboard-page .dashboard-showcase .yp-pack--starter {
+  min-height: 0;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(120, 176, 206, 0.32);
+  background: #fff;
+  color: #0a0c2a;
+  box-shadow: none;
+  gap: 0.12rem;
+}
+.dashboard-page .dashboard-showcase .yp-pack:hover:not(:disabled) {
+  transform: none;
+  border-color: #0a7aa8;
+  background: #f5fbfe;
+}
+.dashboard-page .dashboard-showcase .yp-pack__foil {
+  animation: none;
+  display: none;
+}
+.dashboard-page .dashboard-showcase .yp-pack__icon {
+  width: 1.55rem;
+  height: 1.55rem;
+  margin-bottom: 0;
+  border-radius: 0.45rem;
+  background: #eef6fb;
+  color: #0a7aa8;
+}
+.dashboard-page .dashboard-showcase .yp-pack strong {
+  font-size: 0.8rem;
+  color: #0a0c2a;
+}
+.dashboard-page .dashboard-showcase .yp-pack span {
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: #5a5670;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dashboard-page .dashboard-showcase .yp-pack em {
+  margin-top: 0.1rem;
+  color: #3d4a00;
+  font-size: 0.75rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__drops {
+  padding: 0.5rem;
+  margin-bottom: 0.55rem;
+  background: #f5fbfe;
+  border: 1px dashed rgba(10, 122, 168, 0.35);
+}
+.dashboard-page .dashboard-showcase .yp-cards__drops-head button {
+  color: #0a7aa8;
+}
+.dashboard-page .dashboard-showcase .yp-cards__showcase h5,
+.dashboard-page .dashboard-showcase .yp-cards__inv-title {
+  color: #0a0c2a;
+  font-size: 0.82rem;
+  margin: 0 0 0.4rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__vitrine,
+.dashboard-page .dashboard-showcase .yp-cards__grid,
+.dashboard-page .dashboard-showcase .yp-cards__drops-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.dashboard-page .dashboard-showcase .yp-cards__series button {
+  background: #fff;
+  color: #0a0c2a;
+  border: 1px solid rgba(120, 176, 206, 0.35);
+}
+.dashboard-page .dashboard-showcase .yp-cards__series button.is-on {
+  background: #afca03;
+  color: #0a0c2a;
+  border-color: #9bb502;
+}
+.dashboard-page .dashboard-showcase .yp-card,
+.dashboard-page .dashboard-showcase .yp-cards--sochi .yp-card {
+  min-height: 7.4rem;
+  padding: 0.5rem;
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--card-accent) 16%, #fff), #fff 58%);
+  box-shadow: none;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 38%, #c5dce8);
+  color: #0a0c2a;
+  transform: none;
+}
+.dashboard-page .dashboard-showcase .yp-card:hover,
+.dashboard-page .dashboard-showcase .yp-cards--sochi .yp-card:hover {
+  transform: none;
+  border-color: #0a7aa8;
+}
+.dashboard-page .dashboard-showcase .yp-card::before,
+.dashboard-page .dashboard-showcase .yp-card__foil {
+  animation: none;
+  display: none;
+}
+.dashboard-page .dashboard-showcase .yp-card--legendary {
+  animation: none;
+  filter: none;
+}
+.dashboard-page .dashboard-showcase .yp-card__count {
+  color: #0a0c2a;
+  background: #eef6fb;
+  top: 0.4rem;
+  right: 0.4rem;
+}
+.dashboard-page .dashboard-showcase .yp-card__glyph {
+  font-size: 1.35rem !important;
+  margin: 0.2rem 0 0.05rem;
+  filter: none;
+}
+.dashboard-page .dashboard-showcase .yp-card strong {
+  color: #0a0c2a;
+  font-size: 0.78rem;
+}
+.dashboard-page .dashboard-showcase .yp-card em,
+.dashboard-page .dashboard-showcase .yp-card__tagline {
+  color: #5a5670;
+  font-size: 0.68rem;
+}
+.dashboard-page .dashboard-showcase .yp-card--empty {
+  min-height: 4.6rem;
+  background: #f5fbfe;
+  border: 1px dashed rgba(120, 176, 206, 0.45);
+  color: #5a5670;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.72rem;
+}
+.dashboard-page .dashboard-showcase .yp-card__pin {
+  background: #afca03;
+  color: #0a0c2a;
+  border: 0;
+}
+.dashboard-page .dashboard-showcase .yp-cards__empty {
+  color: #5a5670;
+  font-size: 0.8rem;
+}
+@media (min-width: 720px) {
+  .dashboard-page .dashboard-showcase .showcase-badge-card {
+    flex: 1 1 calc(33.33% - 0.4rem);
+  }
+  .dashboard-page .dashboard-showcase .yp-cards__vitrine,
+  .dashboard-page .dashboard-showcase .yp-cards__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

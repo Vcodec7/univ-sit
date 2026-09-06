@@ -197,9 +197,7 @@ export default function ShowcaseStudio({ showcaseStored, onSaved }: Props) {
           <h3 className="showcase-studio__title">
             <LayoutGrid size={18} aria-hidden /> Значки профиля
           </h3>
-          <p className="showcase-studio__lead">
-            До {SHOWCASE_MAX} значков на публичной странице — медали вашей карточки игрока.
-          </p>
+          <p className="showcase-studio__lead">До {SHOWCASE_MAX} значков на публичной странице.</p>
         </div>
         {!editing ? (
           <button

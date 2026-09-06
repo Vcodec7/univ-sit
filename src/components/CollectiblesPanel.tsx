@@ -168,7 +168,7 @@ export default function CollectiblesPanel({
   );
 
   return (
-    <section className="yp-cards yp-cards--luxe" aria-label="Коллекционные карточки">
+    <section className="yp-cards yp-cards--sochi" aria-label="Коллекционные карточки">
       <div className="yp-cards__head">
         <h4>
           <Layers size={15} aria-hidden /> Карточки коллекции
@@ -178,10 +178,9 @@ export default function CollectiblesPanel({
 
       {level ? (
         <div className="yp-cards__level" style={{ ['--lvl' as string]: level.level.color }}>
-          <span className="yp-cards__level-badge">
+          <span className="yp-cards__level-badge" title={level.level.blurb}>
             <Sparkles size={12} aria-hidden /> Ур. {level.level.level} · {level.level.title}
           </span>
-          <p>{level.level.blurb}</p>
           {level.level.next ? (
             <div className="yp-cards__level-bar">
               <i style={{ width: `${level.pct}%` }} />
@@ -194,16 +193,13 @@ export default function CollectiblesPanel({
         </div>
       ) : null}
 
-      <p className="yp-cards__lead">
-        Собирайте карточки Сочи, афиши и природу. Открывайте паки за М-баллы и ставьте до 5 карт на
-        витрину профиля — как инвентарь в Steam, но под наш портал.
-      </p>
+      <p className="yp-cards__lead">Паки за М-баллы · до 5 карт на витрине профиля.</p>
 
       <div className="yp-cards__setline">
         Коллекция: <strong>{uniqueCount}/{setSize}</strong> уникальных
         {pity > 0 ? (
           <span style={{ marginLeft: 8, color: pity >= 8 ? '#b45309' : '#64748b' }}>
-            · pity {pity}/15 к эпику+
+            · гарантия эпика {pity}/15
           </span>
         ) : null}
       </div>
