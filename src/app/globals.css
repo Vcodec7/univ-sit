@@ -2701,15 +2701,15 @@ img.site-brand-logo {
 }
 .event-carousel__nav {
   position: absolute;
-  top: 38%;
+  top: 50%;
   transform: translateY(-50%);
   z-index: 2;
   width: 2.25rem;
   height: 2.25rem;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  color: #334155;
+  background: #afca03;
+  color: #0a0c2a;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -2752,7 +2752,7 @@ img.site-brand-logo {
   .event-carousel__nav {
     width: 2rem;
     height: 2rem;
-    top: 32%;
+    top: 50%;
   }
   .event-list.is-slideshow .event-card-cover {
     aspect-ratio: 16 / 10;
@@ -27109,14 +27109,15 @@ button.btn,
     display: grid;
     place-items: center;
     position: static;
+    align-self: center;
     width: 2.35rem;
     height: 2.35rem;
-    border: 1px solid rgba(15, 23, 42, 0.1);
+    border: 0;
     border-radius: 999px;
-    background: #fff;
-    color: #334155;
+    background: #afca03;
+    color: #0a0c2a;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 6px 18px rgba(175, 202, 3, 0.32);
     padding: 0;
     flex-shrink: 0;
   }
@@ -28479,7 +28480,7 @@ html.is-admin .main-content {
     padding-inline: 0.15rem !important;
   }
   .home-page.home-page--lift .home-rail-wrap {
-    align-items: stretch;
+    align-items: center;
   }
   .home-page.home-page--lift .home-rail {
     padding-inline: 0 !important;

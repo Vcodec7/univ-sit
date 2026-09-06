@@ -834,27 +834,26 @@ button.btn {
   .home-rail-nav {
     display: grid;
     place-items: center;
-    position: absolute;
-    top: 42%;
-    z-index: 3;
+    place-self: center;
+    position: static;
     width: 2.35rem;
     height: 2.35rem;
-    border: 1px solid rgba(15, 23, 42, 0.1);
+    border: 0;
     border-radius: 999px;
-    background: #fff;
-    color: #334155;
+    background: #afca03;
+    color: #0a0c2a;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 6px 16px rgba(175, 202, 3, 0.35);
     padding: 0;
   }
   .home-rail-nav--prev {
-    left: 0.15rem;
+    left: auto;
   }
   .home-rail-nav--next {
-    right: 0.15rem;
+    right: auto;
   }
   .home-page .home-rail {
-    padding-inline: 2.4rem !important;
+    padding-inline: 0 !important;
   }
 }
 
