@@ -20,6 +20,14 @@ test('V-gesture quick access is not mounted for the public chrome', () => {
   assert.doesNotMatch(guides, /quick-access/);
 });
 
+test('mobile sheet menu is chips, not a long row list', () => {
+  assert.match(nav, /mobile-menu__chips/);
+  assert.match(nav, /className="mobile-menu__chip"/);
+  assert.doesNotMatch(nav, /span>Настройки аккаунта<\/span>/);
+  const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
+  assert.match(unify, /\.mobile-menu__chips \{/);
+});
+
 test('mobile home keeps one booking CTA and actionable deck cards', () => {
   assert.match(page, /label: 'Записаться'/);
   assert.match(hero, /lift-deck__go/);

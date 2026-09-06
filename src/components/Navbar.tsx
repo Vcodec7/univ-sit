@@ -28,7 +28,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  ChevronRight,
   Search,
   LogOut,
   Ticket,
@@ -49,8 +48,6 @@ import {
   MapPin,
   Newspaper,
   Sparkles,
-  Camera,
-  ScrollText,
   Phone,
   Home,
   Shield,
@@ -900,280 +897,135 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             </div>
 
             {session && !isScanner && !isTech && (
-              <ul className="mobile-menu__list" aria-label="Профиль">
-                {modOn(siteSettings, 'friends') ? (
-                  <li>
-                    <Link href="/dashboard/friends" onClick={closeMenu} className="mobile-menu__row">
-                      <Users size={20} aria-hidden />
-                      <span>Друзья</span>
-                      <ChevronRight size={16} aria-hidden />
-                    </Link>
-                  </li>
-                ) : null}
-                {modOn(siteSettings, 'messaging') ? (
-                  <li>
-                    <Link href="/dashboard/messages" onClick={closeMenu} className="mobile-menu__row">
-                      <MessageCircle size={20} aria-hidden />
-                      <span>Сообщения</span>
-                      <ChevronRight size={16} aria-hidden />
-                    </Link>
-                  </li>
-                ) : null}
-                <li>
-                  <Link href="/dashboard/tickets" onClick={closeMenu} className="mobile-menu__row">
-                    <Ticket size={20} aria-hidden />
-                    <span>Билеты</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/guides" onClick={closeMenu} className="mobile-menu__row">
-                    <BookOpen size={20} aria-hidden />
-                    <span>Инструктажи</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
+              <div className="mobile-menu__chips" aria-label="Кабинет">
+                <Link href="/dashboard/tickets" onClick={closeMenu} className="mobile-menu__chip">
+                  Билеты
+                </Link>
+                <Link href="/dashboard/guides" onClick={closeMenu} className="mobile-menu__chip">
+                  Инструктажи
+                </Link>
                 {modOn(siteSettings, 'achievements') ? (
-                  <li>
-                    <Link href="/dashboard/achievements" onClick={closeMenu} className="mobile-menu__row">
-                      <Award size={20} aria-hidden />
-                      <span>Достижения</span>
-                      <ChevronRight size={16} aria-hidden />
-                    </Link>
-                  </li>
+                  <Link href="/dashboard/achievements" onClick={closeMenu} className="mobile-menu__chip">
+                    Достижения
+                  </Link>
                 ) : null}
                 {modOn(siteSettings, 'eco') ? (
-                  <li>
-                    <Link href="/dashboard/shop" onClick={closeMenu} className="mobile-menu__row">
-                      <ShoppingBag size={20} aria-hidden />
-                      <span>Магазин</span>
-                      <ChevronRight size={16} aria-hidden />
-                    </Link>
-                  </li>
-                ) : null}
-                <li>
-                  <Link href="/dashboard/settings" onClick={closeMenu} className="mobile-menu__row">
-                    <Settings size={20} aria-hidden />
-                    <span>Настройки аккаунта</span>
-                    <ChevronRight size={16} aria-hidden />
+                  <Link href="/dashboard/shop" onClick={closeMenu} className="mobile-menu__chip">
+                    Магазин
                   </Link>
-                </li>
+                ) : null}
                 {isStaff ? (
-                  <li>
-                    <Link href="/admin" onClick={closeMenu} className="mobile-menu__row">
-                      <Shield size={20} aria-hidden />
-                      <span>Панель</span>
-                      <ChevronRight size={16} aria-hidden />
-                    </Link>
-                  </li>
+                  <Link href="/admin" onClick={closeMenu} className="mobile-menu__chip">
+                    Панель
+                  </Link>
                 ) : null}
-              </ul>
-            )}
-            {session && (isScanner || isTech) && (
-              <ul className="mobile-menu__list" aria-label="Рабочее место">
-                <li>
-                  <Link href={dashboardHref} onClick={closeMenu} className="mobile-menu__row">
-                    <LayoutDashboard size={20} aria-hidden />
-                    <span>{cabinetLabel}</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-              </ul>
-            )}
-
-            <div className="mobile-menu__section-label">Разделы сайта</div>
-            <ul className="mobile-menu__list" aria-label="Разделы сайта">
-              {headerMainPages.map((page: any) => (
-                <li key={page.id}>
-                  <Link
-                    href={publicPagePath(page.slug)}
-                    onClick={closeMenu}
-                    className="mobile-menu__row"
-                    style={getLinkStyle(publicPagePath(page.slug))}
-                  >
-                    <Sparkles size={20} aria-hidden />
-                    <span>{page.title}</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-              ))}
-              {modOn(siteSettings, 'projects') ? (
-              <li>
-                <Link href="/projects" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/projects')}>
-                  <Sparkles size={20} aria-hidden />
-                  <span>Проекты</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'clubs') ? (
-              <li>
-                <Link href="/clubs" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/clubs')}>
-                  <Users size={20} aria-hidden />
-                  <span>Клубы</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'spaces') ? (
-              <li>
-                <Link href="/spaces" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/spaces')}>
-                  <Building2 size={20} aria-hidden />
-                  <span>Пространства</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'places') && (
-              <li>
-                <Link href="/places" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/places')}>
-                  <MapPin size={20} aria-hidden />
-                  <span>Куда сходить</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              )}
-              {modOn(siteSettings, 'events') ? (
-              <li>
-                <Link href="/events" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/events')}>
-                  <CalendarDays size={20} aria-hidden />
-                  <span>Афиша</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {(siteSettings?.galleryPageEnabled ?? true) && modOn(siteSettings, 'gallery') && (
-                <li>
-                  <Link href="/gallery" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/gallery')}>
-                    <ImageIcon size={20} aria-hidden />
-                    <span>Галерея</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-              )}
-              {modOn(siteSettings, 'news') ? (
-              <li>
-                <Link href="/news" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/news')}>
-                  <Newspaper size={20} aria-hidden />
-                  <span>Новости</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'vacancies') && (
-                <li>
-                  <Link href="/vacancies" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/vacancies')}>
-                    <Briefcase size={20} aria-hidden />
-                    <span>Вакансии</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-              )}
-              {modOn(siteSettings, 'contests') && (
-                <li>
-                  <Link href="/contests" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/contests')}>
-                    <Award size={20} aria-hidden />
-                    <span>Конкурсы</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </Link>
-                </li>
-              )}
-              {modOn(siteSettings, 'grants') ? (
-              <li>
-                <Link href="/grants" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/grants')}>
-                  <Landmark size={20} aria-hidden />
-                  <span>Гранты</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'dobro') ? (
-              <li>
-                <Link href="/dobro" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/dobro')}>
-                  <HandHeart size={20} aria-hidden />
-                  <span>Добро</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'self_gov') ? (
-              <li>
-                <Link href="/self-gov" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/self-gov')}>
-                  <Landmark size={20} aria-hidden />
-                  <span>Самоуправление</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'documents') ? (
-              <li>
-                <Link href="/documents" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/documents')}>
-                  <FileText size={20} aria-hidden />
-                  <span>Документы</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              ) : null}
-              {modOn(siteSettings, 'games') && (
-              <li>
-                <Link href="/games" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/games')}>
-                  <Gamepad2 size={20} aria-hidden />
-                  <span>Игры</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-              )}
-              <li>
-                <Link href="/contacts" onClick={closeMenu} className="mobile-menu__row" style={getLinkStyle('/contacts')}>
-                  <Phone size={20} aria-hidden />
-                  <span>Контакты</span>
-                  <ChevronRight size={16} aria-hidden />
-                </Link>
-              </li>
-            </ul>
-
-            {headerSubPages.length > 0 && (
-              <>
-                <div className="mobile-menu__section-label">Ещё</div>
-                <ul className="mobile-menu__list">
-                  {headerSubPages.map((page: any) => (
-                    <li key={page.id}>
-                      <Link
-                        href={publicPagePath(page.slug)}
-                        onClick={closeMenu}
-                        className={`mobile-menu__row mobile-menu__row--sub mobile-menu__row--${page.slug === 'media' ? 'media' : page.slug === 'pravila-dm' ? 'rules' : 'page'}`}
-                      >
-                        {page.slug === 'media' ? (
-                          <Camera size={20} aria-hidden />
-                        ) : page.slug === 'pravila-dm' ? (
-                          <ScrollText size={20} aria-hidden />
-                        ) : (
-                          <Sparkles size={20} aria-hidden />
-                        )}
-                        <span>{publicCmsTitle(page.slug, page.title)}</span>
-                        <ChevronRight size={16} aria-hidden />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            {session && (
-              <div className="mobile-menu__foot">
-                <button
-                  type="button"
-                  className="mobile-menu__logout"
-                  onClick={() => {
-                    closeMenu();
-                    void signOutLogged({ callbackUrl: '/' });
-                  }}
-                >
-                  <LogOut size={18} aria-hidden />
-                  Выйти из аккаунта
-                </button>
               </div>
             )}
+            {session && (isScanner || isTech) && (
+              <div className="mobile-menu__chips" aria-label="Рабочее место">
+                <Link href={dashboardHref} onClick={closeMenu} className="mobile-menu__chip">
+                  {cabinetLabel}
+                </Link>
+              </div>
+            )}
+
+            <div className="mobile-menu__section-label">Разделы</div>
+            <div className="mobile-menu__chips" aria-label="Разделы сайта">
+              {headerMainPages.map((page: any) => (
+                <Link
+                  key={page.id}
+                  href={publicPagePath(page.slug)}
+                  onClick={closeMenu}
+                  className="mobile-menu__chip"
+                  style={getLinkStyle(publicPagePath(page.slug))}
+                >
+                  {page.title}
+                </Link>
+              ))}
+              {modOn(siteSettings, 'projects') ? (
+                <Link href="/projects" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/projects')}>
+                  Проекты
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'clubs') ? (
+                <Link href="/clubs" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/clubs')}>
+                  Клубы
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'spaces') ? (
+                <Link href="/spaces" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/spaces')}>
+                  Пространства
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'places') ? (
+                <Link href="/places" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/places')}>
+                  Куда сходить
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'events') ? (
+                <Link href="/events" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/events')}>
+                  Афиша
+                </Link>
+              ) : null}
+              {(siteSettings?.galleryPageEnabled ?? true) && modOn(siteSettings, 'gallery') ? (
+                <Link href="/gallery" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/gallery')}>
+                  Галерея
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'news') ? (
+                <Link href="/news" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/news')}>
+                  Новости
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'vacancies') ? (
+                <Link href="/vacancies" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/vacancies')}>
+                  Вакансии
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'contests') ? (
+                <Link href="/contests" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/contests')}>
+                  Конкурсы
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'grants') ? (
+                <Link href="/grants" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/grants')}>
+                  Гранты
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'dobro') ? (
+                <Link href="/dobro" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/dobro')}>
+                  Добро
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'self_gov') ? (
+                <Link href="/self-gov" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/self-gov')}>
+                  Самоуправление
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'documents') ? (
+                <Link href="/documents" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/documents')}>
+                  Документы
+                </Link>
+              ) : null}
+              {modOn(siteSettings, 'games') ? (
+                <Link href="/games" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/games')}>
+                  Игры
+                </Link>
+              ) : null}
+              <Link href="/contacts" onClick={closeMenu} className="mobile-menu__chip" style={getLinkStyle('/contacts')}>
+                Контакты
+              </Link>
+              {headerSubPages.map((page: any) => (
+                <Link
+                  key={page.id}
+                  href={publicPagePath(page.slug)}
+                  onClick={closeMenu}
+                  className="mobile-menu__chip"
+                >
+                  {publicCmsTitle(page.slug, page.title)}
+                </Link>
+              ))}
+            </div>
           </nav>
         </div>
       )}

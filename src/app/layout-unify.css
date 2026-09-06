@@ -1621,10 +1621,36 @@ html[data-eco-frame] .dashboard-page .profile-hero__avatar,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.mobile-menu__row {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
+.mobile-menu__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 0.75rem 0.55rem;
+}
+.mobile-menu__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  background: #eef5fa;
+  border: 1px solid rgba(10, 12, 42, 0.08);
+  color: #0a0c2a;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.mobile-menu__chip:hover,
+.mobile-menu__chip:focus-visible {
+  background: #dceaf2;
+  border-color: rgba(10, 122, 168, 0.35);
+}
+.mobile-menu__section-label {
+  margin: 0.35rem 0.85rem 0.3rem !important;
+}
+.mobile-menu__sheet-title {
+  font-size: 1.15rem !important;
 }
 .dashboard-nav--labeled .dashboard-nav-btn {
   min-width: 0;
