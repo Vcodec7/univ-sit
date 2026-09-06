@@ -22,10 +22,10 @@ export async function getInterestInsights(range: StatsRange) {
       take: 6,
       select: { id: true, title: true, category: true },
     }),
-    prisma.application.groupBy({
-      by: ['type'],
+    prisma.application.findMany({
       where: { createdAt: created },
-      _count: { _all: true },
+      select: { projectId: true, clubId: true, programId: true },
+      take: 400,
     }).catch(() => []),
     prisma.insightSearch.findMany({
       where: { createdAt: created, source: 'faq' },
@@ -59,11 +59,19 @@ export async function getInterestInsights(range: StatsRange) {
     .map((s) => ({ query: s.query, _count: s._count, _avg: { hits: s.hitsSum / s._count._all } }));
   const unanswered = faqSearches.filter((s) => (s._avg.hits || 0) < 1);
 
+  const appRows = apps as Array<{ projectId: string | null; clubId: string | null; programId: string | null }>;
+  const applicationsByType = [
+    { type: 'Проекты', count: appRows.filter((a) => a.projectId).length },
+    { type: 'Клубы', count: appRows.filter((a) => a.clubId).length },
+    { type: 'Программы', count: appRows.filter((a) => a.programId).length },
+  ].filter((a) => a.count > 0);
+  const weakProjects = projectViews.filter((p) => (p.viewCount || 0) < 3).slice(0, 6);
+
   return {
     topProjects: projectViews,
     topClubs: clubViews,
     topSpaces: spaceViews,
-    applicationsByType: (apps as Array<{ type: string; _count: { _all: number } }>).map((a) => ({ type: a.type, count: a._count._all })),
+    applicationsByType,
     faqSearches,
     faqCategories: faqCats,
     faqQuestions: faqItems,

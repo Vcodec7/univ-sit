@@ -149,7 +149,7 @@ export default function AdminInterestStats({ compact, faqOnly }: { compact?: boo
                 <div>
                   <h3>Слабая вовлечённость</h3>
                   <ul>
-                    {(data.weakProjects || []).map((p) => (
+                    {(data.weakProjects || []).map((p: { id: string; title: string }) => (
                       <li key={p.id}>{p.title}</li>
                     ))}
                   </ul>

@@ -83,37 +83,36 @@ const loadFreeNowCards = unstable_cache(
       }),
     ]);
 
-    return spaces
-      .map((space, idx) => {
-        const { openMin, closeMin } = parseOpenClose(
-          space.openTime,
-          space.closeTime,
-          settings?.bookingOpenTime,
-          settings?.bookingCloseTime
-        );
-        const week = buildOccupancyWeek({
-          openMin,
-          closeMin,
-          stepMin: space.slotStepMin === 30 ? 30 : 60,
-          dayKeys,
-          bookings: bookings.filter((b) => b.spaceId === space.id),
-          closures: closures.filter((c) => c.spaceId === space.id),
-        });
-        const next = nextFreeWindow(week);
-        if (!next) return null;
-        return {
-          id: space.id,
-          title: space.title,
-          address: space.address,
-          category: space.category,
-          image: space.image,
-          coworking: isCoworkingSpace(space),
-          slotLabel: next.label,
-          idx,
-        };
-      })
-      .filter((c): c is FreeNowCard => Boolean(c))
-      .slice(0, limit);
+    const cards: FreeNowCard[] = [];
+    spaces.forEach((space, idx) => {
+      const { openMin, closeMin } = parseOpenClose(
+        space.openTime,
+        space.closeTime,
+        settings?.bookingOpenTime,
+        settings?.bookingCloseTime
+      );
+      const week = buildOccupancyWeek({
+        openMin,
+        closeMin,
+        stepMin: space.slotStepMin === 30 ? 30 : 60,
+        dayKeys,
+        bookings: bookings.filter((b) => b.spaceId === space.id),
+        closures: closures.filter((c) => c.spaceId === space.id),
+      });
+      const next = nextFreeWindow(week);
+      if (!next) return;
+      cards.push({
+        id: space.id,
+        title: space.title,
+        address: space.address,
+        category: space.category,
+        image: space.image,
+        coworking: isCoworkingSpace(space),
+        slotLabel: next.label,
+        idx,
+      });
+    });
+    return cards.slice(0, limit);
   },
   ['free-now-home-v1'],
   { revalidate: 45, tags: ['yp-home-catalog'] }

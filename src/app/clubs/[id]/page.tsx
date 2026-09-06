@@ -23,6 +23,7 @@ import { staticClubParams } from '@/lib/generate-public-static-params';
 import YouthJoinBlock from '@/components/YouthJoinBlock';
 import { decodeRouteParam } from '@/lib/route-id';
 import { clubCover } from '@/lib/theme-covers';
+import { isPublicCatalogEntity } from '@/lib/publish';
 
 export const revalidate = 60;
 export const dynamic = 'force-static';
