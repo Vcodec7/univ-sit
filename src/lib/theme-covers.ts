@@ -63,7 +63,19 @@ const SECTION: Record<string, string> = {
 const WEAK_COVER =
   /(\/covers\/[^/?#]+\.svg)|(\/uploads\/covers\/[^/?#]+\.svg)|(\/brand\/templates\/)|(\/media\/news\/)|space-house\.svg|news-default|news-seed/i;
 
-export const DEFAULT_SECTION_COVER = PHOTO.sea;
+const BRAND_COVERS = [
+  '/brand/covers/ink-lime.svg',
+  '/brand/covers/ink-lav.svg',
+  '/brand/covers/ink-mix.svg',
+] as const;
+
+export const DEFAULT_SECTION_COVER = BRAND_COVERS[0];
+
+/** Branded plate when an entity has no uploaded photo. */
+export function brandCover(section: string, index = 0): string {
+  const h = hashSeed(`brand:${section}:${index}`);
+  return BRAND_COVERS[h % BRAND_COVERS.length];
+}
 
 function hashSeed(s: string): number {
   let h = 2166136261;
@@ -133,13 +145,10 @@ export function eventCover(
   index = 0
 ): string {
   const spaceImg = String(event.space?.image || '').trim();
-  const byTitle = afishaItemCover({ title: event.title || '' }, index);
   if (spaceImg && !isWeakCover(spaceImg)) {
-    return resolveEntityCover(spaceImg, byTitle || sectionCover('events', index));
+    return resolveEntityCover(spaceImg, brandCover('events', index));
   }
-  if (byTitle) return byTitle;
-  if (spaceImg) return resolveEntityCover(spaceImg, sectionCover('events', index));
-  return sectionCover('events', index);
+  return brandCover('events', index);
 }
 
 export function sectionCover(section: string, index = 0): string {
@@ -178,10 +187,7 @@ function entityCover(
 ): string {
   const img = String(entity.image || '').trim();
   if (img && !isWeakCover(img)) return resolveEntityCover(img, sectionCover(section, index));
-  // Prefer stable per-entity seed so list cards never all share one stock photo.
-  // Title only nudges the seed (does not collapse many entities onto one JPG).
-  const seed = `${section}:${entity.id || entity.title || index}:${titlePhoto(entity.title || '') || ''}`;
-  return photoBySeed(seed, index);
+  return brandCover(section, index);
 }
 
 /** Project cover: real uploads win; weak SVGs → unique thematic photos. */
@@ -204,10 +210,11 @@ export function spaceCover(space: CoverEntity, index = 0): string {
   if (venue) return venue;
   const title = String(space.title || '');
   const hallish = /зал|павильон|аудитор|сцен|конференц|репетиц/i.test(title);
-  const pool = hallish ? HALL_POOL : PHOTO_POOL;
-  const seed = `spaces:${space.id || title || index}:${titlePhoto(title) || ''}`;
-  const h = hashSeed(`${seed}::${index}`);
-  return pool[h % pool.length];
+  if (hallish) {
+    const h = hashSeed(`spaces:${space.id || title || index}::${index}`);
+    return HALL_POOL[h % HALL_POOL.length];
+  }
+  return brandCover('spaces', index);
 }
 
 export function placeCover(place: CoverEntity, index = 0): string {

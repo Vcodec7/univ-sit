@@ -14,3 +14,9 @@ test('Sochi venues map to CC photos, not random beaches', () => {
   assert.match(src, /ульянов/);
   assert.match(src, /function matchVenuePhoto/);
 });
+
+test('missing uploads use branded plates, not empty frames', () => {
+  assert.match(src, /brandCover/);
+  assert.match(src, /\/brand\/covers\/ink-lime\.svg/);
+  assert.match(src, /return brandCover\(section, index\)/);
+});

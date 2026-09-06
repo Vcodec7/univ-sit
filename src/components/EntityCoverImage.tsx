@@ -14,7 +14,7 @@ type Props = {
   priority?: boolean;
 };
 
-const PLACEHOLDER = '/covers/photo/sochi-sea.jpg';
+const PLACEHOLDER = '/brand/covers/ink-lime.svg';
 
 /** Catalog / event cover with SVG-safe loading and thematic fallback. */
 export default function EntityCoverImage({

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="yp-ink-c" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0A0C2A"/>
+      <stop offset="100%" stop-color="#3D4A05"/>
+    </linearGradient>
+    <linearGradient id="yp-band-c" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#AFCA03"/>
+      <stop offset="55%" stop-color="#8562D8"/>
+      <stop offset="100%" stop-color="#AFCA03"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#yp-ink-c)"/>
+  <rect x="0" y="430" width="1200" height="18" fill="url(#yp-band-c)" opacity="0.9"/>
+  <circle cx="180" cy="180" r="110" fill="#AFCA03" fill-opacity="0.18"/>
+  <circle cx="1040" cy="620" r="160" fill="#8562D8" fill-opacity="0.28"/>
+  <text x="72" y="700" fill="#AFCA03" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="800" letter-spacing="6">, !'</text>
+</svg>
