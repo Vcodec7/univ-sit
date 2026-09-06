@@ -23979,16 +23979,23 @@ body.yp-scroll-locked {
   line-height: 1.5;
 }
 .home-cta--split {
-  background: linear-gradient(135deg, #0a0c2a 0%, #2a1d4d 55%, #3d4a05 140%);
+  background: transparent;
+  color: inherit;
   text-align: left;
+  padding: 0;
+  margin: 1.4rem 0 2.2rem;
 }
 .home-cta-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.2rem;
+  gap: 0.9rem;
 }
 .home-cta-split article {
-  padding: 0.4rem 0.2rem;
+  padding: 1.35rem 1.4rem 1.45rem;
+  border-radius: 1.2rem;
+  background: #0a0c2a;
+  border: 1px solid rgba(133, 98, 216, 0.28);
+  box-shadow: 0 16px 36px rgba(10, 12, 42, 0.12);
 }
 .home-cta-split article > p:first-child {
   margin: 0 0 0.35rem;
@@ -24006,6 +24013,10 @@ body.yp-scroll-locked {
 .home-cta--split .home-cta-text {
   margin: 0 0 1.1rem;
   max-width: none;
+  color: rgba(255, 255, 255, 0.78);
+}
+.home-cta-split .lift-hero__btn--ghost {
+  background: rgba(255, 255, 255, 0.08);
 }
 @media (max-width: 900px) {
   .lift-deck,

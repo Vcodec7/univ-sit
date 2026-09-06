@@ -350,18 +350,18 @@ export default async function Home() {
           variant="compact"
         />
 
-        <section className="home-cta home-cta--split">
+        <section className="home-cta home-cta--split" aria-label="Два сценария">
           <div className="home-cta-split">
             <article>
               <p>Для себя</p>
               <h2>Сесть и сделать</h2>
               <p className="home-cta-text">Коворкинг на час, без переписки и без «есть ли место».</p>
               {showSpaces ? (
-                <Link href="/coworking" className="btn btn-primary home-hero-btn">
+                <Link href="/coworking" className="lift-hero__btn lift-hero__btn--lime">
                   Записаться
                 </Link>
               ) : (
-                <Link href="/contacts" className="btn btn-primary home-hero-btn">
+                <Link href="/contacts" className="lift-hero__btn lift-hero__btn--lime">
                   Контакты
                 </Link>
               )}
@@ -371,15 +371,15 @@ export default async function Home() {
               <h2>Собрать людей</h2>
               <p className="home-cta-text">Зал под встречу или проект, который видно в портфолио.</p>
               {showSpaces ? (
-                <Link href="/spaces" className="btn btn-secondary home-hero-btn">
+                <Link href="/spaces" className="lift-hero__btn lift-hero__btn--ghost">
                   К площадкам
                 </Link>
               ) : showProjects ? (
-                <Link href="/projects" className="btn btn-secondary home-hero-btn">
+                <Link href="/projects" className="lift-hero__btn lift-hero__btn--ghost">
                   К проектам
                 </Link>
               ) : (
-                <Link href="/contacts" className="btn btn-secondary home-hero-btn">
+                <Link href="/contacts" className="lift-hero__btn lift-hero__btn--ghost">
                   Контакты
                 </Link>
               )}

@@ -30,4 +30,5 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
   assert.match(hero, /href: '\/coworking'/);
   assert.match(page, /home-page--lift/);
   assert.match(page, /HomeSochiStrip/);
+  assert.match(page, /home-cta--split/);
 });
