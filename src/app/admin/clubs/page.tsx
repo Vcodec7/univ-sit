@@ -1,10 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Edit, Trash2, X, Users } from 'lucide-react';
+import { Eye, Plus, Trash2, Users, X } from 'lucide-react';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
@@ -12,7 +11,7 @@ import { parseGalleryInput, serializeClubTags } from '@/lib/clubs';
 import { getGallerySettings } from '@/lib/gallery';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 import AdminYouthStudioForm from '@/components/admin/AdminYouthStudioForm';
-import { serializeStudioJson, studioFromFormData } from '@/lib/youth-studio';
+import { catalogStatusLabel, serializeStudioJson, stripHtml, studioFromFormData } from '@/lib/youth-studio';
 
 async function processImage(formData: FormData) {
   const file = formData.get('imageFile') as File | null;
@@ -118,6 +117,17 @@ async function updateItem(formData: FormData) {
   redirect('/admin/clubs');
 }
 
+async function quickHide(formData: FormData) {
+  'use server';
+  await requirePermission('clubs');
+  const id = String(formData.get('id') || '');
+  const next = String(formData.get('next') || 'INACTIVE');
+  await prisma.club.update({ where: { id }, data: { status: next } });
+  revalidatePath('/admin/clubs');
+  revalidatePath('/clubs');
+  redirect('/admin/clubs');
+}
+
 function ClubFormFields({ item, orgPool = [] }: { item?: any; orgPool?: string[] }) {
   return <AdminYouthStudioForm kind="club" item={item} pool={orgPool} />;
 }
@@ -132,7 +142,12 @@ export default async function AdminClubs({
   const isAdding = resolvedParams.add === 'true';
   const statusRaw = (resolvedParams.status || 'ALL').toUpperCase();
   const statusFilter =
-    statusRaw === 'ACTIVE' || statusRaw === 'INACTIVE' || statusRaw === 'COMPLETED' || statusRaw === 'ALL'
+    statusRaw === 'ACTIVE' ||
+    statusRaw === 'INACTIVE' ||
+    statusRaw === 'COMPLETED' ||
+    statusRaw === 'DRAFT' ||
+    statusRaw === 'REVIEW' ||
+    statusRaw === 'ALL'
       ? statusRaw
       : 'ALL';
 
@@ -154,6 +169,8 @@ export default async function AdminClubs({
 
   const counts = {
     ALL: allItems.length,
+    DRAFT: allItems.filter((i) => i.status === 'DRAFT').length,
+    REVIEW: allItems.filter((i) => i.status === 'REVIEW').length,
     ACTIVE: allItems.filter((i) => i.status === 'ACTIVE').length,
     INACTIVE: allItems.filter((i) => i.status === 'INACTIVE').length,
     COMPLETED: allItems.filter((i) => i.status === 'COMPLETED').length,
@@ -178,24 +195,11 @@ export default async function AdminClubs({
     <div className="admin-page-shell" style={{ paddingBottom: '6rem' }}>
       <div className="admin-page-header">
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.25rem' }}>Клубы</h1>
-          <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>
-            Расписание, куратор, галерея и заявки участников
-          </p>
+          <h1>Клубы</h1>
+          <p>Живые карточки: расписание, как вступить, обложка</p>
         </div>
-        <Link
-          href={`?add=true&status=${statusFilter}`}
-          className="btn btn-primary"
-          style={{
-            padding: '0.6rem 1.5rem',
-            borderRadius: '100px',
-            boxShadow: '0 4px 12px rgba(59,130,246,0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-          }}
-        >
-          Добавить клуб
+        <Link href={`?add=true&status=${statusFilter}`} className="btn btn-primary">
+          <Plus size={16} /> Новый клуб
         </Link>
       </div>
 
@@ -203,6 +207,13 @@ export default async function AdminClubs({
         ariaLabel="Статус клуба"
         items={[
           { href: statusHref('ALL'), label: 'Все', count: counts.ALL, active: statusFilter === 'ALL', tone: 'muted' },
+          {
+            href: statusHref('DRAFT'),
+            label: 'Черновики',
+            count: counts.DRAFT,
+            active: statusFilter === 'DRAFT',
+            tone: 'warning',
+          },
           {
             href: statusHref('ACTIVE'),
             label: 'Активные',
@@ -226,100 +237,53 @@ export default async function AdminClubs({
         ]}
       />
 
-      <div className="admin-table-wrap" style={{ padding: '0.5rem 0' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)' }}>Название</th>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)' }}>Статус</th>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)' }}>Участники</th>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)' }}>Расписание</th>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)' }}>Фото</th>
-              <th style={{ padding: '0.75rem', color: 'var(--muted)', textAlign: 'right' }}>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td data-label="Название" style={{ padding: '0.75rem', fontWeight: 500 }}>
-                  <Link href={`/clubs/${item.id}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-                    {item.title}
-                  </Link>
-                </td>
-                <td data-label="Статус" style={{ padding: '0.75rem' }}>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: '100px',
-                      fontWeight: 600,
-                      backgroundColor:
-                        item.status === 'ACTIVE'
-                          ? 'rgba(34,197,94,0.1)'
-                          : item.status === 'COMPLETED'
-                            ? 'rgba(59,130,246,0.1)'
-                            : 'rgba(239,68,68,0.1)',
-                      color:
-                        item.status === 'ACTIVE' ? '#15803d' : item.status === 'COMPLETED' ? '#1d4ed8' : '#b91c1c',
-                    }}
-                  >
-                    {item.status === 'ACTIVE' ? 'Активный' : item.status === 'COMPLETED' ? 'Завершён' : 'Скрыт'}
-                  </span>
-                </td>
-                <td data-label="Участники" style={{ padding: '0.75rem', color: 'var(--muted)' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                    <Users size={14} /> {item._count?.applications ?? 0}
-                  </span>
-                </td>
-                <td data-label="Расписание" style={{ padding: '0.75rem', color: 'var(--muted)', fontSize: '0.88rem' }}>
-                  {item.meetingSchedule || '—'}
-                </td>
-                <td data-label="Фото" style={{ padding: '0.75rem' }}>
-                  {item.image ? (
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 6,
-                        backgroundImage: `url(${item.image})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        border: '1px solid rgba(0,0,0,0.1)',
-                      }}
-                    />
-                  ) : (
-                    '—'
-                  )}
-                </td>
-                <td data-label="Действия" style={{ padding: '0.75rem', textAlign: 'right' }}>
-                  <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                    <Link href={`/admin/clubs?edit=${item.id}`} className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--primary)' }}>
-                      <Edit size={16} />
-                    </Link>
-                    <form action={deleteItem}>
-                      <input type="hidden" name="id" value={item.id} />
-                      <ConfirmSubmitButton message="Удалить клуб?" className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }}>
-                        <Trash2 size={16} />
-                      </ConfirmSubmitButton>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && (
-              <tr>
-                <td colSpan={6} style={{ padding: '1rem', textAlign: 'center', color: 'var(--muted)' }}>
-                  Нет записей
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="admin-catalog-cards">
+        {items.map((item) => (
+          <article key={item.id} className="admin-catalog-card">
+            <div
+              className="admin-catalog-card__cover"
+              style={item.image ? { backgroundImage: `url(${item.image})` } : undefined}
+            />
+            <div className="admin-catalog-card__body">
+              <div className="admin-catalog-card__top">
+                <h2>{item.title}</h2>
+                <span className={`admin-status-pill is-${item.status}`}>{catalogStatusLabel(item.status)}</span>
+              </div>
+              <p className="admin-catalog-card__meta">
+                <Users size={14} /> {item._count?.applications ?? 0} в клубе
+                {item.meetingSchedule ? ` · ${item.meetingSchedule}` : ''}
+              </p>
+              <p className="admin-catalog-card__excerpt">{stripHtml(item.description || '', 140)}</p>
+              <div className="admin-catalog-card__actions">
+                <Link href={`/admin/clubs?edit=${item.id}&status=${statusFilter}`} className="btn btn-primary">
+                  Править
+                </Link>
+                <Link href={`/clubs/${item.id}`} className="btn btn-secondary">
+                  <Eye size={14} /> Как видит гость
+                </Link>
+                <form action={quickHide}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <input type="hidden" name="next" value={item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'} />
+                  <button type="submit" className="btn btn-secondary">
+                    {item.status === 'ACTIVE' ? 'Снять с публикации' : 'Опубликовать'}
+                  </button>
+                </form>
+                <form action={deleteItem}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <ConfirmSubmitButton message="Удалить клуб?" className="btn btn-secondary admin-catalog-card__danger">
+                    <Trash2 size={16} /> Удалить
+                  </ConfirmSubmitButton>
+                </form>
+              </div>
+            </div>
+          </article>
+        ))}
+        {items.length === 0 ? <p className="admin-studio-hint">Ничего не найдено — создайте клуб.</p> : null}
       </div>
 
       {showModal && (
         <div className="admin-modal-backdrop">
-          <div className="admin-modal-dialog">
+          <div className="admin-modal-dialog admin-modal-dialog--studio">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>{editItem ? 'Редактировать клуб' : 'Новый клуб'}</h3>
               <Link href="?" className="yp-modal-close" aria-label="Закрыть">

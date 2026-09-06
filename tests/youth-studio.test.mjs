@@ -19,6 +19,7 @@ test('admin studio wizard and publish hide drafts', () => {
   assert.match(proj, /AdminYouthStudioForm/);
   assert.match(proj, /admin-catalog-cards/);
   assert.match(clubs, /AdminYouthStudioForm/);
+  assert.match(clubs, /admin-catalog-cards/);
   const spaces = readFileSync(join(root, 'src/app/admin/spaces/page.tsx'), 'utf8');
   const pages = readFileSync(join(root, 'src/app/admin/pages/PageEditorForm.tsx'), 'utf8');
   const form = readFileSync(join(root, 'src/components/admin/AdminYouthStudioForm.tsx'), 'utf8');
