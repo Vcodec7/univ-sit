@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { getUploadRoot } from '@/lib/upload-root';
 import crypto from 'crypto';
 import { detectImageType } from '@/lib/image-magic';
 import {
@@ -70,7 +71,7 @@ export async function saveUploadedImage(
   });
 
   const fileName = `${crypto.randomUUID()}.${optimized.ext}`;
-  const uploadDir = join(process.cwd(), 'public', 'uploads', subdir);
+  const uploadDir = join(getUploadRoot(), subdir);
   await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, fileName), optimized.buffer);
   return `/uploads/${subdir}/${fileName}`;
@@ -102,7 +103,7 @@ export async function saveUploadedVideo(
   }
   const ext = name.endsWith('.mov') ? 'mov' : 'mp4';
   const fileName = `${crypto.randomUUID()}.${ext}`;
-  const uploadDir = join(process.cwd(), 'public', 'uploads', subdir);
+  const uploadDir = join(getUploadRoot(), subdir);
   await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, fileName), buffer);
   return `/uploads/${subdir}/${fileName}`;
@@ -154,7 +155,7 @@ export async function saveUploadedDocument(
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  const uploadDir = join(process.cwd(), 'public', 'uploads', subdir);
+  const uploadDir = join(getUploadRoot(), subdir);
   await mkdir(uploadDir, { recursive: true });
 
   // Image certificates / docs → same WebP pipeline

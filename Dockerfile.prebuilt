@@ -22,7 +22,8 @@ RUN mkdir -p /app/data /app/.next/cache /app/public/uploads /app/certs \
  && chown -R node:node /app/data /app/.next /app/public /app/scripts /app/certs \
  && (rm -f /app/.env || true)
 
-USER node
+# Entrypoint starts as root to chown the bind-mounted uploads tree, then drops to node.
+USER root
 EXPOSE 3000
 ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 CMD ["node", "server.js"]

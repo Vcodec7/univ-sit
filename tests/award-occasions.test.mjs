@@ -41,3 +41,18 @@ test('issued document stores occasion in metaJson', () => {
   assert.match(issue, /occasion: input.occasion/);
   assert.match(issue, /metaJson/);
 });
+
+test('official PDF writes under getUploadRoot awards', () => {
+  const pdf = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '../src/lib/official-documents.ts'),
+    'utf8'
+  );
+  assert.match(pdf, /getUploadRoot/);
+  assert.match(pdf, /uploads\/awards/);
+  const entry = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), '../scripts/docker-entrypoint.sh'),
+    'utf8'
+  );
+  assert.match(entry, /chown -R node:node \/app\/public\/uploads/);
+  assert.match(entry, /runuser -u node/);
+});

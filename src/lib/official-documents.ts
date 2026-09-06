@@ -3,6 +3,7 @@ import fontkit from '@pdf-lib/fontkit';
 import { mkdir, writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
 import { randomBytes } from 'crypto';
+import { getUploadRoot } from '@/lib/upload-root';
 import {
   OFFICIAL_DOC_TYPE_META,
   type OfficialDocType,
@@ -153,9 +154,17 @@ export async function generateOfficialDocumentPdf(input: OfficialPdfInput): Prom
   });
 
   const bytes = await pdf.save();
-  const dir = join(process.cwd(), 'public', 'uploads', 'awards');
-  await mkdir(dir, { recursive: true });
+  const dir = join(getUploadRoot(), 'awards');
   const fileName = `${input.serialNumber.replace(/[^A-Z0-9-]/gi, '_')}.pdf`;
-  await writeFile(join(dir, fileName), bytes);
+  try {
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, fileName), bytes);
+  } catch (err) {
+    const code = err && typeof err === 'object' && 'code' in err ? String((err as { code?: string }).code) : '';
+    if (code === 'EACCES' || code === 'EPERM') {
+      throw new Error('Нет прав записать диплом в uploads/awards. Папка на сервере должна быть доступна пользователю node.');
+    }
+    throw err;
+  }
   return { pdfPath: `/uploads/awards/${fileName}`, bytes };
 }

@@ -82,7 +82,9 @@ NEW_SHA="$(sha256sum "$EXTRACT/prisma/schema.prisma" | awk '{print $1}')"
 OLD_SHA="$(sudo -n cat "$APP/.yp-schema-sha" 2>/dev/null || true)"
 
 cd "$APP"
-# Build from the extract itself — skip a second 200MB copy into a buildctx.
+# Host uploads are bind-mounted read-write; node uid 1000 must own them to issue PDFs.
+sudo -n mkdir -p /opt/sochi-portal/public/uploads/awards
+sudo -n chown -R 1000:1000 /opt/sochi-portal/public/uploads 2>/dev/null || sudo -n chmod -R a+rwX /opt/sochi-portal/public/uploads
 sudo -n docker build -f "$EXTRACT/Dockerfile.prebuilt" -t sochi-staging_web:latest "$EXTRACT"
 sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml up -d --no-build web
 

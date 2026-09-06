@@ -55,7 +55,7 @@ RUN mkdir -p /app/data /app/.next/cache /app/public/uploads /app/public/uploads/
  && chown -R node:node /app/data /app/.next /app/public /app/scripts /app/certs \
  && (rm -f /app/.env || true)
 
-USER node
+USER root
 
 EXPOSE 3000
 ENV PORT=3000
