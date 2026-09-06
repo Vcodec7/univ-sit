@@ -24575,8 +24575,6 @@ fieldset.svc-form-group,
   min-height: 2.55rem;
   width: 100%;
 }
-  width: 100%;
-}
 .svc-space-card__cta-row.is-dual {
   grid-template-columns: 1fr 1fr;
 }
