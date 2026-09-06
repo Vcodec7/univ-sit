@@ -12,13 +12,16 @@ export function publishedNonDemoWhere(now = new Date()) {
 }
 
 /** Catalog entities: hide QA/seed demo rows and drafts. */
+const HIDDEN_CATALOG = ['INACTIVE', 'DRAFT', 'REVIEW'] as const;
+
 export function publicCatalogWhere() {
-  return { isDemoData: false as const, status: { not: 'INACTIVE' as const } };
+  return { isDemoData: false as const, status: { notIn: [...HIDDEN_CATALOG] } };
 }
 
 export function isPublicCatalogEntity(entity: { isDemoData?: boolean; status?: string | null }) {
   if (entity.isDemoData) return false;
-  return (entity.status || 'ACTIVE') !== 'INACTIVE';
+  const s = entity.status || 'ACTIVE';
+  return !HIDDEN_CATALOG.includes(s as (typeof HIDDEN_CATALOG)[number]);
 }
 
 export function parsePublishFields(formData: FormData): {

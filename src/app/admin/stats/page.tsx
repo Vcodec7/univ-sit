@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { BarChart3, Download, Printer, ScanLine, Ticket, Users, ArrowLeft, QrCode } from 'lucide-react';
 import { formatMskDateTime } from '@/lib/booking-hours';
 import PeriodPicker from '@/components/admin/PeriodPicker';
+import AdminInterestStats from '@/components/admin/AdminInterestStats';
 import { parseStatsRange, statsRangeQuery, type StatsRange } from '@/lib/stats-period';
 
 function AdminStatsInner() {
@@ -217,6 +218,7 @@ function AdminStatsInner() {
           <p style={{ color: 'var(--muted)' }}>Нет откликов за выбранный период</p>
         )}
       </div>
+      <AdminInterestStats />
     </div>
   );
 }

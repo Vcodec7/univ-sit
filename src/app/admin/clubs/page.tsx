@@ -4,15 +4,15 @@ import { Edit, Trash2, X, Users } from 'lucide-react';
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import RichTextInput from '@/components/RichTextInput';
-import CoverImageField from '@/components/admin/CoverImageField';
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
-import { parseGalleryInput, serializeClubTags, parseClubTags } from '@/lib/clubs';
-import GalleryPickerField from '@/components/admin/GalleryPickerField';
+import { parseGalleryInput, serializeClubTags } from '@/lib/clubs';
 import { getGallerySettings } from '@/lib/gallery';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
+import AdminYouthStudioForm from '@/components/admin/AdminYouthStudioForm';
+import { serializeStudioJson, studioFromFormData } from '@/lib/youth-studio';
 
 async function processImage(formData: FormData) {
   const file = formData.get('imageFile') as File | null;
@@ -34,7 +34,8 @@ function clubFields(formData: FormData) {
     meetingPlace: ((formData.get('meetingPlace') as string) || '').trim() || null,
     curatorName: ((formData.get('curatorName') as string) || '').trim() || null,
     curatorContact: ((formData.get('curatorContact') as string) || '').trim() || null,
-    curatorContactPublic: formData.get('curatorContactPublic') === 'on',
+    curatorContactPublic:
+      formData.get('curatorContactPublic') === 'on' || formData.get('curatorContactPublic') === 'true',
     tags: serializeClubTags(((formData.get('tags') as string) || '').trim() || null),
     gallery: parseGalleryInput(formData.get('gallery')),
     signupUrl: ((formData.get('signupUrl') as string) || '').trim() || null,
@@ -43,6 +44,7 @@ function clubFields(formData: FormData) {
     roadmapJson: trimOrNull('roadmapJson'),
     rolesJson: trimOrNull('rolesJson'),
     tasksJson: trimOrNull('tasksJson'),
+    studioJson: serializeStudioJson(studioFromFormData(formData)),
   };
 }
 
@@ -117,187 +119,7 @@ async function updateItem(formData: FormData) {
 }
 
 function ClubFormFields({ item, orgPool = [] }: { item?: any; orgPool?: string[] }) {
-  return (
-    <>
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Название</label>
-        <input
-          type="text"
-          name="title"
-          defaultValue={item?.title || ''}
-          required
-          style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-        />
-      </div>
-
-      <div className="admin-form-grid admin-form-grid--2">
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Шаблон</label>
-          <select
-            name="template"
-            defaultValue={item?.template || 'DEFAULT'}
-            className="modern-input"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          >
-            <option value="DEFAULT">Стандартная страница</option>
-            <option value="GALLERY">Галерея в тексте</option>
-            <option value="TEAM">Команда</option>
-            <option value="FAQ">FAQ</option>
-            <option value="HERO">Hero</option>
-            <option value="CONTACTS">Контакты</option>
-            <option value="FEATURES">Особенности</option>
-          </select>
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Статус</label>
-          <select
-            name="status"
-            defaultValue={item?.status || 'ACTIVE'}
-            className="modern-input"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          >
-            <option value="ACTIVE">Активный</option>
-            <option value="COMPLETED">Завершён</option>
-            <option value="INACTIVE">Скрыт</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="admin-form-grid admin-form-grid--2">
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Расписание</label>
-          <input
-            type="text"
-            name="meetingSchedule"
-            defaultValue={item?.meetingSchedule || ''}
-            placeholder="По средам в 18:00"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Место встреч</label>
-          <input
-            type="text"
-            name="meetingPlace"
-            defaultValue={item?.meetingPlace || ''}
-            placeholder="Дом молодёжи, зал 2"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Цель клуба</label>
-        <textarea name="goal" rows={2} defaultValue={item?.goal || ''} placeholder="Чему учимся / какой вклад в город" style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Миссия</label>
-        <textarea name="mission" rows={2} defaultValue={item?.mission || ''} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Дорожная карта (JSON)</label>
-        <textarea name="roadmapJson" rows={2} defaultValue={item?.roadmapJson || ''} placeholder='[{"title":"Знакомство","status":"active"}]' style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'ui-monospace, monospace', fontSize: '0.82rem' }} />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Роли (JSON)</label>
-        <textarea name="rolesJson" rows={2} defaultValue={item?.rolesJson || ''} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'ui-monospace, monospace', fontSize: '0.82rem' }} />
-      </div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Задачи сезона (JSON)</label>
-        <textarea name="tasksJson" rows={2} defaultValue={item?.tasksJson || ''} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'ui-monospace, monospace', fontSize: '0.82rem' }} />
-      </div>
-
-      <div className="admin-form-grid admin-form-grid--2">
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Куратор</label>
-          <input
-            type="text"
-            name="curatorName"
-            defaultValue={item?.curatorName || ''}
-            placeholder="Имя куратора"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Контакт куратора</label>
-          <input
-            type="text"
-            name="curatorContact"
-            defaultValue={item?.curatorContact || ''}
-            placeholder="@telegram или телефон"
-            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-          />
-        </div>
-      </div>
-
-      <label
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '0.65rem',
-          padding: '0.75rem 0.9rem',
-          borderRadius: 12,
-          background: '#f8fafc',
-          border: '1px solid rgba(15,23,42,0.08)',
-          fontSize: '0.88rem',
-          lineHeight: 1.45,
-          cursor: 'pointer',
-        }}
-      >
-        <input
-          type="checkbox"
-          name="curatorContactPublic"
-          defaultChecked={item?.curatorContactPublic !== false}
-          style={{ marginTop: 3, width: 16, height: 16, flexShrink: 0 }}
-        />
-        <span>
-          <strong style={{ display: 'block', marginBottom: 2 }}>Показывать контакт публично</strong>
-          Если выключено — контакт видят только одобренные участники клуба.
-        </span>
-      </label>
-
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>
-          Ссылка на запись (Telegram / форма)
-        </label>
-        <input
-          type="url"
-          name="signupUrl"
-          defaultValue={item?.signupUrl || ''}
-          placeholder="https://t.me/+… или анкета"
-          style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-        />
-        <p style={{ margin: '0.35rem 0 0', fontSize: '0.8rem', color: 'var(--muted)' }}>
-          Если указана — на странице клуба появится кнопка «Записаться…». Можно оставить пустым и писать ссылку в описании.
-        </p>
-      </div>
-
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Теги интересов</label>
-        <input
-          type="text"
-          name="tags"
-          defaultValue={item?.tags ? serializeClubTags(parseClubTags(item.tags)) || '' : ''}
-          placeholder="волонтёрство, спорт, медиа"
-          style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }}
-        />
-      </div>
-
-      <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Описание</label>
-        <RichTextInput name="description" defaultValue={item?.description || ''} />
-      </div>
-
-      <GalleryPickerField
-        name="gallery"
-        label="Галерея клуба"
-        defaultValue={item?.gallery}
-        pool={orgPool}
-      />
-
-      <CoverImageField currentImage={item?.image} />
-    </>
-  );
+  return <AdminYouthStudioForm kind="club" item={item} pool={orgPool} />;
 }
 
 export default async function AdminClubs({
@@ -507,9 +329,6 @@ export default async function AdminClubs({
             <form action={editItem ? updateItem : createItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {editItem && <input type="hidden" name="id" value={editItem.id} />}
               <ClubFormFields item={editItem || undefined} orgPool={orgGalleryPool} />
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem', padding: '0.75rem', fontWeight: 600 }}>
-                {editItem ? 'Сохранить' : 'Создать'}
-              </button>
             </form>
           </div>
         </div>

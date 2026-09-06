@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Plus, Trash2, Eye, EyeOff, Save } from 'lucide-react';
+import toast from 'react-hot-toast';
+import AdminInterestStats from '@/components/admin/AdminInterestStats';
 
 type FaqItemRow = {
   id: string;
@@ -93,12 +95,13 @@ export default function AdminFaqClient() {
         </p>
       ) : null}
 
+      <section className="admin-faq-create card-surface" style={{ padding: '1rem', marginBottom: '1.25rem' }}>
+        <h2 style={{ fontSize: '1.05rem', marginTop: 0 }}>Новая категория</h2>
       <div
         style={{
           display: 'flex',
           gap: 8,
           flexWrap: 'wrap',
-          marginBottom: '1.25rem',
           alignItems: 'center',
         }}
       >
@@ -116,7 +119,10 @@ export default function AdminFaqClient() {
           disabled={busy || !newCatTitle.trim()}
           onClick={() => {
             void api('POST', { kind: 'category', title: newCatTitle.trim() }).then((ok) => {
-              if (ok) setNewCatTitle('');
+              if (ok) {
+                setNewCatTitle('');
+                toast.success('Категория создана');
+              }
             });
           }}
         >
@@ -126,12 +132,29 @@ export default function AdminFaqClient() {
           Обновить
         </button>
       </div>
+      </section>
 
       {loading ? <p style={{ color: 'var(--muted)' }}>Загрузка…</p> : null}
 
-      {!loading && categories.length === 0 ? (
-        <p style={{ color: 'var(--muted)' }}>Категорий пока нет — создайте первую.</p>
-      ) : null}
+      <section className="admin-faq-current" style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '1.15rem' }}>Текущие категории</h2>
+        {!loading && categories.length === 0 ? (
+          <p style={{ color: 'var(--muted)' }}>Категорий пока нет — создайте первую.</p>
+        ) : null}
+        {categories.length > 0 ? (
+          <ul className="admin-faq-cat-index">
+            {categories.map((c) => (
+              <li key={c.id}>
+                <a href={`#faq-cat-${c.id}`}>
+                  <strong>{c.title}</strong>
+                  <span>{c.published ? 'Опубликована' : 'Черновик'}</span>
+                  <span>{c.items.length} вопр.</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {categories.map((cat) => {
@@ -139,6 +162,7 @@ export default function AdminFaqClient() {
           return (
             <section
               key={cat.id}
+              id={`faq-cat-${cat.id}`}
               style={{
                 background: '#fff',
                 border: '1px solid rgba(15,23,42,0.08)',
@@ -188,7 +212,7 @@ export default function AdminFaqClient() {
                   onClick={() => void api('PATCH', { kind: 'category', id: cat.id, published: !cat.published })}
                 >
                   {cat.published ? <Eye size={16} /> : <EyeOff size={16} />}
-                  {cat.published ? 'Опубликовано' : 'Скрыто'}
+                  {cat.published ? 'Опубликовано' : 'Черновик'}
                 </button>
                 <button
                   type="button"
@@ -305,6 +329,8 @@ export default function AdminFaqClient() {
           );
         })}
       </div>
+
+      <AdminInterestStats compact />
     </div>
   );
 }

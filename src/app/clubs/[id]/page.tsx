@@ -20,7 +20,7 @@ import EntityPlanPanel, { EntityPlanSummary } from '@/components/entity/EntityPl
 import { EntityApplyStatus, EntityMembersPanel, EntityCuratorBlock } from '@/components/entity/EntityAuthIslands';
 import ViewBeacon from '@/components/ViewBeacon';
 import { staticClubParams } from '@/lib/generate-public-static-params';
-import { isPublicCatalogEntity } from '@/lib/publish';
+import YouthJoinBlock from '@/components/YouthJoinBlock';
 import { decodeRouteParam } from '@/lib/route-id';
 import { clubCover } from '@/lib/theme-covers';
 
@@ -154,6 +154,16 @@ export default async function ClubDetail({ params }: { params: Promise<{ id: str
       </div>
 
       <div className="container" style={{ marginTop: '1.25rem', padding: '0 clamp(1rem, 3vw, 1.5rem)' }}>
+        <YouthJoinBlock
+          kind="club"
+          id={club.id}
+          open={open}
+          studioJson={club.studioJson}
+          signupUrl={club.signupUrl}
+          curatorName={club.curatorName}
+          curatorContact={club.curatorContact}
+          curatorPublic={club.curatorContactPublic}
+        />
         {tags.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '1rem' }}>
             {tags.map((t) => (

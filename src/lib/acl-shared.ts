@@ -113,7 +113,7 @@ export function permissionsForAdminPath(
   if (pathname.startsWith('/admin/awards')) return ['portfolios', 'pages'];
   if (pathname.startsWith('/admin/programs')) return ['programs', 'pages'];
   if (pathname.startsWith('/admin/news')) return ['news', 'pages'];
-  if (pathname.startsWith('/admin/stats')) return ['stats', 'bookings'];
+  if (pathname.startsWith('/admin/stats') || pathname.startsWith('/admin/insights')) return ['stats', 'bookings', 'pages'];
   if (pathname.startsWith('/admin/moderation')) return ['moderation'];
   if (pathname.startsWith('/admin/scanner')) return ['scanner'];
   if (pathname.startsWith('/admin/vacancies') || pathname.startsWith('/admin/employers')) return ['vacancies'];

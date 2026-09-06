@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import FaqAccordion from '@/components/FaqAccordion';
 import { searchFaqCategories, type FaqCategory } from '@/lib/faq-content';
@@ -17,6 +17,19 @@ export default function FaqHub({ categories }: { categories: FaqCategory[] }) {
   }, [categories, deferredQuery, activeCat]);
 
   const totalItems = filtered.reduce((n, c) => n + c.items.length, 0);
+
+  useEffect(() => {
+    const q = deferredQuery.trim();
+    if (q.length < 2) return;
+    const t = window.setTimeout(() => {
+      void fetch('/api/insights/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: 'faq', query: q, hits: totalItems }),
+      });
+    }, 800);
+    return () => window.clearTimeout(t);
+  }, [deferredQuery, totalItems]);
 
   return (
     <div className="faq-hub">

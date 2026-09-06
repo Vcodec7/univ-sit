@@ -66,15 +66,18 @@ export default function GalleryPickerField({
           })}
         </div>
       ) : null}
-      <textarea
-        className="settings-input"
-        rows={3}
-        value={items.map((i) => i.url).join('\n')}
-        onChange={(e) => setItems(parseGalleryItems(e.target.value, max))}
-        placeholder={'/uploads/…\nпо одной ссылке на строку'}
-      />
+      <details className="gallery-picker-field__advanced">
+        <summary>Свой URL (если фото уже на сайте)</summary>
+        <textarea
+          className="settings-input"
+          rows={2}
+          value={items.map((i) => i.url).join('\n')}
+          onChange={(e) => setItems(parseGalleryItems(e.target.value, max))}
+          placeholder={'/uploads/…\nпо одной ссылке на строку'}
+        />
+      </details>
       <p className="gallery-picker-field__hint">
-        Выберите из общей базы или вставьте URL. Макс. {max}. Фото лучше заранее оптимизировать (WebP).
+        JPG/WebP, лучше 1600×900. Обложка отдельно выше. Можно выбрать из общей базы или переставить порядок в списке ссылок. Макс. {max}.
       </p>
     </div>
   );

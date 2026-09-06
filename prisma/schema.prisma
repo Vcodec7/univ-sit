@@ -442,6 +442,8 @@ model Project {
   rolesJson    String?
   /** JSON задачи: { title, status, assigneeName?, done? }[] */
   tasksJson    String?
+  /** Youth studio extras: joinMode, audience, whatHappens, howToJoin, curator… */
+  studioJson   String?
   applications Application[]
   invites      EntityInvite[]
   /** Unique viewers (ContentView) */
@@ -470,6 +472,7 @@ model Club {
   rolesJson       String?
   /** JSON задачи / активности */
   tasksJson       String?
+  studioJson      String?
   /** Когда встречаются, напр. «По средам в 18:00» */
   meetingSchedule String?
   /** Где встречаются */
@@ -503,6 +506,7 @@ model Space {
   description String?  
   image       String?
   gallery     String?
+  studioJson  String?
   /** Catalog category: Коворкинг, Зал мероприятий, Спорт, … */
   category    String    @default("Общее")
   /** JSON array of amenity ids: wifi, gym, game_zone, … */
@@ -1762,6 +1766,7 @@ model FaqCategory {
   slug      String    @unique
   sortOrder Int       @default(0)
   published Boolean   @default(true)
+  viewCount Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   items     FaqItem[]
@@ -1777,8 +1782,20 @@ model FaqItem {
   answer     String
   sortOrder  Int         @default(0)
   published  Boolean     @default(true)
+  viewCount  Int         @default(0)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
   @@index([categoryId, published, sortOrder])
+}
+
+/** Admin interest insights: FAQ / catalog search queries */
+model InsightSearch {
+  id        String   @id @default(cuid())
+  source    String
+  query     String
+  hits      Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([source, createdAt])
 }

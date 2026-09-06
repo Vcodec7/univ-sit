@@ -34,7 +34,16 @@ export default function FaqAccordion({ categories }: { categories: FaqCategory[]
                     type="button"
                     className="faq-accordion__q"
                     aria-expanded={isOpen}
-                    onClick={() => setOpen(isOpen ? null : id)}
+                    onClick={() => {
+                      setOpen(isOpen ? null : id);
+                      if (!isOpen && item.id) {
+                        void fetch('/api/insights/faq-view', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ itemId: item.id, categoryId: item.categoryId }),
+                        });
+                      }
+                    }}
                   >
                     <span>{item.q}</span>
                     <ChevronDown

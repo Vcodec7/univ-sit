@@ -35,6 +35,7 @@ import {
   serializeModerationConfig,
 } from '@/lib/moderation-config';
 import { getModuleFlags, isTechRole, type ModuleFlagKey } from '@/lib/module-flags';
+import { getSettingsHealth } from '@/lib/admin-settings-health';
 
 export const dynamic = 'force-dynamic';
 
@@ -452,6 +453,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
   const settings = await prisma.siteSettings.findUnique({ where: { id: '1' } });
   const flags = await getModuleFlags();
   const tech = isTechRole(session.user.role);
+  const health = await getSettingsHealth();
 
   const tabModuleOff = (tabId: string) => {
     if (tech) return false;
@@ -549,7 +551,27 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
         {/* Page Header */}
         <div className="settings-page-header">
           <h1>Настройки сайта</h1>
-          <p>Параметры портала · {tabs.length} разделов</p>
+          <p>
+            Сводка портала: заполнено {health.filled}/{health.total} · опубликовано проектов {health.projects} · клубов{' '}
+            {health.clubs} · заявок в очереди {health.pending}
+          </p>
+        </div>
+        <div className="admin-settings-health">
+          {health.core.map((item) => (
+            <Link key={item.id} href={item.href} className={`admin-settings-health__item${item.ok ? ' is-ok' : ' is-miss'}`}>
+              <strong>{item.label}</strong>
+              <span>{item.ok ? 'Заполнено' : 'Нужно заполнить'}</span>
+            </Link>
+          ))}
+          <details className="admin-settings-health__more">
+            <summary>Дополнительно</summary>
+            {health.more.map((item) => (
+              <Link key={item.id} href={item.href} className={`admin-settings-health__item${item.ok ? ' is-ok' : ' is-miss'}`}>
+                <strong>{item.label}</strong>
+                <span>{item.ok ? 'Ок' : 'Пусто'}</span>
+              </Link>
+            ))}
+          </details>
         </div>
 
       {/* Tab Bar */}
@@ -574,10 +596,10 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                     href={`?tab=${tab.id}`}
                     className={`settings-tab ${activeTab === tab.id ? 'active' : ''}`}
                     style={off ? { opacity: 0.55, textDecoration: off && activeTab !== tab.id ? 'line-through' : undefined } : undefined}
-                    title={off ? 'Выключено в Ops' : undefined}
+                    title={off ? 'Раздел выключен' : undefined}
                   >
                     <Icon size={14} /> {tab.label}
-                    {off ? <span style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.9 }}>Ops</span> : null}
+                    {off ? <span style={{ fontSize: '0.65rem', fontWeight: 800, opacity: 0.9 }}>выкл</span> : null}
                   </Link>
                 );
               })}
@@ -599,7 +621,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
             fontWeight: 600,
           }}
         >
-          Вкладка выключена в Ops — настройки сохранены, но раздел недоступен пользователям. TECH видит все вкладки.
+          Раздел сейчас выключен: настройки сохранены, но посетители его не видят.
         </div>
       ) : null}
         {activeTab === 'general' && (

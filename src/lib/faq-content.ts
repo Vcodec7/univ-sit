@@ -3,6 +3,8 @@ import type { ModuleFlagKey } from '@/lib/module-flags';
 export type FaqItem = {
   q: string;
   a: string;
+  id?: string;
+  categoryId?: string;
 };
 
 export type FaqCategory = {

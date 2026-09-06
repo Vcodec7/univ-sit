@@ -11,6 +11,7 @@ import ShareButton from '@/components/ShareButton';
 import PhotoGallery from '@/components/PhotoGallery';
 import EntityPlanPanel, { EntityPlanSummary } from '@/components/entity/EntityPlanPanel';
 import { EntityApplyStatus, EntityMembersPanel } from '@/components/entity/EntityAuthIslands';
+import YouthJoinBlock from '@/components/YouthJoinBlock';
 import { Metadata } from 'next';
 import { findProjectByRouteId } from '@/lib/resolve-entity';
 import { isPublicCatalogEntity } from '@/lib/publish';
@@ -202,6 +203,12 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
       <div className="container project-detail-wrap">
         <div className="project-detail-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <YouthJoinBlock
+              kind="project"
+              id={project.id}
+              open={open}
+              studioJson={project.studioJson}
+            />
             <EntityPlanPanel
               entityKind="project"
               entityTitle={project.title}

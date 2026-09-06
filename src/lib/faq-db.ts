@@ -21,7 +21,7 @@ export async function getPublishedFaqCategories(): Promise<FaqCategory[]> {
       items: {
         where: { published: true },
         orderBy: [{ sortOrder: 'asc' }, { question: 'asc' }],
-        select: { question: true, answer: true },
+        select: { id: true, question: true, answer: true, categoryId: true },
       },
     },
   });
@@ -30,7 +30,7 @@ export async function getPublishedFaqCategories(): Promise<FaqCategory[]> {
     .map((c) => ({
       id: c.slug || c.id,
       title: c.title,
-      items: c.items.map((i) => ({ q: i.question, a: i.answer })),
+      items: c.items.map((i) => ({ id: i.id, categoryId: i.categoryId, q: i.question, a: i.answer })),
     }));
 }
 

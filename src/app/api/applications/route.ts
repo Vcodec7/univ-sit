@@ -55,7 +55,7 @@ export async function POST(req: Request) {
         where: { id: projectId },
         select: { status: true },
       });
-      if (!project || project.status === 'INACTIVE' || project.status === 'COMPLETED') {
+      if (!project || ['INACTIVE', 'COMPLETED', 'DRAFT', 'REVIEW'].includes(project.status)) {
         return NextResponse.json({ message: 'Проект недоступен для заявок' }, { status: 400 });
       }
     }
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         where: { id: clubId },
         select: { status: true },
       });
-      if (!club || club.status === 'INACTIVE' || club.status === 'COMPLETED') {
+      if (!club || ['INACTIVE', 'COMPLETED', 'DRAFT', 'REVIEW'].includes(club.status)) {
         return NextResponse.json({ message: 'Клуб недоступен для заявок' }, { status: 400 });
       }
     }
