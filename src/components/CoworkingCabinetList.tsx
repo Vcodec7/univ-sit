@@ -87,8 +87,13 @@ export default function CoworkingCabinetList() {
               hour: '2-digit',
               minute: '2-digit',
             })}`;
+            const canCancel = ['PENDING', 'CONFIRMED', 'WAITLIST'].includes(row.status);
+            const groupHref =
+              row.kind === 'GROUP' && row.inviteToken
+                ? `/coworking/group/${row.inviteToken}`
+                : null;
             return (
-              <li key={row.id} className="cw-cabinet-pill">
+              <li key={row.id} className={`cw-cabinet-pill${row.kind === 'GROUP' ? ' is-group' : ''}`}>
                 <span className="cw-cabinet-pill__day">{day}</span>
                 <span className="cw-cabinet-pill__slot">{slot}</span>
                 <span className="cw-cabinet-pill__place">{row.space.title}</span>
@@ -96,15 +101,19 @@ export default function CoworkingCabinetList() {
                   {row.kind === 'GROUP' ? 'группа · ' : ''}
                   {statusRu(row.status)}
                 </span>
-                {row.kind === 'GROUP' && row.inviteToken ? (
-                  <Link href={`/coworking/group/${row.inviteToken}`} className="cw-cabinet-pill__cancel">
-                    Группа
-                  </Link>
-                ) : null}
-                {['PENDING', 'CONFIRMED', 'WAITLIST'].includes(row.status) ? (
-                  <button type="button" className="cw-cabinet-pill__cancel" onClick={() => cancel(row.id)}>
-                    Отменить
-                  </button>
+                {groupHref || canCancel ? (
+                  <div className="cw-cabinet-pill__actions">
+                    {groupHref ? (
+                      <Link href={groupHref} className="cw-cabinet-pill__group">
+                        Группа
+                      </Link>
+                    ) : null}
+                    {canCancel ? (
+                      <button type="button" className="cw-cabinet-pill__cancel" onClick={() => cancel(row.id)}>
+                        Отменить
+                      </button>
+                    ) : null}
+                  </div>
                 ) : null}
               </li>
             );

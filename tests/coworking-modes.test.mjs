@@ -1,5 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 // coworking.ts is TypeScript — exercise via compiled-less copy of the predicates.
 function spaceBookingMode(space) {
@@ -46,4 +51,11 @@ test('solo kind hides extra seats; group kind reserves a block', () => {
   const seatsToBook = (kind, seats) => (kind === 'SOLO' ? 1 : seats);
   assert.equal(seatsToBook('SOLO', 6), 1);
   assert.equal(seatsToBook('GROUP', 4), 4);
+});
+
+test('cabinet bookings keep group and cancel in a separate actions row', () => {
+  const src = readFileSync(join(root, 'src/components/CoworkingCabinetList.tsx'), 'utf8');
+  assert.match(src, /cw-cabinet-pill__actions/);
+  assert.match(src, /cw-cabinet-pill__group/);
+  assert.doesNotMatch(src, /className="cw-cabinet-pill__cancel">\s*Группа/);
 });
