@@ -1758,3 +1758,108 @@ body:has(.dashboard-page .messages-root) .main-content > div {
     font-size: 0.72rem !important;
   }
 }
+
+.admin-vac-page {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.admin-vac-card {
+  padding: 0.75rem !important;
+  min-width: 0;
+  overflow: hidden;
+}
+.admin-vac-card h2 {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0a0c2a;
+}
+.admin-search-row--stack {
+  flex-wrap: wrap;
+  margin-bottom: 0.55rem;
+}
+.admin-search-row--stack input,
+.admin-search-row--stack .settings-input {
+  flex: 1 1 12rem;
+}
+.admin-vac-form {
+  display: grid;
+  gap: 0.45rem;
+}
+.admin-vac-form label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 750;
+  color: #5a5670;
+  min-width: 0;
+}
+.admin-vac-form input,
+.admin-vac-form select,
+.admin-vac-form textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.42rem 0.55rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(120, 176, 206, 0.4);
+  background: #fff;
+  color: #0a0c2a;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.admin-vac-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.admin-entity-list {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.admin-entity-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: #fff;
+  min-width: 0;
+}
+.admin-entity-list li.is-stack {
+  grid-template-columns: 1fr;
+}
+.admin-entity-list__copy {
+  min-width: 0;
+}
+.admin-entity-list__copy strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #0a0c2a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-entity-list__copy span {
+  display: block;
+  font-size: 0.72rem;
+  color: #5a5670;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-entity-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+.admin-entity-list__actions .btn {
+  padding: 0.32rem 0.6rem !important;
+  font-size: 0.74rem !important;
+  white-space: nowrap;
+}

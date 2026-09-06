@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { EMPLOYER_STATUS_RU, VACANCY_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
-import { parseVacancyRequirements } from '@/lib/vacancy-content';
+import { parseVacancyRequirements, vacancyHtmlToPlain, vacancyPlainToHtml } from '@/lib/vacancy-content';
 
 type Employer = {
   id: string;
@@ -43,7 +43,7 @@ type App = {
   vacancy: { title: string };
 };
 
-const DEFAULT_DESC = '<p>Стажировка у партнёра Центра. React/Node, менторство, разбор реальных задач.</p>';
+const DEFAULT_DESC = 'Стажировка у партнёра Центра. React/Node, менторство, разбор реальных задач.';
 
 export default function AdminVacanciesClient() {
   const [employers, setEmployers] = useState<Employer[]>([]);
@@ -118,7 +118,7 @@ export default function AdminVacanciesClient() {
     setVacId(v.id);
     setVacTitle(v.title);
     setVacEmployerId(v.employerId);
-    setVacDesc(v.description || '');
+    setVacDesc(vacancyHtmlToPlain(v.description || ''));
     setVacPay(c.salaryText || '');
     setVacEmp(c.employmentType || 'internship');
     setVacPaid(c.paid === null ? 'unk' : c.paid ? 'yes' : 'no');
@@ -142,13 +142,24 @@ export default function AdminVacanciesClient() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1.5rem' }}>
-      <h1 style={{ margin: 0 }}>Вакансии и работодатели</h1>
+    <div className="admin-page-shell admin-vac-page">
+      <div className="admin-page-header">
+        <div>
+          <h1>Вакансии</h1>
+          <p>Работодатели, карточки и отклики</p>
+        </div>
+      </div>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.1rem' }}>Работодатели</h2>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          <input value={empTitle} onChange={(e) => setEmpTitle(e.target.value)} style={{ flex: 1, minWidth: 200, padding: 8 }} />
+      <section className="card-surface admin-vac-card">
+        <h2>Работодатели</h2>
+        <div className="admin-search-row admin-search-row--stack">
+          <input
+            className="settings-input"
+            value={empTitle}
+            onChange={(e) => setEmpTitle(e.target.value)}
+            aria-label="Название работодателя"
+            placeholder="Название работодателя"
+          />
           <button
             type="button"
             className="btn btn-primary"
@@ -168,7 +179,7 @@ export default function AdminVacanciesClient() {
                 .catch((e) => toast.error(e.message))
             }
           >
-            {empEditId ? 'Сохранить работодателя' : 'Создать / центр'}
+            {empEditId ? 'Сохранить' : 'Создать'}
           </button>
           {empEditId ? (
             <button type="button" className="btn btn-secondary" onClick={() => setEmpEditId(null)}>
@@ -176,72 +187,89 @@ export default function AdminVacanciesClient() {
             </button>
           ) : null}
         </div>
-        <ul>
+        <ul className="admin-entity-list">
           {employers.map((e) => (
-            <li key={e.id} style={{ marginBottom: 8 }}>
-              {e.title} · {statusRu(EMPLOYER_STATUS_RU, e.status)}
-              {e.isInternal ? ' · внутренний' : ''}
-              {' '}
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => {
-                  setEmpEditId(e.id);
-                  setEmpTitle(e.title);
-                }}
-              >
-                Править
-              </button>
-              {e.status === 'PENDING' && (
-                <>
-                  {' '}
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() =>
-                      void post({ action: 'setEmployerStatus', id: e.id, status: 'APPROVED' }).then(() => {
-                        toast.success('Одобрен');
-                        void load();
-                      })
-                    }
-                  >
-                    Одобрить
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() =>
-                      void post({ action: 'setEmployerStatus', id: e.id, status: 'REJECTED' }).then(() => {
-                        void load();
-                      })
-                    }
-                  >
-                    Отклонить
-                  </button>
-                </>
-              )}
+            <li key={e.id}>
+              <div className="admin-entity-list__copy">
+                <strong>{e.title}</strong>
+                <span>
+                  {statusRu(EMPLOYER_STATUS_RU, e.status)}
+                  {e.isInternal ? ' · внутренний' : ''}
+                </span>
+              </div>
+              <div className="admin-entity-list__actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setEmpEditId(e.id);
+                    setEmpTitle(e.title);
+                  }}
+                >
+                  Править
+                </button>
+                {e.status === 'PENDING' ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() =>
+                        void post({ action: 'setEmployerStatus', id: e.id, status: 'APPROVED' }).then(() => {
+                          toast.success('Одобрен');
+                          void load();
+                        })
+                      }
+                    >
+                      Одобрить
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() =>
+                        void post({ action: 'setEmployerStatus', id: e.id, status: 'REJECTED' }).then(() => {
+                          void load();
+                        })
+                      }
+                    >
+                      Отклонить
+                    </button>
+                  </>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.1rem' }}>{vacId ? 'Редактировать вакансию' : 'Новая вакансия'}</h2>
-        <div style={{ display: 'grid', gap: 8 }}>
-          <select value={vacEmployerId} onChange={(e) => setVacEmployerId(e.target.value)}>
-            {employers
-              .filter((e) => e.status === 'APPROVED')
-              .map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.title}
-                </option>
-              ))}
-          </select>
-          <input placeholder="Название" value={vacTitle} onChange={(e) => setVacTitle(e.target.value)} />
-          <textarea rows={3} value={vacDesc} onChange={(e) => setVacDesc(e.target.value)} />
-          <input placeholder="Оплата / стипендия" value={vacPay} onChange={(e) => setVacPay(e.target.value)} />
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <select value={vacEmp} onChange={(e) => setVacEmp(e.target.value)}>
+      <section className="card-surface admin-vac-card">
+        <h2>{vacId ? 'Редактировать вакансию' : 'Новая вакансия'}</h2>
+        <div className="admin-vac-form">
+          <label>
+            Работодатель
+            <select value={vacEmployerId} onChange={(e) => setVacEmployerId(e.target.value)}>
+              {employers
+                .filter((emp) => emp.status === 'APPROVED')
+                .map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.title}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label>
+            Название
+            <input placeholder="Название" value={vacTitle} onChange={(e) => setVacTitle(e.target.value)} />
+          </label>
+          <label>
+            Описание
+            <textarea rows={3} value={vacDesc} onChange={(e) => setVacDesc(e.target.value)} placeholder="Текст без HTML" />
+          </label>
+          <label>
+            Оплата
+            <input placeholder="Оплата / стипендия" value={vacPay} onChange={(e) => setVacPay(e.target.value)} />
+          </label>
+          <div className="admin-vac-form__row">
+            <select value={vacEmp} onChange={(e) => setVacEmp(e.target.value)} aria-label="Тип занятости">
               <option value="internship">Стажировка</option>
               <option value="part_time">Подработка</option>
               <option value="full_time">Полная занятость</option>
@@ -266,16 +294,33 @@ export default function AdminVacanciesClient() {
               value={vacAge}
               onChange={(e) => setVacAge(e.target.value)}
               aria-label="Возраст от"
-              style={{ width: 96 }}
             />
           </div>
-          <textarea rows={2} placeholder="О работодателе" value={vacAbout} onChange={(e) => setVacAbout(e.target.value)} />
-          <textarea rows={3} placeholder="Чем заниматься (по строке)" value={vacDuties} onChange={(e) => setVacDuties(e.target.value)} />
-          <textarea rows={3} placeholder="Что получите (по строке)" value={vacOffer} onChange={(e) => setVacOffer(e.target.value)} />
-          <textarea rows={3} placeholder="Что важно (по строке)" value={vacReqs} onChange={(e) => setVacReqs(e.target.value)} />
-          <input placeholder="Вопрос скрининга" value={qPrompt} onChange={(e) => setQPrompt(e.target.value)} />
-          <input placeholder="Правильный ответ" value={qCorrect} onChange={(e) => setQCorrect(e.target.value)} />
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <label>
+            О работодателе
+            <textarea rows={2} placeholder="О работодателе" value={vacAbout} onChange={(e) => setVacAbout(e.target.value)} />
+          </label>
+          <label>
+            Чем заниматься
+            <textarea rows={3} placeholder="По строке" value={vacDuties} onChange={(e) => setVacDuties(e.target.value)} />
+          </label>
+          <label>
+            Что получите
+            <textarea rows={3} placeholder="По строке" value={vacOffer} onChange={(e) => setVacOffer(e.target.value)} />
+          </label>
+          <label>
+            Что важно
+            <textarea rows={3} placeholder="По строке" value={vacReqs} onChange={(e) => setVacReqs(e.target.value)} />
+          </label>
+          <label>
+            Вопрос скрининга
+            <input placeholder="Вопрос скрининга" value={qPrompt} onChange={(e) => setQPrompt(e.target.value)} />
+          </label>
+          <label>
+            Правильный ответ
+            <input placeholder="Правильный ответ" value={qCorrect} onChange={(e) => setQCorrect(e.target.value)} />
+          </label>
+          <div className="admin-entity-list__actions">
             <button
               type="button"
               className="btn btn-primary"
@@ -285,7 +330,7 @@ export default function AdminVacanciesClient() {
                   id: vacId || undefined,
                   employerId: vacEmployerId,
                   title: vacTitle,
-                  description: vacDesc,
+                  description: vacancyPlainToHtml(vacDesc),
                   status: vacStatus,
                   workFormat: 'hybrid',
                   city: 'Сочи',
@@ -329,65 +374,75 @@ export default function AdminVacanciesClient() {
             ) : null}
           </div>
         </div>
-        <ul style={{ marginTop: 12 }}>
+        <ul className="admin-entity-list">
           {vacancies.map((v) => (
-            <li key={v.id} style={{ marginBottom: 8 }}>
-              {v.title} · {statusRu(VACANCY_STATUS_RU, v.status)} · {v.employer.title} · откликов {v._count.applications}
-              {' '}
-              <button type="button" className="btn btn-secondary" onClick={() => loadVacancy(v)}>
-                Править
-              </button>
+            <li key={v.id}>
+              <div className="admin-entity-list__copy">
+                <strong>{v.title}</strong>
+                <span>
+                  {statusRu(VACANCY_STATUS_RU, v.status)} · {v.employer.title} · откликов {v._count.applications}
+                </span>
+              </div>
+              <div className="admin-entity-list__actions">
+                <button type="button" className="btn btn-secondary" onClick={() => loadVacancy(v)}>
+                  Править
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.1rem' }}>Отклики на разбор</h2>
+      <section className="card-surface admin-vac-card">
+        <h2>Отклики на разбор</h2>
         {applications.length === 0 ? (
-          <p style={{ color: 'var(--muted)' }}>Нет заявок на рассмотрении</p>
+          <p className="admin-empty">Нет заявок на рассмотрении</p>
         ) : (
-          <ul>
+          <ul className="admin-entity-list">
             {applications.map((a) => (
-              <li key={a.id} style={{ marginBottom: 10 }}>
-                {a.user.name} ({a.user.email}) → {a.vacancy.title} · балл {a.autoScore}%
-                <div style={{ display: 'grid', gap: 8, marginTop: 4, maxWidth: 480 }}>
-                  <input
-                    placeholder="Причина отказа (увидит кандидат)"
-                    value={rejectById[a.id] || ''}
-                    onChange={(e) => setRejectById((m) => ({ ...m, [a.id]: e.target.value }))}
-                  />
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() =>
-                        void post({ action: 'reviewApplication', id: a.id, status: 'APPROVED' }).then(() => {
-                          toast.success('Одобрено');
-                          void load();
-                        })
-                      }
-                    >
-                      Одобрить
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() =>
-                        void post({
-                          action: 'reviewApplication',
-                          id: a.id,
-                          status: 'REJECTED',
-                          rejectReason: (rejectById[a.id] || '').trim() || 'Пока другое решение по этой вакансии',
-                        }).then(() => {
-                          toast.success('Отклонено');
-                          void load();
-                        })
-                      }
-                    >
-                      Отклонить
-                    </button>
-                  </div>
+              <li key={a.id} className="is-stack">
+                <div className="admin-entity-list__copy">
+                  <strong>{a.user.name}</strong>
+                  <span>
+                    {a.user.email} → {a.vacancy.title} · балл {a.autoScore}%
+                  </span>
+                </div>
+                <input
+                  className="settings-input"
+                  placeholder="Причина отказа"
+                  value={rejectById[a.id] || ''}
+                  onChange={(e) => setRejectById((m) => ({ ...m, [a.id]: e.target.value }))}
+                />
+                <div className="admin-entity-list__actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() =>
+                      void post({ action: 'reviewApplication', id: a.id, status: 'APPROVED' }).then(() => {
+                        toast.success('Одобрено');
+                        void load();
+                      })
+                    }
+                  >
+                    Одобрить
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() =>
+                      void post({
+                        action: 'reviewApplication',
+                        id: a.id,
+                        status: 'REJECTED',
+                        rejectReason: (rejectById[a.id] || '').trim() || 'Пока другое решение по этой вакансии',
+                      }).then(() => {
+                        toast.success('Отклонено');
+                        void load();
+                      })
+                    }
+                  >
+                    Отклонить
+                  </button>
                 </div>
               </li>
             ))}

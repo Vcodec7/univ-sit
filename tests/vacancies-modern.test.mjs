@@ -52,6 +52,15 @@ test('expired or full vacancy is not apply-open', () => {
   assert.equal(vacancyIsApplyOpen({ status: 'OPEN', seats: 3, seatsTaken: 1 }), true);
 });
 
+test('admin vacancy description strips html tags in the editor', () => {
+  assert.match(content, /export function vacancyHtmlToPlain/);
+  assert.match(content, /export function vacancyPlainToHtml/);
+  const client = readFileSync(join(root, 'src/components/admin/AdminVacanciesClient.tsx'), 'utf8');
+  assert.match(client, /admin-vac-form/);
+  assert.match(client, /vacancyHtmlToPlain/);
+  assert.doesNotMatch(client, /DEFAULT_DESC = '<p>/);
+});
+
 test('logged-in apply does not require captcha token', () => {
   assert.match(apply, /captchaToken: z.string\(\)\.optional\(\)/);
   assert.match(apply, /Отклик отправлен/);

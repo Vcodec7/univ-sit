@@ -94,6 +94,27 @@ export function serializeVacancyRequirements(c: {
   });
 }
 
+export function vacancyHtmlToPlain(html: string) {
+  return String(html || '')
+    .replace(/<\s*br\s*\/?\s*>/gi, '\n')
+    .replace(/<\s*\/\s*p\s*>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+export function vacancyPlainToHtml(text: string) {
+  const t = String(text || '').trim();
+  if (!t) return '';
+  if (/<[a-z][\s\S]*>/i.test(t)) return t;
+  const escaped = t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<p>${escaped.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br/>')}</p>`;
+}
+
 export function vacancyIsApplyOpen(opts: {
   status: string;
   closesAt?: Date | string | null;
