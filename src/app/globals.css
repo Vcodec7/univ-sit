@@ -27087,12 +27087,14 @@ button.btn,
   width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   max-width: none !important;
   height: auto !important;
-  align-self: start;
+  align-self: stretch;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 .home-page--lift .home-rail__slide > * {
-  height: auto !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
 }
 @media (min-width: 640px) {
   .home-page--lift .home-rail {
@@ -27119,18 +27121,35 @@ button.btn,
 .home-page--lift .free-now-body h3,
 .home-page--lift .lift-feed-card .event-card-title {
   color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5em;
+  line-height: 1.25;
+}
+.home-page--lift .free-now-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  min-height: 2.7em;
+  line-height: 1.35;
+}
+.home-page--lift .free-now-slot {
+  min-height: 1.35em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-page--lift .free-now-actions {
+  margin-top: auto !important;
 }
 .home-page--lift .free-now-body p,
 .home-page--lift .lift-feed-card .event-card-facts,
 .home-page--lift .lift-feed-card .event-card-desc {
   color: rgba(255, 255, 255, 0.72);
-}
-.home-page--lift .free-now-body p {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: normal;
 }
 .home-page--lift .free-now-slot,
 .home-page--lift .lift-feed-card .event-card-seats,
@@ -27182,6 +27201,12 @@ button.btn,
 .home-page--lift .lift-feed-card .event-card-body {
   background: #0a0c2a;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.home-page--lift .lift-feed-card .event-card-actions {
+  margin-top: auto;
 }
 .home-page--lift .lift-feed-card .event-card-desc {
   display: none;
@@ -27207,7 +27232,8 @@ button.btn,
   background: rgba(133, 98, 216, 0.1);
 }
 .home-page--lift .home-sections .free-now-body p {
-  -webkit-line-clamp: 3 !important;
+  -webkit-line-clamp: 2 !important;
+  min-height: 2.7em;
   white-space: normal !important;
 }
 .home-page--lift .free-now-avatar .free-now-img,
