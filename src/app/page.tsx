@@ -154,7 +154,7 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Клубы по интересам</h2>
-              <p className="home-section-sub">Сообщества, где находят своих в Сочи</p>
+              <p className="home-section-sub">Найти своих в Сочи — не в чате на 400 человек</p>
             </div>
             <Link href="/clubs" className="home-section-link">
               Все клубы <ArrowRight size={18} />
@@ -198,7 +198,7 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Пространства</h2>
-              <p className="home-section-sub">Площадки ЦРМ для брони, встреч и учёбы</p>
+              <p className="home-section-sub">Залы ЦРМ: бронь, учёба, встреча без переписки</p>
             </div>
             <Link href="/spaces" className="home-section-link">
               Все пространства <ArrowRight size={18} />
@@ -242,7 +242,7 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Ближайшие мероприятия</h2>
-              <p className="home-section-sub">События в молодёжных пространствах города</p>
+              <p className="home-section-sub">Что происходит в городе на этой неделе</p>
             </div>
             <Link href="/events" className="home-section-link">
               Календарь <ArrowRight size={18} />
@@ -263,11 +263,11 @@ export default async function Home() {
             <HomeGallery
               enabled
               orgGalleryJson={siteSettings?.orgGalleryJson}
-              title="Деятельность портала"
+              title="Сочи в кадре"
             />
           </Suspense>
         ) : galleryAuthOnly ? (
-          <HomeGalleryAuth homepageEnabled title="Деятельность портала" />
+          <HomeGalleryAuth homepageEnabled title="Сочи в кадре" />
         ) : null}
 
         {showNews && (
@@ -275,7 +275,7 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Новости</h2>
-              <p className="home-section-sub">Что происходит в молодёжной повестке города</p>
+              <p className="home-section-sub">Коротко: что уже случилось в городе</p>
             </div>
             <Link href="/news" className="home-section-link">
               Все новости <ArrowRight size={18} />
@@ -329,7 +329,7 @@ export default async function Home() {
             <article>
               <p>Для себя</p>
               <h2>Сесть и сделать</h2>
-              <p className="home-cta-text">Коворкинг на час, без переписки и без «есть ли место».</p>
+              <p className="home-cta-text">Коворкинг на час — без переписки и без «есть ли место».</p>
               {showSpaces ? (
                 <Link href="/coworking" className="lift-hero__btn lift-hero__btn--lime">
                   Записаться

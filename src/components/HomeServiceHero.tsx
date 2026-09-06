@@ -47,7 +47,7 @@ const DECK = [
     icon: Landmark,
     kicker: 'Площадки',
     title: 'Залы',
-    text: 'Встреча, концерт или сбор команды — слоты видно сразу.',
+    text: 'Слоты видны. Тусовка, концерт или сбор — без «есть ли место».',
     flag: 'showSpaces' as const,
   },
   {
@@ -57,7 +57,7 @@ const DECK = [
     icon: Building2,
     kicker: 'Работа',
     title: 'Коворкинг',
-    text: 'Час за столом: для себя или открытой группой.',
+    text: 'Час за столом — один или компанией, запись в пару тапов.',
     flag: 'showSpaces' as const,
   },
   {
@@ -67,7 +67,7 @@ const DECK = [
     icon: Users,
     kicker: 'Люди',
     title: 'Клубы',
-    text: 'Свои по интересу — каждую неделю, не разовый заход.',
+    text: 'Свои по вайбу — каждую неделю, не разовый заход.',
     flag: 'showClubs' as const,
   },
   {
@@ -115,13 +115,13 @@ export default function HomeServiceHero({
         <div className="lift-hero__glow" aria-hidden />
       </div>
       <div className="container lift-hero__copy">
-        <p className="lift-hero__eyebrow">Чёрное море · Кавказ · {brand}</p>
+        <p className="lift-hero__eyebrow">Сочи · сейчас · {brand}</p>
         <h1 className="lift-hero__title">
           Старт с Сочи
-          <span>к своим людям и проектам</span>
+          <span>море, люди, свои</span>
         </h1>
         <p className="lift-hero__lead">
-          Залы, коворкинг, клубы и афиша — один портал, без десяти чатов.
+          Залы, коворкинг, клубы и афиша — один вход в город, без десяти чатов.
         </p>
         <div className="lift-hero__cta">
           {primary ? (
@@ -180,22 +180,22 @@ export function HomeSochiStrip() {
   const moments = [
     {
       title: 'Море и город',
-      text: 'Набережная, события на открытом воздухе и точки, куда можно дойти пешком.',
+      text: 'Набережная, открытый воздух и точки, куда доходишь пешком.',
     },
     {
       title: 'Горы рядом',
-      text: 'Выезды клубов, сборы команд и другой ритм — не только зал в центре.',
+      text: 'Выезды клубов и другой ритм — не только зал в центре.',
     },
     {
       title: 'Дом молодёжи',
-      text: 'Точка сборки: бронь, коворкинг, парламент и понятные правила дома.',
+      text: 'Бронь, коворкинг, парламент — точка сборки, не ведомство.',
     },
   ];
   return (
     <section className="lift-sochi" aria-labelledby="lift-sochi-title">
       <div className="container">
-        <p className="lift-sochi__eyebrow">Собрано для Сочи</p>
-        <h2 id="lift-sochi-title">Не абстрактный «молодёжный портал» — карта живого города</h2>
+        <p className="lift-sochi__eyebrow">Это Сочи</p>
+        <h2 id="lift-sochi-title">Город, в котором тусуешь — не абстрактный портал</h2>
         <div className="lift-sochi__grid">
           {moments.map((m) => (
             <article key={m.title} className="lift-sochi__card">

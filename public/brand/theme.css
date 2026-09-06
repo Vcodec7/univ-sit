@@ -5,7 +5,7 @@
   --yp-purple-deep: #6e4bc4;
   --yp-lime: #afca03;
   --yp-lime-deep: #8fa502;
-  --background: #fafbf4;
+  --background: #eef6fb;
   --foreground: #0a0c2a;
   --primary: #8562d8;
   --primary-hover: #6e4bc4;
@@ -14,16 +14,19 @@
   --accent-hover: #8fa502;
   --muted: #5a5670;
   --card-bg: #ffffff;
-  --card-border: #e6e2f2;
+  --card-border: rgba(120, 176, 206, 0.35);
   --surface: #ffffff;
-  --surface-elevated: #eee9fb;
+  --surface-elevated: #e4f3fa;
   --ink-soft: #0a0c2a;
-  --brand-soft: #eee9fb;
+  --brand-soft: #e4f3fa;
   --brand-pill: #f3f8c4;
-  --line: #e6e2f2;
-  --shadow-sm: 0 4px 16px rgba(133, 98, 216, 0.08);
-  --shadow-md: 0 8px 28px rgba(133, 98, 216, 0.1);
-  --shadow-lg: 0 16px 40px rgba(133, 98, 216, 0.12);
+  --line: rgba(120, 176, 206, 0.35);
+  --shadow-sm: 0 4px 16px rgba(30, 90, 130, 0.08);
+  --shadow-md: 0 8px 28px rgba(30, 90, 130, 0.1);
+  --shadow-lg: 0 16px 40px rgba(30, 90, 130, 0.12);
+  --yp-sea: #7ec8e3;
+  --yp-sky: #d7eef8;
+  --yp-sand: #f7f3e8;
   --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px));
 }
 

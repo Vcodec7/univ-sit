@@ -128,7 +128,7 @@ export default async function FreeNowSpaces({ limit = 6 }: { limit?: number }) {
       <div className="home-section-head">
         <div>
           <h2 className="home-section-title">Сейчас свободно</h2>
-          <p className="home-section-sub">Ближайшие окна на площадках ЦРМ</p>
+          <p className="home-section-sub">Можно зайти без очереди — ближайшие окна ЦРМ</p>
         </div>
         <Link href="/spaces" className="home-section-link">
           Все пространства
