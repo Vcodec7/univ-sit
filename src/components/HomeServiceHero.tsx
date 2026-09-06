@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Building2, Landmark, Sparkles, Users } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import HomeHeroMedia from '@/components/HomeHeroMedia';
+import SochiLivingSky from '@/components/SochiLivingSky';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
 
 type Cta = { href: string; label: string };
@@ -113,6 +114,7 @@ export default function HomeServiceHero({
         <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
         <div className="lift-hero__veil" aria-hidden />
         <div className="lift-hero__glow" aria-hidden />
+        <SochiLivingSky />
       </div>
       <div className="container lift-hero__copy">
         <p className="lift-hero__eyebrow">Сочи · сейчас · {brand}</p>

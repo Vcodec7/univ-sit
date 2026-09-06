@@ -1,0 +1,188 @@
+/* Living Black Sea hero: time-of-day grade, swell, fauna. Transform/opacity only. */
+
+.sochi-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sochi-sky__grade {
+  position: absolute;
+  inset: 0;
+  transition: background 1.2s ease;
+}
+
+.sochi-sky[data-phase='dawn'] .sochi-sky__grade {
+  background:
+    linear-gradient(180deg, rgba(255, 186, 150, 0.42) 0%, rgba(255, 140, 90, 0.12) 38%, rgba(10, 30, 50, 0.28) 100%),
+    linear-gradient(90deg, rgba(255, 210, 170, 0.2), transparent 55%);
+}
+
+.sochi-sky[data-phase='day'] .sochi-sky__grade {
+  background:
+    linear-gradient(180deg, rgba(120, 190, 230, 0.18) 0%, transparent 42%, rgba(6, 40, 60, 0.28) 100%);
+}
+
+.sochi-sky[data-phase='sunset'] .sochi-sky__grade {
+  background:
+    linear-gradient(180deg, rgba(255, 120, 70, 0.5) 0%, rgba(190, 40, 80, 0.22) 36%, rgba(10, 16, 42, 0.45) 100%),
+    radial-gradient(ellipse at 78% 28%, rgba(255, 200, 80, 0.45), transparent 42%);
+}
+
+.sochi-sky[data-phase='dusk'] .sochi-sky__grade {
+  background:
+    linear-gradient(180deg, rgba(70, 50, 110, 0.45) 0%, rgba(20, 24, 50, 0.4) 50%, rgba(6, 12, 28, 0.55) 100%);
+}
+
+.sochi-sky[data-phase='night'] .sochi-sky__grade {
+  background:
+    linear-gradient(180deg, rgba(4, 10, 28, 0.55) 0%, rgba(8, 18, 40, 0.35) 48%, rgba(2, 8, 18, 0.5) 100%);
+}
+
+.sochi-sky__sun,
+.sochi-sky__moon {
+  position: absolute;
+  width: 5.2rem;
+  height: 5.2rem;
+  margin: -2.6rem 0 0 -2.6rem;
+  border-radius: 50%;
+  transition: left 1.4s ease, top 1.4s ease, opacity 0.8s ease;
+}
+
+.sochi-sky__sun {
+  background:
+    radial-gradient(circle at 50% 50%, #fff8d6 0 28%, #ffd56a 42%, rgba(255, 170, 60, 0.35) 62%, transparent 72%);
+}
+
+.sochi-sky[data-phase='sunset'] .sochi-sky__sun,
+.sochi-sky[data-phase='dawn'] .sochi-sky__sun {
+  background:
+    radial-gradient(circle at 50% 50%, #ffe7a8 0 26%, #ff8a3c 46%, rgba(255, 80, 40, 0.28) 64%, transparent 74%);
+  width: 6.4rem;
+  height: 6.4rem;
+  margin: -3.2rem 0 0 -3.2rem;
+}
+
+.sochi-sky__moon {
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: -1.3rem 0 0 -1.3rem;
+  background:
+    radial-gradient(circle at 38% 38%, #f4f1e6 0 46%, #cfd6e4 70%, transparent 72%);
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.04);
+}
+
+.sochi-sky__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.sochi-sky[data-phase='night'] .sochi-sky__stars,
+.sochi-sky[data-phase='dusk'] .sochi-sky__stars {
+  opacity: 1;
+}
+
+.sochi-sky__stars span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  animation: sochi-twinkle 3.6s ease-in-out infinite;
+}
+
+.sochi-sky__swell {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  height: 38%;
+  bottom: 0;
+  opacity: 0.28;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(255, 255, 255, 0.45) 0 12%, transparent 42%),
+    radial-gradient(ellipse at 70% 90%, rgba(255, 255, 255, 0.28) 0 10%, transparent 40%);
+  mix-blend-mode: soft-light;
+}
+
+.sochi-sky__swell--a {
+  animation: sochi-swell 11s linear infinite;
+}
+.sochi-sky__swell--b {
+  opacity: 0.2;
+  animation: sochi-swell 17s linear infinite reverse;
+}
+.sochi-sky__swell--c {
+  height: 24%;
+  opacity: 0.18;
+  animation: sochi-swell 8s linear infinite;
+}
+
+.sochi-sky__birds {
+  position: absolute;
+  top: 14%;
+  left: -30%;
+  width: 11rem;
+  height: 2rem;
+  fill: rgba(10, 12, 42, 0.42);
+  animation: sochi-flock 22s linear infinite;
+}
+
+.sochi-sky[data-phase='night'] .sochi-sky__birds,
+.sochi-sky[data-phase='dusk'] .sochi-sky__birds {
+  fill: rgba(255, 255, 255, 0.45);
+}
+
+.sochi-sky__dolphin {
+  position: absolute;
+  left: 18%;
+  bottom: 18%;
+  width: 4.6rem;
+  height: 2.8rem;
+  color: rgba(10, 30, 50, 0.72);
+  animation: sochi-leap 16s ease-in-out infinite;
+}
+
+.sochi-sky[data-phase='night'] .sochi-sky__dolphin {
+  color: rgba(180, 210, 230, 0.55);
+}
+
+@keyframes sochi-swell {
+  from { transform: translate3d(-6%, 0, 0); }
+  to { transform: translate3d(6%, 0, 0); }
+}
+
+@keyframes sochi-flock {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  8% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate3d(140vw, -12px, 0); opacity: 0; }
+}
+
+@keyframes sochi-leap {
+  0%, 62%, 100% { transform: translate3d(0, 28px, 0) rotate(-8deg); opacity: 0; }
+  68% { opacity: 1; }
+  74% { transform: translate3d(42px, -38px, 0) rotate(12deg); opacity: 1; }
+  82% { transform: translate3d(88px, 30px, 0) rotate(-16deg); opacity: 0; }
+}
+
+@keyframes sochi-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sochi-sky__swell,
+  .sochi-sky__birds,
+  .sochi-sky__dolphin,
+  .sochi-sky__stars span {
+    animation: none !important;
+  }
+  .sochi-sky__birds,
+  .sochi-sky__dolphin {
+    display: none;
+  }
+}

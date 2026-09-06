@@ -28,6 +28,7 @@ test('home streams heavy sections and does not embed session CTAs in the feed', 
 test('home lift hero keeps Sochi copy, product deck and exclusive media', () => {
   assert.match(hero, /className="lift-hero"/);
   assert.match(hero, /HomeHeroMedia/);
+  assert.match(hero, /SochiLivingSky/);
   assert.match(hero, /Старт с Сочи/);
   assert.match(hero, /Дом молодёжи/);
   assert.match(hero, /href: '\/coworking'/);

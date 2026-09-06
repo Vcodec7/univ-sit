@@ -5,6 +5,7 @@ import './globals.css';
 import './auth-layout.css';
 import '../../public/brand/theme.css';
 import './layout-unify.css';
+import './sochi-living-sky.css';
 import NavbarWrapper from '@/components/NavbarWrapper';
 import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
