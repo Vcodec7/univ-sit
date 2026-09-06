@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+test('admin studio wizard and publish hide drafts', () => {
+  const studio = readFileSync(join(root, 'src/lib/youth-studio.ts'), 'utf8');
+  const pub = readFileSync(join(root, 'src/lib/publish.ts'), 'utf8');
+  const proj = readFileSync(join(root, 'src/app/admin/projects/page.tsx'), 'utf8');
+  const faq = readFileSync(join(root, 'src/components/admin/AdminFaqClient.tsx'), 'utf8');
+  const settings = readFileSync(join(root, 'src/app/admin/settings/page.tsx'), 'utf8');
+  const clubs = readFileSync(join(root, 'src/app/admin/clubs/page.tsx'), 'utf8');
+  assert.match(studio, /JOIN_MODES/);
+  assert.match(studio, /Черновик/);
+  assert.match(studio, /catalogPitch/);
+  assert.match(pub, /DRAFT/);
+  assert.match(proj, /AdminYouthStudioForm/);
+  assert.match(proj, /admin-catalog-cards/);
+  assert.match(clubs, /AdminYouthStudioForm/);
+  assert.match(clubs, /admin-catalog-cards/);
+  const spaces = readFileSync(join(root, 'src/app/admin/spaces/page.tsx'), 'utf8');
+  const pages = readFileSync(join(root, 'src/app/admin/pages/PageEditorForm.tsx'), 'utf8');
+  const form = readFileSync(join(root, 'src/components/admin/AdminYouthStudioForm.tsx'), 'utf8');
+  assert.match(spaces, /AdminYouthStudioForm/);
+  assert.match(spaces, /kind="space"/);
+  assert.match(spaces, /admin-catalog-cards/);
+  assert.match(pages, /kind="page"/);
+  assert.match(form, /STEPS_SPACE/);
+  assert.match(form, /bookingMode/);
+  assert.match(form, /StudioCopyField/);
+  assert.match(studio, /studioCopyChips/);
+  assert.match(faq, /Текущие категории/);
+  assert.match(faq, /Категория создана/);
+  assert.match(faq, /Редактировать/);
+  assert.match(faq, /Открыть вопросы/);
+  assert.match(faq, /Базовые вопросы подтягиваются сами/);
+  const faqDb = readFileSync(join(root, 'src/lib/faq-db.ts'), 'utf8');
+  const faqApi = readFileSync(join(root, 'src/app/api/admin/faq/route.ts'), 'utf8');
+  assert.match(faqDb, /ensureBuiltinFaq/);
+  assert.match(faqApi, /ensureBuiltinFaq/);
+  assert.match(settings, /admin-settings-health/);
+});
