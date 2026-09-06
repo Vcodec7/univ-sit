@@ -8,6 +8,8 @@ const root = dirname(fileURLToPath(import.meta.url));
 const home = readFileSync(join(root, '../src/lib/home-catalog.ts'), 'utf8');
 const page = readFileSync(join(root, '../src/app/page.tsx'), 'utf8');
 const hero = readFileSync(join(root, '../src/components/HomeServiceHero.tsx'), 'utf8');
+const freeNow = readFileSync(join(root, '../src/components/FreeNowSpaces.tsx'), 'utf8');
+const css = readFileSync(join(root, '../src/app/globals.css'), 'utf8');
 
 test('home catalog stays slim for first paint', () => {
   assert.match(home, /HOME_FEED_TAKE = 8/);
@@ -31,4 +33,10 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
   assert.match(page, /home-page--lift/);
   assert.match(page, /HomeSochiStrip/);
   assert.match(page, /home-cta--split/);
+});
+
+test('free-now rail on lift home keeps full cards and hero buttons', () => {
+  assert.match(freeNow, /lift-hero__btn--lime/);
+  assert.match(css, /home-page--lift \.free-now-card/);
+  assert.match(css, /home-page--lift \.home-rail::-webkit-scrollbar/);
 });

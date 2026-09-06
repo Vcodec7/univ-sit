@@ -152,15 +152,15 @@ export default async function FreeNowSpaces({ limit = 6 }: { limit?: number }) {
               <p>{card.address || 'Сочи'}</p>
               <strong className="free-now-slot">{card.slotLabel}</strong>
               <div className="free-now-actions">
-                <Link href={`/spaces/${encodeRouteParam(card.id)}`} className="btn btn-secondary">
+                <Link href={`/spaces/${encodeRouteParam(card.id)}`} className="lift-hero__btn lift-hero__btn--ghost">
                   Сетка
                 </Link>
                 {card.coworking ? (
-                  <Link href={`/coworking?space=${encodeURIComponent(card.id)}`} className="btn btn-primary">
+                  <Link href={`/coworking?space=${encodeURIComponent(card.id)}`} className="lift-hero__btn lift-hero__btn--lime">
                     В коворкинг
                   </Link>
                 ) : (
-                  <Link href={`/spaces/${encodeRouteParam(card.id)}/book?from=list`} className="btn btn-primary">
+                  <Link href={`/spaces/${encodeRouteParam(card.id)}/book?from=list`} className="lift-hero__btn lift-hero__btn--lime">
                     Забронировать
                   </Link>
                 )}

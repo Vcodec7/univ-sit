@@ -27063,6 +27063,69 @@ button.btn,
   }
 }
 
+/* Lift home: rails stay in the same language; do not clip the card or leave a stray scrollbar */
+.home-page--lift .home-rail {
+  scrollbar-width: none !important;
+  padding: 0.4rem 1.15rem 1.4rem 0.2rem !important;
+}
+.home-page--lift .home-rail::-webkit-scrollbar {
+  height: 0 !important;
+  display: none !important;
+}
+.home-page--lift .home-rail__slide {
+  height: auto !important;
+  align-self: start;
+}
+.home-page--lift .home-rail__slide > * {
+  height: auto !important;
+}
+.home-page--lift .free-now-card {
+  background: #0a0c2a;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 40px rgba(10, 12, 42, 0.18);
+  overflow: hidden;
+}
+.home-page--lift .free-now-body h3 {
+  color: #fff;
+}
+.home-page--lift .free-now-body p {
+  color: rgba(255, 255, 255, 0.72);
+}
+.home-page--lift .free-now-slot {
+  color: #afca03;
+}
+.home-page--lift .free-now-badge {
+  background: rgba(10, 12, 42, 0.72);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.home-page--lift .free-now-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.45rem !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn {
+  width: 100%;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.86rem;
+}
+.home-page--lift .free-now-actions .lift-hero__btn--ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.home-page--lift .catalog-card {
+  border-radius: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgba(133, 98, 216, 0.16);
+  box-shadow: 0 14px 32px rgba(10, 12, 42, 0.08);
+}
+.home-page--lift .home-section-link {
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  background: rgba(133, 98, 216, 0.1);
+}
+
 /* ===== 1.6.16 home + places polish ===== */
 .svc-hero__switch {
   display: flex !important;
