@@ -29,7 +29,7 @@ type Item = {
   description?: string;
   content?: string;
   template?: string;
-  status?: string;
+  status?: string | null;
   image?: string | null;
   images?: string | null;
   gallery?: string | null;
