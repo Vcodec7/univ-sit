@@ -27079,30 +27079,59 @@ button.btn,
 .home-page--lift .home-rail__slide > * {
   height: auto !important;
 }
-.home-page--lift .free-now-card {
+.home-page--lift .free-now-card,
+.home-page--lift .lift-feed-card {
   background: #0a0c2a;
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 18px 40px rgba(10, 12, 42, 0.18);
   overflow: hidden;
 }
-.home-page--lift .free-now-body h3 {
+.home-page--lift .free-now-body h3,
+.home-page--lift .lift-feed-card .event-card-title {
   color: #fff;
 }
-.home-page--lift .free-now-body p {
+.home-page--lift .free-now-body p,
+.home-page--lift .lift-feed-card .event-card-facts,
+.home-page--lift .lift-feed-card .event-card-desc {
   color: rgba(255, 255, 255, 0.72);
 }
-.home-page--lift .free-now-slot {
+.home-page--lift .free-now-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.home-page--lift .free-now-slot,
+.home-page--lift .lift-feed-card .event-card-seats,
+.home-page--lift .lift-feed-card .event-card-date {
   color: #afca03;
 }
-.home-page--lift .free-now-badge {
+.home-page--lift .free-now-badge,
+.home-page--lift .lift-feed-card .event-card-category {
   background: rgba(10, 12, 42, 0.72);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.home-page--lift .lift-feed-card__media {
+  display: block;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+.home-page--lift .lift-feed-card__media .free-now-badge {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 1;
+  margin: 0;
 }
 .home-page--lift .free-now-actions {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 0.45rem !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn:only-child {
+  grid-column: 1 / -1;
 }
 .home-page--lift .free-now-actions .lift-hero__btn {
   width: 100%;
@@ -27114,11 +27143,32 @@ button.btn,
   color: #fff;
   border-color: rgba(255, 255, 255, 0.28);
 }
-.home-page--lift .catalog-card {
-  border-radius: 1.15rem;
-  overflow: hidden;
-  border: 1px solid rgba(133, 98, 216, 0.16);
-  box-shadow: 0 14px 32px rgba(10, 12, 42, 0.08);
+.home-page--lift .lift-feed-card.event-card {
+  background: #0a0c2a;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 40px rgba(10, 12, 42, 0.18);
+}
+.home-page--lift .lift-feed-card .event-card-body {
+  background: #0a0c2a;
+  color: #fff;
+}
+.home-page--lift .lift-feed-card .event-card-desc {
+  display: none;
+}
+.home-page--lift .lift-feed-card .event-action-chip,
+.home-page--lift .lift-feed-card .join-event-btn {
+  border-radius: 999px !important;
+}
+.home-page--lift .lift-feed-card .join-event-btn.is-primary,
+.home-page--lift .lift-feed-card .join-event-btn.is-waitlist {
+  background: #afca03 !important;
+  color: #0a0c2a !important;
+  border: 0 !important;
+}
+.home-page--lift .lift-feed-card .event-action-chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
 }
 .home-page--lift .home-section-link {
   border-radius: 999px;

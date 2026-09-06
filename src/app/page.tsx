@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
+import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
+import HomeSlideRail from '@/components/HomeSlideRail';
 import { getSiteIdentity } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
@@ -11,7 +13,7 @@ import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
-import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import NewsCoverImage from '@/components/NewsCoverImage';
 import EntityCoverImage from '@/components/EntityCoverImage';
 import NewsMediaBadge from '@/components/NewsMediaBadge';
@@ -120,30 +122,33 @@ export default async function Home() {
           {latestProjects.length === 0 ? (
             <p className="home-empty">Пока нет опубликованных проектов.</p>
           ) : (
-            <div className="home-feed-grid">
-              {latestProjects.map((project, idx) => (
-                <Link key={project.id} href={`/projects/${encodeURIComponent(project.id)}`} className="catalog-card">
-                  <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                    <EntityCoverImage
-                      src={projectCover(project, idx)}
-                      alt={project.title}
-                      fallback={projectCover(project, idx + 3)}
-                      className="catalog-img"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      priority={idx < 2}
-                    />
-                  </div>
-                  <div className="catalog-card-body">
-                    <h3 className="catalog-card-title">{project.title}</h3>
-                    <p className="line-clamp-3 catalog-card-text">{stripHtml(project.description)}</p>
-                    <div className="catalog-card-meta">
-                      <span>Открыт для заявок</span>
-                      <span className="catalog-card-more">Подробнее</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <HomeSlideRail label="Свежие проекты">
+              {latestProjects.map((project, idx) => {
+                const href = `/projects/${encodeURIComponent(project.id)}`;
+                return (
+                  <HomeLiftFeedCard
+                    key={project.id}
+                    href={href}
+                    badge="Проект"
+                    title={project.title}
+                    line={stripHtml(project.description)}
+                    highlight="Открыт для заявок"
+                    secondary={{ href, label: 'Подробнее' }}
+                    primary={{ href, label: 'Участвовать' }}
+                    cover={
+                      <EntityCoverImage
+                        src={projectCover(project, idx)}
+                        alt={project.title}
+                        fallback={projectCover(project, idx + 3)}
+                        className="free-now-img"
+                        sizes="(max-width: 768px) 85vw, 280px"
+                        priority={idx < 2}
+                      />
+                    }
+                  />
+                );
+              })}
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -166,31 +171,32 @@ export default async function Home() {
           {latestClubs.length === 0 ? (
             <p className="home-empty">Клубы скоро появятся в каталоге.</p>
           ) : (
-            <div className="home-feed-grid">
-              {latestClubs.map((club, idx) => (
-                <Link key={club.id} href={`/clubs/${encodeURIComponent(club.id)}`} className="catalog-card">
-                  <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                    <EntityCoverImage
-                      src={clubCover(club, idx)}
-                      alt={club.title}
-                      fallback={clubCover(club, idx + 3)}
-                      className="catalog-img"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                  <div className="catalog-card-body">
-                    <h3 className="catalog-card-title">{club.title}</h3>
-                    <p className="line-clamp-3 catalog-card-text">{stripHtml(club.description)}</p>
-                    <div className="catalog-card-meta">
-                      <span>
-                        <Users size={16} /> Открыт для заявок
-                      </span>
-                      <span className="catalog-card-more">Подробнее</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <HomeSlideRail label="Клубы по интересам">
+              {latestClubs.map((club, idx) => {
+                const href = `/clubs/${encodeURIComponent(club.id)}`;
+                return (
+                  <HomeLiftFeedCard
+                    key={club.id}
+                    href={href}
+                    badge="Клуб"
+                    title={club.title}
+                    line={stripHtml(club.description)}
+                    highlight="Открыт для заявок"
+                    secondary={{ href, label: 'Подробнее' }}
+                    primary={{ href, label: 'В клуб' }}
+                    cover={
+                      <EntityCoverImage
+                        src={clubCover(club, idx)}
+                        alt={club.title}
+                        fallback={clubCover(club, idx + 3)}
+                        className="free-now-img"
+                        sizes="(max-width: 768px) 85vw, 280px"
+                      />
+                    }
+                  />
+                );
+              })}
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -213,47 +219,32 @@ export default async function Home() {
           {latestSpaces.length === 0 ? (
             <p className="home-empty">Свободных пространств пока нет в каталоге.</p>
           ) : (
-            <div className="home-feed-grid">
-              {latestSpaces.map((space, idx) => (
-                <article key={space.id} className="catalog-card catalog-card--hit" style={{ position: 'relative' }}>
-                  <Link
-                    href={`/spaces/${encodeURIComponent(space.id)}`}
-                    className="catalog-card__hit-link"
-                    aria-label={space.title}
+            <HomeSlideRail label="Пространства">
+              {latestSpaces.map((space, idx) => {
+                const href = `/spaces/${encodeURIComponent(space.id)}`;
+                return (
+                  <HomeLiftFeedCard
+                    key={space.id}
+                    href={href}
+                    badge="Площадка"
+                    title={space.title}
+                    line={space.address || `до ${space.capacity} чел.`}
+                    highlight="Можно забронировать"
+                    secondary={{ href, label: 'Сетка' }}
+                    primary={{ href: `${href}/book`, label: 'Забронировать' }}
+                    cover={
+                      <EntityCoverImage
+                        src={spaceCover(space, idx)}
+                        alt={space.title}
+                        fallback={spaceCover(space, idx + 3)}
+                        className="free-now-img"
+                        sizes="(max-width: 768px) 85vw, 280px"
+                      />
+                    }
                   />
-                  <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                    <EntityCoverImage
-                      src={spaceCover(space, idx)}
-                      alt={space.title}
-                      fallback={spaceCover(space, idx + 3)}
-                      className="catalog-img"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                  <div className="catalog-card-body">
-                    <h3 className="catalog-card-title">{space.title}</h3>
-                    <p className="line-clamp-3 catalog-card-text">
-                      {space.description ? stripHtml(space.description) : 'Молодёжная площадка для ваших событий'}
-                    </p>
-                    <div className="catalog-card-meta">
-                      <span>
-                        <MapPin size={16} /> {space.address || `до ${space.capacity} чел.`}
-                      </span>
-                      <span className="catalog-card-more">Подробнее</span>
-                    </div>
-                    <div className="catalog-card__interactive" style={{ marginTop: '0.65rem' }}>
-                      <Link
-                        href={`/spaces/${encodeURIComponent(space.id)}/book`}
-                        className="btn btn-primary"
-                        title="Забронировать зал"
-                      >
-                        Забронировать
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                );
+              })}
+            </HomeSlideRail>
           )}
         </section>
         )}
@@ -309,36 +300,35 @@ export default async function Home() {
           {latestNews.length === 0 ? (
             <p className="home-empty">Новостей пока нет — загляните позже.</p>
           ) : (
-            <div className="home-feed-grid">
+            <HomeSlideRail label="Новости">
               {latestNews.map((item) => {
                 const when = item.publishedAt || item.createdAt;
                 const title = item.title?.trim() || stripHtml(item.text).slice(0, 80) || 'Новость';
+                const href = `/news/${item.id}`;
                 return (
-                  <Link key={item.id} href={`/news/${item.id}`} className="catalog-card">
-                    <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                      <NewsCoverImage
-                        src={item.imageUrl}
-                        alt={title}
-                        className="catalog-img"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
-                      <NewsMediaBadge hasVideo={!!item.videoEmbedUrl} />
-                    </div>
-                    <div className="catalog-card-body">
-                      <h3 className="catalog-card-title">{title}</h3>
-                      <p className="line-clamp-3 catalog-card-text">{stripHtml(item.text)}</p>
-                      <div className="catalog-card-meta">
-                        <span>
-                          <Calendar size={16} />{' '}
-                          {formatRuDate(when, { day: 'numeric', month: 'long' })}
-                        </span>
-                        <span className="catalog-card-more">Читать</span>
-                      </div>
-                    </div>
-                  </Link>
+                  <HomeLiftFeedCard
+                    key={item.id}
+                    href={href}
+                    badge={item.videoEmbedUrl ? 'Видео' : 'Новость'}
+                    title={title}
+                    line={stripHtml(item.text)}
+                    highlight={formatRuDate(when, { day: 'numeric', month: 'long' })}
+                    primary={{ href, label: 'Читать' }}
+                    cover={
+                      <>
+                        <NewsCoverImage
+                          src={item.imageUrl}
+                          alt={title}
+                          className="free-now-img"
+                          sizes="(max-width: 768px) 85vw, 280px"
+                        />
+                        <NewsMediaBadge hasVideo={!!item.videoEmbedUrl} />
+                      </>
+                    }
+                  />
                 );
               })}
-            </div>
+            </HomeSlideRail>
           )}
         </section>
         )}

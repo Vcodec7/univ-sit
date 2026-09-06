@@ -15,6 +15,7 @@ import EntityCoverImage from './EntityCoverImage';
 import { eventCover, sectionCover } from '@/lib/theme-covers';
 import { normalizeEventCategory, normalizeEventContactMode } from '@/lib/event-meta';
 import EventHomeCarousel from './EventHomeCarousel';
+import HomeSlideRail from './HomeSlideRail';
 import ViewBeacon from '@/components/ViewBeacon';
 import { isJunkEventTitle } from '@/lib/afisha-filters';
 import { eventRewardBadge, isEcoTagged } from '@/lib/score-scales';
@@ -170,7 +171,7 @@ function EventCard({
   const rewards = eventRewardBadge({ ecoTagged: isEcoTagged(null, event.category) });
 
   return (
-    <article key={event.id} id={`event-${event.id}`} className={`glass event-card yp-feed-card${iconActions ? " event-card--compact" : ""}`}>
+    <article key={event.id} id={`event-${event.id}`} className={`event-card yp-feed-card${iconActions ? " event-card--compact" : ""}${compact ? " lift-feed-card free-now-card" : " glass"}`}>
       <div className="event-card-cover">
         <EntityCoverImage
           src={cover}
@@ -327,7 +328,9 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
         </div>
       )}
 
-      {useCarousel ? (
+      {useCarousel && compact ? (
+        <HomeSlideRail label="Ближайшие мероприятия">{cards}</HomeSlideRail>
+      ) : useCarousel ? (
         <EventHomeCarousel count={events.length}>
           {cards.map((card) => (
             <div key={card.key} className="event-carousel__slide">
