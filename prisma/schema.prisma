@@ -797,6 +797,7 @@ model PageContent {
   template  String @default("DEFAULT") // DEFAULT, GALLERY, TEAM, FAQ
   status    String   @default("PUBLISHED") // DRAFT | PUBLISHED
   publishedAt DateTime?
+  studioJson String?
   updatedAt DateTime @updatedAt
 
   @@index([menuPosition, status])

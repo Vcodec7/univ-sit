@@ -50,8 +50,7 @@ export default async function AdminPages({
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.25rem' }}>Страницы</h1>
           <p style={{ color: 'var(--muted)', margin: 0 }}>
-            Редактор текстов сайта: политика, правила, «О нас», FAQ и страницы из VK (#правилаДМ, медиа). Файлы PDF и
-            памятки — в{' '}
+            Редактор страниц тем же конструктором, что проекты и пространства. PDF — в{' '}
             <Link href="/admin/documents" style={{ color: 'var(--primary)', fontWeight: 600 }}>
               Документах
             </Link>

@@ -6,26 +6,32 @@ import CoverImageField from '@/components/admin/CoverImageField';
 import GalleryPickerField from '@/components/admin/GalleryPickerField';
 import RichTextInput from '@/components/RichTextInput';
 import AdminPlanBuilder from '@/components/admin/AdminPlanBuilder';
+import SpaceAmenitiesField from '@/components/admin/SpaceAmenitiesField';
 import {
   CATALOG_STATUSES,
   CATALOG_STATUS_RU,
   JOIN_MODES,
+  PAGE_STATUSES,
+  PAGE_STATUS_RU,
   YOUTH_TEMPLATES,
   parseStudioJson,
   studioChecklist,
   stripHtml,
   type JoinMode,
 } from '@/lib/youth-studio';
+import { SPACE_CATEGORIES } from '@/lib/spaces';
 
-export type StudioKind = 'project' | 'club';
+export type StudioKind = 'project' | 'club' | 'space' | 'page';
 
 type Item = {
   id?: string;
   title?: string;
   description?: string;
+  content?: string;
   template?: string;
   status?: string;
   image?: string | null;
+  images?: string | null;
   gallery?: string | null;
   goal?: string | null;
   mission?: string | null;
@@ -40,9 +46,22 @@ type Item = {
   signupUrl?: string | null;
   meetingSchedule?: string | null;
   meetingPlace?: string | null;
+  address?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  capacity?: number | null;
+  category?: string | null;
+  amenities?: string | null;
+  bookingMode?: string | null;
+  openTime?: string | null;
+  closeTime?: string | null;
+  slotStepMin?: number | null;
+  slug?: string | null;
+  menuPosition?: string | null;
+  publishedAt?: Date | string | null;
 };
 
-const STEPS = [
+const STEPS_DEFAULT = [
   { id: 'main', label: 'Основное' },
   { id: 'copy', label: 'Описание' },
   { id: 'join', label: 'Участие' },
@@ -50,6 +69,53 @@ const STEPS = [
   { id: 'media', label: 'Медиа' },
   { id: 'publish', label: 'Публикация' },
 ] as const;
+
+const STEPS_SPACE = [
+  { id: 'main', label: 'Основное' },
+  { id: 'copy', label: 'Описание' },
+  { id: 'venue', label: 'Площадка' },
+  { id: 'join', label: 'Запись' },
+  { id: 'media', label: 'Медиа' },
+  { id: 'publish', label: 'Публикация' },
+] as const;
+
+const STEPS_PAGE = [
+  { id: 'main', label: 'Основное' },
+  { id: 'copy', label: 'Текст' },
+  { id: 'media', label: 'Медиа' },
+  { id: 'publish', label: 'Публикация' },
+] as const;
+
+function stepsFor(kind: StudioKind) {
+  if (kind === 'space') return STEPS_SPACE;
+  if (kind === 'page') return STEPS_PAGE;
+  return STEPS_DEFAULT;
+}
+
+function defaultFormat(kind: StudioKind) {
+  if (kind === 'club') return 'Клуб';
+  if (kind === 'space') return 'Пространство';
+  if (kind === 'page') return 'Страница';
+  return 'Проект';
+}
+
+function defaultJoin(kind: StudioKind): JoinMode {
+  if (kind === 'page') return 'none';
+  if (kind === 'space') return 'apply';
+  return 'apply';
+}
+
+function publicHref(kind: StudioKind, item?: Item | null) {
+  if (!item?.id) return null;
+  if (kind === 'club') return `/clubs/${item.id}`;
+  if (kind === 'project') return `/projects/${item.id}`;
+  if (kind === 'space') return `/spaces/${item.id}`;
+  if (kind === 'page' && item.slug) {
+    if (item.slug === 'privacy') return '/privacy';
+    return `/p/${item.slug}`;
+  }
+  return null;
+}
 
 export default function AdminYouthStudioForm({
   kind,
@@ -62,24 +128,30 @@ export default function AdminYouthStudioForm({
   pool: string[];
   formId?: string;
 }) {
+  const steps = stepsFor(kind);
   const studio0 = parseStudioJson(item?.studioJson);
   if (item?.curatorName && !studio0.curatorName) studio0.curatorName = item.curatorName;
   if (item?.curatorContact && !studio0.curatorContact) studio0.curatorContact = item.curatorContact;
   if (item?.signupUrl && !studio0.signupUrl) studio0.signupUrl = item.signupUrl;
   if (item?.tags && !studio0.tags) studio0.tags = item.tags;
+  if (!studio0.joinMode || (kind === 'page' && !item?.studioJson)) studio0.joinMode = defaultJoin(kind);
 
   const [step, setStep] = useState(0);
   const [title, setTitle] = useState(item?.title || '');
-  const [status, setStatus] = useState(item?.status || 'DRAFT');
+  const [status, setStatus] = useState(item?.status || (kind === 'page' ? 'PUBLISHED' : 'DRAFT'));
   const [template, setTemplate] = useState(item?.template || 'DEFAULT');
-  const [mission, setMission] = useState(item?.mission || '');
-  const [goal, setGoal] = useState(item?.goal || '');
+  const [mission, setMission] = useState(item?.mission || studio0.mission || '');
+  const [goal, setGoal] = useState(item?.goal || studio0.goal || '');
   const [audience, setAudience] = useState(studio0.audience);
   const [whatHappens, setWhatHappens] = useState(studio0.whatHappens);
   const [howToJoin, setHowToJoin] = useState(studio0.howToJoin);
-  const [joinMode, setJoinMode] = useState<JoinMode>(studio0.joinMode);
-  const [format, setFormat] = useState(studio0.format || (kind === 'club' ? 'Клуб' : 'Проект'));
+  const [joinMode, setJoinMode] = useState<JoinMode>(studio0.joinMode || defaultJoin(kind));
+  const [format, setFormat] = useState(studio0.format || defaultFormat(kind));
+  const [slug, setSlug] = useState(item?.slug || '');
+  const bodyHtml = item?.content || item?.description || '';
+  const cover = item?.image || (item?.images && item.images !== '[]' ? item.images : null);
   const draftKey = `yp-studio-${kind}-${item?.id || 'new'}`;
+  const stepId = steps[step]?.id || 'main';
 
   useEffect(() => {
     try {
@@ -119,10 +191,10 @@ export default function AdminYouthStudioForm({
     () =>
       studioChecklist({
         title,
-        description: item?.description || '',
+        description: bodyHtml,
         mission,
         goal,
-        image: item?.image,
+        image: cover,
         studio: {
           audience,
           whatHappens,
@@ -133,17 +205,19 @@ export default function AdminYouthStudioForm({
           signupUrl: studio0.signupUrl,
           tags: studio0.tags,
           format,
+          mission,
+          goal,
         },
       }),
-    [title, item?.description, item?.image, mission, goal, audience, whatHappens, howToJoin, joinMode, format, studio0]
+    [title, bodyHtml, cover, mission, goal, audience, whatHappens, howToJoin, joinMode, format, studio0]
   );
   const ready = checklist.filter((c) => c.ok).length;
-  const publicHref = item?.id ? `/${kind === 'club' ? 'clubs' : 'projects'}/${item.id}` : null;
+  const href = publicHref(kind, item);
 
   return (
     <div className="admin-studio">
       <nav className="admin-studio__steps" aria-label="Шаги">
-        {STEPS.map((s, i) => (
+        {steps.map((s, i) => (
           <button
             key={s.id}
             type="button"
@@ -155,69 +229,149 @@ export default function AdminYouthStudioForm({
         ))}
       </nav>
 
-      <section className="admin-studio__panel" hidden={step !== 0}>
-          <p className="admin-studio-hint">Шаблон подставляет тексты — их можно править.</p>
-          <div className="admin-studio__chips">
-            {Object.entries(YOUTH_TEMPLATES).map(([k, t]) => (
+      <section className="admin-studio__panel" hidden={stepId !== 'main'}>
+        <p className="admin-studio-hint">Шаблон подставляет тексты — их можно править.</p>
+        <div className="admin-studio__chips">
+          {Object.entries(YOUTH_TEMPLATES)
+            .filter(([k]) => (kind === 'page' ? true : k !== 'page'))
+            .map(([k, t]) => (
               <button key={k} type="button" className="btn btn-secondary" onClick={() => applyTemplate(k)}>
                 {t.label}
               </button>
             ))}
-          </div>
+        </div>
+        <label className="admin-studio__field">
+          <span>
+            Название <em>*</em>
+          </span>
+          <input name="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Например: Медиалаборатория Сочи" />
+        </label>
+        {kind === 'page' ? (
           <label className="admin-studio__field">
-            <span>
-              Название <em>*</em>
-            </span>
-            <input name="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Например: Медиалаборатория Сочи" />
+            <span>URL (slug)</span>
+            {item?.slug === 'privacy' || item?.slug === 'about' || item?.slug === 'rules' || item?.slug === 'terms' ? (
+              <>
+                <input type="hidden" name="slug" value={item.slug} />
+                <input value={item.slug} disabled />
+              </>
+            ) : (
+              <input name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="about" required={!item?.id} />
+            )}
           </label>
+        ) : null}
+        <label className="admin-studio__field">
+          <span>Формат</span>
+          <input name="format" value={format} onChange={(e) => setFormat(e.target.value)} />
+        </label>
+        <label className="admin-studio__field">
+          <span>Как выглядит страница</span>
+          <select name="template" value={template} onChange={(e) => setTemplate(e.target.value)}>
+            <option value="DEFAULT">Текст и блоки</option>
+            <option value="GALLERY">Галерея</option>
+            <option value="TEAM">Команда</option>
+            <option value="HERO">Крупный заголовок</option>
+            {kind === 'space' || kind === 'page' ? <option value="FAQ">Вопрос-ответ</option> : null}
+          </select>
+        </label>
+        {kind === 'page' ? (
           <label className="admin-studio__field">
-            <span>Формат участия</span>
-            <input name="format" value={format} onChange={(e) => setFormat(e.target.value)} placeholder="Клуб / проект / набор" />
-          </label>
-          <label className="admin-studio__field">
-            <span>Как выглядит страница</span>
-            <select name="template" value={template} onChange={(e) => setTemplate(e.target.value)}>
-              <option value="DEFAULT">Текст и блоки</option>
-              <option value="GALLERY">Галерея</option>
-              <option value="TEAM">Команда</option>
-              <option value="HERO">Крупный заголовок</option>
+            <span>Позиция в меню</span>
+            <select name="menuPosition" defaultValue={item?.menuPosition || 'NONE'}>
+              <option value="NONE">Скрыта (только по ссылке)</option>
+              <option value="HEADER_MAIN">Главное меню</option>
+              <option value="HEADER_SUB">Подменю «Ещё»</option>
+              <option value="FOOTER">Подвал</option>
             </select>
           </label>
+        ) : null}
       </section>
 
-      <section className="admin-studio__panel" hidden={step !== 1}>
-          <label className="admin-studio__field">
-            <span>
-              Зачем идти <em>*</em>
-            </span>
-            <textarea name="mission" rows={2} value={mission} onChange={(e) => setMission(e.target.value)} placeholder="Одно предложение пользы" />
-          </label>
-          <label className="admin-studio__field">
-            <span>
-              Кому подойдёт <em>*</em>
-            </span>
-            <textarea name="audience" rows={2} value={audience} onChange={(e) => setAudience(e.target.value)} />
-          </label>
-          <label className="admin-studio__field">
-            <span>Что будет на встречах</span>
-            <textarea name="whatHappens" rows={2} value={whatHappens} onChange={(e) => setWhatHappens(e.target.value)} />
-          </label>
-          <label className="admin-studio__field">
-            <span>
-              Что получит участник <em>*</em>
-            </span>
-            <textarea name="goal" rows={2} value={goal} onChange={(e) => setGoal(e.target.value)} />
-          </label>
-          <label className="admin-studio__field">
-            <span>
-              Полное описание <em>*</em>
-            </span>
-            <RichTextInput name="description" defaultValue={item?.description || ''} />
-            <small className="admin-studio-hint">Не короче 80 символов. На телефоне панель редактора прокручивается.</small>
-          </label>
+      <section className="admin-studio__panel" hidden={stepId !== 'copy'}>
+        <label className="admin-studio__field">
+          <span>Зачем идти / читать</span>
+          <textarea name="mission" rows={2} value={mission} onChange={(e) => setMission(e.target.value)} />
+        </label>
+        <label className="admin-studio__field">
+          <span>Кому подойдёт</span>
+          <textarea name="audience" rows={2} value={audience} onChange={(e) => setAudience(e.target.value)} />
+        </label>
+        <label className="admin-studio__field">
+          <span>Что будет / о чём страница</span>
+          <textarea name="whatHappens" rows={2} value={whatHappens} onChange={(e) => setWhatHappens(e.target.value)} />
+        </label>
+        <label className="admin-studio__field">
+          <span>Что получит читатель</span>
+          <textarea name="goal" rows={2} value={goal} onChange={(e) => setGoal(e.target.value)} />
+        </label>
+        <label className="admin-studio__field">
+          <span>
+            {kind === 'page' ? 'Содержание' : 'Полное описание'} <em>*</em>
+          </span>
+          <RichTextInput name={kind === 'page' ? 'content' : 'description'} defaultValue={bodyHtml} />
+        </label>
       </section>
 
-      <section className="admin-studio__panel" hidden={step !== 2}>
+      {kind === 'space' ? (
+        <section className="admin-studio__panel" hidden={stepId !== 'venue'}>
+          <label className="admin-studio__field">
+            <span>Адрес</span>
+            <input name="address" defaultValue={item?.address || ''} placeholder="г. Сочи, ул. …" required />
+          </label>
+          <div className="admin-form-grid admin-form-grid--2">
+            <label className="admin-studio__field">
+              <span>Широта</span>
+              <input type="number" step="any" name="lat" defaultValue={item?.lat ?? ''} />
+            </label>
+            <label className="admin-studio__field">
+              <span>Долгота</span>
+              <input type="number" step="any" name="lng" defaultValue={item?.lng ?? ''} />
+            </label>
+          </div>
+          <label className="admin-studio__field">
+            <span>Категория</span>
+            <select name="category" defaultValue={item?.category || 'Общее'}>
+              {SPACE_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="admin-studio__field">
+            <span>Сценарий записи</span>
+            <select name="bookingMode" defaultValue={item?.bookingMode || 'HALL'}>
+              <option value="HALL">Только зал</option>
+              <option value="COWORKING">Только коворкинг</option>
+              <option value="BOTH">Зал и коворкинг</option>
+            </select>
+          </label>
+          <label className="admin-studio__field">
+            <span>Вместимость</span>
+            <input type="number" name="capacity" defaultValue={item?.capacity || 50} required />
+          </label>
+          <div className="admin-form-grid admin-form-grid--2">
+            <label className="admin-studio__field">
+              <span>Открытие</span>
+              <input name="openTime" defaultValue={item?.openTime || ''} placeholder="09:00" />
+            </label>
+            <label className="admin-studio__field">
+              <span>Закрытие</span>
+              <input name="closeTime" defaultValue={item?.closeTime || ''} placeholder="21:00" />
+            </label>
+          </div>
+          <label className="admin-studio__field">
+            <span>Шаг сетки (мин)</span>
+            <select name="slotStepMin" defaultValue={String(item?.slotStepMin || 60)}>
+              <option value="30">30</option>
+              <option value="60">60</option>
+            </select>
+          </label>
+          <SpaceAmenitiesField defaultValue={item?.amenities} />
+        </section>
+      ) : null}
+
+      {kind !== 'page' ? (
+        <section className="admin-studio__panel" hidden={stepId !== 'join'}>
           <fieldset className="admin-studio__join">
             <legend>Как вступить</legend>
             {JOIN_MODES.map((m) => (
@@ -248,20 +402,32 @@ export default function AdminYouthStudioForm({
               </label>
             </>
           ) : null}
-          <div className="admin-studio__preview-card">
-            <strong>Куратор и запись</strong>
-            <p>{joinMode === 'none' ? 'Кнопки записи не будет.' : JOIN_MODES.find((m) => m.id === joinMode)?.hint}</p>
-          </div>
-      </section>
+          {kind === 'space' ? (
+            <>
+              <label className="admin-studio__field">
+                <span>Кто отвечает за площадку</span>
+                <input name="curatorName" defaultValue={studio0.curatorName} />
+              </label>
+              <label className="admin-studio__field">
+                <span>Контакт</span>
+                <input name="curatorContact" defaultValue={studio0.curatorContact} />
+              </label>
+            </>
+          ) : null}
+        </section>
+      ) : (
+        <input type="hidden" name="joinMode" value="none" />
+      )}
 
-      <section className="admin-studio__panel" hidden={step !== 3}>
+      {kind === 'project' || kind === 'club' ? (
+        <section className="admin-studio__panel" hidden={stepId !== 'team'}>
           <label className="admin-studio__field">
             <span>Кто ведёт</span>
-            <input name="curatorName" defaultValue={studio0.curatorName} placeholder="Имя куратора" />
+            <input name="curatorName" defaultValue={studio0.curatorName} />
           </label>
           <label className="admin-studio__field">
             <span>Контакт куратора</span>
-            <input name="curatorContact" defaultValue={studio0.curatorContact} placeholder="Телефон или @ник" />
+            <input name="curatorContact" defaultValue={studio0.curatorContact} />
           </label>
           {kind === 'club' ? (
             <label className="admin-studio__check">
@@ -271,7 +437,7 @@ export default function AdminYouthStudioForm({
           ) : null}
           <label className="admin-studio__field">
             <span>Теги</span>
-            <input name="tags" defaultValue={studio0.tags} placeholder="медиа, волонтёрство" />
+            <input name="tags" defaultValue={studio0.tags} />
           </label>
           <AdminPlanBuilder
             name="roadmapJson"
@@ -306,57 +472,72 @@ export default function AdminYouthStudioForm({
               { key: 'assigneeName', label: 'Ответственный' },
             ]}
           />
-      </section>
-
-      <section className="admin-studio__panel" hidden={step !== 4}>
-          <CoverImageField currentImage={item?.image} label="Обложка (16:9, лучше WebP)" />
-          <GalleryPickerField name="gallery" label="Галерея" defaultValue={item?.gallery} pool={pool} />
-      </section>
-
-      <section className="admin-studio__panel" hidden={step !== 5}>
-          <label className="admin-studio__field">
-            <span>Статус</span>
-            <select name="status" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {CATALOG_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {CATALOG_STATUS_RU[s]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="admin-studio__check-list">
-            <p>
-              Заполнено {ready} из {checklist.length}
-            </p>
-            <ul>
-              {checklist.map((c) => (
-                <li key={c.id} className={c.ok ? 'is-ok' : 'is-miss'}>
-                  {c.ok ? '✓' : '!'} {c.label}
-                </li>
-              ))}
-            </ul>
-            {status === 'ACTIVE' && ready < checklist.length ? (
-              <p className="admin-studio-warn">Перед публикацией лучше закрыть пункты с «!».</p>
-            ) : null}
-          </div>
-          {item?.id ? (
-            <p className="admin-studio-hint">
-              Создано {item.id ? '' : ''}
-              {publicHref ? (
-                <Link href={publicHref} target="_blank">
-                  Открыть публичную страницу
-                </Link>
-              ) : null}
-            </p>
-          ) : null}
         </section>
+      ) : null}
+
+      <section className="admin-studio__panel" hidden={stepId !== 'media'}>
+        <CoverImageField
+          currentImage={cover}
+          label="Обложка (16:9, лучше WebP)"
+          hiddenName={kind === 'page' ? 'images' : 'image'}
+        />
+        {kind !== 'page' ? (
+          <GalleryPickerField name="gallery" label="Галерея" defaultValue={item?.gallery} pool={pool} />
+        ) : null}
+      </section>
+
+      <section className="admin-studio__panel" hidden={stepId !== 'publish'}>
+        <label className="admin-studio__field">
+          <span>Статус</span>
+          <select name="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+            {(kind === 'page' ? PAGE_STATUSES : CATALOG_STATUSES).map((s) => (
+              <option key={s} value={s}>
+                {kind === 'page' ? PAGE_STATUS_RU[s] : CATALOG_STATUS_RU[s]}
+              </option>
+            ))}
+          </select>
+        </label>
+        {kind === 'page' ? (
+          <label className="admin-studio__field">
+            <span>Дата публикации</span>
+            <input
+              type="datetime-local"
+              name="publishedAt"
+              defaultValue={item?.publishedAt ? new Date(item.publishedAt).toISOString().slice(0, 16) : ''}
+            />
+          </label>
+        ) : null}
+        <div className="admin-studio__check-list">
+          <p>
+            Заполнено {ready} из {checklist.length}
+          </p>
+          <ul>
+            {checklist.map((c) => (
+              <li key={c.id} className={c.ok ? 'is-ok' : 'is-miss'}>
+                {c.ok ? '✓' : '!'} {c.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {href ? (
+          <p className="admin-studio-hint">
+            <Link href={href} target="_blank">
+              Открыть публичную страницу
+            </Link>
+          </p>
+        ) : null}
+      </section>
 
       <aside className="admin-studio__live" aria-live="polite">
         <div className="admin-studio__card-preview">
-          <span className="admin-studio__badge">{CATALOG_STATUS_RU[status] || status}</span>
+          <span className="admin-studio__badge">
+            {kind === 'page' ? PAGE_STATUS_RU[status] || status : CATALOG_STATUS_RU[status] || status}
+          </span>
           <h3>{title || 'Без названия'}</h3>
-          <p>{mission || stripHtml(item?.description || '', 120) || 'Кратко о проекте появится здесь'}</p>
-          <small>{format || 'Формат'} · {JOIN_MODES.find((m) => m.id === joinMode)?.label}</small>
+          <p>{mission || stripHtml(bodyHtml, 120) || 'Кратко появится здесь'}</p>
+          <small>
+            {format} · {JOIN_MODES.find((m) => m.id === joinMode)?.label}
+          </small>
         </div>
       </aside>
 
@@ -364,8 +545,8 @@ export default function AdminYouthStudioForm({
         <button type="button" className="btn btn-secondary" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
           Назад
         </button>
-        {step < STEPS.length - 1 ? (
-          <button type="button" className="btn btn-primary" onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>
+        {step < steps.length - 1 ? (
+          <button type="button" className="btn btn-primary" onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}>
             Дальше
           </button>
         ) : (

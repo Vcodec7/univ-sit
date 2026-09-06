@@ -8,6 +8,7 @@ import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission } from '@/lib/acl';
 import { parsePublishFields } from '@/lib/publish';
 import { isSystemPageSlug, publicPagePath } from '@/lib/system-pages';
+import { serializeStudioJson, studioFromFormData } from '@/lib/youth-studio';
 
 async function processImage(formData: FormData) {
   const file = formData.get('imageFile') as File | null;
@@ -57,8 +58,9 @@ export async function createPage(formData: FormData) {
     assertCleanText(slug, title, content);
     const imagePath = await processImage(formData);
     const { status, publishedAt } = parsePublishFields(formData);
+    const studioJson = serializeStudioJson(studioFromFormData(formData));
     const created = await prisma.pageContent.create({
-      data: { slug, title, content, images: imagePath, menuPosition, template, status, publishedAt },
+      data: { slug, title, content, images: imagePath, menuPosition, template, status, publishedAt, studioJson },
     });
     revalidatePagePaths(slug);
     redirect(`/admin/pages/${created.id}/edit?saved=1`);
@@ -87,9 +89,10 @@ export async function updatePage(formData: FormData) {
     assertCleanText(slug, title, content);
     const imagePath = await processImage(formData);
     const { status, publishedAt } = parsePublishFields(formData);
+    const studioJson = serializeStudioJson(studioFromFormData(formData));
     await prisma.pageContent.update({
       where: { id },
-      data: { slug, title, content, images: imagePath, menuPosition, template, status, publishedAt },
+      data: { slug, title, content, images: imagePath, menuPosition, template, status, publishedAt, studioJson },
     });
     revalidatePagePaths(slug);
     if (existing && existing.slug !== slug) revalidatePagePaths(existing.slug);

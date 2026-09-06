@@ -14,6 +14,7 @@ import { galleryUrls, parseGalleryItems } from '@/lib/gallery-shared';
 import { staticSpaceParams } from '@/lib/generate-public-static-params';
 import HallWeekGrid from '@/components/HallWeekGrid';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
+import YouthJoinBlock from '@/components/YouthJoinBlock';
 import { isCoworkingSpace, isHallBookable } from '@/lib/coworking';
 import { isPublicCatalogEntity } from '@/lib/publish';
 
@@ -317,6 +318,15 @@ export default async function SpaceDetail({ params }: { params: Promise<{ id: st
           <div style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#334155' }}>
             <ContentRenderer template={space.template} content={space.description} />
           </div>
+
+          <YouthJoinBlock
+            kind="space"
+            id={space.id}
+            open={space.status === 'ACTIVE'}
+            studioJson={space.studioJson}
+            coworkingHref={isCoworkingSpace(space) ? `/coworking?space=${encodeURIComponent(space.id)}` : null}
+            hallHref={isHallBookable(space) ? `/spaces/${encodeURIComponent(space.id)}/book` : null}
+          />
 
           <PhotoGallery images={galleryImages} />
         </div>

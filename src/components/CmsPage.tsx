@@ -1,6 +1,7 @@
 import React from 'react';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
 import { applySitePlaceholders, DEFAULT_SITE_NAME } from '@/lib/site-identity-shared';
+import { parseStudioJson } from '@/lib/youth-studio';
 import { publicCmsLead, publicCmsTitle } from '@/lib/cms-page-copy';
 
 interface CmsPageProps {
@@ -10,6 +11,7 @@ interface CmsPageProps {
     content: string;
     images: string;
     template: string;
+    studioJson?: string | null;
   };
   siteName?: string;
   publicOrigin?: string;
@@ -24,7 +26,8 @@ interface CmsPageProps {
 export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsPageProps) {
   const cover = page.images || '';
   const heading = publicCmsTitle(page.slug, page.title);
-  const lead = publicCmsLead(page.slug);
+  const studio = parseStudioJson(page.studioJson);
+  const lead = studio.mission || studio.audience || publicCmsLead(page.slug);
   const safeContent = sanitizeCmsHtml(
     applySitePlaceholders(page.content, {
       siteName: siteName || DEFAULT_SITE_NAME,

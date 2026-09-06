@@ -29,6 +29,8 @@ export type YouthStudio = {
   signupUrl: string;
   tags: string;
   format: string;
+  mission: string;
+  goal: string;
 };
 
 export const EMPTY_STUDIO: YouthStudio = {
@@ -41,6 +43,8 @@ export const EMPTY_STUDIO: YouthStudio = {
   signupUrl: '',
   tags: '',
   format: '',
+  mission: '',
+  goal: '',
 };
 
 export const YOUTH_TEMPLATES: Record<
@@ -87,6 +91,14 @@ export const YOUTH_TEMPLATES: Record<
     whatHappens: 'Свободные слоты, события, чекин по QR.',
     howToJoin: 'Забронируй слот или приходи в часы работы.',
   },
+  page: {
+    label: 'Страница сайта',
+    why: 'Понятный текст для гостя: зачем читать и что делать дальше.',
+    audience: 'Посетители портала и участники программ.',
+    offer: 'Ответы, правила или история — без канцелярита.',
+    whatHappens: 'Короткий лид, основной текст, ссылки дальше.',
+    howToJoin: 'Если нужна запись — поставьте ссылку или кнопку.',
+  },
 };
 
 export function parseStudioJson(raw: string | null | undefined): YouthStudio {
@@ -105,6 +117,8 @@ export function parseStudioJson(raw: string | null | undefined): YouthStudio {
       signupUrl: String(o.signupUrl || '').slice(0, 400),
       tags: String(o.tags || '').slice(0, 200),
       format: String(o.format || '').slice(0, 80),
+      mission: String(o.mission || '').slice(0, 400),
+      goal: String(o.goal || '').slice(0, 400),
     };
   } catch {
     return { ...EMPTY_STUDIO };
@@ -132,10 +146,20 @@ export function studioFromFormData(formData: FormData): YouthStudio {
     signupUrl: String(formData.get('signupUrl') || '').trim(),
     tags: String(formData.get('tags') || '').trim(),
     format: String(formData.get('format') || '').trim(),
+    mission: String(formData.get('mission') || '').trim(),
+    goal: String(formData.get('goal') || '').trim(),
   };
 }
 
+export const PAGE_STATUSES = ['DRAFT', 'PUBLISHED'] as const;
+
+export const PAGE_STATUS_RU: Record<string, string> = {
+  DRAFT: 'Черновик',
+  PUBLISHED: 'Опубликована',
+};
+
 export function catalogStatusLabel(status?: string | null) {
+  if (status === 'PUBLISHED') return PAGE_STATUS_RU.PUBLISHED;
   return CATALOG_STATUS_RU[status || 'ACTIVE'] || status || 'Опубликован';
 }
 
