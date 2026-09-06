@@ -35,7 +35,9 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
           s.title.toLowerCase().includes(query) ||
           String(s.address || '').toLowerCase().includes(query) ||
           String(s.description || '').toLowerCase().includes(query) ||
-          String(s.category || '').toLowerCase().includes(query)
+          String(s.category || '').toLowerCase().includes(query) ||
+          String(s.pitch || '').toLowerCase().includes(query) ||
+          String(s.who || '').toLowerCase().includes(query)
       );
     }
     if (statusFilter !== 'ALL') list = list.filter((s) => s.status === statusFilter);
@@ -126,6 +128,10 @@ export default function SpacesCatalogClient({ items }: { items: PublicSpaceCard[
                     <MapPin size={14} aria-hidden />
                     <span>{space.address || 'Сочи'}</span>
                   </p>
+                  {space.pitch ? <p className="svc-space-card__why">{space.pitch}</p> : null}
+                  {space.who && space.who !== space.pitch ? (
+                    <p className="svc-space-card__who">Кому: {space.who}</p>
+                  ) : null}
                   <p className={`svc-space-card__status${coworking ? ' is-cowork' : ''}`}>{statusLine}</p>
                   {space.status !== 'COMPLETED' ? (
                     <div className={`svc-space-card__cta-row${coworking && hall ? ' is-dual' : ''}`}>

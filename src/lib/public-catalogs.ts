@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { isNextBuildPhase } from '@/lib/build-phase';
 import { publishedNonDemoWhere, publicCatalogWhere } from '@/lib/publish';
 import { PUBLIC_REVALIDATE } from '@/lib/public-revalidate';
+import { catalogPitch } from '@/lib/youth-studio';
 
 const CATALOG_TAKE = 180;
 
@@ -15,6 +16,11 @@ export type PublicProjectCard = {
   viewCount: number;
   createdAt: string;
   applicationsCount: number;
+  mission?: string | null;
+  goal?: string | null;
+  studioJson?: string | null;
+  pitch?: string;
+  who?: string;
 };
 
 export type PublicClubCard = {
@@ -29,6 +35,11 @@ export type PublicClubCard = {
   curatorName: string | null;
   createdAt: string;
   membersCount: number;
+  mission?: string | null;
+  goal?: string | null;
+  studioJson?: string | null;
+  pitch?: string;
+  who?: string;
 };
 
 export type PublicSpaceCard = {
@@ -43,6 +54,9 @@ export type PublicSpaceCard = {
   bookingMode?: string | null;
   amenities: string | null;
   createdAt: string;
+  studioJson?: string | null;
+  pitch?: string;
+  who?: string;
   bookings: Array<{
     id: string;
     title: string;
@@ -113,21 +127,37 @@ export const getCachedPublicProjects = unstable_cache(
         status: true,
         viewCount: true,
         createdAt: true,
+        mission: true,
+        goal: true,
+        studioJson: true,
         _count: { select: { applications: true } },
       },
     });
-    return rows.map((p) => ({
-      id: p.id,
-      title: p.title,
-      description: p.description,
-      image: p.image,
-      status: p.status,
-      viewCount: p.viewCount,
-      createdAt: p.createdAt.toISOString(),
-      applicationsCount: p._count.applications,
-    }));
+    return rows.map((p) => {
+      const pitch = catalogPitch({
+        studioJson: p.studioJson,
+        mission: p.mission,
+        goal: p.goal,
+        description: p.description,
+      });
+      return {
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        image: p.image,
+        status: p.status,
+        viewCount: p.viewCount,
+        createdAt: p.createdAt.toISOString(),
+        applicationsCount: p._count.applications,
+        mission: p.mission,
+        goal: p.goal,
+        studioJson: p.studioJson,
+        pitch: pitch.text,
+        who: pitch.who,
+      };
+    });
   },
-  ['public-projects-catalog-v2'],
+  ['public-projects-catalog-v3'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 
@@ -149,24 +179,40 @@ export const getCachedPublicClubs = unstable_cache(
         meetingPlace: true,
         curatorName: true,
         createdAt: true,
+        mission: true,
+        goal: true,
+        studioJson: true,
         _count: { select: { applications: { where: { status: 'APPROVED' } } } },
       },
     });
-    return rows.map((c) => ({
-      id: c.id,
-      title: c.title,
-      description: c.description,
-      image: c.image,
-      status: c.status,
-      tags: c.tags,
-      meetingSchedule: c.meetingSchedule,
-      meetingPlace: c.meetingPlace,
-      curatorName: c.curatorName,
-      createdAt: c.createdAt.toISOString(),
-      membersCount: c._count.applications,
-    }));
+    return rows.map((c) => {
+      const pitch = catalogPitch({
+        studioJson: c.studioJson,
+        mission: c.mission,
+        goal: c.goal,
+        description: c.description,
+      });
+      return {
+        id: c.id,
+        title: c.title,
+        description: c.description,
+        image: c.image,
+        status: c.status,
+        tags: c.tags,
+        meetingSchedule: c.meetingSchedule,
+        meetingPlace: c.meetingPlace,
+        curatorName: c.curatorName,
+        createdAt: c.createdAt.toISOString(),
+        membersCount: c._count.applications,
+        mission: c.mission,
+        goal: c.goal,
+        studioJson: c.studioJson,
+        pitch: pitch.text,
+        who: pitch.who,
+      };
+    });
   },
-  ['public-clubs-catalog-v2'],
+  ['public-clubs-catalog-v3'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 
@@ -190,6 +236,7 @@ export const getCachedPublicSpaces = unstable_cache(
         bookingMode: true,
         amenities: true,
         createdAt: true,
+        studioJson: true,
         bookings: {
           where: { status: 'APPROVED', startTime: { gte: now } },
           select: {
@@ -207,31 +254,40 @@ export const getCachedPublicSpaces = unstable_cache(
         },
       },
     });
-    return rows.map((s) => ({
-      id: s.id,
-      title: s.title,
-      description: s.description,
-      image: s.image,
-      status: s.status,
-      address: s.address,
-      capacity: s.capacity,
-      category: s.category,
-      bookingMode: s.bookingMode,
-      amenities: s.amenities,
-      createdAt: s.createdAt.toISOString(),
-      bookings: s.bookings.map((b) => ({
-        id: b.id,
-        title: b.title,
-        description: b.description,
-        startTime: b.startTime.toISOString(),
-        endTime: b.endTime.toISOString(),
-        status: b.status,
-        space: b.space,
-        participantsCount: b._count.participants,
-      })),
-    }));
+    return rows.map((s) => {
+      const pitch = catalogPitch({
+        studioJson: 'studioJson' in s ? (s as { studioJson?: string | null }).studioJson : null,
+        description: s.description,
+      });
+      return {
+        id: s.id,
+        title: s.title,
+        description: s.description,
+        image: s.image,
+        status: s.status,
+        address: s.address,
+        capacity: s.capacity,
+        category: s.category,
+        bookingMode: s.bookingMode,
+        amenities: s.amenities,
+        createdAt: s.createdAt.toISOString(),
+        studioJson: 'studioJson' in s ? (s as { studioJson?: string | null }).studioJson : null,
+        pitch: pitch.text,
+        who: pitch.who,
+        bookings: s.bookings.map((b) => ({
+          id: b.id,
+          title: b.title,
+          description: b.description,
+          startTime: b.startTime.toISOString(),
+          endTime: b.endTime.toISOString(),
+          status: b.status,
+          space: b.space,
+          participantsCount: b._count.participants,
+        })),
+      };
+    });
   },
-          ['public-spaces-catalog-v3'],
+          ['public-spaces-catalog-v4'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 

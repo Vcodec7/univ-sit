@@ -206,3 +206,18 @@ export function stripHtml(html: string, max = 160) {
   if (t.length <= max) return t;
   return `${t.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
+
+/** Short public-card copy from the studio constructor. */
+export function catalogPitch(opts: {
+  studioJson?: string | null;
+  mission?: string | null;
+  goal?: string | null;
+  description?: string | null;
+}) {
+  const s = parseStudioJson(opts.studioJson);
+  const why = String(opts.mission || s.mission || '').trim();
+  const who = s.audience.trim();
+  const offer = String(opts.goal || s.goal || '').trim();
+  const text = why || who || offer || stripHtml(opts.description || '', 140);
+  return { why, who, offer, text };
+}

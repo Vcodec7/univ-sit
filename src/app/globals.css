@@ -24559,6 +24559,22 @@ fieldset.svc-form-group,
 .svc-space-card__status.is-cowork {
   color: var(--success);
 }
+.svc-space-card__why,
+.svc-space-card__who,
+.catalog-card__who {
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.svc-space-card__why {
+  color: var(--foreground);
+  font-weight: 650;
+}
 .svc-space-card__cta {
   align-self: stretch;
   margin-top: 0;

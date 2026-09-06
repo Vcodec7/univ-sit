@@ -69,7 +69,9 @@ export default function ClubsCatalogClient({ items }: { items: PublicClubCard[] 
       list = list.filter(
         (c) =>
           c.title.toLowerCase().includes(query) ||
-          String(c.tags || '').toLowerCase().includes(query)
+          String(c.tags || '').toLowerCase().includes(query) ||
+          String(c.pitch || '').toLowerCase().includes(query) ||
+          String(c.who || '').toLowerCase().includes(query)
       );
     }
     if (statusFilter !== 'ALL') list = list.filter((c) => c.status === statusFilter);
@@ -134,7 +136,7 @@ export default function ClubsCatalogClient({ items }: { items: PublicClubCard[] 
             const members = club.membersCount;
             const mine = myApps[club.id];
             const open = club.status !== 'COMPLETED';
-            const excerpt = stripHtml(club.description).slice(0, 140);
+            const excerpt = club.pitch || stripHtml(club.description).slice(0, 140);
 
             return (
               <Link key={club.id} href={`/clubs/${encodeRouteParam(club.id)}`} className="catalog-card">
@@ -160,6 +162,9 @@ export default function ClubsCatalogClient({ items }: { items: PublicClubCard[] 
                     </div>
                   )}
                   <p className="line-clamp-3">{excerpt || 'Подробности на странице клуба.'}</p>
+                  {club.who && club.who !== excerpt ? (
+                    <p className="catalog-card__who">Кому: {club.who}</p>
+                  ) : null}
                   <div className="catalog-card__facts">
                     {club.meetingSchedule && (
                       <span>

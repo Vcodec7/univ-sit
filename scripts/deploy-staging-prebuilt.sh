@@ -60,6 +60,10 @@ if [[ -f "$EXTRACT/docker-compose.staging.yml" ]]; then
   sudo -n rsync -a "$EXTRACT/docker-compose.staging.yml" "$APP/docker-compose.staging.yml"
 fi
 sudo -n rsync -a "$EXTRACT/prisma/" "$APP/prisma/"
+if [[ -f "$EXTRACT/scripts/prisma-push.config.mjs" ]]; then
+  sudo -n mkdir -p "$APP/scripts"
+  sudo -n rsync -a "$EXTRACT/scripts/prisma-push.config.mjs" "$APP/scripts/prisma-push.config.mjs"
+fi
 if [[ -d "$EXTRACT/public/brand" ]]; then
   sudo -n rsync -a "$EXTRACT/public/brand/" "$APP/public/brand/"
 fi
@@ -68,6 +72,10 @@ if [[ -d "$EXTRACT/public/icons" ]]; then
 fi
 if [[ -d "$EXTRACT/public/covers" ]]; then
   sudo -n rsync -a "$EXTRACT/public/covers/" "$APP/public/covers/"
+fi
+
+if [[ -f "$EXTRACT/prisma.config.ts" ]]; then
+  sudo -n rsync -a "$EXTRACT/prisma.config.ts" "$APP/prisma.config.ts"
 fi
 
 NEW_SHA="$(sha256sum "$EXTRACT/prisma/schema.prisma" | awk '{print $1}')"
@@ -82,11 +90,27 @@ if [[ "$NEW_SHA" == "$OLD_SHA" ]]; then
   echo "==> prisma schema unchanged, skip db push"
 else
   echo "==> prisma schema changed, db push (additive, no data-loss flag)"
+  pushed=0
   if sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T web \
       sh -c 'test -x ./node_modules/.bin/prisma && ./node_modules/.bin/prisma db push'; then
+    pushed=1
+  elif [[ -f "$APP/.env" && -f "$APP/prisma/schema.prisma" ]]; then
+    echo "==> prisma CLI missing in web image, one-shot node container"
+    if sudo -n docker run --rm \
+        --network sochi-portal_default \
+        --env-file "$APP/.env" \
+        -v "$APP/prisma:/work/prisma:ro" \
+        -v "$APP/scripts/prisma-push.config.mjs:/work/prisma.config.mjs:ro" \
+        -w /work \
+        node:22-bookworm-slim \
+        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs --accept-data-loss'; then
+      pushed=1
+    fi
+  fi
+  if [[ "$pushed" == "1" ]]; then
     echo "$NEW_SHA" | sudo -n tee "$APP/.yp-schema-sha" >/dev/null
   else
-    echo "WARN: prisma CLI not in image; schema not applied. Image still started." >&2
+    echo "WARN: prisma schema not applied. Image still started." >&2
   fi
 fi
 

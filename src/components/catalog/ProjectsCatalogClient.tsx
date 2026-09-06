@@ -42,7 +42,9 @@ export default function ProjectsCatalogClient({ items }: { items: PublicProjectC
       list = list.filter(
         (p) =>
           p.title.toLowerCase().includes(query) ||
-          stripHtml(p.description).toLowerCase().includes(query)
+          stripHtml(p.description).toLowerCase().includes(query) ||
+          String(p.pitch || '').toLowerCase().includes(query) ||
+          String(p.who || '').toLowerCase().includes(query)
       );
     }
     if (statusFilter !== 'ALL') {
@@ -129,7 +131,10 @@ export default function ProjectsCatalogClient({ items }: { items: PublicProjectC
                   <div className="catalog-card__body">
                     {catLabel ? <span className="catalog-card__cat">{catLabel}</span> : null}
                     <h3>{project.title.replace(/^Проект:\s*/i, '')}</h3>
-                    <p className="line-clamp-3">{stripHtml(project.description)}</p>
+                    <p className="line-clamp-3">{project.pitch || stripHtml(project.description)}</p>
+                    {project.who && project.who !== project.pitch ? (
+                      <p className="catalog-card__who">Кому: {project.who}</p>
+                    ) : null}
                     <div className="catalog-card-meta">
                       <span>{project.applicationsCount} заявок</span>
                       <span>

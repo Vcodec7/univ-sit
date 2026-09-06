@@ -15,6 +15,7 @@ test('admin studio wizard and publish hide drafts', () => {
   const clubs = readFileSync(join(root, 'src/app/admin/clubs/page.tsx'), 'utf8');
   assert.match(studio, /JOIN_MODES/);
   assert.match(studio, /Черновик/);
+  assert.match(studio, /catalogPitch/);
   assert.match(pub, /DRAFT/);
   assert.match(proj, /AdminYouthStudioForm/);
   assert.match(proj, /admin-catalog-cards/);
