@@ -11,6 +11,7 @@ import {
   maxListSubscriptions,
   maxSend,
   maxSendMessage,
+  maxWebhookFailRu,
 } from '@/lib/max';
 import { getTelegramConfig, tgGetMe, tgGetWebhookInfo, tgSend, tgSetWebhook } from '@/lib/telegram';
 import {
@@ -327,21 +328,28 @@ export async function POST(req: Request) {
       const r = await maxEnsureWebhook(
         typeof body.publicOrigin === 'string' ? body.publicOrigin : undefined
       );
+      const failRu =
+        r.ok ? '' : maxWebhookFailRu('reason' in r ? r.reason : undefined, 'body' in r ? String(r.body || '') : '');
       voidLogUserAction({
         userId: actor.actorId,
         userEmail: actor.actorEmail,
         action: 'BOTS_WEBHOOK',
         category: 'bots',
-        summary: r.ok ? 'Вебхук MAX зарегистрирован' : 'Ошибка вебхука MAX',
+        summary: r.ok ? 'Вебхук MAX зарегистрирован' : `Ошибка вебхука MAX: ${failRu}`,
         success: r.ok,
-        detail: { channel: 'max', types },
+        detail: {
+          channel: 'max',
+          types,
+          reason: r.ok ? undefined : 'reason' in r ? r.reason : undefined,
+          status: r.ok ? undefined : 'status' in r ? r.status : undefined,
+        },
       });
       if (!r.ok) {
         const bodyText = 'body' in r ? r.body : undefined;
         return NextResponse.json(
           {
             ok: false,
-            message: ('reason' in r && r.reason) || 'Не удалось зарегистрировать вебхук',
+            message: failRu || ('reason' in r && r.reason) || 'Не удалось зарегистрировать вебхук',
             body: bodyText,
           },
           { status: 400 }

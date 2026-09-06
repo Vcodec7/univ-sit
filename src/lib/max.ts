@@ -200,6 +200,23 @@ function extractReason(json: unknown, text: string): string {
   return text.slice(0, 240) || 'error';
 }
 
+/** Short Russian text for activity log / admin toast (no secrets). */
+export function maxWebhookFailRu(reason?: string | null, body?: string | null): string {
+  const raw = `${reason || ''} ${body || ''}`.trim();
+  const r = (reason || '').trim();
+  if (r === 'no-token' || r === 'disabled-or-no-token') {
+    return 'бот выключен или не задан токен';
+  }
+  if (/certificate|ssl|tls|UNABLE_TO_VERIFY|self[- ]signed/i.test(raw)) {
+    return 'MAX не принял HTTPS (проверьте сертификат на сервере)';
+  }
+  if (/url|https|not.?allowed|invalid/i.test(raw) && raw.length < 220) {
+    return r.slice(0, 180);
+  }
+  if (r) return r.slice(0, 180);
+  return 'MAX не принял адрес вебхука';
+}
+
 /** Broadcast to configured alert user ids (and optional override list). */
 export async function maxSend(text: string, userIds?: string[]) {
   const c = await maxGetConfig();
