@@ -13,6 +13,7 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.ok(layout.indexOf('layout-unify.css') > layout.indexOf('globals.css'));
   assert.ok(layout.indexOf('layout-unify.css') > layout.indexOf('theme.css'));
   assert.match(css, /align-self:\s*center/);
+  assert.match(css, /background:\s*transparent\s*!important/);
   assert.match(css, /#afca03/);
   assert.match(css, /catalog-page-header__intro/);
   assert.match(css, /flex-wrap: wrap/);

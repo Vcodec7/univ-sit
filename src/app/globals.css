@@ -2706,19 +2706,18 @@ img.site-brand-logo {
   z-index: 2;
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 999px;
-  background: #afca03;
-  color: #0a0c2a;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #afca03;
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+  box-shadow: none;
   transition: border-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
 }
 .event-carousel__nav:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  color: var(--yp-lime-deep, #8fa502);
 }
 .event-carousel__nav--prev { left: 0.15rem; }
 .event-carousel__nav--next { right: 0.15rem; }
@@ -27113,11 +27112,11 @@ button.btn,
     width: 2.35rem;
     height: 2.35rem;
     border: 0;
-    border-radius: 999px;
-    background: #afca03;
-    color: #0a0c2a;
+    border-radius: 0;
+    background: transparent;
+    color: #afca03;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(175, 202, 3, 0.32);
+    box-shadow: none;
     padding: 0;
     flex-shrink: 0;
   }

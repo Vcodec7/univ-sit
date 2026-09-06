@@ -317,13 +317,16 @@
     width: 2.45rem;
     height: 2.45rem;
     border: 0 !important;
-    background: #afca03 !important;
-    color: #0a0c2a !important;
-    box-shadow: 0 8px 18px rgba(175, 202, 3, 0.32);
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #afca03 !important;
+    box-shadow: none !important;
   }
   .home-rail-nav svg {
-    color: #0a0c2a;
-    stroke: #0a0c2a;
+    color: #afca03;
+    stroke: #afca03;
+    width: 1.85rem;
+    height: 1.85rem;
   }
 }
 
@@ -331,9 +334,15 @@
   .event-carousel__nav {
     top: 50% !important;
     transform: translateY(-50%);
-    background: #afca03 !important;
-    color: #0a0c2a !important;
+    background: transparent !important;
+    color: #afca03 !important;
     border: 0 !important;
-    box-shadow: 0 8px 18px rgba(175, 202, 3, 0.32);
+    box-shadow: none !important;
+  }
+  .event-carousel__nav svg {
+    color: #afca03;
+    stroke: #afca03;
+    width: 1.85rem;
+    height: 1.85rem;
   }
 }

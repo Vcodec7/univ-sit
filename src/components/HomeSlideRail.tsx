@@ -65,7 +65,7 @@ export default function HomeSlideRail({ label, children }: Props) {
           aria-label={`${label}: предыдущий слайд`}
           onClick={() => scrollBySlide(-1)}
         >
-          <ChevronLeft size={20} aria-hidden />
+          <ChevronLeft size={28} strokeWidth={2.4} aria-hidden />
         </button>
       ) : null}
       <div
@@ -89,7 +89,7 @@ export default function HomeSlideRail({ label, children }: Props) {
           aria-label={`${label}: следующий слайд`}
           onClick={() => scrollBySlide(1)}
         >
-          <ChevronRight size={20} aria-hidden />
+          <ChevronRight size={28} strokeWidth={2.4} aria-hidden />
         </button>
       ) : null}
     </div>
