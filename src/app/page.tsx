@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import HomeServiceHero from '@/components/HomeServiceHero';
+import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import { getSiteIdentity } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
@@ -11,7 +11,7 @@ import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
-import { ArrowRight, Calendar, MapPin, Users, FileText, Phone } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
 import NewsCoverImage from '@/components/NewsCoverImage';
 import EntityCoverImage from '@/components/EntityCoverImage';
 import NewsMediaBadge from '@/components/NewsMediaBadge';
@@ -76,7 +76,7 @@ export default async function Home() {
       : null;
 
   return (
-    <div className="home-page">
+    <div className="home-page home-page--lift">
       {heroMediaKind === 'image' ? (
         <link rel="preload" as="image" href={heroUrl} fetchPriority="high" />
       ) : null}
@@ -88,7 +88,12 @@ export default async function Home() {
         primary={heroPrimary}
         secondary={heroSecondary}
         faceUrls={latestSpaces.slice(0, 3).map((s, i) => spaceCover(s, i))}
+        showSpaces={showSpaces}
+        showClubs={showClubs}
+        showProjects={showProjects}
+        showEvents={showEvents}
       />
+      <HomeSochiStrip />
 
       <div className="container home-sections">
         {showSpaces ? (
@@ -345,20 +350,40 @@ export default async function Home() {
           variant="compact"
         />
 
-        <section className="home-cta">
-          <h2 className="home-cta-title">Готовы начать?</h2>
-          <p className="home-cta-text">
-            Документы и контакты — если нужна помощь с заявкой или бронированием.
-          </p>
-          <div className="home-cta-actions">
-            {showDocuments ? (
-              <Link href="/documents" className="btn btn-primary home-hero-btn">
-                <FileText size={18} style={{ marginRight: 8 }} /> Документы
-              </Link>
-            ) : null}
-            <Link href="/contacts" className="btn btn-secondary home-hero-btn">
-              <Phone size={18} style={{ marginRight: 8 }} /> Контакты
-            </Link>
+        <section className="home-cta home-cta--split">
+          <div className="home-cta-split">
+            <article>
+              <p>Для себя</p>
+              <h2>Сесть и сделать</h2>
+              <p className="home-cta-text">Коворкинг на час, без переписки и без «есть ли место».</p>
+              {showSpaces ? (
+                <Link href="/coworking" className="btn btn-primary home-hero-btn">
+                  Записаться
+                </Link>
+              ) : (
+                <Link href="/contacts" className="btn btn-primary home-hero-btn">
+                  Контакты
+                </Link>
+              )}
+            </article>
+            <article>
+              <p>Командой</p>
+              <h2>Собрать людей</h2>
+              <p className="home-cta-text">Зал под встречу или проект, который видно в портфолио.</p>
+              {showSpaces ? (
+                <Link href="/spaces" className="btn btn-secondary home-hero-btn">
+                  К площадкам
+                </Link>
+              ) : showProjects ? (
+                <Link href="/projects" className="btn btn-secondary home-hero-btn">
+                  К проектам
+                </Link>
+              ) : (
+                <Link href="/contacts" className="btn btn-secondary home-hero-btn">
+                  Контакты
+                </Link>
+              )}
+            </article>
           </div>
         </section>
       </div>
