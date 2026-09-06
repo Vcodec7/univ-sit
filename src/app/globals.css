@@ -23882,13 +23882,13 @@ body.yp-scroll-locked {
 }
 .lift-hero__veil {
   background:
-    linear-gradient(90deg, rgba(10, 12, 42, 0.58) 0%, rgba(10, 12, 42, 0.22) 38%, rgba(10, 12, 42, 0.04) 72%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(10, 12, 42, 0.08) 38%, rgba(10, 12, 42, 0.62) 100%);
+    linear-gradient(105deg, rgba(6, 52, 74, 0.72) 0%, rgba(10, 12, 42, 0.18) 46%, rgba(10, 122, 168, 0.08) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(10, 12, 42, 0.08) 40%, rgba(10, 12, 42, 0.7) 100%);
 }
 .lift-hero__glow {
   background:
-    radial-gradient(ellipse at 82% 12%, rgba(255, 255, 255, 0.28), transparent 42%),
-    radial-gradient(ellipse at 70% 30%, rgba(175, 202, 3, 0.16), transparent 48%);
+    radial-gradient(ellipse at 86% 8%, rgba(175, 202, 3, 0.28), transparent 44%),
+    radial-gradient(ellipse at 12% 88%, rgba(126, 200, 227, 0.35), transparent 42%);
 }
 .lift-hero__copy {
   position: relative;
@@ -23976,18 +23976,18 @@ body.yp-scroll-locked {
   min-height: 8.6rem;
   padding: 1.05rem 1.1rem 1.15rem;
   border-radius: 1.15rem;
-  background: rgba(10, 12, 42, 0.52);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #fff;
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.35);
+  border-top: 3px solid #afca03;
+  color: #0a0c2a;
   text-decoration: none;
   text-align: left;
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 40px rgba(10, 12, 42, 0.22);
+  box-shadow: 0 18px 40px rgba(30, 90, 130, 0.12);
   transition: transform 0.18s ease, background 0.18s ease;
 }
 .lift-deck__card:hover {
   transform: translateY(-3px);
-  background: rgba(133, 98, 216, 0.3);
+  background: #f5fbfe;
 }
 .lift-deck__kicker {
   display: inline-flex;
@@ -23997,7 +23997,7 @@ body.yp-scroll-locked {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #afca03;
+  color: #0a7aa8;
 }
 .lift-deck__card strong {
   font-size: 1.12rem;
@@ -24006,7 +24006,7 @@ body.yp-scroll-locked {
   margin: 0;
   font-size: 0.86rem;
   line-height: 1.4;
-  color: rgba(255, 255, 255, 0.78);
+  color: #5a5670;
 }
 .lift-sochi {
   padding: 1.6rem 0 0.4rem;
@@ -24017,7 +24017,7 @@ body.yp-scroll-locked {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #8562d8;
+  color: #0a7aa8;
 }
 .lift-sochi h2 {
   margin: 0 0 1.1rem;
@@ -24062,9 +24062,12 @@ body.yp-scroll-locked {
 .home-cta-split article {
   padding: 1.35rem 1.4rem 1.45rem;
   border-radius: 1.2rem;
-  background: #0a0c2a;
-  border: 1px solid rgba(133, 98, 216, 0.28);
-  box-shadow: 0 16px 36px rgba(10, 12, 42, 0.12);
+  background: linear-gradient(165deg, #0a7aa8 0%, #06344a 100%);
+  border: 0;
+  box-shadow: 0 18px 40px rgba(30, 90, 130, 0.18);
+}
+.home-cta-split article:last-child {
+  background: linear-gradient(165deg, #6e8f02 0%, #0a0c2a 88%);
 }
 .home-cta-split article > p:first-child {
   margin: 0 0 0.35rem;
@@ -30298,7 +30301,7 @@ html.is-admin .main-content {
     min-height: 0;
     padding: 0.85rem 0.8rem 0.9rem;
     border-radius: 1rem;
-    background: #12153a;
+    background: #fff;
     box-shadow: none;
     backdrop-filter: none;
   }
