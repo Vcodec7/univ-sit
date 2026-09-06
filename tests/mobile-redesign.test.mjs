@@ -42,4 +42,6 @@ test('profile card stacks identity then actions then extras', () => {
   assert.match(unify, /profile-hero__showcase--shelf/);
   assert.match(unify, /--chip-accent/);
   assert.match(profile, /--chip-accent/);
+  assert.match(unify, /profile-hero__meters/);
+  assert.match(profile, /authority == null \? '—' : `\$\{authority\}%`/);
 });

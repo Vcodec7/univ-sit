@@ -518,7 +518,9 @@ export default function ProfileHeroCard({
             <Shield size={18} aria-hidden />
             <span>
               <small>Репутация</small>
-              <strong>{authority == null ? '—' : authorityLabel || `${authority}%`}</strong>
+              <strong title={authorityLabel || undefined}>
+                {authority == null ? '—' : `${authority}%`}
+              </strong>
             </span>
           </button>
           {showEco ? (
