@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { CONTEST_KIND_RU, CONTEST_STATUS_RU } from '@/lib/contest-eligibility-shared';
+import { vacancyHtmlToPlain, vacancyPlainToHtml } from '@/lib/vacancy-content';
 
 type Contest = {
   id: string;
@@ -32,7 +33,7 @@ export default function AdminContestsClient() {
   const [kind, setKind] = useState('SUBMISSION');
   const [status, setStatus] = useState('OPEN');
   const [summary, setSummary] = useState('');
-  const [rulesHtml, setRulesHtml] = useState('<p>Правила конкурса</p>');
+  const [rulesHtml, setRulesHtml] = useState('Правила конкурса');
   const [prizeText, setPrizeText] = useState('Приз от Центра');
   const [bookingId, setBookingId] = useState('');
   const [awardContestId, setAwardContestId] = useState('');
@@ -74,7 +75,7 @@ export default function AdminContestsClient() {
     setKind('SUBMISSION');
     setStatus('OPEN');
     setSummary('');
-    setRulesHtml('<p>Правила конкурса</p>');
+    setRulesHtml('Правила конкурса');
     setPrizeText('Приз от Центра');
     setBookingId('');
   }
@@ -85,40 +86,62 @@ export default function AdminContestsClient() {
     setKind(c.kind);
     setStatus(c.status);
     setSummary(c.summary || '');
-    setRulesHtml(c.rulesHtml || '<p></p>');
+    setRulesHtml(vacancyHtmlToPlain(c.rulesHtml || ''));
     setPrizeText(c.prizeText || '');
     setBookingId(c.bookingId || '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1.25rem' }}>
-      <h1 style={{ margin: 0 }}>Конкурсы и розыгрыши</h1>
+    <div className="admin-page-shell admin-vac-page">
+      <div className="admin-page-header">
+        <div>
+          <h1>Конкурсы</h1>
+          <p>Работы, розыгрыши, М-баллы</p>
+        </div>
+      </div>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.05rem', marginTop: 0 }}>{editId ? 'Редактировать' : 'Создать'}</h2>
-        <div style={{ display: 'grid', gap: 8 }}>
-          <select value={kind} onChange={(e) => setKind(e.target.value)} disabled={Boolean(editId)}>
-            <option value="SUBMISSION">Конкурс работ</option>
-            <option value="RAFFLE">Розыгрыш</option>
-          </select>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Статус">
-            <option value="OPEN">Открыт</option>
-            <option value="DRAFT">Черновик</option>
-            <option value="CLOSED">Закрыт</option>
-          </select>
-          <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} />
-          <input placeholder="Кратко" value={summary} onChange={(e) => setSummary(e.target.value)} />
-          <textarea rows={4} placeholder="Правила (HTML)" value={rulesHtml} onChange={(e) => setRulesHtml(e.target.value)} />
-          <input placeholder="Приз" value={prizeText} onChange={(e) => setPrizeText(e.target.value)} />
-          {kind === 'RAFFLE' && (
-            <input
-              placeholder="bookingId события (афиша)"
-              value={bookingId}
-              onChange={(e) => setBookingId(e.target.value)}
-            />
-          )}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <section className="card-surface admin-vac-card">
+        <h2>{editId ? 'Редактировать' : 'Создать'}</h2>
+        <div className="admin-vac-form">
+          <div className="admin-vac-form__row">
+            <select value={kind} onChange={(e) => setKind(e.target.value)} disabled={Boolean(editId)} aria-label="Тип">
+              <option value="SUBMISSION">Конкурс работ</option>
+              <option value="RAFFLE">Розыгрыш</option>
+            </select>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Статус">
+              <option value="OPEN">Открыт</option>
+              <option value="DRAFT">Черновик</option>
+              <option value="CLOSED">Закрыт</option>
+            </select>
+          </div>
+          <label>
+            Название
+            <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} />
+          </label>
+          <label>
+            Кратко
+            <input placeholder="Кратко" value={summary} onChange={(e) => setSummary(e.target.value)} />
+          </label>
+          <label>
+            Правила
+            <textarea rows={4} placeholder="Текст правил без HTML" value={rulesHtml} onChange={(e) => setRulesHtml(e.target.value)} />
+          </label>
+          <label>
+            Приз
+            <input placeholder="Приз" value={prizeText} onChange={(e) => setPrizeText(e.target.value)} />
+          </label>
+          {kind === 'RAFFLE' ? (
+            <label>
+              Событие афиши
+              <input
+                placeholder="ID брони события"
+                value={bookingId}
+                onChange={(e) => setBookingId(e.target.value)}
+              />
+            </label>
+          ) : null}
+          <div className="admin-entity-list__actions">
             <button
               type="button"
               className="btn btn-primary"
@@ -129,7 +152,7 @@ export default function AdminContestsClient() {
                   kind,
                   title,
                   summary: summary || null,
-                  rulesHtml,
+                  rulesHtml: vacancyPlainToHtml(rulesHtml),
                   status,
                   allowVoting: true,
                   bookingId: kind === 'RAFFLE' ? bookingId || null : null,
@@ -154,39 +177,37 @@ export default function AdminContestsClient() {
         </div>
       </section>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.05rem', marginTop: 0 }}>Наградить мбаллами</h2>
-        <p style={{ margin: '0 0 8px', fontSize: '0.85rem', color: 'var(--muted)' }}>
-          Ручная награда участнику (учитывается общий пул). Авто-начисления при одобрении/победе
-          уже работают.
+      <section className="card-surface admin-vac-card">
+        <h2>Наградить М-баллами</h2>
+        <p className="admin-empty" style={{ marginBottom: '0.55rem' }}>
+          Ручная награда (общий пул). Авто-начисления при одобрении и победе уже работают.
         </p>
-        <div style={{ display: 'grid', gap: 8, maxWidth: 520 }}>
-          <select value={awardContestId} onChange={(e) => setAwardContestId(e.target.value)}>
-            <option value="">Конкурс…</option>
-            {contests.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
-            ))}
-          </select>
-          <input
-            placeholder="Код профиля (YM-…)"
-            value={awardCode}
-            onChange={(e) => setAwardCode(e.target.value)}
-          />
-          <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 8 }}>
+        <div className="admin-vac-form">
+          <label>
+            Конкурс
+            <select value={awardContestId} onChange={(e) => setAwardContestId(e.target.value)}>
+              <option value="">Выберите конкурс</option>
+              {contests.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Код профиля
+            <input placeholder="YM-…" value={awardCode} onChange={(e) => setAwardCode(e.target.value)} />
+          </label>
+          <div className="admin-vac-form__row">
             <input
               type="number"
               min={1}
               max={5000}
               value={awardAmount}
               onChange={(e) => setAwardAmount(Number(e.target.value) || 1)}
+              aria-label="Сумма М-баллов"
             />
-            <input
-              placeholder="Причина (необязательно)"
-              value={awardReason}
-              onChange={(e) => setAwardReason(e.target.value)}
-            />
+            <input placeholder="Причина" value={awardReason} onChange={(e) => setAwardReason(e.target.value)} />
           </div>
           <button
             type="button"
@@ -207,27 +228,31 @@ export default function AdminContestsClient() {
                 .catch((e) => toast.error(e.message))
             }
           >
-            Выдать мбаллы
+            Выдать М-баллы
           </button>
         </div>
       </section>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.05rem', marginTop: 0 }}>Список</h2>
-        <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
+      <section className="card-surface admin-vac-card">
+        <h2>Список</h2>
+        <ul className="admin-entity-list">
           {contests.map((c) => (
-            <li key={c.id} style={{ marginBottom: 12 }}>
-              <strong>{c.title}</strong> · {CONTEST_KIND_RU[c.kind] || c.kind} · {CONTEST_STATUS_RU[c.status] || "Неизвестно"}
-              {c.booking ? ` · ${c.booking.title}` : ''}
-              <div style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>
-                работ {c._count.submissions} · пул {c._count.raffleEntries} · победителей{' '}
-                {c._count.winners}
+            <li key={c.id} className="is-stack">
+              <div className="admin-entity-list__copy">
+                <strong>{c.title}</strong>
+                <span>
+                  {CONTEST_KIND_RU[c.kind] || c.kind} · {CONTEST_STATUS_RU[c.status] || 'Неизвестно'}
+                  {c.booking ? ` · ${c.booking.title}` : ''}
+                </span>
+                <span>
+                  работ {c._count.submissions} · пул {c._count.raffleEntries} · победителей {c._count.winners}
+                </span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 }}>
+              <div className="admin-entity-list__actions">
                 <button type="button" className="btn btn-secondary" onClick={() => loadContest(c)}>
                   Править
                 </button>
-                {c.kind === 'RAFFLE' && (
+                {c.kind === 'RAFFLE' ? (
                   <>
                     <button
                       type="button"
@@ -241,7 +266,7 @@ export default function AdminContestsClient() {
                           .catch((e) => toast.error(e.message))
                       }
                     >
-                      Синхронизировать отметки
+                      Синхр. отметки
                     </button>
                     <button
                       type="button"
@@ -255,11 +280,11 @@ export default function AdminContestsClient() {
                           .catch((e) => toast.error(e.message))
                       }
                     >
-                      Провести розыгрыш
+                      Розыгрыш
                     </button>
                   </>
-                )}
-                {c.kind === 'SUBMISSION' && (
+                ) : null}
+                {c.kind === 'SUBMISSION' ? (
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -272,80 +297,79 @@ export default function AdminContestsClient() {
                         .catch((e) => toast.error(e.message))
                     }
                   >
-                    Топ-3 по голосам
+                    Топ-3
                   </button>
-                )}
+                ) : null}
               </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="card-surface" style={{ padding: '1rem' }}>
-        <h2 style={{ fontSize: '1.05rem', marginTop: 0 }}>Модерация работ</h2>
+      <section className="card-surface admin-vac-card">
+        <h2>Модерация работ</h2>
         {pending.length === 0 ? (
-          <p style={{ color: 'var(--muted)' }}>Нет работ на проверке</p>
+          <p className="admin-empty">Нет работ на проверке</p>
         ) : (
-          <ul>
+          <ul className="admin-entity-list">
             {pending.map((s) => (
-              <li key={s.id} style={{ marginBottom: 10 }}>
-                {s.user.name}
-                {s.user.publicCode ? ` (${s.user.publicCode})` : ''} → {s.contest.title}:{' '}
-                {s.title || 'без названия'}
-                <div style={{ display: 'grid', gap: 8, marginTop: 4, maxWidth: 480 }}>
-                  <input
-                    placeholder="Причина отказа"
-                    value={rejectById[s.id] || ''}
-                    onChange={(e) => setRejectById((m) => ({ ...m, [s.id]: e.target.value }))}
-                  />
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() =>
-                        void post({ action: 'reviewSubmission', id: s.id, status: 'APPROVED' }).then(
-                          () => {
-                            toast.success('Одобрено (+М-баллы)');
-                            void load();
-                          }
-                        )
-                      }
-                    >
-                      Одобрить
-                    </button>
+              <li key={s.id} className="is-stack">
+                <div className="admin-entity-list__copy">
+                  <strong>{s.user.name}</strong>
+                  <span>
+                    {s.user.publicCode ? `${s.user.publicCode} · ` : ''}
+                    {s.contest.title}: {s.title || 'без названия'}
+                  </span>
+                </div>
+                <input
+                  className="settings-input"
+                  placeholder="Причина отказа"
+                  value={rejectById[s.id] || ''}
+                  onChange={(e) => setRejectById((m) => ({ ...m, [s.id]: e.target.value }))}
+                />
+                <div className="admin-entity-list__actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() =>
+                      void post({ action: 'reviewSubmission', id: s.id, status: 'APPROVED' }).then(() => {
+                        toast.success('Одобрено (+М-баллы)');
+                        void load();
+                      })
+                    }
+                  >
+                    Одобрить
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() =>
+                      void post({
+                        action: 'reviewSubmission',
+                        id: s.id,
+                        status: 'REJECTED',
+                        rejectReason: (rejectById[s.id] || '').trim() || undefined,
+                      }).then(() => {
+                        toast.success('Отклонено');
+                        void load();
+                      })
+                    }
+                  >
+                    Отклонить
+                  </button>
+                  {s.user.publicCode ? (
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={() =>
-                        void post({
-                          action: 'reviewSubmission',
-                          id: s.id,
-                          status: 'REJECTED',
-                          rejectReason: (rejectById[s.id] || '').trim() || undefined,
-                        }).then(() => {
-                          toast.success('Отклонено');
-                          void load();
-                        })
-                      }
+                      onClick={() => {
+                        setAwardContestId(contests.find((c) => c.title === s.contest.title)?.id || awardContestId);
+                        setAwardCode(s.user.publicCode || '');
+                        toast.success('Код подставлен в форму награды');
+                      }}
                     >
-                      Отклонить
+                      В награду
                     </button>
-                    {s.user.publicCode ? (
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={() => {
-                          setAwardContestId(
-                            contests.find((c) => c.title === s.contest.title)?.id || awardContestId
-                          );
-                          setAwardCode(s.user.publicCode || '');
-                          toast.success('Код подставлен в форму награды');
-                        }}
-                      >
-                        В награду
-                      </button>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
               </li>
             ))}

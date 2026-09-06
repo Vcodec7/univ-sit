@@ -33,6 +33,16 @@ test('expired OPEN contest is not accepting entries', () => {
   assert.equal(p.expired, true);
 });
 
+test('admin contests form strips html and uses compact entity cards', () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const client = readFileSync(join(root, 'src/components/admin/AdminContestsClient.tsx'), 'utf8');
+  assert.match(client, /admin-vac-form/);
+  assert.match(client, /vacancyHtmlToPlain/);
+  assert.match(client, /vacancyPlainToHtml/);
+  assert.doesNotMatch(client, /useState\('<p>/);
+  assert.match(client, /Синхр\. отметки/);
+});
+
 test('contest winners notify and land on profile', () => {
   assert.match(shared, /export function contestPhase/);
   assert.match(admin, /Вы победили в конкурсе/);
