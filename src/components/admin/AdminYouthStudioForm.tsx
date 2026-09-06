@@ -401,7 +401,7 @@ export default function AdminYouthStudioForm({
             label="Как присоединиться (текст на странице)"
             value={howToJoin}
             onChange={setHowToJoin}
-            options={studioCopyChips(kind === 'page' ? 'page' : kind, 'howToJoin')}
+            options={studioCopyChips(kind, 'howToJoin')}
           />
           <label className="admin-studio__field">
             <span>Ссылка записи</span>
