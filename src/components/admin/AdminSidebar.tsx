@@ -389,8 +389,8 @@ export default function AdminSidebar({
           <Menu size={18} />
         </button>
         <div className="admin-mobile-bar__meta">
-          <strong>Панель управления</strong>
-          <span>Карточки разделов</span>
+          <strong>Панель</strong>
+          <span>Разделы</span>
         </div>
         <div className="admin-mobile-bar__actions">
           <Link href="/" className="admin-mobile-bar__icon" title="Главная" aria-label="Главная">

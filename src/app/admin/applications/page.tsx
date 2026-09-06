@@ -230,33 +230,18 @@ export default async function AdminApplications({ searchParams }: { searchParams
   };
 
   return (
-    <div className="admin-page-shell" style={{ paddingBottom: '6rem' }}>
+    <div className="admin-page-shell">
       <AdminFocusTarget id={focus ? `app-${focus}` : null} />
       <style>{`
         tr[data-focus-flash="1"] td { background: rgba(59,130,246,0.12) !important; transition: background 0.4s; }
       `}</style>
       <div className="admin-page-header">
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.25rem' }}>
-            Заявки
-          </h1>
-          <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>
-            Вступление в клубы, проекты и программы · найдено: {total}
-          </p>
+          <h1>Заявки</h1>
+          <p>Клубы, проекты, программы · {total}</p>
         </div>
-        <a
-          href="/api/admin/export?type=applications"
-          className="btn btn-primary"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.6rem 1.5rem',
-            borderRadius: '100px',
-            boxShadow: '0 4px 12px rgba(59,130,246,0.25)',
-          }}
-        >
-          Экспорт в CSV
+        <a href="/api/admin/export?type=applications" className="btn btn-primary">
+          Экспорт CSV
         </a>
       </div>
 
@@ -323,28 +308,11 @@ export default async function AdminApplications({ searchParams }: { searchParams
         ]}
       />
 
-      <form
-        method="GET"
-        className="card-surface"
-        style={{
-          padding: '0.75rem 1rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '0.55rem',
-          alignItems: 'center',
-        }}
-      >
+      <form method="GET" className="admin-search-row">
         <input type="hidden" name="status" value={effectiveStatus} />
         <input type="hidden" name="type" value={type} />
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Поиск: имя, email, клуб, проект, программа…"
-          className="settings-input"
-          style={{ flex: '1 1 220px', minWidth: 0, margin: 0 }}
-        />
-        <button type="submit" className="btn btn-secondary" style={{ padding: '0.55rem 1rem', fontWeight: 700 }}>
+        <input name="q" defaultValue={q} placeholder="Имя, email, клуб…" className="settings-input" />
+        <button type="submit" className="btn btn-secondary">
           Найти
         </button>
       </form>
