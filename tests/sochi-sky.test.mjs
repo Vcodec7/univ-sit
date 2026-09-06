@@ -13,11 +13,11 @@ const layout = readFileSync(join(root, 'src/app/layout.tsx'), 'utf8');
 test('living Sochi sky uses Moscow time, fauna and reduced-motion', () => {
   assert.match(sky, /Europe\/Moscow/);
   assert.match(sky, /sunrise: 6\.55 - tilt/);
-  assert.match(overlay, /sochi-sky__dolphin/);
-  assert.match(overlay, /sochi-sky__birds/);
+  assert.match(sky, /moonVisible: phase === 'night' \|\| phase === 'dusk'/);
+  assert.doesNotMatch(overlay, /sochi-sky__birds/);
+  assert.doesNotMatch(overlay, /sochi-sky__dolphin/);
   assert.match(overlay, /data-phase/);
-  assert.match(css, /sochi-leap/);
-  assert.match(css, /\.sochi-sky__dolphin \{\s*display: none/);
+  assert.match(overlay, /sochi-sky__sun/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(layout, /sochi-living-sky\.css/);
   assert.ok(layout.indexOf('sochi-living-sky.css') > layout.indexOf('layout-unify.css'));

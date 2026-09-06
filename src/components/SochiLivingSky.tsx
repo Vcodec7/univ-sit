@@ -51,19 +51,6 @@ export default function SochiLivingSky() {
       <div className="sochi-sky__swell sochi-sky__swell--a" />
       <div className="sochi-sky__swell sochi-sky__swell--b" />
       <div className="sochi-sky__swell sochi-sky__swell--c" />
-      <svg className="sochi-sky__birds" viewBox="0 0 280 48" fill="none">
-        <path d="M6 28 Q18 14 30 28" />
-        <path d="M30 28 Q40 16 52 28" />
-        <path d="M78 18 Q88 8 98 18 Q108 9 118 18" />
-        <path d="M148 24 Q156 14 164 24 Q172 15 180 24" />
-        <path d="M208 16 Q214 10 220 16 Q226 10 232 16" />
-      </svg>
-      <svg className="sochi-sky__dolphin" viewBox="0 0 64 40" fill="none">
-        <path
-          fill="currentColor"
-          d="M6 28c8-2 16-14 28-16 6-1 12 2 18 8-7-1-12 2-14 6-6 2-12 4-20 4-6 0-10-1-12-2Zm28-16c2-6 8-10 10-8-4 3-6 6-8 10Z"
-        />
-      </svg>
     </div>
   );
 }

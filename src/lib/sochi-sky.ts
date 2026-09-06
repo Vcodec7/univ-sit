@@ -70,6 +70,6 @@ export function resolveSochiSky(date: Date = new Date()): SochiSky {
     moonX,
     moonY,
     sunVisible,
-    moonVisible: phase === 'night' || phase === 'dusk' || phase === 'dawn',
+    moonVisible: phase === 'night' || phase === 'dusk',
   };
 }
