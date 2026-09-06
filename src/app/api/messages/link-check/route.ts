@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { checkLinksInText, notifyStaffRknLinks } from '@/lib/rkn-link-guard';
+import { checkLinksInText, checkSingleUrl, notifyStaffRknLinks } from '@/lib/rkn-link-guard';
 import { rateLimitJson, placesReadRateLimiter } from '@/lib/rateLimit';
 import { assertSameOrigin } from '@/lib/csrf-origin';
 
@@ -19,11 +19,12 @@ export async function POST(req: Request) {
   }
 
   const payload = await req.json().catch(() => ({}));
-  const text = typeof payload.text === 'string' ? payload.text : '';
+  const url = typeof payload.url === 'string' ? payload.url : '';
+  const text = typeof payload.text === 'string' ? payload.text : url;
   const conversationId = typeof payload.conversationId === 'string' ? payload.conversationId : null;
   const alert = payload.alert === true;
 
-  const hits = await checkLinksInText(text);
+  const hits = url && !payload.text ? [await checkSingleUrl(url)] : await checkLinksInText(text);
   const rkn = hits.filter((h) => h.status === 'rkn');
 
   if (alert && rkn.length) {
@@ -46,7 +47,9 @@ export async function POST(req: Request) {
       ? `В реестре РКН: ${rkn.map((h) => h.host).join(', ')}. Администрация получит предупреждение.`
       : hits.some((h) => h.status === 'shortener')
         ? 'Есть сокращённые ссылки — лучше вставить полный адрес.'
-        : 'Ссылки не найдены в локальной базе РКН.';
+        : hits.some((h) => h.status === 'suspicious')
+          ? 'Адрес выглядит подозрительно. Лучше не открывать.'
+          : 'Ссылки не найдены в локальной базе РКН.';
 
   return NextResponse.json({ hits, summary, rknCount: rkn.length });
 }

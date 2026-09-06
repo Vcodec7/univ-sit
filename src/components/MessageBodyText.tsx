@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { splitMessageBodyMedia } from '@/lib/message-body-media';
+import MessageSafeLink from '@/components/MessageSafeLink';
 
 type Props = {
   body: string;
@@ -9,7 +10,7 @@ type Props = {
 };
 
 /**
- * Chat text with image/gif URL → compact preview (fallback: short link).
+ * Chat text with image/gif URL → compact preview (fallback: gated link).
  */
 export default function MessageBodyText({ body, className }: Props) {
   const parts = splitMessageBodyMedia(body);
@@ -24,6 +25,9 @@ export default function MessageBodyText({ body, className }: Props) {
             </span>
           );
         }
+        if (part.type === 'link') {
+          return <MessageSafeLink key={i} href={part.url} />;
+        }
         return <MsgImagePreview key={i} url={part.url} />;
       })}
     </div>
@@ -33,16 +37,12 @@ export default function MessageBodyText({ body, className }: Props) {
 function MsgImagePreview({ url }: { url: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
-    return (
-      <a className="msg-body-link" href={url} target="_blank" rel="noopener noreferrer">
-        Изображение
-      </a>
-    );
+    return <MessageSafeLink href={url}>Изображение</MessageSafeLink>;
   }
   return (
-    <a className="msg-body-media" href={url} target="_blank" rel="noopener noreferrer">
+    <MessageSafeLink href={url} className="msg-body-media msg-body-link--gate">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} />
-    </a>
+    </MessageSafeLink>
   );
 }

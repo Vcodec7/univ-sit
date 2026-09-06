@@ -3,12 +3,13 @@ import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { createUserNotification } from '@/lib/security';
 import { LINK_SHORTENER_HOSTS, RKN_SEED_HOSTS } from '@/lib/rkn-blocklist-seed';
+import { classifyLinkClient } from '@/lib/link-safety';
 
 const EXTRA_FILE = path.join(process.cwd(), 'data', 'rkn-blocklist.json');
 
 const URL_RE = /(?:https?:\/\/|www\.)[^\s<>"')\]]+/gi;
 
-export type LinkCheckStatus = 'ok' | 'rkn' | 'shortener' | 'invalid';
+export type LinkCheckStatus = 'ok' | 'rkn' | 'shortener' | 'invalid' | 'suspicious';
 
 export type LinkCheckItem = {
   url: string;
@@ -72,20 +73,34 @@ export async function saveExtraRknHosts(hosts: string[]) {
   return extra;
 }
 
+function classifyHit(url: string, host: string, rknAll: string[]): LinkCheckItem {
+  if (!host) return { url, host: '', status: 'invalid' };
+  if (rknAll.some((listed) => hostMatches(host, listed))) {
+    return { url, host, status: 'rkn' };
+  }
+  if (LINK_SHORTENER_HOSTS.some((listed) => hostMatches(host, listed))) {
+    return { url, host, status: 'shortener' };
+  }
+  const local = classifyLinkClient(url);
+  if (local.risk === 'blocked') return { url, host, status: 'invalid' };
+  if (local.risk === 'shortener') return { url, host, status: 'shortener' };
+  if (local.risk === 'suspicious') return { url, host, status: 'suspicious' };
+  return { url, host, status: 'ok' };
+}
+
 export async function checkLinksInText(text: string): Promise<LinkCheckItem[]> {
   const { all } = await listRknHosts();
   const urls = extractUrls(text);
-  return urls.map((url) => {
-    const host = hostFromUrl(url);
-    if (!host) return { url, host: '', status: 'invalid' as const };
-    if (all.some((listed) => hostMatches(host, listed))) {
-      return { url, host, status: 'rkn' as const };
-    }
-    if (LINK_SHORTENER_HOSTS.some((listed) => hostMatches(host, listed))) {
-      return { url, host, status: 'shortener' as const };
-    }
-    return { url, host, status: 'ok' as const };
-  });
+  return urls.map((url) => classifyHit(url, hostFromUrl(url) || '', all));
+}
+
+export async function checkSingleUrl(raw: string): Promise<LinkCheckItem> {
+  const local = classifyLinkClient(raw);
+  if (!local.href || local.risk === 'blocked') {
+    return { url: String(raw || ''), host: local.host, status: 'invalid' };
+  }
+  const hits = await checkLinksInText(local.href);
+  return hits[0] || classifyHit(local.href, local.host, []);
 }
 
 export async function notifyStaffRknLinks(opts: {

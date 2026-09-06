@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { isEndUserRole } from '@/lib/acl-shared';
 import { consumeCaptchaToken } from '@/lib/captcha';
 import { assertSameOrigin } from '@/lib/csrf-origin';
+import { MODERATION_PENDING_MESSAGE } from '@/lib/account-moderation';
 import {
   checkContestEligibility,
   parseContestEligibility,
@@ -24,6 +25,9 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !isEndUserRole(session.user.role)) {
       return NextResponse.json({ message: 'Войдите' }, { status: 401 });
+    }
+    if (session.user.moderationPending) {
+      return NextResponse.json({ message: MODERATION_PENDING_MESSAGE }, { status: 403 });
     }
     const body = await req.json();
     const submissionId = String(body.submissionId || '');

@@ -11,6 +11,7 @@ import { evaluateAchievements } from '@/lib/award-achievements';
 import { isSafeHttpUrl, safeHttpUrl } from '@/lib/safe-url';
 import { assertSameOrigin } from '@/lib/csrf-origin';
 import { checkContestEligibility } from '@/lib/contest-eligibility';
+import { MODERATION_PENDING_MESSAGE } from '@/lib/account-moderation';
 
 const submitSchema = z.object({
   contestId: z.string().min(1),
@@ -35,6 +36,9 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !isEndUserRole(session.user.role)) {
       return NextResponse.json({ message: 'Войдите как участник' }, { status: 401 });
+    }
+    if (session.user.moderationPending) {
+      return NextResponse.json({ message: MODERATION_PENDING_MESSAGE }, { status: 403 });
     }
     const parsed = submitSchema.safeParse(await req.json());
     if (!parsed.success) {

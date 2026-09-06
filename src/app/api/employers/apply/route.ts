@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { consumeCaptchaToken } from '@/lib/captcha';
 import { isEndUserRole } from '@/lib/acl-shared';
 import { assertSameOrigin } from '@/lib/csrf-origin';
+import { MODERATION_PENDING_MESSAGE } from '@/lib/account-moderation';
 
 const schema = z.object({
   title: z.string().min(2).max(200),
@@ -33,6 +34,9 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !isEndUserRole(session.user.role)) {
       return NextResponse.json({ message: 'Войдите в аккаунт' }, { status: 401 });
+    }
+    if (session.user.moderationPending) {
+      return NextResponse.json({ message: MODERATION_PENDING_MESSAGE }, { status: 403 });
     }
     const parsed = schema.safeParse(await req.json());
     if (!parsed.success) {
