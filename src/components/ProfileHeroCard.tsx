@@ -379,10 +379,16 @@ export default function ProfileHeroCard({
                   {displayName.charAt(0).toUpperCase() || <User size={22} />}
                 </span>
               )}
+              {onAvatarPick && !stableImage ? (
+                <span className="profile-hero__avatar-add">
+                  <Camera size={16} aria-hidden />
+                  Фото
+                </span>
+              ) : null}
             </div>
             {onAvatarPick ? (
-              <label className="profile-hero__avatar-edit" title="Сменить фото">
-                <Camera size={12} />
+              <label className="profile-hero__avatar-edit" title="Добавить фото" aria-label="Добавить фото">
+                <Camera size={11} />
                 <input
                   type="file"
                   accept="image/*"
@@ -495,7 +501,7 @@ export default function ProfileHeroCard({
         <div className="profile-hero__meters" aria-label="Пропуск, репутация и М-баллы">
           {onPassClick ? (
             <button type="button" className="profile-hero__meter" onClick={onPassClick}>
-              <QrCode size={18} aria-hidden />
+              <QrCode size={14} aria-hidden />
               <span>
                 <small>Пропуск</small>
                 <strong>Открыть</strong>
@@ -503,7 +509,7 @@ export default function ProfileHeroCard({
             </button>
           ) : (
             <a className="profile-hero__meter" href="#pass">
-              <QrCode size={18} aria-hidden />
+              <QrCode size={14} aria-hidden />
               <span>
                 <small>Пропуск</small>
                 <strong>QR</strong>
@@ -515,7 +521,7 @@ export default function ProfileHeroCard({
             className="profile-hero__meter"
             onClick={() => onStatClick?.('AUTHORITY')}
           >
-            <Shield size={18} aria-hidden />
+            <Shield size={14} aria-hidden />
             <span>
               <small>Репутация</small>
               <strong title={authorityLabel || undefined}>
@@ -525,7 +531,7 @@ export default function ProfileHeroCard({
           </button>
           {showEco ? (
             <button type="button" className="profile-hero__meter" onClick={() => onStatClick?.('ECO')}>
-              <Leaf size={18} aria-hidden />
+              <Leaf size={14} aria-hidden />
               <span>
                 <small>М-баллы</small>
                 <strong>{Number(ecoPoints || 0).toLocaleString('ru-RU')}</strong>

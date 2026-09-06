@@ -588,12 +588,12 @@ html[data-eco-banner] .profile-hero--cabinet {
   gap: 0.85rem !important;
 }
 .dashboard-page .profile-hero__avatar-edit {
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  width: auto !important;
+  left: auto !important;
+  right: 0.12rem !important;
+  bottom: 0.12rem !important;
+  width: 1.35rem !important;
   height: 1.35rem !important;
-  border-radius: 0 !important;
+  border-radius: 50% !important;
   border: 0 !important;
   box-shadow: none !important;
 }

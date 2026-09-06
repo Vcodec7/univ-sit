@@ -649,52 +649,82 @@
   }
 }
 
-/* Cabinet identity: Sochi sea card, lime ring, camera chip — no glow loops */
+/* Cabinet identity: light card, one circular photo, compact meters */
+html[data-eco-theme] .dashboard-page .profile-hero,
+html[data-eco-banner] .dashboard-page .profile-hero,
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero,
 .dashboard-page .profile-hero.profile-hero--cabinet,
 .dashboard-page .profile-hero {
-  background:
-    linear-gradient(165deg, #d7eef8 0%, #fff 46%, #f7faf4 100%) !important;
-  border: 1px solid rgba(120, 176, 206, 0.34) !important;
-  box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
+  color: #0a0c2a !important;
+  background: #f4f8fb !important;
+  border: 1px solid rgba(10, 12, 42, 0.08) !important;
+  box-shadow: 0 8px 22px rgba(30, 90, 130, 0.06) !important;
+}
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__name,
+.dashboard-page .profile-hero--cabinet .profile-hero__name {
+  color: #0a0c2a !important;
+}
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__email,
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__phone,
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__id,
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__bio,
+html[data-eco-theme='theme_nightcity'] .dashboard-page .profile-hero__sub {
+  color: #5a5670 !important;
 }
 .dashboard-page .profile-hero--cabinet .profile-hero__main {
   align-items: center !important;
-  gap: 1rem !important;
-}
-.dashboard-page .profile-hero--cabinet .profile-hero__avatar,
-.dashboard-page .profile-hero__avatar {
-  width: 4.75rem !important;
-  height: 4.75rem !important;
-  overflow: visible !important;
-  background: #0a7aa8 !important;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px #afca03 !important;
-  filter: none !important;
+  gap: 0.85rem !important;
 }
 html[data-eco-aura] .dashboard-page .profile-hero__avatar,
-html[data-eco-aura] .dashboard-page .profile-hero__avatar-inner,
-html[data-eco-frame='frame_neon'] .dashboard-page .profile-hero__avatar,
-html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px #afca03 !important;
+html[data-eco-frame] .dashboard-page .profile-hero__avatar,
+.dashboard-page .profile-hero--cabinet .profile-hero__avatar,
+.dashboard-page .profile-hero__avatar {
+  width: 4.4rem !important;
+  height: 4.4rem !important;
+  overflow: hidden !important;
+  background: #dceaf2 !important;
+  border: 1px solid rgba(10, 12, 42, 0.1) !important;
+  outline: none !important;
+  box-shadow: none !important;
   filter: none !important;
   animation: none !important;
 }
 .dashboard-page .profile-hero__avatar-inner {
+  position: relative;
   overflow: hidden;
   border-radius: 50%;
+  width: 100%;
+  height: 100%;
+}
+.dashboard-page .profile-hero__avatar-add {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.12rem;
+  background: rgba(10, 12, 42, 0.38);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  z-index: 2;
 }
 .dashboard-page .profile-hero__avatar-edit {
   left: auto !important;
-  right: -0.12rem !important;
-  bottom: -0.08rem !important;
-  width: 1.7rem !important;
-  height: 1.7rem !important;
-  border-radius: 999px !important;
-  background: #afca03 !important;
-  color: #0a0c2a !important;
-  border: 2px solid #fff !important;
+  right: 0.12rem !important;
+  bottom: 0.12rem !important;
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  border-radius: 50% !important;
+  background: #0a0c2a !important;
+  color: #fff !important;
+  border: 0 !important;
   box-shadow: none !important;
   display: grid !important;
   place-items: center !important;
+  z-index: 3 !important;
 }
 .dashboard-page .profile-hero--cabinet .profile-hero__name-row {
   flex-wrap: wrap !important;
@@ -894,28 +924,41 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
   font-weight: 750;
 }
 
+.dashboard-page .profile-hero__toolbar {
+  margin-top: 0.55rem !important;
+  gap: 0.32rem !important;
+}
+.dashboard-page .profile-hero__tool {
+  min-height: 2.05rem !important;
+  padding: 0.28rem 0.5rem !important;
+  font-size: 0.74rem !important;
+  border-radius: 999px !important;
+}
 .dashboard-page .profile-hero__meters {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   align-items: stretch;
-  gap: 0.4rem !important;
+  gap: 0.32rem !important;
 }
-.dashboard-page .profile-hero__meter {
+.dashboard-page .profile-hero__meter,
+.dashboard-page .profile-hero__meter:nth-child(2) {
   display: flex !important;
   align-items: center !important;
-  min-height: 3.15rem;
-  height: 100%;
-  gap: 0.4rem !important;
-  padding: 0.45rem 0.42rem !important;
-  border-radius: 0.85rem !important;
+  min-height: 2.35rem !important;
+  height: auto !important;
+  gap: 0.32rem !important;
+  padding: 0.28rem 0.38rem !important;
+  border-radius: 0.7rem !important;
   background: #fff !important;
-  border: 1px solid rgba(120, 176, 206, 0.32) !important;
+  border: 1px solid rgba(10, 12, 42, 0.1) !important;
+  box-shadow: none !important;
   box-sizing: border-box;
+  flex: 1 1 0 !important;
 }
 .dashboard-page .profile-hero__meter svg {
-  flex: 0 0 1rem;
-  width: 1rem;
-  height: 1rem;
+  flex: 0 0 0.9rem;
+  width: 0.9rem;
+  height: 0.9rem;
 }
 .dashboard-page .profile-hero__meter span {
   min-width: 0;
@@ -924,7 +967,7 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 .dashboard-page .profile-hero__meter small {
   display: block;
   color: #5a5670 !important;
-  font-size: 0.62rem !important;
+  font-size: 0.58rem !important;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
@@ -932,12 +975,13 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 }
 .dashboard-page .profile-hero__meter strong {
   display: block;
-  font-size: 0.82rem !important;
+  font-size: 0.78rem !important;
   line-height: 1.15;
   letter-spacing: -0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 800;
 }
 
 /* Showcase: compact light Sochi — no navy collection well */
@@ -1862,4 +1906,33 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   padding: 0.32rem 0.6rem !important;
   font-size: 0.74rem !important;
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  html[data-eco-theme] .dashboard-page .profile-hero,
+  html[data-eco-banner] .dashboard-page .profile-hero,
+  .profile-hero--cabinet,
+  .dashboard-page .profile-hero {
+    background: #f4f8fb !important;
+    color: #0a0c2a !important;
+    box-shadow: 0 8px 22px rgba(30, 90, 130, 0.06) !important;
+  }
+  html[data-eco-frame] .dashboard-page .profile-hero__avatar,
+  .profile-hero--cabinet .profile-hero__avatar,
+  .dashboard-page .profile-hero__avatar {
+    width: 4.2rem !important;
+    height: 4.2rem !important;
+    overflow: hidden !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(10, 12, 42, 0.1) !important;
+  }
+  .dashboard-page .profile-hero__avatar-edit {
+    left: auto !important;
+    right: 0.1rem !important;
+    bottom: 0.1rem !important;
+    width: 1.3rem !important;
+    height: 1.3rem !important;
+    border-radius: 50% !important;
+  }
 }
