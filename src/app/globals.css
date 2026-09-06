@@ -30054,8 +30054,6 @@ html.is-admin .main-content {
 .admin-plan-builder__row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.6rem; }
 .admin-plan-builder__fields { flex: 1; display: grid; gap: 0.35rem; }
 .admin-plan-builder__fields input { width: 100%; padding: 0.5rem 0.65rem; border-radius: 10px; border: 1px solid rgba(15,23,42,0.12); }
-.admin-catalog-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
-.admin-catalog-search { display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 180px; background: #fff; border: 1px solid rgba(15,23,42,0.1); border-radius: 999px; padding: 0.35rem 0.8rem; }
 .admin-catalog-search input { border: 0; width: 100%; outline: none; }
 .admin-catalog-cards { display: grid; gap: 0.85rem; }
 .admin-catalog-card { display: grid; grid-template-columns: 88px 1fr; gap: 0.85rem; background: #fff; border: 1px solid rgba(15,23,42,0.08); border-radius: 16px; overflow: hidden; }
@@ -30291,4 +30289,139 @@ html.is-admin .main-content {
     display: block;
   }
 }
+
+/* Unified modern fields — kill native OS selects/inputs site-wide */
+input:not([type]),
+input[type='text'],
+input[type='search'],
+input[type='email'],
+input[type='tel'],
+input[type='url'],
+input[type='password'],
+input[type='number'],
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'],
+input[type='month'],
+input[type='week'],
+textarea,
+select:not([multiple]):not([size]) {
+  font: inherit;
+  color: #0a0c2a;
+  background-color: #fff;
+  border: 1px solid rgba(10, 12, 42, 0.14);
+  border-radius: 0.95rem;
+  min-height: 2.7rem;
+  padding: 0.55rem 0.95rem;
+  box-shadow: none;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+textarea {
+  min-height: 6.5rem;
+  border-radius: 1.05rem;
+  resize: vertical;
+  line-height: 1.45;
+}
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230A0C2A' d='M1 1.2L6 6.2 11 1.2 12.2 2.4 6 8.6 0 2.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 12px 8px;
+  padding-right: 2.4rem;
+  cursor: pointer;
+}
+input:not([type]):focus,
+input[type='text']:focus,
+input[type='search']:focus,
+input[type='email']:focus,
+input[type='tel']:focus,
+input[type='url']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+input[type='date']:focus,
+input[type='time']:focus,
+input[type='datetime-local']:focus,
+textarea:focus,
+select:not([multiple]):not([size]):focus {
+  border-color: #8562d8;
+  box-shadow: 0 0 0 3px rgba(133, 98, 216, 0.2);
+}
+.admin-catalog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.55rem;
+  margin: 1rem 0;
+}
+.admin-catalog-toolbar select {
+  flex: 1 1 10.5rem;
+  min-width: 10.5rem;
+}
+.admin-catalog-toolbar .btn {
+  min-height: 2.7rem;
+  border-radius: 0.95rem;
+  padding-inline: 1.1rem;
+}
+.admin-catalog-search {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  min-height: 2.7rem;
+  background: #fff;
+  border: 1px solid rgba(10, 12, 42, 0.14);
+  border-radius: 0.95rem;
+  padding: 0 0.9rem;
+  color: #64748b;
+}
+.admin-catalog-search input,
+.filter-bar__input,
+.space-filter-bar__input,
+.catalog-filter-pop__search input,
+.places-search input,
+.yp-engage__search input {
+  min-height: 0;
+  height: auto;
+  padding: 0.55rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.admin-catalog-search input:focus,
+.filter-bar__input:focus,
+.space-filter-bar__input:focus,
+.catalog-filter-pop__search input:focus,
+.places-search input:focus,
+.yp-engage__search input:focus {
+  box-shadow: none;
+  border: 0;
+}
+.filter-bar__sort select,
+.places-sort select,
+.yp-field select,
+.cw-field select,
+.profile-view select {
+  min-height: 2.7rem;
+  border-radius: 0.95rem;
+}
+@media (max-width: 720px) {
+  .admin-catalog-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .admin-catalog-toolbar select,
+  .admin-catalog-search,
+  .admin-catalog-toolbar .btn {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+  }
+}
+
 
