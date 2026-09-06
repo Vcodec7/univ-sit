@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const css = fs.readFileSync(path.join(root, 'src/app/globals.css'), 'utf8');
-const qa = fs.readFileSync(path.join(root, 'src/components/QuickAccess.tsx'), 'utf8');
+const providers = fs.readFileSync(path.join(root, 'src/components/Providers.tsx'), 'utf8');
 const gamesCss = fs.readFileSync(path.join(root, 'src/app/games/games.css'), 'utf8');
 
 const fails = [];
@@ -27,11 +27,8 @@ if (navBlock && /border-bottom\s*:\s*1px/i.test(navBlock) && !/border-bottom\s*:
   fails.push('glass-nav again has a 1px border-bottom (strip under header)');
 }
 
-if (!qa.includes('qa-edge-tab')) {
-  fails.push('QuickAccess is missing qa-edge-tab (phone-friendly access)');
-}
-if (qa.includes('attachVGesture(') && !qa.includes('attachEdgeSwipe')) {
-  fails.push('V-gesture is wired without edge swipe — will fight mobile scroll');
+if (/<QuickAccess/.test(providers)) {
+  fails.push('QuickAccess V-panel must not be mounted in Providers');
 }
 
 if (!gamesCss.includes('games-root.is-hub') || !gamesCss.includes('games-root.is-play')) {
@@ -41,10 +38,6 @@ if (!gamesCss.includes('games-root.is-hub') || !gamesCss.includes('games-root.is
 const brandCta = lastMatch(css, /\.svc-pill--brand[\s\S]{0,280}/g);
 if (brandCta && /color\s*:\s*var\(--primary/i.test(brandCta) && !/color\s*:\s*#fff/i.test(brandCta)) {
   fails.push('svc-pill--brand looks low-contrast (purple on purple)');
-}
-
-if (!css.includes('qa-edge-tab')) {
-  fails.push('globals.css missing .qa-edge-tab styles');
 }
 
 const navEndSmear = lastMatch(

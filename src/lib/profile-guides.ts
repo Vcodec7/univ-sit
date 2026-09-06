@@ -6,7 +6,6 @@ import type { ModuleFlagKey, ModuleFlags } from '@/lib/module-flags';
 export const PROFILE_GUIDES_KEY = 'yp-profile-guides-v2';
 
 export type ProfileGuideId =
-  | 'quick-access'
   | 'profile'
   | 'events'
   | 'social'
@@ -27,7 +26,6 @@ export type ProfileGuideRecord = {
 
 /** All current guide ids — order is display order for completeness checks */
 export const ALL_GUIDE_IDS: ProfileGuideId[] = [
-  'quick-access',
   'profile',
   'events',
   'social',

@@ -12,7 +12,6 @@ import {
   Shield,
   Ticket,
   Users,
-  Zap,
   UserRound,
   Gauge,
   BadgeCheck,
@@ -21,12 +20,6 @@ import {
   Briefcase,
   Trophy,
 } from 'lucide-react'
-import {
-  getQuickAccessTutorialState,
-  requestOpenQuickAccess,
-  requestQuickAccessTutorial,
-  QUICK_ACCESS_TUTORIAL_DONE_EVENT,
-} from '@/lib/quick-access'
 import {
   ALL_GUIDE_IDS,
   areAllGuidesViewed,
@@ -54,18 +47,6 @@ type GuideDef = {
 }
 
 const GUIDES: GuideDef[] = [
-  {
-    id: 'quick-access',
-    title: 'Быстрый доступ',
-    summary: 'Панель ⚡ — разделы без лишних кликов',
-    accent: '#2563eb',
-    Icon: Zap,
-    steps: [
-      'Телефон: кнопка ⚡ справа внизу — открыть панель.',
-      'ПК: клавиша ? — шпаргалка; G + буква — переход (G H — главная).',
-      'Пройдите анимацию один раз — портал запомнит.',
-    ],
-  },
   {
     id: 'profile',
     title: 'Профиль',
@@ -286,20 +267,10 @@ export default function ProfileGuides({
   useEffect(() => {
     const onChange = () => refresh()
     window.addEventListener('yp:profile-guides-changed', onChange)
-    window.addEventListener(QUICK_ACCESS_TUTORIAL_DONE_EVENT, onChange)
     return () => {
       window.removeEventListener('yp:profile-guides-changed', onChange)
-      window.removeEventListener(QUICK_ACCESS_TUTORIAL_DONE_EVENT, onChange)
     }
   }, [refresh])
-
-  useEffect(() => {
-    const state = getQuickAccessTutorialState()
-    if ((state === 'done' || state === 'skipped') && !isGuideViewed('quick-access')) {
-      markGuideViewed('quick-access')
-      refresh()
-    }
-  }, [refresh, tick])
 
   const { unseen, seen, progress } = useMemo(() => {
     void tick
@@ -375,11 +346,6 @@ export default function ProfileGuides({
     refresh()
     setTab('new')
     setOpenId(id)
-  }
-
-  const runQuickAccess = () => {
-    requestOpenQuickAccess()
-    if (nextGuide?.id === 'quick-access') markSeen('quick-access')
   }
 
   return (
@@ -491,20 +457,6 @@ export default function ProfileGuides({
                         <li key={step}>{step}</li>
                       ))}
                     </ol>
-                    {g.id === 'quick-access' ? (
-                      <div className="profile-guide-actions">
-                        <button type="button" className="btn btn-primary btn-sm" onClick={runQuickAccess}>
-                          Открыть панель
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => requestQuickAccessTutorial(true)}
-                        >
-                          Анимация
-                        </button>
-                      </div>
-                    ) : null}
                     <div className="profile-guide-meta">
                       {tab === 'new' ? (
                         <button type="button" className="profile-guide-mark" onClick={() => markSeen(g.id)}>

@@ -367,10 +367,10 @@ export default function ProfileHeroCard({
       <div className="profile-hero__main">
         <div className="profile-hero__avatar-col">
           <div
-            className={`profile-hero__avatar${legend ? ' avatar-legend-frame' : ''}${onAvatarPick ? ' is-editable' : ''}${frameLook ? ' has-eco-frame' : ''}${stableImage ? ' has-photo' : ' is-fallback'}`}
+            className={`profile-hero__avatar${onAvatarPick ? ' is-editable' : ''}${stableImage ? ' has-photo' : ' is-fallback'}`}
             title={frameLook ? 'Рамка из магазина' : undefined}
           >
-            <div className={legend ? 'avatar-legend-inner' : 'profile-hero__avatar-inner'}>
+            <div className="profile-hero__avatar-inner">
               {stableImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={stableImage} alt="" style={avatarStyle} />
@@ -405,44 +405,49 @@ export default function ProfileHeroCard({
             {roleLabel ? <span className="profile-hero__role">{roleLabel}</span> : null}
           </div>
           {showLegal ? <div className="profile-hero__sub">{name}</div> : null}
-          <ul className="profile-hero__contacts">
-            {email ? (
-              <li>
-                <Mail size={14} aria-hidden />
-                {revealContacts ? <a href={`mailto:${email}`}>{email}</a> : <span>{email}</span>}
-              </li>
-            ) : null}
-            {phone ? (
-              <li>
-                <Phone size={14} aria-hidden />
-                {revealContacts ? (
-                  <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>
-                ) : (
-                  <span>{phone}</span>
-                )}
-              </li>
-            ) : null}
-            {publicCode ? (
-              <li>
-                <button
-                  type="button"
-                  className="profile-hero__id"
-                  title="Скопировать публичный ID"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(publicCode);
-                      toast.success('ID скопирован');
-                    } catch {
-                      toast.error('Не удалось скопировать');
-                    }
-                  }}
-                >
-                  ID {publicCode} <Copy size={11} />
-                </button>
-              </li>
-            ) : null}
-          </ul>
           {bio ? <p className="profile-hero__bio">{bio}</p> : null}
+          {email || phone || publicCode ? (
+            <details className="profile-hero__more">
+              <summary>Контакты и ID</summary>
+              <ul className="profile-hero__contacts">
+                {email ? (
+                  <li>
+                    <Mail size={14} aria-hidden />
+                    {revealContacts ? <a href={`mailto:${email}`}>{email}</a> : <span>{email}</span>}
+                  </li>
+                ) : null}
+                {phone ? (
+                  <li>
+                    <Phone size={14} aria-hidden />
+                    {revealContacts ? (
+                      <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>
+                    ) : (
+                      <span>{phone}</span>
+                    )}
+                  </li>
+                ) : null}
+                {publicCode ? (
+                  <li>
+                    <button
+                      type="button"
+                      className="profile-hero__id"
+                      title="Скопировать публичный ID"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(publicCode);
+                          toast.success('ID скопирован');
+                        } catch {
+                          toast.error('Не удалось скопировать');
+                        }
+                      }}
+                    >
+                      ID {publicCode} <Copy size={11} />
+                    </button>
+                  </li>
+                ) : null}
+              </ul>
+            </details>
+          ) : null}
         </div>
       </div>
 

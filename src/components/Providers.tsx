@@ -4,7 +4,6 @@ import { useEffect, useLayoutEffect } from 'react';
 import { SessionProvider, useSession } from 'next-auth/react';
 import { flushGameScoreQueue } from '@/lib/game-scores-client';
 import EcoAwardToast from '@/components/EcoAwardToast';
-import QuickAccess from '@/components/QuickAccess';
 import InstructionsWelcomeModal from '@/components/InstructionsWelcomeModal';
 import { VoiceProvider } from '@/components/VoiceProvider';
 
@@ -116,7 +115,6 @@ export function Providers({
         {!minimal && <PresenceHeartbeat />}
         {!minimal && <EcoAwardToast />}
         {!minimal && <InstructionsWelcomeModal />}
-        {!minimal && <QuickAccess />}
         {children}
       </VoiceProvider>
     </SessionProvider>

@@ -100,7 +100,7 @@ export default function HomeServiceHero({
             <span>к своим людям и проектам</span>
           </h1>
           <p className="lift-hero__lead">
-            Залы, коворкинг, клубы и афиша города — один портал, без десяти чатов и пустых «напиши организатору».
+            Залы, коворкинг, клубы и афиша — один портал, без десяти чатов.
           </p>
           <div className="lift-hero__cta">
             {primary ? (
@@ -145,6 +145,7 @@ export default function HomeServiceHero({
                 </span>
                 <strong>{card.title}</strong>
                 <p>{card.text}</p>
+                <span className="lift-deck__go">Открыть</span>
               </>
             );
             return card.auth ? (

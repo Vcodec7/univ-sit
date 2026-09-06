@@ -35,8 +35,8 @@ function initialsNode(
         display: 'grid',
         placeItems: 'center',
         background: aliased
-          ? 'linear-gradient(135deg, #0f766e, #38bdf8)'
-          : 'linear-gradient(135deg, #2563eb, #0ea5e9)',
+          ? 'linear-gradient(135deg, #0A0C2A, #8562D8)'
+          : 'linear-gradient(145deg, #0A0C2A 0%, #8562D8 58%, #AFCA03 140%)',
         color: '#fff',
         fontWeight: 800,
         fontSize: Math.max(12, Math.round((Number(shared.width) || 44) * 0.36)),
@@ -69,8 +69,8 @@ export default function UserAvatar({
     borderRadius: '50%',
     objectFit: 'cover',
     flex: '0 0 auto',
-    border: `3px solid ${ring}`,
-    boxShadow: frameGlow ? `0 0 0 3px ${frameGlow}` : undefined,
+    border: `2px solid ${ring}`,
+    boxShadow: undefined,
     ...style,
   };
 

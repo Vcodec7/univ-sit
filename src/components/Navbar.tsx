@@ -57,7 +57,6 @@ import {
   MessageCircle,
   BookOpen,
   ShoppingBag,
-  Zap,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -71,7 +70,6 @@ import { signOutLogged } from '@/lib/sign-out-logged';
 import { encodeRouteParam } from '@/lib/route-id';
 import { isPrimaryHeaderSlug } from '@/lib/nav-catalog';
 import { fetchProfileCached } from '@/lib/user-data-client';
-import { requestOpenQuickAccess } from '@/lib/quick-access';
 import { persistSessionHint, readSessionHint } from '@/lib/session-hint';
 
 type OpenMenu = 'projects' | 'clubs' | 'spaces' | 'more' | 'account' | null;
@@ -144,11 +142,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   const toggleMenu = () => setIsMobileMenuOpen((open) => !open);
   const closeMenu = () => setIsMobileMenuOpen(false);
   const closeDesktopMenus = () => setOpenMenu(null);
-  const openQuickPanel = () => {
-    closeMenu();
-    closeDesktopMenus();
-    requestOpenQuickAccess();
-  };
 
   useEffect(() => {
     closeMenu();
@@ -428,21 +421,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                     <small>Обзор и разделы</small>
                   </span>
                 </Link>
-                <button
-                  type="button"
-                  className="dropdown-item"
-                  role="menuitem"
-                  onClick={() => {
-                    closeDesktopMenus();
-                    openQuickPanel();
-                  }}
-                >
-                  <Zap size={16} aria-hidden />
-                  <span className="nav-account-menu__label">
-                    <strong>Быстрый доступ</strong>
-                    <small>Панель справа</small>
-                  </span>
-                </button>
                 {!isScanner && !isTech ? (
                   <Link href="/dashboard/guides" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
                     <BookOpen size={16} aria-hidden />
@@ -859,15 +837,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             <div className="mobile-menu__sheet-head">
               <h2 className="mobile-menu__sheet-title">Меню</h2>
               <div className="mobile-menu__sheet-tools">
-                <button
-                  type="button"
-                  className="mobile-menu__icon-btn"
-                  aria-label="Быстрый доступ"
-                  title="Быстрый доступ"
-                  onClick={openQuickPanel}
-                >
-                  <Zap size={20} />
-                </button>
                 {session && !isScanner && !isTech && (
                   <Link
                     href={settingsHref}
@@ -932,13 +901,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
 
             {session && !isScanner && !isTech && (
               <ul className="mobile-menu__list" aria-label="Профиль">
-                <li>
-                  <button type="button" className="mobile-menu__row" onClick={openQuickPanel}>
-                    <Zap size={20} aria-hidden />
-                    <span>Быстрый доступ</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </button>
-                </li>
                 {modOn(siteSettings, 'friends') ? (
                   <li>
                     <Link href="/friends" onClick={closeMenu} className="mobile-menu__row">
@@ -1009,13 +971,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             )}
             {session && (isScanner || isTech) && (
               <ul className="mobile-menu__list" aria-label="Рабочее место">
-                <li>
-                  <button type="button" className="mobile-menu__row" onClick={openQuickPanel}>
-                    <Zap size={20} aria-hidden />
-                    <span>Быстрый доступ</span>
-                    <ChevronRight size={16} aria-hidden />
-                  </button>
-                </li>
                 <li>
                   <Link href={dashboardHref} onClick={closeMenu} className="mobile-menu__row">
                     <LayoutDashboard size={20} aria-hidden />
