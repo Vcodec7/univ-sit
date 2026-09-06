@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentType, type KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Users,
@@ -38,65 +38,52 @@ import {
   Home,
   UserCircle,
   CalendarRange,
+  Search,
 } from 'lucide-react';
 import { hasPermission, type ModeratorPermission } from '@/lib/acl-shared';
 import NotificationsBell from '@/components/NotificationsBell';
 import { signOutLogged } from '@/lib/sign-out-logged';
+import {
+  ADMIN_NAV_GROUP_LABELS,
+  ADMIN_NAV_ITEMS,
+  filterAdminNav,
+  type AdminNavDef,
+  type AdminNavGroup,
+} from '@/lib/admin-nav';
 
-type NavDef = {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  requiredPermission?: ModeratorPermission | ModeratorPermission[] | 'ADMIN_ONLY';
-  group: 'main' | 'content' | 'ops' | 'system';
-  badgeKey?: string;
-};
-
-const NAV_ITEMS: NavDef[] = [
-  { href: '/admin', label: 'Дашборд', icon: LayoutDashboard, group: 'main' },
-  { href: '/admin/projects', label: 'Проекты', icon: Folder, requiredPermission: 'projects', group: 'content' },
-  { href: '/admin/clubs', label: 'Клубы', icon: Users, requiredPermission: 'clubs', group: 'content' },
-  { href: '/admin/spaces', label: 'Пространства', icon: Calendar, requiredPermission: 'spaces', group: 'content' },
-  { href: '/admin/places', label: 'Куда сходить', icon: MapPin, requiredPermission: 'places', group: 'content' },
-  { href: '/admin/programs', label: 'Гранты и добро', icon: HandHeart, requiredPermission: ['programs', 'pages'], group: 'content' },
-  { href: '/admin/bookings', label: 'Афиша', icon: Clock, requiredPermission: 'bookings', group: 'ops', badgeKey: '/admin/bookings' },
-  { href: '/admin/occupancy', label: 'Занятость залов', icon: CalendarRange, requiredPermission: 'bookings', group: 'ops' },
-  { href: '/admin/pages', label: 'Страницы', icon: ScrollText, requiredPermission: 'pages', group: 'content' },
-  { href: '/admin/faq', label: 'FAQ', icon: FileText, requiredPermission: 'pages', group: 'content' },
-  { href: '/admin/about-team', label: 'Команда «О нас»', icon: Users, requiredPermission: ['pages', 'portfolios'], group: 'content' },
-  { href: '/admin/documents', label: 'Документы', icon: FileStack, requiredPermission: 'pages', group: 'content' },
-  { href: '/admin/news', label: 'Новости', icon: Newspaper, requiredPermission: ['news', 'pages'], group: 'content' },
-  { href: '/admin/applications', label: 'Заявки', icon: FileText, requiredPermission: 'applications', group: 'ops', badgeKey: '/admin/applications' },
-  { href: '/admin/portfolios', label: 'Портфолио', icon: Briefcase, requiredPermission: ['portfolios', 'pages'], group: 'ops', badgeKey: '/admin/portfolios' },
-  { href: '/admin/awards', label: 'Награды', icon: Award, requiredPermission: ['portfolios', 'pages'], group: 'ops' },
-  { href: '/admin/vacancies', label: 'Вакансии', icon: Briefcase, requiredPermission: 'vacancies', group: 'ops' },
-  { href: '/admin/contests', label: 'Конкурсы', icon: Trophy, requiredPermission: 'contests', group: 'ops' },
-  { href: '/admin/moderation', label: 'Модерация', icon: ShieldAlert, requiredPermission: 'moderation', group: 'ops', badgeKey: '/admin/moderation' },
-  { href: '/admin/security', label: 'IP и подозрительные', icon: Shield, requiredPermission: ['moderation'], group: 'ops' },
-  { href: '/admin/stats', label: 'Статистика', icon: BarChart3, requiredPermission: ['stats', 'bookings'], group: 'ops' },
-  { href: '/admin/scanner', label: 'Сканер', icon: ScanLine, requiredPermission: 'scanner', group: 'ops' },
-  { href: '/admin/users', label: 'Пользователи', icon: Users, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/pending-users', label: 'Заявки регистрации', icon: UserPlus, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/audit-log', label: 'Журнал админов', icon: ScrollText, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/rkn', label: 'РКН / ПДн', icon: FileText, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/backup', label: 'Бэкап', icon: DatabaseBackup, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/bots', label: 'Боты', icon: Bot, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/system', label: 'Состояние сервера', icon: Server, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/online', label: 'Онлайн', icon: UsersRound, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/activity', label: 'Активность', icon: Activity, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-  { href: '/admin/settings', label: 'Настройки сайта', icon: Settings, requiredPermission: 'ADMIN_ONLY', group: 'system' },
-];
-
-const GROUP_LABELS: Record<NavDef['group'], string> = {
-  main: 'Обзор',
-  content: 'Контент',
-  ops: 'Операции',
-  system: 'Система',
+const ICONS: Record<string, ComponentType<{ size?: number; className?: string }>> = {
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  Folder,
+  Calendar,
+  FileText,
+  Settings,
+  Clock,
+  Newspaper,
+  BarChart3,
+  ScanLine,
+  ScrollText,
+  FileStack,
+  HandHeart,
+  Briefcase,
+  ShieldAlert,
+  DatabaseBackup,
+  MapPin,
+  Trophy,
+  Bot,
+  Activity,
+  Shield,
+  Server,
+  Award,
+  UsersRound,
+  CalendarRange,
 };
 
 const COLLAPSE_KEY = 'yp-admin-sidebar-collapsed';
+const RECENT_KEY = 'yp-admin-nav-recent';
 
-function canSee(item: NavDef, userRole: string, userPermissions: string[]): boolean {
+function canSee(item: AdminNavDef, userRole: string, userPermissions: string[]): boolean {
   if (userRole === 'ADMIN') return true;
   if (item.requiredPermission === 'ADMIN_ONLY') return false;
   if (!item.requiredPermission) return true;
@@ -118,6 +105,25 @@ function formatBadge(n: number) {
   return n > 999 ? '999+' : String(n);
 }
 
+function readRecent(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecent(href: string) {
+  try {
+    const next = [href, ...readRecent().filter((x) => x !== href)].slice(0, 6);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function AdminSidebar({
   userRole,
   userPermissions,
@@ -126,19 +132,23 @@ export default function AdminSidebar({
   userPermissions: string[];
 }) {
   const pathname = usePathname() || '/admin';
+  const router = useRouter();
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const drawerSearchRef = useRef<HTMLInputElement | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [navQuery, setNavQuery] = useState('');
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [recent, setRecent] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  useEffect(() => {
-    setPortalReady(true);
-  }, []);
+  useEffect(() => setPortalReady(true), []);
 
   useEffect(() => {
     try {
       setCollapsed(localStorage.getItem(COLLAPSE_KEY) === '1');
+      setRecent(readRecent());
     } catch {
       /* ignore */
     }
@@ -146,12 +156,15 @@ export default function AdminSidebar({
 
   useEffect(() => {
     setDrawerOpen(false);
+    pushRecent(pathname.startsWith('/admin') ? pathname.replace(/\/+$/, '') || '/admin' : pathname);
+    setRecent(readRecent());
   }, [pathname]);
 
   useEffect(() => {
     if (!drawerOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const t = window.setTimeout(() => drawerSearchRef.current?.focus(), 30);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setDrawerOpen(false);
     };
@@ -159,17 +172,44 @@ export default function AdminSidebar({
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
     };
   }, [drawerOpen]);
 
-  const items = useMemo(() => {
-    const visible = NAV_ITEMS.filter((item) => canSee(item, userRole, userPermissions));
-    const q = navQuery.trim().toLowerCase();
-    if (!q) return visible;
-    return visible.filter(
-      (item) => item.label.toLowerCase().includes(q) || item.href.toLowerCase().includes(q)
-    );
-  }, [userRole, userPermissions, navQuery]);
+  const visible = useMemo(
+    () => ADMIN_NAV_ITEMS.filter((item) => canSee(item, userRole, userPermissions)),
+    [userRole, userPermissions]
+  );
+
+  const filtered = useMemo(() => filterAdminNav(visible, navQuery), [visible, navQuery]);
+  const searching = Boolean(navQuery.trim());
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [navQuery, drawerOpen]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement | null)?.isContentEditable;
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (window.matchMedia('(max-width: 899px)').matches) {
+          setDrawerOpen(true);
+        } else {
+          searchRef.current?.focus();
+        }
+        return;
+      }
+      if (!typing && e.key === '/') {
+        e.preventDefault();
+        if (window.matchMedia('(max-width: 899px)').matches) setDrawerOpen(true);
+        else searchRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -203,84 +243,177 @@ export default function AdminSidebar({
     });
   };
 
-  const badgeFor = (item: NavDef) => {
+  const badgeFor = (item: AdminNavDef) => {
     if (!item.badgeKey) return null;
     return formatBadge(counts[item.badgeKey] || 0);
   };
 
-  const renderNav = (opts: { compact: boolean; idPrefix: string }) => (
-    <nav className="samsung-nav" aria-label="Админ-навигация">
-      {(['main', 'content', 'ops', 'system'] as const).map((group) => {
-        const groupItems = items.filter((i) => i.group === group);
-        if (!groupItems.length) return null;
-        return (
-          <div key={group} className="samsung-nav__group">
-            {!opts.compact ? (
-              <div className="samsung-nav__group-label">{GROUP_LABELS[group]}</div>
-            ) : (
-              <div className="samsung-nav__group-rule" aria-hidden />
-            )}
-            {groupItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActivePath(pathname, item.href);
-              const badge = badgeFor(item);
+  const go = (href: string) => {
+    pushRecent(href);
+    setDrawerOpen(false);
+    router.push(href);
+  };
+
+  const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (!filtered.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(filtered.length - 1, i + 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(0, i - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const hit = filtered[activeIndex] || filtered[0];
+      if (hit) go(hit.href);
+    }
+  };
+
+  const recentItems = useMemo(() => {
+    if (searching) return [];
+    return recent
+      .map((href) => visible.find((i) => i.href === href || href.startsWith(`${i.href}/`)))
+      .filter((x, i, arr): x is AdminNavDef => Boolean(x) && arr.findIndex((y) => y?.href === x?.href) === i)
+      .slice(0, 4);
+  }, [recent, visible, searching]);
+
+  const renderCards = (opts: { compact: boolean; idPrefix: string }) => {
+    if (opts.compact) {
+      return (
+        <nav className="samsung-nav" aria-label="Админ-навигация">
+          {filtered.map((item) => {
+            const Icon = ICONS[item.icon] || LayoutDashboard;
+            const active = isActivePath(pathname, item.href);
+            const badge = badgeFor(item);
+            return (
+              <Link
+                key={`${opts.idPrefix}-${item.href}`}
+                href={item.href}
+                className={`samsung-nav__link${active ? ' is-active' : ''}`}
+                aria-current={active ? 'page' : undefined}
+                title={item.label}
+                onClick={() => setDrawerOpen(false)}
+              >
+                <span className="samsung-nav__icon">
+                  <Icon size={18} />
+                </span>
+                {badge ? <span className="samsung-nav__dot" aria-label={badge} /> : null}
+              </Link>
+            );
+          })}
+        </nav>
+      );
+    }
+
+    const groups: AdminNavGroup[] = ['main', 'content', 'ops', 'system'];
+    const showFlat = searching;
+
+    return (
+      <nav className="admin-nav-board" aria-label="Разделы панели">
+        {searching ? (
+          <p className="admin-nav-board__status">
+            {filtered.length ? `${filtered.length} раздел(а)` : 'Ничего не найдено — смените запрос'}
+          </p>
+        ) : recentItems.length ? (
+          <div className="admin-nav-board__group">
+            <p className="admin-nav-board__label">Недавние</p>
+            <div className="admin-nav-board__grid">
+              {recentItems.map((item) => renderCard(item, opts.idPrefix, -1))}
+            </div>
+          </div>
+        ) : null}
+        {showFlat
+          ? (
+              <div className="admin-nav-board__grid">
+                {filtered.map((item, i) => renderCard(item, opts.idPrefix, i))}
+              </div>
+            )
+          : groups.map((group) => {
+              const groupItems = filtered.filter((i) => i.group === group);
+              if (!groupItems.length) return null;
               return (
-                <Link
-                  key={`${opts.idPrefix}-${item.href}`}
-                  href={item.href}
-                  className={`samsung-nav__link${active ? ' is-active' : ''}`}
-                  aria-current={active ? 'page' : undefined}
-                  title={item.label}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <span className="samsung-nav__icon">
-                    <Icon size={18} />
-                  </span>
-                  {!opts.compact ? <span className="samsung-nav__label">{item.label}</span> : null}
-                  {!opts.compact && badge ? <span className="samsung-nav__badge">{badge}</span> : null}
-                  {opts.compact && badge ? <span className="samsung-nav__dot" aria-label={badge} /> : null}
-                </Link>
+                <div key={group} className="admin-nav-board__group">
+                  <p className="admin-nav-board__label">{ADMIN_NAV_GROUP_LABELS[group]}</p>
+                  <div className="admin-nav-board__grid">
+                    {groupItems.map((item) => renderCard(item, opts.idPrefix, filtered.indexOf(item)))}
+                  </div>
+                </div>
               );
             })}
-          </div>
-        );
-      })}
-      <div className="samsung-nav__group samsung-nav__group--foot">
-        <Link
-          href="/"
-          className="samsung-nav__link samsung-nav__link--site"
-          title="На главную сайта"
-          onClick={() => setDrawerOpen(false)}
-        >
-          <span className="samsung-nav__icon">
-            <Home size={18} />
-          </span>
-          {!opts.compact ? <span className="samsung-nav__label">На сайт</span> : null}
-        </Link>
-        <Link
-          href="/dashboard"
-          className="samsung-nav__link"
-          title="Профиль"
-          onClick={() => setDrawerOpen(false)}
-        >
-          <span className="samsung-nav__icon">
-            <UserCircle size={18} />
-          </span>
-          {!opts.compact ? <span className="samsung-nav__label">Профиль</span> : null}
-        </Link>
-        <button
-          type="button"
-          className="samsung-nav__link"
-          title="Выйти"
-          onClick={() => void signOutLogged({ callbackUrl: '/' })}
-        >
-          <span className="samsung-nav__icon">
-            <LogOut size={18} />
-          </span>
-          {!opts.compact ? <span className="samsung-nav__label">Выйти</span> : null}
+      </nav>
+    );
+  };
+
+  const renderCard = (item: AdminNavDef, idPrefix: string, index: number) => {
+    const Icon = ICONS[item.icon] || LayoutDashboard;
+    const active = isActivePath(pathname, item.href);
+    const badge = badgeFor(item);
+    const hot = searching && index === activeIndex;
+    return (
+      <Link
+        key={`${idPrefix}-${item.href}`}
+        href={item.href}
+        className={`admin-nav-card${active ? ' is-active' : ''}${hot ? ' is-hot' : ''}`}
+        aria-current={active ? 'page' : undefined}
+        onClick={() => setDrawerOpen(false)}
+      >
+        <span className="admin-nav-card__icon">
+          <Icon size={16} />
+        </span>
+        <span className="admin-nav-card__copy">
+          <strong>{item.label}</strong>
+          <small>{item.hint}</small>
+        </span>
+        {badge ? <span className="admin-nav-card__badge">{badge}</span> : null}
+      </Link>
+    );
+  };
+
+  const searchField = (ref: typeof searchRef, id: string) => (
+    <div className="samsung-sidebar__search admin-nav-search">
+      <Search size={15} aria-hidden />
+      <input
+        ref={ref}
+        id={id}
+        value={navQuery}
+        onChange={(e) => setNavQuery(e.target.value)}
+        onKeyDown={onSearchKey}
+        placeholder="Раздел, синоним или /admin/…"
+        aria-label="Быстрый поиск по панели"
+        autoComplete="off"
+        spellCheck={false}
+      />
+      {navQuery ? (
+        <button type="button" className="admin-nav-search__clear" onClick={() => setNavQuery('')} aria-label="Очистить поиск">
+          <X size={14} />
         </button>
-      </div>
-    </nav>
+      ) : (
+        <kbd className="admin-nav-search__kbd">/</kbd>
+      )}
+    </div>
+  );
+
+  const foot = (compact: boolean) => (
+    <div className="samsung-nav__group samsung-nav__group--foot">
+      <Link href="/" className="samsung-nav__link samsung-nav__link--site" title="На главную сайта" onClick={() => setDrawerOpen(false)}>
+        <span className="samsung-nav__icon">
+          <Home size={18} />
+        </span>
+        {!compact ? <span className="samsung-nav__label">На сайт</span> : null}
+      </Link>
+      <Link href="/dashboard" className="samsung-nav__link" title="Профиль" onClick={() => setDrawerOpen(false)}>
+        <span className="samsung-nav__icon">
+          <UserCircle size={18} />
+        </span>
+        {!compact ? <span className="samsung-nav__label">Профиль</span> : null}
+      </Link>
+      <button type="button" className="samsung-nav__link" title="Выйти" onClick={() => void signOutLogged({ callbackUrl: '/' })}>
+        <span className="samsung-nav__icon">
+          <LogOut size={18} />
+        </span>
+        {!compact ? <span className="samsung-nav__label">Выйти</span> : null}
+      </button>
+    </div>
   );
 
   return (
@@ -289,7 +422,7 @@ export default function AdminSidebar({
         <button
           type="button"
           className="admin-mobile-bar__menu"
-          aria-label="Открыть меню панели"
+          aria-label="Открыть панель разделов"
           aria-expanded={drawerOpen}
           aria-controls="admin-nav-drawer"
           onClick={() => setDrawerOpen(true)}
@@ -298,7 +431,7 @@ export default function AdminSidebar({
         </button>
         <div className="admin-mobile-bar__meta">
           <strong>Панель управления</strong>
-          <span>Управление порталом</span>
+          <span>Карточки разделов</span>
         </div>
         <div className="admin-mobile-bar__actions">
           <Link href="/" className="admin-mobile-bar__icon" title="Главная" aria-label="Главная">
@@ -318,7 +451,7 @@ export default function AdminSidebar({
       >
         <div className="samsung-sidebar__head">
           {!collapsed ? (
-            <Link href="/" className="samsung-sidebar__title" title="На главную сайта">
+            <Link href="/admin" className="samsung-sidebar__title" title="Обзор панели">
               Панель управления
             </Link>
           ) : (
@@ -339,17 +472,9 @@ export default function AdminSidebar({
             </button>
           </div>
         </div>
-        {!collapsed ? (
-          <div className="samsung-sidebar__search">
-            <input
-              value={navQuery}
-              onChange={(e) => setNavQuery(e.target.value)}
-              placeholder="Поиск…"
-              aria-label="Поиск раздела панели"
-            />
-          </div>
-        ) : null}
-        {renderNav({ compact: collapsed, idPrefix: 'desk' })}
+        {!collapsed ? searchField(searchRef, 'admin-nav-search-desk') : null}
+        {renderCards({ compact: collapsed, idPrefix: 'desk' })}
+        {foot(collapsed)}
       </aside>
 
       {portalReady
@@ -367,7 +492,7 @@ export default function AdminSidebar({
                 tabIndex={drawerOpen ? 0 : -1}
                 onClick={() => setDrawerOpen(false)}
               />
-              <div className="samsung-drawer__panel" role="dialog" aria-modal="true" aria-label="Меню панели">
+              <div className="samsung-drawer__panel" role="dialog" aria-modal="true" aria-label="Карточная панель">
                 <div className="samsung-drawer__head">
                   <strong>Панель управления</strong>
                   <div className="samsung-drawer__head-actions">
@@ -379,16 +504,10 @@ export default function AdminSidebar({
                     </button>
                   </div>
                 </div>
-                <div className="samsung-sidebar__search">
-                  <input
-                    value={navQuery}
-                    onChange={(e) => setNavQuery(e.target.value)}
-                    placeholder="Поиск…"
-                    aria-label="Поиск раздела"
-                  />
-                </div>
+                {searchField(drawerSearchRef, 'admin-nav-search-drawer')}
                 <div className="samsung-drawer__nav-scroll">
-                  {renderNav({ compact: false, idPrefix: 'drawer' })}
+                  {renderCards({ compact: false, idPrefix: 'drawer' })}
+                  {foot(false)}
                 </div>
               </div>
             </div>,

@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const nav = readFileSync(join(root, 'src/components/admin/AdminSidebar.tsx'), 'utf8');
+const nav = readFileSync(join(root, 'src/lib/admin-nav.ts'), 'utf8');
 const programs = readFileSync(join(root, 'src/app/admin/programs/page.tsx'), 'utf8');
 const vac = readFileSync(join(root, 'src/components/admin/AdminVacanciesClient.tsx'), 'utf8');
 const contests = readFileSync(join(root, 'src/components/admin/AdminContestsClient.tsx'), 'utf8');

@@ -1279,6 +1279,145 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
   color: #0a0c2a;
 }
 
+.admin-layout-wrapper {
+  --admin-sidebar-w: 292px;
+}
+.samsung-drawer__panel {
+  width: min(96vw, 26rem) !important;
+  background: #f5fbfe !important;
+}
+.admin-nav-search {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.35rem 0.45rem !important;
+}
+.admin-nav-search svg {
+  flex: 0 0 15px;
+  color: #0a7aa8;
+}
+.admin-nav-search input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(120, 176, 206, 0.4) !important;
+  background: #fff !important;
+  color: #0a0c2a;
+}
+.admin-nav-search__clear {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #5a5670;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.admin-nav-search__kbd {
+  flex: 0 0 auto;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #5a5670;
+  border: 1px solid rgba(120, 176, 206, 0.4);
+  border-radius: 0.35rem;
+  padding: 0.05rem 0.3rem;
+  background: #fff;
+}
+.admin-nav-board {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 0 0.2rem 0.4rem;
+  scrollbar-width: thin;
+}
+.admin-nav-board__status {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #5a5670;
+  padding: 0 0.2rem;
+}
+.admin-nav-board__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5a5670;
+}
+.admin-nav-board__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.admin-nav-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 3.05rem;
+  padding: 0.4rem 0.45rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(120, 176, 206, 0.3);
+  background: #fff;
+  text-decoration: none;
+  color: #0a0c2a;
+  min-width: 0;
+}
+.admin-nav-card:hover {
+  border-color: #0a7aa8;
+  background: #eef6fb;
+}
+.admin-nav-card.is-active,
+.admin-nav-card.is-hot {
+  border-color: #8562d8;
+  background: #f4f0fc;
+  box-shadow: inset 3px 0 0 #8562d8;
+}
+.admin-nav-card__icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.5rem;
+  display: grid;
+  place-items: center;
+  background: #eef6fb;
+  color: #0a7aa8;
+}
+.admin-nav-card.is-active .admin-nav-card__icon {
+  background: #afca03;
+  color: #0a0c2a;
+}
+.admin-nav-card__copy {
+  min-width: 0;
+}
+.admin-nav-card__copy strong {
+  display: block;
+  font-size: 0.74rem;
+  line-height: 1.15;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-nav-card__copy small {
+  display: block;
+  font-size: 0.62rem;
+  color: #5a5670;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-nav-card__badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: #afca03;
+  color: #0a0c2a;
+  border-radius: 999px;
+  padding: 0.08rem 0.35rem;
+}
+
 /* Friends / messages / tickets stay inside cabinet chrome */
 body:has(.dashboard-page .messages-root) {
   overflow: auto !important;
