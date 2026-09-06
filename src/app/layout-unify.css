@@ -134,17 +134,17 @@
     bottom: calc(0.5rem + var(--yp-bottom-nav-h, 0px));
   }
 
-  /* Home phone: quiet media plate, centered type, two pills, icon orbit */
+  /* Home phone: hero photo matches feed cards, first screen fits */
   .home-page--lift {
-    background-color: #f3f1ec;
-    background-image: radial-gradient(rgba(10, 12, 42, 0.045) 0.6px, transparent 0.7px);
+    background-color: #eef6fb;
+    background-image: radial-gradient(rgba(10, 12, 42, 0.04) 0.55px, transparent 0.7px);
     background-size: 3px 3px;
   }
   .lift-hero {
     background: transparent !important;
     border-radius: 0 !important;
     overflow: visible !important;
-    padding: 0.85rem 0 0.4rem;
+    padding: 0.55rem 0 0.15rem;
   }
   .lift-hero__stage {
     position: relative;
@@ -152,12 +152,12 @@
     min-height: 0 !important;
     max-height: none !important;
     height: auto !important;
-    aspect-ratio: 4 / 3;
-    border-radius: 1.65rem;
+    aspect-ratio: 16 / 10;
+    border-radius: 1.15rem;
     overflow: hidden;
-    border: 0;
-    box-shadow: 0 18px 40px rgba(10, 12, 42, 0.12);
-    background: #0a0c2a;
+    border: 1px solid rgba(120, 176, 206, 0.28);
+    box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08);
+    background: #fff;
   }
   .lift-hero__veil,
   .lift-hero__glow {
@@ -169,18 +169,18 @@
     max-width: 22.5rem;
     margin: 0 auto;
     color: #0a0c2a !important;
-    padding: 1.65rem 1.15rem 0.35rem !important;
+    padding: 0.85rem 1.15rem 0.15rem !important;
   }
   .lift-hero__eyebrow {
     color: #5a5670 !important;
     letter-spacing: 0.08em;
-    font-size: 0.68rem !important;
-    margin-bottom: 0.7rem !important;
+    font-size: 0.62rem !important;
+    margin-bottom: 0.4rem !important;
   }
   .lift-hero__title {
     color: #0a0c2a !important;
     text-shadow: none !important;
-    font-size: 1.72rem !important;
+    font-size: 1.32rem !important;
     line-height: 1.12 !important;
     letter-spacing: -0.04em !important;
     justify-items: center;
@@ -188,20 +188,25 @@
   .lift-hero__title span {
     color: #0a0c2a !important;
   }
+  .lift-hero__lead {
+    display: none !important;
+  }
   .lift-hero__cta {
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
-    margin-top: 1.2rem !important;
-    gap: 0.6rem !important;
-    width: min(100%, 18.5rem);
+    margin-top: 0.75rem !important;
+    gap: 0.45rem !important;
+    width: min(100%, 20rem);
     margin-left: auto;
     margin-right: auto;
   }
   .lift-hero__btn {
-    width: 100%;
+    flex: 1 1 0;
+    width: auto;
     border-radius: 999px !important;
-    min-height: 3.15rem !important;
-    font-size: 0.95rem;
+    min-height: 2.55rem !important;
+    font-size: 0.88rem;
+    padding: 0.45rem 0.7rem !important;
   }
   .lift-hero__btn--lime {
     background: #0a0c2a !important;
@@ -214,7 +219,7 @@
     border: 0 !important;
     text-decoration: none !important;
     backdrop-filter: none !important;
-    min-height: 2.9rem !important;
+    min-height: 2.55rem !important;
     font-weight: 750 !important;
   }
   .lift-deck {
@@ -222,14 +227,14 @@
     justify-content: center;
     align-items: center;
     flex-wrap: nowrap;
-    gap: 0.7rem !important;
-    margin: 1.15rem 0 0.25rem !important;
+    gap: 0.55rem !important;
+    margin: 0.7rem 0 0.1rem !important;
     padding: 0 1rem !important;
     grid-template-columns: none !important;
   }
   .lift-deck__card {
-    width: 3.35rem;
-    height: 3.35rem;
+    width: 2.85rem;
+    height: 2.85rem;
     min-height: 0 !important;
     padding: 0 !important;
     border-radius: 999px !important;
@@ -253,18 +258,7 @@
     display: none !important;
   }
   .lift-sochi {
-    padding-top: 1.6rem;
-    text-align: center;
-  }
-  .lift-sochi h2 {
-    font-size: 1.28rem !important;
-    line-height: 1.25;
-    max-width: 22rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .lift-sochi__grid {
-    text-align: left;
+    display: none !important;
   }
 }
 

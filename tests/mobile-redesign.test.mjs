@@ -25,7 +25,8 @@ test('mobile home keeps one booking CTA and actionable deck cards', () => {
   assert.match(hero, /lift-deck__go/);
   assert.match(css, /lift-hero__lead \{\s*display: none;/);
   const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
-  assert.match(unify, /quiet media plate/);
+  assert.match(unify, /hero photo matches feed cards/);
+  assert.match(unify, /aspect-ratio: 16 \/ 10/);
   assert.match(unify, /background: #0a0c2a !important/);
   assert.match(unify, /lift-deck__glyph/);
   assert.match(hero, /lift-deck__glyph/);
