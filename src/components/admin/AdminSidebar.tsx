@@ -254,7 +254,7 @@ export default function AdminSidebar({
     router.push(href);
   };
 
-  const onSearchKey = (e: KeyboardEvent<HTMLInputElement>) => {
+  const onSearchKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (!filtered.length) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
