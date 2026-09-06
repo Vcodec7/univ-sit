@@ -43,6 +43,7 @@ test('free-now rail on lift home keeps full cards and hero buttons', () => {
   assert.match(freeNow, /lift-hero__btn--lime/);
   assert.match(css, /home-page--lift \.free-now-card/);
   assert.match(css, /home-page--lift \.home-rail::-webkit-scrollbar/);
+  assert.match(css, /--rail-cols/);
 });
 
 test('home feeds reuse lift cards for projects clubs spaces news', () => {
