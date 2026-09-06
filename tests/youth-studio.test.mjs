@@ -21,5 +21,7 @@ test('admin studio wizard and publish hide drafts', () => {
   assert.match(clubs, /AdminYouthStudioForm/);
   assert.match(faq, /Текущие категории/);
   assert.match(faq, /Категория создана/);
+  assert.match(faq, /Редактировать/);
+  assert.match(faq, /Открыть вопросы/);
   assert.match(settings, /admin-settings-health/);
 });

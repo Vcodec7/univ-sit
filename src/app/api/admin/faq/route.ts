@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requirePermission } from '@/lib/acl';
+import { requirePermission, aclJsonError, AclError } from '@/lib/acl';
 import { slugify } from '@/lib/faq-db';
 import { revalidatePath } from 'next/cache';
 
@@ -14,15 +14,52 @@ function revalidateFaq() {
   }
 }
 
+const itemOrder = { orderBy: [{ sortOrder: 'asc' as const }, { question: 'asc' as const }] };
+
+async function loadCategories() {
+  try {
+    return await prisma.faqCategory.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
+      include: { items: itemOrder },
+    });
+  } catch (e) {
+    console.error('[admin faq GET]', e);
+    return prisma.faqCategory.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        sortOrder: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        items: {
+          ...itemOrder,
+          select: {
+            id: true,
+            categoryId: true,
+            question: true,
+            answer: true,
+            sortOrder: true,
+            published: true,
+          },
+        },
+      },
+    });
+  }
+}
+
 export async function GET() {
-  await requirePermission('pages');
-  const categories = await prisma.faqCategory.findMany({
-    orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
-    include: {
-      items: { orderBy: [{ sortOrder: 'asc' }, { question: 'asc' }] },
-    },
-  });
-  return NextResponse.json({ categories });
+  try {
+    await requirePermission('pages');
+    const categories = await loadCategories();
+    return NextResponse.json({ categories });
+  } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
+    console.error('[admin faq]', e);
+    return NextResponse.json({ categories: [], message: 'Не удалось загрузить категории' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
@@ -41,6 +78,7 @@ export async function POST(req: Request) {
     const published = body.published !== false;
     const cat = await prisma.faqCategory.create({
       data: { title, slug, sortOrder, published },
+      include: { items: true },
     });
     revalidateFaq();
     return NextResponse.json({ category: cat });
@@ -81,7 +119,7 @@ export async function PATCH(req: Request) {
     if (body.sortOrder != null && Number.isFinite(Number(body.sortOrder))) data.sortOrder = Number(body.sortOrder);
     if (typeof body.published === 'boolean') data.published = body.published;
     try {
-      const category = await prisma.faqCategory.update({ where: { id }, data });
+      const category = await prisma.faqCategory.update({ where: { id }, data, include: { items: itemOrder } });
       revalidateFaq();
       return NextResponse.json({ category });
     } catch {
