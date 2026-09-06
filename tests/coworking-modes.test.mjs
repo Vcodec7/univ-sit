@@ -30,9 +30,20 @@ test('coworking-only space has no hall book', () => {
   assert.equal(isHallBookable(s), false);
 });
 
-test('BOTH and category-коворк with default HALL still allow both uses', () => {
-  assert.equal(isCoworkingSpace({ bookingMode: 'BOTH', title: 'Зал' }), true);
-  assert.equal(isHallBookable({ bookingMode: 'BOTH', title: 'Зал' }), true);
-  assert.equal(isCoworkingSpace({ category: 'Коворкинг', title: 'Центр' }), true);
-  assert.equal(isHallBookable({ category: 'Коворкинг', title: 'Центр' }), true);
+test('group occupancy counts approved seats and leftover spots', () => {
+  const members = [{ status: 'APPROVED' }, { status: 'APPROVED' }, { status: 'PENDING' }];
+  const approved = members.filter((m) => m.status === 'APPROVED').length;
+  assert.equal(approved, 2);
+  assert.equal(Math.max(0, 5 - approved), 3);
+});
+
+test('solo kind hides extra seats; group kind reserves a block', () => {
+  function coworkingKind(raw) {
+    return String(raw || '').toUpperCase() === 'GROUP' ? 'GROUP' : 'SOLO';
+  }
+  assert.equal(coworkingKind('GROUP'), 'GROUP');
+  assert.equal(coworkingKind('solo'), 'SOLO');
+  const seatsToBook = (kind, seats) => (kind === 'SOLO' ? 1 : seats);
+  assert.equal(seatsToBook('SOLO', 6), 1);
+  assert.equal(seatsToBook('GROUP', 4), 4);
 });

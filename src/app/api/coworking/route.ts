@@ -7,12 +7,14 @@ import {
   canCancelFree,
   COWORKING_MAX_SEATS,
   COWORKING_PERIODS,
+  coworkingKind,
   isCoworkingSpace,
   occupiedSeatStatuses,
   periodBounds,
   todayKey,
 } from '@/lib/coworking';
 import { getCoworkingAvailability } from '@/lib/coworking-availability';
+import { groupInclude, newCoworkingInviteToken } from '@/lib/coworking-group';
 import { adjustScore, M_BALL } from '@/lib/score-scales';
 
 export const dynamic = 'force-dynamic';
@@ -28,12 +30,18 @@ export async function GET(req: Request) {
       const session = await requireUser();
       const rows = await prisma.coworkingSignup.findMany({
         where: {
-          userId: session.user.id,
           status: { in: [...activeSignupStatuses(), 'ATTENDED'] },
           endTime: { gte: new Date(Date.now() - 2 * 86400000) },
+          OR: [
+            { userId: session.user.id },
+            { members: { some: { userId: session.user.id, status: 'APPROVED' } } },
+          ],
         },
         orderBy: { startTime: 'asc' },
-        include: { space: { select: { id: true, title: true, address: true, image: true, capacity: true } } },
+        include: {
+          space: { select: { id: true, title: true, address: true, image: true, capacity: true } },
+          members: { select: { userId: true, status: true, role: true } },
+        },
         take: 40,
       });
       return NextResponse.json({ signups: rows });
@@ -68,6 +76,8 @@ export async function POST(req: Request) {
   );
   const purpose = body?.purpose ? String(body.purpose).slice(0, 80) : null;
   const waitlist = Boolean(body?.waitlist);
+  const kind = coworkingKind(body?.kind);
+  const seatsToBook = kind === 'SOLO' ? 1 : seats;
 
   if (!spaceId || !/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) {
     return NextResponse.json({ message: 'Укажите площадку и дату' }, { status: 400 });
@@ -111,7 +121,7 @@ export async function POST(req: Request) {
   const used = usedAgg.reduce((a, s) => a + s.seats, 0);
   const left = space.capacity - used;
 
-  if (left < seats) {
+  if (left < seatsToBook) {
     if (!waitlist && left <= 0) {
       return NextResponse.json(
         { message: 'Мест нет', left: 0, canWaitlist: true },
@@ -123,7 +133,8 @@ export async function POST(req: Request) {
     }
   }
 
-  const status = left < seats ? 'WAITLIST' : 'CONFIRMED';
+  const status = left < seatsToBook ? 'WAITLIST' : 'CONFIRMED';
+  const inviteToken = kind === 'GROUP' && status === 'CONFIRMED' ? newCoworkingInviteToken() : null;
   const row = await prisma.coworkingSignup.create({
     data: {
       spaceId,
@@ -132,11 +143,24 @@ export async function POST(req: Request) {
       period,
       startTime: start,
       endTime: end,
-      seats,
+      seats: seatsToBook,
       purpose,
       status,
+      kind,
+      inviteToken,
+      joinOpen: kind === 'GROUP',
+      members:
+        kind === 'GROUP' && status === 'CONFIRMED'
+          ? {
+              create: {
+                userId: session.user.id,
+                role: 'HOST',
+                status: 'APPROVED',
+              },
+            }
+          : undefined,
     },
-    include: { space: { select: { id: true, title: true, address: true } } },
+    include: groupInclude(),
   });
 
   return NextResponse.json({ ok: true, signup: row }, { status: 201 });

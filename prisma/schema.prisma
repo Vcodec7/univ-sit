@@ -225,6 +225,7 @@ model User {
   bookingInvitesReceived BookingInvite[] @relation("BookingInvitesReceived")
   reputationEvents       ReputationEvent[]
   coworkingSignups       CoworkingSignup[]
+  coworkingGroupMemberships CoworkingGroupMember[]
   presenceCheckIns       PresenceCheckIn[] @relation("PresenceUser")
   presenceScans          PresenceCheckIn[] @relation("PresenceScanner")
   spaceClosuresCreated   SpaceClosure[]    @relation("SpaceClosureActor")
@@ -565,14 +566,36 @@ model CoworkingSignup {
   purpose   String?
   /** PENDING | CONFIRMED | CANCELLED | ATTENDED | NO_SHOW | WAITLIST */
   status    String   @default("CONFIRMED")
+  /** SOLO | GROUP */
+  kind        String   @default("SOLO")
+  inviteToken String?  @unique
+  joinOpen    Boolean  @default(true)
   actorId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   presenceCheckIns PresenceCheckIn[]
+  members          CoworkingGroupMember[]
 
   @@index([spaceId, dayKey, period, status])
   @@index([userId, startTime])
   @@index([status, startTime])
+}
+
+/** Участник открытой группы коворкинга */
+model CoworkingGroupMember {
+  id        String   @id @default(cuid())
+  signup    CoworkingSignup @relation(fields: [signupId], references: [id], onDelete: Cascade)
+  signupId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  /** HOST | MEMBER */
+  role      String   @default("MEMBER")
+  /** PENDING | APPROVED */
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  @@unique([signupId, userId])
+  @@index([userId])
 }
 
 /** Чек-ин по личному QR / walk-in на площадке */

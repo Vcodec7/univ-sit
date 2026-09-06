@@ -115,3 +115,15 @@ export function clampCoworkingSeats(raw: unknown, max = COWORKING_MAX_SEATS) {
   if (!Number.isFinite(n) || n < 1) return 1;
   return Math.min(cap, n);
 }
+
+export function coworkingKind(raw: unknown): 'SOLO' | 'GROUP' {
+  return String(raw || '').toUpperCase() === 'GROUP' ? 'GROUP' : 'SOLO';
+}
+
+export function groupApprovedCount(members: { status?: string | null }[] | null | undefined) {
+  return (members || []).filter((m) => String(m.status || '').toUpperCase() === 'APPROVED').length;
+}
+
+export function groupSeatsLeft(seats: number, approvedCount: number) {
+  return Math.max(0, Math.floor(seats) - Math.floor(approvedCount));
+}

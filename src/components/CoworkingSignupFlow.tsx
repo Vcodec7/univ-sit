@@ -15,6 +15,7 @@ import type { CoworkingSpaceAvailability } from '@/lib/coworking-availability';
 import SvcDateField from '@/components/SvcDateField';
 import ServiceSplitModal from '@/components/ServiceSplitModal';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
+import CoworkingInviteScreen, { type CoworkingGroupPayload } from '@/components/CoworkingInviteScreen';
 
 type SpaceInfo = CoworkingSpaceAvailability;
 
@@ -57,8 +58,8 @@ export default function CoworkingSignupFlow({
     return initialSpaces[0]?.id || initialSpaceId || '';
   });
   const [period, setPeriod] = useState(() => defaultCoworkingPeriodId(initialDayKey || todayYmd()));
-  const [seats, setSeats] = useState(1);
-  const [seatsDraft, setSeatsDraft] = useState('1');
+  const [mode, setMode] = useState<'SOLO' | 'GROUP'>('SOLO');
+  const [seats, setSeats] = useState(2);
   const [purpose, setPurpose] = useState('');
   const [loading, setLoading] = useState(initialSpaces.length === 0);
   const [refreshing, setRefreshing] = useState(false);
@@ -74,6 +75,7 @@ export default function CoworkingSignupFlow({
     waitlist: boolean;
   } | null>(null);
   const [qrUrl, setQrUrl] = useState('');
+  const [inviteGroup, setInviteGroup] = useState<CoworkingGroupPayload | null>(null);
   const spaceIdRef = useRef(spaceId);
   spaceIdRef.current = spaceId;
   const lastFetchedDay = useRef<string | null>(
@@ -85,7 +87,6 @@ export default function CoworkingSignupFlow({
   useEffect(() => {
     let cancelled = false;
 
-    // SSR already hydrated this day — don't blank the UI with a remount refetch.
     if (lastFetchedDay.current === dayKey) return;
 
     const soft = spacesRef.current.length > 0;
@@ -132,31 +133,19 @@ export default function CoworkingSignupFlow({
   const periodDef = resolveCoworkingPeriod(period);
   const busy = loading && spaces.length === 0;
   const seatsMax = Math.max(
-    1,
+    2,
     Math.min(COWORKING_MAX_SEATS, left > 0 ? left : COWORKING_MAX_SEATS, space?.capacity || COWORKING_MAX_SEATS)
   );
+  const participants = mode === 'SOLO' ? 1 : clampCoworkingSeats(seats, seatsMax);
 
   useEffect(() => {
-    setSeats((prev) => {
-      const next = clampCoworkingSeats(prev, seatsMax);
-      if (next !== prev) setSeatsDraft(String(next));
-      return next;
-    });
+    setSeats((prev) => clampCoworkingSeats(prev, seatsMax));
   }, [seatsMax]);
-
-  function commitSeatsDraft(raw: string) {
-    const next = clampCoworkingSeats(raw === '' ? 1 : raw, seatsMax);
-    setSeats(next);
-    setSeatsDraft(String(next));
-  }
 
   async function submit(waitlist = false) {
     setSubmitting(true);
     setMessage(null);
     setError(null);
-    const seatsToSend = clampCoworkingSeats(seatsDraft === '' ? seats : seatsDraft, seatsMax);
-    setSeats(seatsToSend);
-    setSeatsDraft(String(seatsToSend));
     try {
       const r = await fetch('/api/coworking', {
         method: 'POST',
@@ -166,7 +155,8 @@ export default function CoworkingSignupFlow({
           spaceId,
           dayKey,
           period,
-          seats: seatsToSend,
+          kind: mode,
+          seats: participants,
           purpose: purpose || null,
           waitlist,
         }),
@@ -196,13 +186,50 @@ export default function CoworkingSignupFlow({
       } catch {
         /* optional */
       }
-      setSuccessOpen(true);
+      if (mode === 'GROUP' && data.signup?.kind === 'GROUP' && !wait) {
+        const signup = data.signup;
+        setInviteGroup({
+          id: signup.id,
+          seats: signup.seats,
+          joinOpen: signup.joinOpen !== false,
+          invitePath: signup.inviteToken ? `/coworking/group/${signup.inviteToken}` : null,
+          dayKey: signup.dayKey,
+          startTime: signup.startTime,
+          endTime: signup.endTime,
+          space: { title: signup.space?.title || space?.title || 'Коворкинг' },
+          organizer: signup.user || { id: signup.userId, name: 'Вы' },
+          approvedCount: 1,
+          seatsLeft: Math.max(0, signup.seats - 1),
+          full: signup.seats <= 1,
+          recruiting: true,
+          isHost: true,
+          isMember: true,
+          isPending: false,
+          members: (signup.members || []).map((m: { id: string; userId: string; role: string; status: string; user?: { name?: string | null } }) => ({
+            id: m.id,
+            userId: m.userId,
+            role: m.role,
+            status: m.status,
+            name: m.user?.name || null,
+          })),
+        });
+      } else {
+        setSuccessOpen(true);
+      }
       router.refresh();
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (inviteGroup) {
+    return (
+      <div className="cw-layout">
+        <CoworkingInviteScreen group={inviteGroup} />
+      </div>
+    );
   }
 
   return (
@@ -220,7 +247,7 @@ export default function CoworkingSignupFlow({
             {busy
               ? 'Загрузка…'
               : left > 0
-                ? `осталось ${left} из ${space?.capacity ?? 0}`
+                ? `Свободно мест: ${left} из ${space?.capacity ?? 0}`
                 : space
                   ? 'мест нет на этот час'
                   : 'Загрузка…'}
@@ -230,6 +257,28 @@ export default function CoworkingSignupFlow({
 
       <div className="cw-flow">
         <div className="cw-flow-steps">
+          <fieldset className="cw-field">
+            <legend>Как записываетесь</legend>
+            <div className="cw-mode-switch" role="group" aria-label="Формат записи">
+              <button
+                type="button"
+                className={mode === 'SOLO' ? 'is-active' : ''}
+                aria-pressed={mode === 'SOLO'}
+                onClick={() => setMode('SOLO')}
+              >
+                Для себя
+              </button>
+              <button
+                type="button"
+                className={mode === 'GROUP' ? 'is-active' : ''}
+                aria-pressed={mode === 'GROUP'}
+                onClick={() => setMode('GROUP')}
+              >
+                Группой
+              </button>
+            </div>
+          </fieldset>
+
           <label className="cw-field">
             <span>Площадка</span>
             <select
@@ -270,8 +319,8 @@ export default function CoworkingSignupFlow({
                     <em>
                       {typeof slotLeft === 'number'
                         ? slotLeft > 0
-                          ? `${slotLeft}`
-                          : 'нет'
+                          ? `Свободно мест: ${slotLeft}`
+                          : 'нет мест'
                         : busy
                           ? '…'
                           : '—'}
@@ -282,43 +331,77 @@ export default function CoworkingSignupFlow({
             </div>
           </div>
 
-          <div className="cw-row">
-            <label className="cw-field">
-              <span>Мест</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                autoComplete="off"
-                value={seatsDraft}
-                aria-describedby="cw-seats-hint"
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/\D/g, '');
-                  setSeatsDraft(raw);
-                  if (raw === '') return;
-                  const n = Number(raw);
-                  if (Number.isFinite(n) && n >= 1 && n <= seatsMax) setSeats(n);
-                }}
-                onBlur={() => commitSeatsDraft(seatsDraft)}
-              />
-              <span id="cw-seats-hint" className="cw-field-hint">
-                от 1 до {seatsMax}
-                {left > 0 ? ` · свободно ${left}` : ''}
-              </span>
-            </label>
+          {periodDef ? (
+            <div className="cw-slot-summary" aria-live="polite">
+              <strong>Выбрано</strong>
+              <p>
+                {periodDef.start}–{periodDef.end} · {mode === 'SOLO' ? 'для себя' : 'группой'} ·{' '}
+                {participants} {participants === 1 ? 'участник' : participants < 5 ? 'участника' : 'участников'}
+              </p>
+            </div>
+          ) : null}
 
-            <label className="cw-field">
-              <span>Цель визита</span>
-              <select value={purpose} onChange={(e) => setPurpose(e.target.value)}>
-                <option value="">Необязательно</option>
-                {PURPOSES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          {mode === 'GROUP' ? (
+            <div className="cw-field">
+              <span>Количество участников</span>
+              <div className="cw-stepper">
+                <button
+                  type="button"
+                  aria-label="Меньше"
+                  disabled={participants <= 2}
+                  onClick={() => setSeats((n) => clampCoworkingSeats(n - 1, seatsMax))}
+                >
+                  −
+                </button>
+                <strong>{participants}</strong>
+                <button
+                  type="button"
+                  aria-label="Больше"
+                  disabled={participants >= seatsMax}
+                  onClick={() => setSeats((n) => clampCoworkingSeats(n + 1, seatsMax))}
+                >
+                  +
+                </button>
+              </div>
+              <span className="cw-field-hint">Организатор занимает 1 место. Можно пригласить ещё {Math.max(0, participants - 1)}.</span>
+            </div>
+          ) : null}
+
+          <label className="cw-field">
+            <span>Цель визита</span>
+            <select value={purpose} onChange={(e) => setPurpose(e.target.value)}>
+              <option value="">Необязательно</option>
+              {PURPOSES.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {mode === 'GROUP' ? (
+            <section className="cw-open-group" aria-label="Открытая группа">
+              <h3>Открытая группа</h3>
+              <ul className="cw-open-group__facts">
+                <li>
+                  <span>Организатор</span>
+                  <strong>Вы</strong>
+                </li>
+                <li>
+                  <span>Уже в группе</span>
+                  <strong>1 из {participants}</strong>
+                </li>
+                <li>
+                  <span>Останется мест</span>
+                  <strong>{Math.max(0, participants - 1)}</strong>
+                </li>
+                <li>
+                  <span>Набор</span>
+                  <strong>откроется после записи</strong>
+                </li>
+              </ul>
+            </section>
+          ) : null}
         </div>
 
         {error ? <p className="cw-error">{error}</p> : null}
@@ -329,10 +412,10 @@ export default function CoworkingSignupFlow({
             <button
               type="button"
               className="btn btn-primary cw-cta"
-              disabled={submitting || !spaceId || busy}
+              disabled={submitting || !spaceId || busy || (mode === 'GROUP' && left < participants)}
               onClick={() => submit(false)}
             >
-              {submitting ? 'Записываем…' : 'Записаться'}
+              {submitting ? 'Записываем…' : mode === 'GROUP' ? 'Создать группу' : 'Записаться'}
             </button>
           ) : (
             <button
@@ -348,11 +431,6 @@ export default function CoworkingSignupFlow({
             К площадкам
           </Link>
         </div>
-        {!busy && left > 0 ? (
-          <p className="cw-left-note">
-            Осталось {left} мест на {periodDef.start}–{periodDef.end}
-          </p>
-        ) : null}
       </div>
 
       <ServiceSplitModal

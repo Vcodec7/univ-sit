@@ -6,10 +6,12 @@ import Link from 'next/link';
 type Signup = {
   id: string;
   status: string;
+  kind?: string;
   period: string;
   startTime: string;
   endTime: string;
   seats: number;
+  inviteToken?: string | null;
   space: { id: string; title: string; address: string | null };
 };
 
@@ -91,8 +93,14 @@ export default function CoworkingCabinetList() {
                 <span className="cw-cabinet-pill__slot">{slot}</span>
                 <span className="cw-cabinet-pill__place">{row.space.title}</span>
                 <span className={`cw-cabinet-pill__status status-${row.status.toLowerCase()}`}>
+                  {row.kind === 'GROUP' ? 'группа · ' : ''}
                   {statusRu(row.status)}
                 </span>
+                {row.kind === 'GROUP' && row.inviteToken ? (
+                  <Link href={`/coworking/group/${row.inviteToken}`} className="cw-cabinet-pill__cancel">
+                    Группа
+                  </Link>
+                ) : null}
                 {['PENDING', 'CONFIRMED', 'WAITLIST'].includes(row.status) ? (
                   <button type="button" className="cw-cabinet-pill__cancel" onClick={() => cancel(row.id)}>
                     Отменить

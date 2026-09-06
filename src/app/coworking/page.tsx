@@ -28,7 +28,7 @@ export default async function CoworkingPage({
       <header className="cw-page-head">
         <p className="cw-eyebrow">Пространства ЦРМ</p>
         <h1>Записаться в коворкинг</h1>
-        <p>Площадка, день и интервал — без лишних шагов.</p>
+        <p>Для себя или группой: выберите час, соберите открытую группу и пригласите друзей.</p>
       </header>
       <CoworkingGuestGate callbackPath={callback}>
         <CoworkingSignupFlow
