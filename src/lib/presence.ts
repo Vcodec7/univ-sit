@@ -55,9 +55,24 @@ export async function resolvePresenceForViewer(opts: {
   return { online, label: online ? 'в сети' : 'не в сети' };
 }
 
-export async function touchUserPresence(userId: string) {
-  await prisma.user.update({
-    where: { id: userId },
-    data: { lastActiveAt: new Date() },
-  });
+/** Skip extra UPDATEs when many APIs fire in the same minute (per process). */
+const lastTouchMs = new Map<string, number>();
+const TOUCH_THROTTLE_MS = 45 * 1000;
+
+export async function touchUserPresence(userId: string, opts?: { force?: boolean }) {
+  const id = String(userId || '').trim();
+  if (!id) return;
+  const now = Date.now();
+  const prev = lastTouchMs.get(id) || 0;
+  if (!opts?.force && now - prev < TOUCH_THROTTLE_MS) return;
+  lastTouchMs.set(id, now);
+  try {
+    await prisma.user.update({
+      where: { id },
+      data: { lastActiveAt: new Date() },
+    });
+  } catch (e) {
+    lastTouchMs.delete(id);
+    console.warn('touchUserPresence', (e as Error)?.message || e);
+  }
 }

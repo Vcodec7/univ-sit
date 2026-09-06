@@ -54,7 +54,7 @@ export async function recordLoginEvent(opts: {
   const userAgent = opts.userAgent ?? (await userAgentFromHeaders());
   const deviceLabel = parseDeviceLabel(userAgent);
   try {
-    return await prisma.loginEvent.create({
+    const row = await prisma.loginEvent.create({
       data: {
         userId: opts.userId,
         ip,
@@ -65,6 +65,10 @@ export async function recordLoginEvent(opts: {
         kind: opts.kind || 'LOGIN',
       },
     });
+    void import('@/lib/presence')
+      .then(({ touchUserPresence }) => touchUserPresence(opts.userId, { force: true }))
+      .catch(() => null);
+    return row;
   } catch (e) {
     console.warn('recordLoginEvent', e);
     return null;

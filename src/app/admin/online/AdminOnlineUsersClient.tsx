@@ -22,7 +22,7 @@ export default function AdminOnlineUsersClient() {
   const [summary, setSummary] = useState({ onlineCount: 0, recentCount: 0, totalUsers: 0 });
   const [q, setQ] = useState('');
   const [role, setRole] = useState('');
-  const [status, setStatus] = useState('online');
+  const [status, setStatus] = useState('all');
   const [sort, setSort] = useState('active');
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [busy, setBusy] = useState(false);
@@ -56,7 +56,7 @@ export default function AdminOnlineUsersClient() {
 
   useEffect(() => {
     void load();
-    const t = window.setInterval(() => void load(), 90_000);
+    const t = window.setInterval(() => void load(), 30_000);
     return () => window.clearInterval(t);
   }, [load]);
 
@@ -68,7 +68,7 @@ export default function AdminOnlineUsersClient() {
             <Users size={22} /> Пользователи онлайн
           </h1>
           <p style={{ margin: '0.3rem 0 0', color: 'var(--muted)', fontSize: '0.88rem' }}>
-            Окно online ≈ 5 мин (heartbeat). Нагрузка = логи + действия + брони/заявки. Обновление каждые 90 с.
+            Окно «в сети» — 5 минут. Счётчик учитывает вход, heartbeat и любые запросы с сессией. Обновление каждые 30 с.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -176,12 +176,12 @@ export default function AdminOnlineUsersClient() {
                 <td style={{ padding: '0.6rem 0.75rem' }}>{u.role}</td>
                 <td style={{ padding: '0.6rem 0.75rem' }}>
                   <span style={{ color: u.online ? '#0f766e' : '#64748b', fontWeight: 650 }}>
-                    {u.online ? 'online' : 'offline'}
+                    {u.online ? 'в сети' : 'не в сети'}
                   </span>
                 </td>
                 <td style={{ padding: '0.6rem 0.75rem', fontWeight: 700 }}>{u.loadScore}</td>
                 <td style={{ padding: '0.6rem 0.75rem', fontSize: '0.78rem', color: 'var(--muted)' }}>
-                  logins {u.activity.loginEvents} · actions {u.activity.actionLogs} · book {u.activity.bookings} · app{' '}
+                  входы {u.activity.loginEvents} · действия {u.activity.actionLogs} · бронь {u.activity.bookings} · заявки{' '}
                   {u.activity.applications}
                 </td>
                 <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap' }}>

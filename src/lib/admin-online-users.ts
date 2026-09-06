@@ -22,20 +22,59 @@ export async function queryOnlineUsers(opts: OnlineUsersQuery = {}) {
   const onlineSince = new Date(now - ONLINE_WINDOW_MS);
   const recentSince = new Date(now - 24 * 60 * 60 * 1000);
 
+  const [loginOnline, loginRecent] = await Promise.all([
+    prisma.loginEvent.groupBy({
+      by: ['userId'],
+      where: { success: true, createdAt: { gte: onlineSince } },
+      _max: { createdAt: true },
+    }),
+    prisma.loginEvent.groupBy({
+      by: ['userId'],
+      where: { success: true, createdAt: { gte: recentSince } },
+      _max: { createdAt: true },
+    }),
+  ]);
+  const loginOnlineIds = loginOnline.map((r) => r.userId);
+  const loginRecentIds = loginRecent.map((r) => r.userId);
+  const loginLast = new Map<string, Date>();
+  for (const r of loginRecent) {
+    if (r._max.createdAt) loginLast.set(r.userId, r._max.createdAt);
+  }
+
+  const activityWhere =
+    status === 'online'
+      ? {
+          OR: [
+            { lastActiveAt: { gte: onlineSince } },
+            ...(loginOnlineIds.length ? [{ id: { in: loginOnlineIds } }] : []),
+          ],
+        }
+      : status === 'recent'
+        ? {
+            OR: [
+              { lastActiveAt: { gte: recentSince } },
+              ...(loginRecentIds.length ? [{ id: { in: loginRecentIds } }] : []),
+            ],
+          }
+        : null;
+
   const where: Record<string, unknown> = { deletedAt: null };
   if (role && ['USER', 'PARTICIPANT', 'MODERATOR', 'ADMIN', 'SCANNER', 'TECH'].includes(role)) {
     where.role = role;
   }
-  if (status === 'online') where.lastActiveAt = { gte: onlineSince };
-  else if (status === 'recent') where.lastActiveAt = { gte: recentSince };
+  const and: unknown[] = [];
+  if (activityWhere) and.push(activityWhere);
   if (q) {
-    where.OR = [
-      { email: { contains: q, mode: 'insensitive' } },
-      { name: { contains: q, mode: 'insensitive' } },
-      { nickname: { contains: q, mode: 'insensitive' } },
-      { publicCode: { contains: q, mode: 'insensitive' } },
-    ];
+    and.push({
+      OR: [
+        { email: { contains: q, mode: 'insensitive' } },
+        { name: { contains: q, mode: 'insensitive' } },
+        { nickname: { contains: q, mode: 'insensitive' } },
+        { publicCode: { contains: q, mode: 'insensitive' } },
+      ],
+    });
   }
+  if (and.length) where.AND = and;
 
   const orderBy =
     sort === 'name'
@@ -71,14 +110,37 @@ export async function queryOnlineUsers(opts: OnlineUsersQuery = {}) {
         },
       },
     }),
-    prisma.user.count({ where: { deletedAt: null, lastActiveAt: { gte: onlineSince } } }),
-    prisma.user.count({ where: { deletedAt: null, lastActiveAt: { gte: recentSince } } }),
+    prisma.user.count({
+      where: {
+        deletedAt: null,
+        OR: [
+          { lastActiveAt: { gte: onlineSince } },
+          ...(loginOnlineIds.length ? [{ id: { in: loginOnlineIds } }] : []),
+        ],
+      },
+    }),
+    prisma.user.count({
+      where: {
+        deletedAt: null,
+        OR: [
+          { lastActiveAt: { gte: recentSince } },
+          ...(loginRecentIds.length ? [{ id: { in: loginRecentIds } }] : []),
+        ],
+      },
+    }),
     prisma.user.count({ where: { deletedAt: null } }),
   ]);
 
   const items = users.map((u) => {
-    const idleMs = u.lastActiveAt ? now - u.lastActiveAt.getTime() : null;
-    const online = Boolean(u.lastActiveAt && u.lastActiveAt >= onlineSince);
+    const fromLogin = loginLast.get(u.id) || null;
+    const last =
+      u.lastActiveAt && fromLogin
+        ? u.lastActiveAt > fromLogin
+          ? u.lastActiveAt
+          : fromLogin
+        : u.lastActiveAt || fromLogin;
+    const idleMs = last ? now - last.getTime() : null;
+    const online = Boolean(last && last >= onlineSince);
     const loadScore =
       (u._count.actionLogs || 0) * 2 +
       (u._count.loginEvents || 0) +
@@ -93,7 +155,7 @@ export async function queryOnlineUsers(opts: OnlineUsersQuery = {}) {
       role: u.role,
       image: u.image,
       city: u.city,
-      lastActiveAt: u.lastActiveAt?.toISOString() || null,
+      lastActiveAt: last?.toISOString() || null,
       onlineVisibility: u.onlineVisibility,
       online,
       idleSec: idleMs != null ? Math.max(0, Math.floor(idleMs / 1000)) : null,

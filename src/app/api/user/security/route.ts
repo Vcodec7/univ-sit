@@ -40,6 +40,8 @@ export async function POST(req: Request) {
       const trust = fingerprint
         ? await touchTrustedDevice({ userId: session.user.id, fingerprint, userAgent: ua })
         : null;
+      const { touchUserPresence } = await import('@/lib/presence');
+      await touchUserPresence(session.user.id);
       return NextResponse.json({ ok: true, throttled: true, trust });
     }
   }

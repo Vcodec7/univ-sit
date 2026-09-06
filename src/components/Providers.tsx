@@ -52,7 +52,7 @@ function PresenceHeartbeat() {
     if (role === 'SCANNER' || role === 'TECH') return;
 
     let cancelled = false;
-    let backoffMs = 180_000;
+    let backoffMs = 50_000;
     let timer: ReturnType<typeof setTimeout> | null = null;
     let inFlight = false;
 
@@ -70,22 +70,26 @@ function PresenceHeartbeat() {
       }
       inFlight = true;
       try {
-        const r = await fetch('/api/user/presence', { method: 'POST' });
-        if (r.status === 429) backoffMs = Math.min(600_000, Math.max(backoffMs * 2, 300_000));
-        else backoffMs = 180_000;
+        const r = await fetch('/api/user/presence', {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        if (r.status === 429) backoffMs = Math.min(180_000, Math.max(backoffMs * 2, 90_000));
+        else if (!r.ok) backoffMs = Math.min(120_000, backoffMs + 20_000);
+        else backoffMs = 50_000;
       } catch {
-        backoffMs = Math.min(600_000, backoffMs + 60_000);
+        backoffMs = Math.min(180_000, backoffMs + 20_000);
       } finally {
         inFlight = false;
         schedule(backoffMs);
       }
     };
 
-    schedule(12_000);
+    schedule(400);
     const onVis = () => {
-      // Don't stampede on tab focus — only resume the scheduled loop
-      if (document.visibilityState === 'visible' && !timer && !inFlight) {
-        schedule(5_000);
+      if (document.visibilityState === 'visible' && !inFlight) {
+        schedule(800);
       }
     };
     document.addEventListener('visibilitychange', onVis);

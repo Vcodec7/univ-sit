@@ -397,6 +397,12 @@ export const authOptions: NextAuthOptions = {
           token.nickname = dbUser.nickname ?? null;
           token.ecoPoints = typeof dbUser.ecoPoints === "number" ? dbUser.ecoPoints : 0;
           token.tv = dbUser.tokenVersion;
+          try {
+            const { touchUserPresence } = await import('@/lib/presence');
+            await touchUserPresence(token.id as string);
+          } catch {
+            /* presence is best-effort */
+          }
           if (dbUser.name) token.name = dbUser.name;
           if (dbUser.email) token.email = dbUser.email;
           try {
