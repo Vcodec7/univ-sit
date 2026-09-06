@@ -36,6 +36,7 @@ import { ACHIEVEMENTS } from '@/lib/achievements';
 import { onReferralProfileComplete } from '@/lib/referrals';
 import { voidLogUserAction } from '@/lib/user-action-log';
 import { recordLoginEvent } from '@/lib/security';
+import { rulesFieldsIfMissing } from '@/lib/consent';
 import {
   identityLocksForUser,
   identityChangeAllowed,
@@ -205,6 +206,20 @@ export async function GET() {
     });
     if (!user) {
       return NextResponse.json({ message: 'Пользователь не найден' }, { status: 404 });
+    }
+
+    const rulesBackfill = rulesFieldsIfMissing({
+      userId: user.id,
+      email: user.email,
+      rulesAcceptedAt: user.rulesAcceptedAt,
+      privacyAcceptedAt: user.privacyAcceptedAt,
+    });
+    if (rulesBackfill) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: rulesBackfill,
+      });
+      Object.assign(user, rulesBackfill);
     }
 
     return NextResponse.json(

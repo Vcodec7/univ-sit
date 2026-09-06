@@ -127,11 +127,15 @@ export default function PrivacyPolicyGate() {
         <p id="privacy-gate-desc" className="privacy-gate__text">
           {refused
             ? 'Без согласия с актуальной политикой пользоваться порталом нельзя. Примите политику или выйдите из аккаунта.'
-            : 'Мы обновили документ. Ознакомьтесь и примите новую версию — иначе доступ к сайту будет ограничен.'}
+            : 'Мы обновили документы. Примите политику и правила сайта — иначе доступ будет ограничен.'}
         </p>
         <p className="privacy-gate__meta">
           <Link href="/privacy" className="privacy-gate__link">
-            Открыть политику конфиденциальности
+            Политика конфиденциальности
+          </Link>
+          {' · '}
+          <Link href="/rules" className="privacy-gate__link">
+            Правила сайта
           </Link>
           <span className="privacy-gate__ver"> · версия {version}</span>
         </p>

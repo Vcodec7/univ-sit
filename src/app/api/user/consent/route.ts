@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import {
   COOKIES_POLICY_VERSION,
   PRIVACY_POLICY_VERSION,
+  RULES_POLICY_VERSION,
   buildConsentSignature,
 } from '@/lib/consent';
 import { needsPrivacyReconsent } from '@/lib/privacy-consent';
@@ -93,6 +94,15 @@ export async function POST(req: Request) {
     if (!existing?.privacyFirstAcceptedAt) {
       data.privacyFirstAcceptedAt = existing?.privacyAcceptedAt || now;
     }
+    data.rulesAcceptedAt = now;
+    data.rulesPolicyVersion = RULES_POLICY_VERSION;
+    data.rulesSignature = buildConsentSignature({
+      userId: session.user.id,
+      email,
+      kind: 'rules',
+      version: RULES_POLICY_VERSION,
+      at: now,
+    });
   }
   if (wantCookies) {
     data.cookiesAcceptedAt = now;

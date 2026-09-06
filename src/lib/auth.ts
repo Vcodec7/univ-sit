@@ -244,6 +244,9 @@ export const authOptions: NextAuthOptions = {
               privacyPolicyVersion: prev.privacyPolicyVersion || PRIVACY_POLICY_VERSION,
               cookiesAcceptedAt: prev.cookiesAcceptedAt || now,
               cookiesPolicyVersion: prev.cookiesPolicyVersion || COOKIES_POLICY_VERSION,
+              rulesAcceptedAt: (prev as { rulesAcceptedAt?: Date | null }).rulesAcceptedAt || now,
+              rulesPolicyVersion:
+                (prev as { rulesPolicyVersion?: string | null }).rulesPolicyVersion || RULES_POLICY_VERSION,
               privacyRefusedAt: null,
             },
           })) as typeof user;

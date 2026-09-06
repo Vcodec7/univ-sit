@@ -28,4 +28,5 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /cw-cabinet-pill__actions/);
   assert.match(css, /dashboard-showcase/);
   assert.match(css, /yp-cards--sochi/);
+  assert.match(css, /profile-consent/);
 });

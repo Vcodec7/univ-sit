@@ -1242,3 +1242,39 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+.dashboard-page .profile-consent-list {
+  gap: 0.32rem;
+}
+.dashboard-page .profile-consent {
+  gap: 0.4rem;
+  padding: 0.38rem 0.5rem;
+  border-radius: 0.7rem;
+  background: #f5fbfe;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+}
+.dashboard-page .profile-consent.is-ok {
+  background: #f4fbe8;
+  border-color: rgba(175, 202, 3, 0.45);
+}
+.dashboard-page .profile-consent a {
+  color: #0a0c2a;
+  font-size: 0.82rem;
+}
+.dashboard-page .profile-consent__meta {
+  margin-top: 0.08rem;
+  font-size: 0.7rem;
+  color: #5a5670;
+}
+.dashboard-page .profile-consent__sig {
+  margin-top: 0.06rem;
+  font-size: 0.62rem;
+  color: #7a8494;
+}
+.dashboard-page .profile-consent + .btn {
+  margin-top: 0.5rem !important;
+  min-height: 2.2rem;
+  background: #eef6fb;
+  border: 1px solid rgba(120, 176, 206, 0.4);
+  color: #0a0c2a;
+}

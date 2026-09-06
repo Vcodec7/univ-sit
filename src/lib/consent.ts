@@ -31,6 +31,33 @@ export function buildConsentSignature(opts: {
   return `yp.${opts.kind}.${opts.version}.${hash}`;
 }
 
+/** Older accounts accepted privacy (and rules in the same checkbox) before `rulesAcceptedAt` existed. */
+export function rulesFieldsIfMissing(opts: {
+  userId: string;
+  email?: string | null;
+  rulesAcceptedAt?: Date | string | null;
+  privacyAcceptedAt?: Date | string | null;
+}) {
+  if (opts.rulesAcceptedAt) return null;
+  if (!opts.privacyAcceptedAt) return null;
+  const at =
+    opts.privacyAcceptedAt instanceof Date
+      ? opts.privacyAcceptedAt
+      : new Date(opts.privacyAcceptedAt);
+  if (Number.isNaN(at.getTime())) return null;
+  return {
+    rulesAcceptedAt: at,
+    rulesPolicyVersion: RULES_POLICY_VERSION,
+    rulesSignature: buildConsentSignature({
+      userId: opts.userId,
+      email: opts.email,
+      kind: 'rules' as const,
+      version: RULES_POLICY_VERSION,
+      at,
+    }),
+  };
+}
+
 export function formatConsentDate(value?: string | Date | null) {
   if (!value) return null;
   const d = value instanceof Date ? value : new Date(value);
