@@ -38,9 +38,9 @@ export const CABINET_NAV: CabinetNavGroup[] = [
   {
     group: 'Кабинет',
     items: [
-      { id: 'friends', label: 'Друзья', href: '/friends', module: 'friends' },
-      { id: 'messages', label: 'Сообщения', href: '/messages', module: 'messaging' },
-      { id: 'tickets', label: 'Билеты', href: '/tickets', module: 'events' },
+      { id: 'friends', label: 'Друзья', href: '/dashboard/friends', module: 'friends' },
+      { id: 'messages', label: 'Сообщения', href: '/dashboard/messages', module: 'messaging' },
+      { id: 'tickets', label: 'Билеты', href: '/dashboard/tickets', module: 'events' },
       { id: 'applications', label: 'Заявки', href: '/dashboard/applications', module: 'applications' },
       { id: 'portfolio', label: 'Портфолио', href: '/dashboard/portfolio', module: 'portfolio' },
       { id: 'referrals', label: 'Рефералы', href: '/dashboard/referrals', module: 'referrals' },
@@ -71,8 +71,8 @@ export function cabinetNavIdFromPath(pathname: string): CabinetNavId {
   if (p.startsWith('/dashboard/shop')) return 'shop';
   if (p.startsWith('/dashboard/achievements')) return 'achievements';
   if (p.startsWith('/dashboard/awards')) return 'awards';
-  if (p.startsWith('/friends')) return 'friends';
-  if (p.startsWith('/messages')) return 'messages';
-  if (p.startsWith('/tickets')) return 'tickets';
+  if (p.startsWith('/dashboard/friends') || p.startsWith('/friends')) return 'friends';
+  if (p.startsWith('/dashboard/messages') || p.startsWith('/messages')) return 'messages';
+  if (p.startsWith('/dashboard/tickets') || p.startsWith('/tickets')) return 'tickets';
   return 'overview';
 }

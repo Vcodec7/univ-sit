@@ -36,14 +36,14 @@ export const QUICK_ACCESS_HOTKEYS: HotkeyDef[] = [
   {
     keys: 'G C',
     label: 'Сообщения',
-    href: '/messages',
+    href: '/dashboard/messages',
     group: 'account',
     roles: ['USER', 'PARTICIPANT', 'MODERATOR', 'ADMIN'],
   },
   {
     keys: 'G R',
     label: 'Друзья',
-    href: '/friends',
+    href: '/dashboard/friends',
     group: 'account',
     roles: ['USER', 'PARTICIPANT', 'MODERATOR', 'ADMIN'],
   },

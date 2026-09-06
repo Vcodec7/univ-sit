@@ -24,7 +24,7 @@ const PRIMARY_NAV: NavItem[] = [
   { href: '/gallery', label: 'Галерея', group: 'discover', module: 'gallery' },
   { href: '/projects', label: 'Проекты', group: 'participate', module: 'projects' },
   { href: '/clubs', label: 'Клубы', group: 'participate', module: 'clubs' },
-  { href: '/friends', label: 'Друзья', group: 'participate', module: 'friends' },
+  { href: '/dashboard/friends', label: 'Друзья', group: 'participate', module: 'friends' },
   { href: '/vacancies', label: 'Вакансии', group: 'participate', module: 'vacancies' },
   { href: '/contests', label: 'Конкурсы', group: 'participate', module: 'contests' },
   { href: '/grants', label: 'Гранты', group: 'participate', module: 'grants' },

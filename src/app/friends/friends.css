@@ -9,6 +9,14 @@
   color: var(--fr-ink);
   box-sizing: border-box;
 }
+.friends-page--cabinet {
+  max-width: none;
+  padding: 0 !important;
+}
+.friends-page--cabinet .friends-head--cabinet {
+  justify-content: flex-end;
+  margin: 0 0 0.55rem;
+}
 .friends-page *,
 .friends-page *::before,
 .friends-page *::after {

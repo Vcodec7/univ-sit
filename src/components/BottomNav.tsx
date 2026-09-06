@@ -168,10 +168,10 @@ export default function BottomNav() {
     ...(modOn('messaging')
       ? [
           {
-            href: '/messages',
+            href: '/dashboard/messages',
             label: 'Сообщения',
             icon: MessageCircle,
-            match: (p: string) => p.startsWith('/messages'),
+            match: (p: string) => p.startsWith('/dashboard/messages') || p.startsWith('/messages'),
             badge: unread,
           } satisfies Tab,
         ]
@@ -179,10 +179,10 @@ export default function BottomNav() {
     ...(modOn('friends')
       ? [
           {
-            href: '/friends',
+            href: '/dashboard/friends',
             label: 'Друзья',
             icon: Users,
-            match: (p: string) => p.startsWith('/friends'),
+            match: (p: string) => p.startsWith('/dashboard/friends') || p.startsWith('/friends'),
           } satisfies Tab,
         ]
       : modOn('games')
@@ -201,10 +201,12 @@ export default function BottomNav() {
       icon: UserRound,
       match: (p) =>
         p.startsWith('/more') ||
-        p.startsWith('/dashboard') ||
         p.startsWith('/u/') ||
-        (!modOn('friends') && p.startsWith('/friends')) ||
-        p.startsWith('/tickets'),
+        (p.startsWith('/dashboard') &&
+          !p.startsWith('/dashboard/friends') &&
+          !p.startsWith('/dashboard/messages') &&
+          !p.startsWith('/dashboard/tickets')) ||
+        (!modOn('friends') && p.startsWith('/friends')),
     },
   ];
 

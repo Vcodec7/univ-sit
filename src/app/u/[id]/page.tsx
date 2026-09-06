@@ -413,7 +413,7 @@ function PublicUserPageInner() {
                 id: 'msg',
                 label: 'Написать сообщение',
                 icon: <MessageCircle size={20} />,
-                href: `/messages?with=${user.id}`,
+                href: `/dashboard/messages?with=${user.id}`,
               },
               {
                 id: 'unfriend',
@@ -499,7 +499,7 @@ function PublicUserPageInner() {
             <Pencil size={18} /> Редактировать профиль
           </Link>
         ) : friendship?.status === 'ACCEPTED' ? (
-          <Link href={`/messages?with=${user.id}`} className="yp-profile__cta">
+          <Link href={`/dashboard/messages?with=${user.id}`} className="yp-profile__cta">
             <MessageCircle size={18} /> Написать
           </Link>
         ) : showAdd && !friendship ? (

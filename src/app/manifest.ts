@@ -22,7 +22,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         name: 'Мои билеты',
         short_name: 'Билеты',
         description: 'Открыть QR-билеты на мероприятия',
-        url: '/tickets',
+        url: '/dashboard/tickets',
         icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
       },
       {

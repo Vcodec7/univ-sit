@@ -56,8 +56,8 @@ export function resolveNotificationHref(
   } catch {
     /* ignore */
   }
-  if (n.type === 'MESSAGE') return '/messages';
-  if (n.type === 'FRIEND_REQUEST') return '/friends';
+  if (n.type === 'MESSAGE') return '/dashboard/messages';
+  if (n.type === 'FRIEND_REQUEST') return '/dashboard/friends';
   if (n.type === 'BOOKING_REQUEST') {
     return opts?.isStaffViewer ? '/admin/bookings' : '/tickets';
   }

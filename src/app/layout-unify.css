@@ -1278,3 +1278,35 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
   border: 1px solid rgba(120, 176, 206, 0.4);
   color: #0a0c2a;
 }
+
+/* Friends / messages / tickets stay inside cabinet chrome */
+body:has(.dashboard-page .messages-root) {
+  overflow: auto !important;
+  height: auto !important;
+  max-height: none !important;
+}
+body:has(.dashboard-page .messages-root) .main-content {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  display: block !important;
+  padding-left: inherit;
+  padding-right: inherit;
+}
+body:has(.dashboard-page .messages-root) .main-content > .page-template,
+body:has(.dashboard-page .messages-root) .main-content > div {
+  height: auto !important;
+  overflow: visible !important;
+  display: block !important;
+}
+.dashboard-page .messages-root {
+  height: min(70dvh, calc(100dvh - 11rem));
+  min-height: 26rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: linear-gradient(180deg, #f5fbfe, #fff 40%);
+}
+.dashboard-page .friends-page--cabinet .friends-card {
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  background: #fff;
+}

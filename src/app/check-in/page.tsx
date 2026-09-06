@@ -124,7 +124,7 @@ function CheckInInner() {
         )}
         <PushNotifyBanner context="check-in" />
         <div className="check-in-card__actions">
-          <Link href="/tickets" className="btn btn-primary">
+          <Link href="/dashboard/tickets" className="btn btn-primary">
             <Ticket size={18} aria-hidden />
             Мои билеты
           </Link>
@@ -149,7 +149,7 @@ function Fail({ message }: { message: string }) {
         <Link href="/events" className="btn btn-primary">
           К афише
         </Link>
-        <Link href="/tickets" className="btn btn-secondary">
+        <Link href="/dashboard/tickets" className="btn btn-secondary">
           Мои билеты
         </Link>
       </div>

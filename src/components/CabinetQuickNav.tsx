@@ -36,7 +36,7 @@ export default function CabinetQuickNav({
             <strong>Мои заявки</strong>
             <span>Статусы: подана / одобрена / участник</span>
           </Link>
-          <Link href="/tickets" className="cabinet-quick__card">
+          <Link href="/dashboard/tickets" className="cabinet-quick__card">
             <span className="cabinet-quick__icon" aria-hidden>
               <Ticket size={18} />
             </span>

@@ -35,7 +35,13 @@ type Participation = {
   };
 };
 
-export default function TicketsHub({ standalone = false }: { standalone?: boolean }) {
+export default function TicketsHub({
+  standalone = false,
+  inCabinet = false,
+}: {
+  standalone?: boolean;
+  inCabinet?: boolean;
+}) {
   const { data: session, status } = useSession();
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,13 +159,13 @@ export default function TicketsHub({ standalone = false }: { standalone?: boolea
 
         {standalone && <PushNotifyBanner context="tickets" />}
 
-        {!standalone && (
+        {!standalone && !inCabinet && (
           <>
             <h2 className="tickets-hub__title">Мои билеты</h2>
             <p className="tickets-hub__lead">
               Откройте{' '}
-              <Link href="/tickets" className="tickets-hub__open-full">
-                отдельную страницу билетов
+              <Link href="/dashboard/tickets" className="tickets-hub__open-full">
+                раздел билетов в кабинете
               </Link>{' '}
               для крупного QR на входе.
             </p>
@@ -181,7 +187,7 @@ export default function TicketsHub({ standalone = false }: { standalone?: boolea
               {selected && (
                 <>
                   <div className="tickets-hub__qr-wrap">
-                    <QRCodeDisplay value={selected.ticketCode} size={standalone ? 220 : 180} />
+                    <QRCodeDisplay value={selected.ticketCode} size={standalone || inCabinet ? 220 : 180} />
                     <button
                       type="button"
                       className="tickets-hub__fullscreen-btn"

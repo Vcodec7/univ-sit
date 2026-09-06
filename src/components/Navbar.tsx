@@ -449,7 +449,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   </Link>
                 ) : null}
                 {!isScanner && !isTech && modOn(siteSettings, 'friends') ? (
-                  <Link href="/friends" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
+                  <Link href="/dashboard/friends" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
                     <Users size={16} aria-hidden />
                     <span className="nav-account-menu__label">
                       <strong>Друзья</strong>
@@ -458,7 +458,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   </Link>
                 ) : null}
                 {!isScanner && !isTech && modOn(siteSettings, 'messaging') ? (
-                  <Link href="/messages" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
+                  <Link href="/dashboard/messages" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
                     <MessageCircle size={16} aria-hidden />
                     <span className="nav-account-menu__label">
                       <strong>Сообщения</strong>
@@ -467,7 +467,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   </Link>
                 ) : null}
                 {!isScanner ? (
-                  <Link href="/tickets" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
+                  <Link href="/dashboard/tickets" className="dropdown-item" role="menuitem" onClick={closeDesktopMenus}>
                     <Ticket size={16} aria-hidden />
                     <span className="nav-account-menu__label">
                       <strong>Билеты</strong>
@@ -903,7 +903,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
               <ul className="mobile-menu__list" aria-label="Профиль">
                 {modOn(siteSettings, 'friends') ? (
                   <li>
-                    <Link href="/friends" onClick={closeMenu} className="mobile-menu__row">
+                    <Link href="/dashboard/friends" onClick={closeMenu} className="mobile-menu__row">
                       <Users size={20} aria-hidden />
                       <span>Друзья</span>
                       <ChevronRight size={16} aria-hidden />
@@ -912,7 +912,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                 ) : null}
                 {modOn(siteSettings, 'messaging') ? (
                   <li>
-                    <Link href="/messages" onClick={closeMenu} className="mobile-menu__row">
+                    <Link href="/dashboard/messages" onClick={closeMenu} className="mobile-menu__row">
                       <MessageCircle size={20} aria-hidden />
                       <span>Сообщения</span>
                       <ChevronRight size={16} aria-hidden />
@@ -920,7 +920,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   </li>
                 ) : null}
                 <li>
-                  <Link href="/tickets" onClick={closeMenu} className="mobile-menu__row">
+                  <Link href="/dashboard/tickets" onClick={closeMenu} className="mobile-menu__row">
                     <Ticket size={20} aria-hidden />
                     <span>Билеты</span>
                     <ChevronRight size={16} aria-hidden />

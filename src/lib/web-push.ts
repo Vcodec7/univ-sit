@@ -132,13 +132,13 @@ function hrefFromMeta(meta?: string | Record<string, unknown> | null): string | 
 export function defaultUrlForNotificationType(type: string): string {
   switch (type) {
     case 'MESSAGE':
-      return '/messages';
+      return '/dashboard/messages';
     case 'FRIEND_REQUEST':
-      return '/friends';
+      return '/dashboard/friends';
     case 'BOOKING_REQUEST':
       return '/admin/bookings';
     case 'CHECK_IN':
-      return '/tickets';
+      return '/dashboard/tickets';
     case 'PORTFOLIO':
       return '/dashboard/portfolio';
     case 'MODERATION':
