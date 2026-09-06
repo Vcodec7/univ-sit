@@ -40,7 +40,7 @@ export async function GET(req: Request) {
           space: { select: { id: true, title: true, address: true, image: true, capacity: true } },
           members: { select: { userId: true, status: true, role: true } },
         },
-        take: 40,
+        take: 80,
       });
       return NextResponse.json({ signups: rows });
     } catch (e) {
