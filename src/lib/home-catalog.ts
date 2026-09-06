@@ -51,7 +51,7 @@ export const getHomeCatalog = unstable_cache(
           createdAt: string;
         }>,
         siteSettings: {
-          heroImageUrl: '/brand/hero-cover.jpg',
+          heroImageUrl: '/covers/photo/sochi-sea.jpg',
           heroVideoUrl: '',
           heroMediaKind: 'image',
           heroAnimationMode: 'animated',

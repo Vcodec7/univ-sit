@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Building2, Landmark, Sparkles, Users } from 'lucide-react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
 import HomeHeroMedia from '@/components/HomeHeroMedia';
+import { resolveHomeHeroPoster } from '@/lib/home-hero';
 
 type Cta = { href: string; label: string };
 
@@ -79,7 +80,7 @@ export default function HomeServiceHero({
   showProjects = true,
   showEvents = true,
 }: Props) {
-  const poster = (imageUrl || '/brand/hero-cover.jpg').trim();
+  const poster = resolveHomeHeroPoster(imageUrl);
   const video = (videoUrl || '').trim();
   const wantVideo = mediaKind === 'video' && Boolean(video);
   const brand = (siteName || 'Молодёжь Сочи').trim();

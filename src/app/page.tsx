@@ -6,6 +6,7 @@ import HomeSlideRail from '@/components/HomeSlideRail';
 import { getSiteIdentity } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
+import { resolveHomeHeroPoster } from '@/lib/home-hero';
 import { formatRuDate } from '@/lib/format-date';
 import { getModuleFlags } from '@/lib/module-flags';
 import HomeGalleryAuth from '@/components/HomeGalleryAuth';
@@ -41,7 +42,7 @@ function stripHtml(html: string) {
 export default async function Home() {
   const [{ latestProjects, latestClubs, latestSpaces, latestNews, siteSettings }, modules, { siteName }] =
     await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentity()]);
-  const heroUrl = (siteSettings?.heroImageUrl || '').trim() || '/brand/hero-cover.jpg';
+  const heroUrl = resolveHomeHeroPoster(siteSettings?.heroImageUrl);
   // Both assets may be stored; display mode is exclusive (image | video).
   const heroVideo = (siteSettings?.heroVideoUrl || '').trim() || null;
   const storedKind = (siteSettings?.heroMediaKind || '').trim().toLowerCase();

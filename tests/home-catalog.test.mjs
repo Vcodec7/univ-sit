@@ -10,6 +10,7 @@ const page = readFileSync(join(root, '../src/app/page.tsx'), 'utf8');
 const hero = readFileSync(join(root, '../src/components/HomeServiceHero.tsx'), 'utf8');
 const freeNow = readFileSync(join(root, '../src/components/FreeNowSpaces.tsx'), 'utf8');
 const css = readFileSync(join(root, '../src/app/globals.css'), 'utf8');
+const homeHero = readFileSync(join(root, '../src/lib/home-hero.ts'), 'utf8');
 
 test('home catalog stays slim for first paint', () => {
   assert.match(home, /HOME_FEED_TAKE = 8/);
@@ -30,9 +31,12 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
   assert.match(hero, /Старт с Сочи/);
   assert.match(hero, /Дом молодёжи/);
   assert.match(hero, /href: '\/coworking'/);
+  assert.match(hero, /resolveHomeHeroPoster/);
   assert.match(page, /home-page--lift/);
   assert.match(page, /HomeSochiStrip/);
   assert.match(page, /home-cta--split/);
+  assert.match(page, /resolveHomeHeroPoster/);
+  assert.match(homeHero, /sochi-sea\.jpg/);
 });
 
 test('free-now rail on lift home keeps full cards and hero buttons', () => {
