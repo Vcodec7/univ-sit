@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   BookOpen,
   Check,
@@ -41,7 +42,7 @@ type GuideDef = {
   summary: string
   steps: string[]
   accent?: string
-  Icon: typeof Zap
+  Icon: LucideIcon
   /** Hide when this ops module flag is off */
   module?: string
 }
