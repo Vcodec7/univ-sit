@@ -27082,7 +27082,7 @@ button.btn,
   height: 0 !important;
   display: none !important;
 }
-.home-page--lift .home-rail__slide {
+.home-page.home-page--lift .home-rail__slide {
   flex: 0 0 calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   max-width: none !important;
@@ -27215,7 +27215,17 @@ button.btn,
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 30%;
+}
+.home-page--lift .free-now-avatar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.4rem;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, #0a0c2a);
 }
 
 /* ===== 1.6.16 home + places polish ===== */
@@ -28377,6 +28387,11 @@ html.is-admin .main-content {
   }
   .home-page.home-page--lift .home-rail {
     padding-inline: 0 !important;
+  }
+  .home-page.home-page--lift .home-rail__slide {
+    flex-basis: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
+    width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
+    max-width: none !important;
   }
 }
 .event-carousel {
