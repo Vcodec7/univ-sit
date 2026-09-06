@@ -16,6 +16,7 @@ import { formatMskDateTime } from '@/lib/booking-hours';
 import { safetyCategoryLabel } from '@/lib/censor';
 import { MODERATION_NOTE_PRESETS } from '@/lib/moderation-config';
 import ProfileTagsModerationPanel from '@/components/admin/ProfileTagsModerationPanel';
+import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 
 type FlagRow = {
   id: string;
@@ -307,86 +308,59 @@ export default function AdminModerationPage() {
         </div>
       ) : null}
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
-        {(
-          [
-            ['all', 'Все типы'],
-            ['chat', `Переписки${stats?.openChatCount != null ? ` (${stats.openChatCount})` : ''}`],
-            ['photo', `Фото${stats?.openPhotoCount != null ? ` (${stats.openPhotoCount})` : ''}`],
-            ['profile', 'Профиль'],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setSource(key)}
-            className={source === key ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ padding: '0.4rem 0.75rem', fontSize: '0.82rem' }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <AdminFilterTabs
+        ariaLabel="Тип сигнала"
+        items={[
+          { label: 'Все типы', onSelect: () => setSource('all'), active: source === 'all' },
+          { label: 'Переписки', onSelect: () => setSource('chat'), active: source === 'chat', count: stats?.openChatCount },
+          { label: 'Фото', onSelect: () => setSource('photo'), active: source === 'photo', count: stats?.openPhotoCount },
+          { label: 'Профиль', onSelect: () => setSource('profile'), active: source === 'profile' },
+        ]}
+      />
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12, alignItems: 'center' }}>
-        {(['OPEN', 'REVIEWED', 'ACTIONED', 'DISMISSED', 'ALL'] as const).map((s) => (
+      <AdminFilterTabs
+        ariaLabel="Статус сигнала"
+        items={(['OPEN', 'REVIEWED', 'ACTIONED', 'DISMISSED', 'ALL'] as const).map((s) => ({
+          label: STATUS_LABEL[s] || s,
+          onSelect: () => setStatus(s),
+          active: status === s,
+          tone: s === 'OPEN' ? 'warning' : s === 'ACTIONED' ? 'danger' : s === 'DISMISSED' ? 'success' : s === 'ALL' ? 'muted' : 'primary',
+        }))}
+      />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setQ(qDraft.trim());
+        }}
+        className="admin-search-row"
+      >
+        <input
+          value={qDraft}
+          onChange={(e) => setQDraft(e.target.value)}
+          placeholder="Имя, код, фрагмент…"
+        />
+        <button type="submit" className="btn btn-secondary">
+          Найти
+        </button>
+        {q || category ? (
           <button
-            key={s}
             type="button"
-            onClick={() => setStatus(s)}
-            className={status === s ? 'btn btn-primary' : 'btn btn-secondary'}
-            style={{ padding: '0.4rem 0.75rem', fontSize: '0.82rem' }}
-          >
-            {STATUS_LABEL[s] || s}
-          </button>
-        ))}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setQ(qDraft.trim());
-          }}
-          style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}
-        >
-          <input
-            value={qDraft}
-            onChange={(e) => setQDraft(e.target.value)}
-            placeholder="Поиск: имя, код, фрагмент…"
-            style={{
-              minWidth: 200,
-              padding: '0.4rem 0.65rem',
-              borderRadius: 8,
-              border: '1px solid #e2e8f0',
-              fontSize: '0.85rem',
+            className="btn btn-secondary"
+            onClick={() => {
+              setQ('');
+              setQDraft('');
+              setCategory('');
             }}
-          />
-          <button type="submit" className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.82rem' }}>
-            Найти
-          </button>
-          {q || category ? (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ padding: '0.4rem 0.75rem', fontSize: '0.82rem' }}
-              onClick={() => {
-                setQ('');
-                setQDraft('');
-                setCategory('');
-              }}
-            >
-              Сбросить
-            </button>
-          ) : null}
-          <select
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            style={{ padding: '0.4rem 0.6rem', borderRadius: 8, border: '1px solid #e2e8f0' }}
           >
-            <option value={7}>7 дней</option>
-            <option value={30}>30 дней</option>
-            <option value={90}>90 дней</option>
-          </select>
-        </form>
-      </div>
+            Сброс
+          </button>
+        ) : null}
+        <select value={days} onChange={(e) => setDays(Number(e.target.value))} aria-label="Период">
+          <option value={7}>7 дн.</option>
+          <option value={30}>30 дн.</option>
+          <option value={90}>90 дн.</option>
+        </select>
+      </form>
 
       {error ? <p style={{ color: '#b91c1c' }}>{error}</p> : null}
       {loading ? <p style={{ color: 'var(--muted)' }}>Загрузка…</p> : null}

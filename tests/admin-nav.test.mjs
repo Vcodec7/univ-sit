@@ -21,6 +21,10 @@ test('admin nav search ranks labels and aliases', async () => {
   assert.doesNotMatch(sidebar, /samsung-nav__link/);
   const filters = readFileSync(join(root, 'src/components/admin/AdminFilterTabs.tsx'), 'utf8');
   assert.match(filters, /admin-filter-tabs/);
+  assert.match(filters, /onSelect/);
+  const portfolios = readFileSync(join(root, 'src/app/admin/portfolios/page.tsx'), 'utf8');
+  assert.match(portfolios, /AdminFilterTabs/);
+  assert.match(portfolios, /ariaLabel="Статус портфолио"/);
   const apps = readFileSync(join(root, 'src/app/admin/applications/page.tsx'), 'utf8');
   assert.match(apps, /admin-search-row/);
   assert.match(apps, /Имя, email, клуб/);

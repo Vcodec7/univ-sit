@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
+import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 
 type PortfolioDiff = {
   isFirstSubmit: boolean;
@@ -69,71 +70,50 @@ export default function AdminPortfoliosPage() {
     await load();
   };
 
-  const formatCount = (n: number) => (n > 999 ? '999+' : String(n));
-
   return (
     <div className="admin-page-shell" style={{ paddingBottom: '4rem' }}>
       <div className="admin-page-header">
         <div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>Портфолио</h1>
-          <p style={{ color: 'var(--muted)', margin: '0.35rem 0 0' }}>Модерация пользовательских портфолио</p>
+          <h1>Портфолио</h1>
+          <p>Модерация пользовательских портфолио</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: '1rem' }}>
-        {(['PENDING', 'APPROVED', 'REJECTED', 'ALL'] as const).map((s) => {
-          const active = status === s;
-          const count = s === 'PENDING' ? pendingCount : s === status ? items.length : null;
-          return (
-            <button
-              key={s}
-              type="button"
-              className="btn"
-              onClick={() => setStatus(s)}
-              style={{
-                padding: '0.45rem 0.8rem',
-                background: active ? 'var(--primary)' : '#f8fafc',
-                color: active ? '#fff' : '#475569',
-                border: '1px solid #e2e8f0',
-                borderRadius: 999,
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              {s === 'PENDING' ? 'На проверке' : s === 'APPROVED' ? 'Одобрено' : s === 'REJECTED' ? 'Отклонено' : 'Все'}
-              {count != null && count > 0 ? (
-                <span
-                  style={{
-                    minWidth: '1.55rem',
-                    height: '1.2rem',
-                    padding: '0 0.4rem',
-                    borderRadius: 999,
-                    fontSize: '0.72rem',
-                    fontWeight: 800,
-                    fontVariantNumeric: 'tabular-nums',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: active ? 'rgba(255,255,255,0.22)' : '#fee2e2',
-                    color: active ? '#fff' : '#b91c1c',
-                    lineHeight: 1,
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {formatCount(count)}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
+      <AdminFilterTabs
+        ariaLabel="Статус портфолио"
+        items={[
+          {
+            label: 'На проверке',
+            onSelect: () => setStatus('PENDING'),
+            active: status === 'PENDING',
+            count: pendingCount,
+            tone: 'warning',
+          },
+          {
+            label: 'Одобрено',
+            onSelect: () => setStatus('APPROVED'),
+            active: status === 'APPROVED',
+            tone: 'success',
+          },
+          {
+            label: 'Отклонено',
+            onSelect: () => setStatus('REJECTED'),
+            active: status === 'REJECTED',
+            tone: 'danger',
+          },
+          {
+            label: 'Все',
+            onSelect: () => setStatus('ALL'),
+            active: status === 'ALL',
+            tone: 'muted',
+          },
+        ]}
+      />
 
       {loading ? (
         <p style={{ color: 'var(--muted)' }}>Загрузка…</p>
       ) : items.length === 0 ? (
-        <p style={{ color: 'var(--muted)' }}>Нет записей</p>
+        <p className="admin-empty">Нет записей</p>
       ) : (
         <div style={{ display: 'grid', gap: 10 }}>
           {items.map((item) => (

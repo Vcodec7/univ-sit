@@ -453,7 +453,7 @@ export default function AdminSidebar({
               />
               <div className="samsung-drawer__panel" role="dialog" aria-modal="true" aria-label="Карточная панель">
                 <div className="samsung-drawer__head">
-                  <strong>Панель управления</strong>
+          <strong>Панель</strong>
                   <div className="samsung-drawer__head-actions">
                     <Link href="/" aria-label="Главная" title="Главная" onClick={() => setDrawerOpen(false)}>
                       <Home size={18} />

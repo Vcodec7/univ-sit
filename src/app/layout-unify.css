@@ -1608,7 +1608,7 @@ body:has(.dashboard-page .messages-root) .main-content > div {
 }
 .admin-filter-tabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap !important;
   gap: 0.28rem;
   margin: 0 0 0.45rem;
   padding: 0 0 0.4rem;
@@ -1619,6 +1619,9 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   max-width: 100%;
 }
 .admin-filter-tab {
+  appearance: none;
+  font-family: inherit;
+  cursor: pointer;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -1675,8 +1678,8 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   color: #fff;
 }
 .admin-search-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: nowrap;
   gap: 0.4rem;
   align-items: center;
   margin: 0 0 0.75rem;
@@ -1685,20 +1688,44 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   border: 1px solid rgba(120, 176, 206, 0.28);
   background: #fff;
   max-width: 100%;
+  overflow-x: auto;
 }
 .admin-search-row .settings-input,
 .admin-search-row input[type='search'],
-.admin-search-row input[type='text'] {
+.admin-search-row input[type='text'],
+.admin-search-row input:not([type]) {
+  flex: 1 1 8rem;
   min-width: 0 !important;
   width: 100% !important;
   margin: 0 !important;
   padding: 0.4rem 0.55rem !important;
   font-size: 0.82rem !important;
 }
-.admin-search-row .btn {
-  padding: 0.4rem 0.7rem !important;
-  font-size: 0.78rem !important;
+.admin-search-row select {
+  min-width: 0;
+  max-width: 5.5rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(120, 176, 206, 0.35);
+  background: #fff;
+  font-size: 0.78rem;
+}
+.admin-empty {
+  margin: 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px dashed rgba(120, 176, 206, 0.4);
+  background: #fff;
+  color: #5a5670;
+  font-size: 0.85rem;
+}
+.admin-mobile-bar__meta span {
+  display: none !important;
+}
+.admin-mobile-bar__meta strong {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 @media (max-width: 900px) {
   .admin-mobile-bar {

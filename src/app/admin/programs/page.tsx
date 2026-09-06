@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import RichTextInput from '@/components/RichTextInput';
 import CoverImageField from '@/components/admin/CoverImageField';
+import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
@@ -354,39 +355,17 @@ export default async function AdminPrograms({
         </Link>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-        <Link
-          href="?"
-          className="btn"
-          style={{
-            padding: '0.4rem 0.9rem',
-            borderRadius: 999,
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            background: kindFilter === 'ALL' ? 'var(--primary)' : 'rgba(15,23,42,0.04)',
-            color: kindFilter === 'ALL' ? '#fff' : 'inherit',
-          }}
-        >
-          Все
-        </Link>
-        {PROGRAM_KINDS.map((k) => (
-          <Link
-            key={k}
-            href={`?kind=${k}`}
-            className="btn"
-            style={{
-              padding: '0.4rem 0.9rem',
-              borderRadius: 999,
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              background: kindFilter === k ? 'var(--primary)' : 'rgba(15,23,42,0.04)',
-              color: kindFilter === k ? '#fff' : 'inherit',
-            }}
-          >
-            {PROGRAM_KIND_META[k].title}
-          </Link>
-        ))}
-      </div>
+      <AdminFilterTabs
+        ariaLabel="Тип программы"
+        items={[
+          { href: '?', label: 'Все', active: kindFilter === 'ALL', tone: 'muted' },
+          ...PROGRAM_KINDS.map((k) => ({
+            href: `?kind=${k}`,
+            label: PROGRAM_KIND_META[k].title,
+            active: kindFilter === k,
+          })),
+        ]}
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div className="admin-table-wrap" style={{ padding: '0.5rem 0' }}>
