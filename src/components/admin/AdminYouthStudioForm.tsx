@@ -25,10 +25,10 @@ export type StudioKind = 'project' | 'club' | 'space' | 'page';
 
 type Item = {
   id?: string;
-  title?: string;
-  description?: string;
-  content?: string;
-  template?: string;
+  title?: string | null;
+  description?: string | null;
+  content?: string | null;
+  template?: string | null;
   status?: string | null;
   image?: string | null;
   images?: string | null;
