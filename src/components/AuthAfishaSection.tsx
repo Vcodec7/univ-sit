@@ -39,10 +39,10 @@ export default function AuthAfishaSection({ hideTitle }: { hideTitle?: boolean }
 
   if (status !== 'authenticated') {
     return (
-      <div className="event-empty glass">
+      <div className="event-empty">
         <h3>Афиша доступна после входа</h3>
         <p>Войдите в аккаунт, чтобы увидеть ближайшие мероприятия.</p>
-        <Link href="/login?callbackUrl=/events" className="btn btn-primary">
+        <Link href="/login?callbackUrl=/events" className="lift-hero__btn lift-hero__btn--lime">
           Войти
         </Link>
       </div>
@@ -55,9 +55,9 @@ export default function AuthAfishaSection({ hideTitle }: { hideTitle?: boolean }
 
   if (!events.length) {
     return (
-      <div className="event-empty glass">
+      <div className="event-empty">
         <h3>Ближайших мероприятий пока нет</h3>
-        <Link href="/spaces" className="btn btn-primary">
+        <Link href="/spaces" className="lift-hero__btn lift-hero__btn--lime">
           Площадки
         </Link>
       </div>

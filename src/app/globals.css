@@ -27100,9 +27100,12 @@ button.btn,
   }
   .home-page .home-rail-wrap {
     display: grid;
-    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: 0.45rem;
+  }
+  .home-page .home-rail-wrap:has(> .home-rail-nav) {
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
   }
   .home-rail-nav {
     display: grid;
@@ -28461,9 +28464,12 @@ html.is-admin .main-content {
 @media (min-width: 900px) {
   .home-page .home-rail-wrap {
     display: grid;
-    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     gap: 0.45rem;
+  }
+  .home-page .home-rail-wrap:has(> .home-rail-nav) {
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
   }
   .home-rail-nav {
     position: static !important;

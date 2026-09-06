@@ -345,7 +345,13 @@
 @media (min-width: 900px) {
   .home-page .home-rail-wrap,
   .home-page.home-page--lift .home-rail-wrap {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     align-items: center !important;
+  }
+  .home-page .home-rail-wrap:has(> .home-rail-nav),
+  .home-page.home-page--lift .home-rail-wrap:has(> .home-rail-nav) {
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem !important;
   }
   .home-rail-nav {
     display: grid !important;
@@ -400,6 +406,7 @@
 .home-page--lift .free-now-card,
 .home-page--lift .lift-feed-card,
 .home-page--lift .lift-feed-card.event-card {
+  height: auto !important;
   background: #fff !important;
   border: 1px solid rgba(120, 176, 206, 0.28) !important;
   box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
@@ -437,6 +444,14 @@
 }
 .home-page--lift .free-now-avatar::after {
   display: none !important;
+}
+.home-page .event-empty {
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  min-height: 8rem;
+  display: grid;
+  place-content: center;
+  gap: 0.35rem;
 }
 
 /* Phone/touch: stop sticky-blur, glow loops and hover paints that hitch profile scroll */

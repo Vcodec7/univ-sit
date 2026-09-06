@@ -298,10 +298,10 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
 
   if (!events.length) {
     return (
-      <div className="event-empty glass">
+      <div className="event-empty">
         <h3>Ближайших мероприятий пока нет</h3>
         <p>Следите за афишей — новые события появятся здесь после подтверждения бронирований.</p>
-        <Link href="/spaces" className="btn btn-primary">
+        <Link href="/spaces" className="lift-hero__btn lift-hero__btn--lime">
           Площадки
         </Link>
       </div>
