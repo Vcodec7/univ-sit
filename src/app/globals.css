@@ -28413,6 +28413,9 @@ html.is-admin .main-content {
     margin-inline: 0 !important;
     padding-inline: 0.15rem !important;
   }
+  .home-page.home-page--lift .home-rail-wrap {
+    align-items: stretch;
+  }
   .home-page.home-page--lift .home-rail {
     padding-inline: 0 !important;
   }
