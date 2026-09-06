@@ -27083,9 +27083,8 @@ button.btn,
   display: none !important;
 }
 .home-page--lift .home-rail__slide {
-  --rail-card: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols));
-  flex: 0 0 var(--rail-card) !important;
-  width: var(--rail-card) !important;
+  flex: 0 0 calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
+  width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   max-width: none !important;
   height: auto !important;
   align-self: start;
