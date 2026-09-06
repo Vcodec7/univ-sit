@@ -20,10 +20,10 @@ export default function HomeGallery({
 
   return (
     <section className="home-section home-gallery">
-      <div className="home-gallery__head">
+      <div className="home-section-head">
         <div>
-          <h2 className="home-gallery__title">{title}</h2>
-          <p className="home-gallery__sub">
+          <h2 className="home-section-title">{title}</h2>
+          <p className="home-section-sub">
             Моменты работы администрации — пространства, события и команда
           </p>
         </div>

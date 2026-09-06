@@ -20,7 +20,6 @@ import EntityCoverImage from '@/components/EntityCoverImage';
 import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ruCount } from '@/lib/catalog-query';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
@@ -108,13 +107,9 @@ export default async function Home() {
         {showProjects && (
         <section className="home-section">
           <div className="home-section-head">
-            <div className="home-section-kicker">
+            <div>
               <h2 className="home-section-title">Свежие проекты</h2>
-              {latestProjects.length ? (
-                <p className="catalog-page-header__count">
-                  {ruCount(latestProjects.length, 'проект', 'проекта', 'проектов')}
-                </p>
-              ) : null}
+              <p className="home-section-sub">Инициативы, в которые можно включиться сейчас</p>
             </div>
             <Link href="/projects" className="home-section-link">
               Смотреть все <ArrowRight size={18} />
@@ -157,13 +152,9 @@ export default async function Home() {
         {showClubs && (
         <section className="home-section">
           <div className="home-section-head">
-            <div className="home-section-kicker">
+            <div>
               <h2 className="home-section-title">Клубы по интересам</h2>
-              {latestClubs.length ? (
-                <p className="catalog-page-header__count">
-                  {ruCount(latestClubs.length, 'клуб', 'клуба', 'клубов')}
-                </p>
-              ) : null}
+              <p className="home-section-sub">Сообщества, где находят своих в Сочи</p>
             </div>
             <Link href="/clubs" className="home-section-link">
               Все клубы <ArrowRight size={18} />
@@ -205,13 +196,9 @@ export default async function Home() {
         {showSpaces && (
         <section className="home-section">
           <div className="home-section-head">
-            <div className="home-section-kicker">
+            <div>
               <h2 className="home-section-title">Пространства</h2>
-              {latestSpaces.length ? (
-                <p className="catalog-page-header__count">
-                  {ruCount(latestSpaces.length, 'площадка', 'площадки', 'площадок')}
-                </p>
-              ) : null}
+              <p className="home-section-sub">Площадки ЦРМ для брони, встреч и учёбы</p>
             </div>
             <Link href="/spaces" className="home-section-link">
               Все пространства <ArrowRight size={18} />
@@ -286,13 +273,9 @@ export default async function Home() {
         {showNews && (
         <section className="home-section">
           <div className="home-section-head">
-            <div className="home-section-kicker">
+            <div>
               <h2 className="home-section-title">Новости</h2>
-              {latestNews.length ? (
-                <p className="catalog-page-header__count">
-                  {ruCount(latestNews.length, 'новость', 'новости', 'новостей')}
-                </p>
-              ) : null}
+              <p className="home-section-sub">Что происходит в молодёжной повестке города</p>
             </div>
             <Link href="/news" className="home-section-link">
               Все новости <ArrowRight size={18} />

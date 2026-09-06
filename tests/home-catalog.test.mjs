@@ -51,5 +51,8 @@ test('home feeds reuse lift cards for projects clubs spaces news', () => {
   assert.match(page, /HomeLiftFeedCard/);
   assert.match(page, /Свежие проекты/);
   assert.match(page, /Клубы по интересам/);
+  assert.match(page, /home-section-sub/);
+  assert.match(page, /Инициативы, в которые можно включиться сейчас/);
+  assert.doesNotMatch(page, /home-section-kicker/);
   assert.doesNotMatch(page, /home-feed-grid/);
 });
