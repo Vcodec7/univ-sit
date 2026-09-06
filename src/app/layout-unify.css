@@ -346,3 +346,53 @@
     height: 1.85rem;
   }
 }
+
+/* Home rails: light sea/sky Sochi cards (last-win) */
+.home-page.home-page--lift {
+  background-color: #eef6fb;
+  background-image:
+    radial-gradient(rgba(10, 12, 42, 0.04) 0.55px, transparent 0.7px),
+    linear-gradient(180deg, #d7eef8 0%, #eef6fb 32%, #f7faf4 100%);
+  background-size: 3px 3px, auto;
+}
+.home-page--lift .free-now-card,
+.home-page--lift .lift-feed-card,
+.home-page--lift .lift-feed-card.event-card {
+  background: #fff !important;
+  border: 1px solid rgba(120, 176, 206, 0.28) !important;
+  box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
+}
+.home-page--lift .free-now-body,
+.home-page--lift .lift-feed-card .event-card-body {
+  background: linear-gradient(180deg, #f5fbfe 0%, #fff 58%) !important;
+  color: #0a0c2a !important;
+}
+.home-page--lift .free-now-body h3,
+.home-page--lift .lift-feed-card .event-card-title {
+  color: #0a0c2a !important;
+}
+.home-page--lift .free-now-body p,
+.home-page--lift .lift-feed-card .event-card-facts,
+.home-page--lift .lift-feed-card .event-card-desc {
+  color: #5a5670 !important;
+}
+.home-page--lift .free-now-slot,
+.home-page--lift .lift-feed-card .event-card-seats,
+.home-page--lift .lift-feed-card .event-card-date {
+  color: #6e8f02 !important;
+}
+.home-page--lift .free-now-badge,
+.home-page--lift .lift-feed-card .event-card-category {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0a0c2a !important;
+  border: 1px solid rgba(10, 12, 42, 0.12) !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn--ghost,
+.home-page--lift .lift-feed-card .event-action-chip {
+  color: #0a0c2a !important;
+  background: #fff !important;
+  border: 1px solid rgba(10, 12, 42, 0.16) !important;
+}
+.home-page--lift .free-now-avatar::after {
+  display: none !important;
+}
