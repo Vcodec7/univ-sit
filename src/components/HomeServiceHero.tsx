@@ -24,6 +24,21 @@ function needsAuth(href: string) {
   return href.startsWith('/coworking') || href.includes('/book');
 }
 
+function CtaLink({ href, className, children }: { href: string; className: string; children: React.ReactNode }) {
+  if (needsAuth(href)) {
+    return (
+      <GuestAuthPrompt href={href} className={className} asButton>
+        {children}
+      </GuestAuthPrompt>
+    );
+  }
+  return (
+    <Link href={href} className={className} prefetch>
+      {children}
+    </Link>
+  );
+}
+
 const DECK = [
   {
     id: 'halls',
@@ -86,6 +101,11 @@ export default function HomeServiceHero({
   const brand = (siteName || 'Молодёжь Сочи').trim();
   const flags = { showSpaces, showClubs, showProjects, showEvents };
   const deck = DECK.filter((c) => flags[c.flag]);
+  const extra =
+    showEvents && primary?.href !== '/events' && secondary?.href !== '/events'
+      ? { href: '/events', label: 'Афиша' }
+      : null;
+  const second = extra || secondary;
 
   return (
     <section className="lift-hero" aria-label="Главный баннер">
@@ -93,44 +113,27 @@ export default function HomeServiceHero({
         <HomeHeroMedia poster={poster} video={video} wantVideo={wantVideo} />
         <div className="lift-hero__veil" aria-hidden />
         <div className="lift-hero__glow" aria-hidden />
-        <div className="container lift-hero__copy">
-          <p className="lift-hero__eyebrow">Чёрное море · Кавказ · {brand}</p>
-          <h1 className="lift-hero__title">
-            Старт с Сочи
-            <span>к своим людям и проектам</span>
-          </h1>
-          <p className="lift-hero__lead">
-            Залы, коворкинг, клубы и афиша — один портал, без десяти чатов.
-          </p>
-          <div className="lift-hero__cta">
-            {primary ? (
-              needsAuth(primary.href) ? (
-                <GuestAuthPrompt href={primary.href} className="lift-hero__btn lift-hero__btn--lime" asButton>
-                  {primary.label}
-                </GuestAuthPrompt>
-              ) : (
-                <Link href={primary.href} className="lift-hero__btn lift-hero__btn--lime" prefetch>
-                  {primary.label}
-                </Link>
-              )
-            ) : null}
-            {secondary ? (
-              needsAuth(secondary.href) ? (
-                <GuestAuthPrompt href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost" asButton>
-                  {secondary.label}
-                </GuestAuthPrompt>
-              ) : (
-                <Link href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost" prefetch>
-                  {secondary.label}
-                </Link>
-              )
-            ) : null}
-            {showEvents ? (
-              <Link href="/events" className="lift-hero__btn lift-hero__btn--ghost" prefetch>
-                Афиша
-              </Link>
-            ) : null}
-          </div>
+      </div>
+      <div className="container lift-hero__copy">
+        <p className="lift-hero__eyebrow">Чёрное море · Кавказ · {brand}</p>
+        <h1 className="lift-hero__title">
+          Старт с Сочи
+          <span>к своим людям и проектам</span>
+        </h1>
+        <p className="lift-hero__lead">
+          Залы, коворкинг, клубы и афиша — один портал, без десяти чатов.
+        </p>
+        <div className="lift-hero__cta">
+          {primary ? (
+            <CtaLink href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
+              {primary.label}
+            </CtaLink>
+          ) : null}
+          {second ? (
+            <CtaLink href={second.href} className="lift-hero__btn lift-hero__btn--ghost">
+              {second.label}
+            </CtaLink>
+          ) : null}
         </div>
       </div>
 
@@ -140,6 +143,9 @@ export default function HomeServiceHero({
             const Icon = card.icon;
             const inner = (
               <>
+                <span className="lift-deck__glyph" aria-hidden>
+                  <Icon size={18} />
+                </span>
                 <span className="lift-deck__kicker">
                   <Icon size={16} aria-hidden /> {card.kicker}
                 </span>
@@ -149,11 +155,17 @@ export default function HomeServiceHero({
               </>
             );
             return card.auth ? (
-              <GuestAuthPrompt key={card.id} href={card.href} className="lift-deck__card" asButton>
+              <GuestAuthPrompt
+                key={card.id}
+                href={card.href}
+                className="lift-deck__card"
+                asButton
+                title={card.title}
+              >
                 {inner}
               </GuestAuthPrompt>
             ) : (
-              <Link key={card.id} href={card.href} className="lift-deck__card" prefetch>
+              <Link key={card.id} href={card.href} className="lift-deck__card" prefetch aria-label={card.title}>
                 {inner}
               </Link>
             );

@@ -134,94 +134,137 @@
     bottom: calc(0.5rem + var(--yp-bottom-nav-h, 0px));
   }
 
-  /* Home: light phone chrome — no navy shell */
+  /* Home phone: quiet media plate, centered type, two pills, icon orbit */
+  .home-page--lift {
+    background-color: #f3f1ec;
+    background-image: radial-gradient(rgba(10, 12, 42, 0.045) 0.6px, transparent 0.7px);
+    background-size: 3px 3px;
+  }
   .lift-hero {
     background: transparent !important;
     border-radius: 0 !important;
     overflow: visible !important;
-    padding: 0.65rem 0 0;
+    padding: 0.85rem 0 0.4rem;
   }
   .lift-hero__stage {
-    margin: 0 max(1rem, env(safe-area-inset-left)) 0 max(1rem, env(safe-area-inset-right));
-    min-height: 11.75rem !important;
+    position: relative;
+    margin: 0 1.15rem;
+    min-height: 0 !important;
     max-height: none !important;
     height: auto !important;
-    border-radius: 1.25rem;
+    aspect-ratio: 4 / 3;
+    border-radius: 1.65rem;
     overflow: hidden;
-    box-shadow: 0 10px 28px rgba(133, 98, 216, 0.1);
-    border: 1px solid rgba(133, 98, 216, 0.12);
+    border: 0;
+    box-shadow: 0 18px 40px rgba(10, 12, 42, 0.12);
+    background: #0a0c2a;
   }
-  .lift-hero__veil {
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(250, 251, 244, 0.42) 48%,
-      rgba(250, 251, 244, 0.96) 100%
-    ) !important;
-  }
+  .lift-hero__veil,
   .lift-hero__glow {
-    background: radial-gradient(ellipse at 80% 0%, rgba(175, 202, 3, 0.18), transparent 46%) !important;
+    display: none !important;
   }
   .lift-hero__copy {
+    position: static !important;
+    text-align: center;
+    max-width: 22.5rem;
+    margin: 0 auto;
     color: #0a0c2a !important;
-    padding: 3.4rem 0.15rem 1rem !important;
+    padding: 1.65rem 1.15rem 0.35rem !important;
   }
   .lift-hero__eyebrow {
-    color: #6e4bc4 !important;
+    color: #5a5670 !important;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem !important;
+    margin-bottom: 0.7rem !important;
   }
   .lift-hero__title {
     color: #0a0c2a !important;
     text-shadow: none !important;
-    font-size: 1.42rem !important;
-    line-height: 1.15 !important;
+    font-size: 1.72rem !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.04em !important;
+    justify-items: center;
   }
   .lift-hero__title span {
-    color: #6e4bc4 !important;
+    color: #0a0c2a !important;
+  }
+  .lift-hero__cta {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 1.2rem !important;
+    gap: 0.6rem !important;
+    width: min(100%, 18.5rem);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .lift-hero__btn {
+    width: 100%;
+    border-radius: 999px !important;
+    min-height: 3.15rem !important;
+    font-size: 0.95rem;
+  }
+  .lift-hero__btn--lime {
+    background: #0a0c2a !important;
+    color: #fff !important;
+    box-shadow: none !important;
   }
   .lift-hero__btn--ghost {
-    color: #6e4bc4 !important;
+    background: #e7e4de !important;
+    color: #0a0c2a !important;
+    border: 0 !important;
+    text-decoration: none !important;
+    backdrop-filter: none !important;
+    min-height: 2.9rem !important;
+    font-weight: 750 !important;
   }
   .lift-deck {
-    margin-top: 0.85rem !important;
-    margin-bottom: 0.35rem !important;
-    padding: 0 !important;
-    grid-template-columns: 1fr 1fr !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: 0.7rem !important;
+    margin: 1.15rem 0 0.25rem !important;
+    padding: 0 1rem !important;
+    grid-template-columns: none !important;
   }
   .lift-deck__card {
-    min-height: 8.4rem;
-    padding: 0.95rem 0.9rem 0.95rem !important;
-    border-radius: 1.15rem !important;
-    background: #fff !important;
-    border: 1px solid #e6e2f2 !important;
+    width: 3.35rem;
+    height: 3.35rem;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background: #e7e4de !important;
+    border: 0 !important;
+    box-shadow: none !important;
     color: #0a0c2a !important;
-    box-shadow: 0 6px 20px rgba(133, 98, 216, 0.08) !important;
-    backdrop-filter: none !important;
-    gap: 0.35rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0 !important;
   }
-  .lift-deck__card:hover {
-    background: #fbfaff !important;
-    transform: none;
-  }
-  .lift-deck__kicker {
-    color: #8562d8 !important;
-    font-size: 0.68rem;
-  }
-  .lift-deck__card strong {
-    font-size: 1.05rem !important;
+  .lift-deck__glyph {
+    display: grid !important;
+    place-items: center;
     color: #0a0c2a;
   }
-  .lift-deck__card p {
-    color: #5a5670 !important;
-    font-size: 0.78rem !important;
-    line-height: 1.4 !important;
-    -webkit-line-clamp: 3;
-  }
+  .lift-deck__kicker,
+  .lift-deck__card strong,
+  .lift-deck__card p,
   .lift-deck__go {
-    color: #6e4bc4 !important;
+    display: none !important;
   }
   .lift-sochi {
-    padding-top: 1.1rem;
+    padding-top: 1.6rem;
+    text-align: center;
+  }
+  .lift-sochi h2 {
+    font-size: 1.28rem !important;
+    line-height: 1.25;
+    max-width: 22rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .lift-sochi__grid {
+    text-align: left;
   }
 }
 
@@ -234,9 +277,25 @@
   min-width: 0;
 }
 
-.dashboard-shell,
-.messages-root,
-.friends-page {
-  min-width: 0;
-  max-width: 100%;
+.lift-deck__glyph {
+  display: none;
+}
+
+@media (min-width: 861px) {
+  .lift-hero {
+    position: relative;
+  }
+  .lift-hero__copy {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6.2rem;
+    z-index: 3;
+    color: #fff;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .lift-hero__title span {
+    color: #afca03;
+  }
 }

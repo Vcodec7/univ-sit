@@ -25,8 +25,10 @@ test('mobile home keeps one booking CTA and actionable deck cards', () => {
   assert.match(hero, /lift-deck__go/);
   assert.match(css, /lift-hero__lead \{\s*display: none;/);
   const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
-  assert.match(unify, /Home: light phone chrome/);
-  assert.match(unify, /background: #fff !important/);
+  assert.match(unify, /quiet media plate/);
+  assert.match(unify, /background: #0a0c2a !important/);
+  assert.match(unify, /lift-deck__glyph/);
+  assert.match(hero, /lift-deck__glyph/);
 });
 
 test('profile card stacks identity then actions then extras', () => {
