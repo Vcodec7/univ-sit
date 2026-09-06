@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { FaqCategory } from '@/lib/faq-content';
+import { FAQ_CATEGORIES, type FaqCategory } from '@/lib/faq-content';
 import { isNextBuildPhase } from '@/lib/build-phase';
 
 function slugify(input: string) {
@@ -14,6 +14,7 @@ function slugify(input: string) {
 
 export async function getPublishedFaqCategories(): Promise<FaqCategory[]> {
   if (isNextBuildPhase()) return [];
+  await ensureBuiltinFaq();
   const rows = await prisma.faqCategory.findMany({
     where: { published: true },
     orderBy: [{ sortOrder: 'asc' }, { title: 'asc' }],
@@ -45,3 +46,49 @@ export async function listFaqAdmin() {
 }
 
 export { slugify };
+
+/** Copy built-in /faq topics into the database so admin and the public page share one list. */
+export async function ensureBuiltinFaq() {
+  if (isNextBuildPhase()) return { createdCategories: 0, createdItems: 0 };
+  const needItems = FAQ_CATEGORIES.reduce((n, c) => n + c.items.length, 0);
+  const [catCount, itemCount] = await Promise.all([
+    prisma.faqCategory.count(),
+    prisma.faqItem.count(),
+  ]);
+  if (catCount >= FAQ_CATEGORIES.length && itemCount >= needItems) {
+    return { createdCategories: 0, createdItems: 0 };
+  }
+  let createdCategories = 0;
+  let createdItems = 0;
+  for (let i = 0; i < FAQ_CATEGORIES.length; i++) {
+    const cat = FAQ_CATEGORIES[i];
+    const slug = slugify(cat.id);
+    let row = await prisma.faqCategory.findUnique({ where: { slug }, select: { id: true } });
+    if (!row) {
+      row = await prisma.faqCategory.create({
+        data: { title: cat.title, slug, sortOrder: i, published: true },
+        select: { id: true },
+      });
+      createdCategories += 1;
+    }
+    for (let j = 0; j < cat.items.length; j++) {
+      const item = cat.items[j];
+      const exists = await prisma.faqItem.findFirst({
+        where: { categoryId: row.id, question: item.q },
+        select: { id: true },
+      });
+      if (exists) continue;
+      await prisma.faqItem.create({
+        data: {
+          categoryId: row.id,
+          question: item.q,
+          answer: item.a,
+          sortOrder: j,
+          published: true,
+        },
+      });
+      createdItems += 1;
+    }
+  }
+  return { createdCategories, createdItems };
+}

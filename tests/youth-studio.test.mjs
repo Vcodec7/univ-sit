@@ -36,5 +36,10 @@ test('admin studio wizard and publish hide drafts', () => {
   assert.match(faq, /Категория создана/);
   assert.match(faq, /Редактировать/);
   assert.match(faq, /Открыть вопросы/);
+  assert.match(faq, /Базовые вопросы подтягиваются сами/);
+  const faqDb = readFileSync(join(root, 'src/lib/faq-db.ts'), 'utf8');
+  const faqApi = readFileSync(join(root, 'src/app/api/admin/faq/route.ts'), 'utf8');
+  assert.match(faqDb, /ensureBuiltinFaq/);
+  assert.match(faqApi, /ensureBuiltinFaq/);
   assert.match(settings, /admin-settings-health/);
 });

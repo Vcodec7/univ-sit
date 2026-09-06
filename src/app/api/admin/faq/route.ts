@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requirePermission, aclJsonError, AclError } from '@/lib/acl';
-import { slugify } from '@/lib/faq-db';
+import { slugify, ensureBuiltinFaq } from '@/lib/faq-db';
 import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
@@ -53,6 +53,7 @@ async function loadCategories() {
 export async function GET() {
   try {
     await requirePermission('pages');
+    await ensureBuiltinFaq();
     const categories = await loadCategories();
     return NextResponse.json({ categories });
   } catch (e) {

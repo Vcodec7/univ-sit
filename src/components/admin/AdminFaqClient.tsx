@@ -105,7 +105,7 @@ export default function AdminFaqClient() {
     <div className="admin-faq-page">
       <header className="admin-faq-page__head">
         <h1>FAQ — категории и вопросы</h1>
-        <p>На одном экране: добавить тему, увидеть уже созданные и понять, что ищут посетители.</p>
+        <p>Те же темы, что на странице «Вопросы и ответы». Базовые вопросы подтягиваются сами — их можно править здесь.</p>
       </header>
 
       {error ? (
@@ -143,7 +143,9 @@ export default function AdminFaqClient() {
         <h2 id="faq-current-title">Текущие категории</h2>
         {loading && !hasCats ? <p className="admin-studio-hint">Загрузка…</p> : null}
         {!loading && !hasCats ? (
-          <div className="admin-faq-empty">Категорий пока нет — создайте первую.</div>
+          <div className="admin-faq-empty">
+            Категорий в базе ещё нет. Нажмите «Обновить» — подтянутся темы с публичной страницы FAQ.
+          </div>
         ) : null}
         {hasCats ? (
           <ul className="admin-faq-cat-list">
