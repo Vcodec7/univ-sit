@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
 import './globals.css';
+import './layout-unify.css';
 import './auth-layout.css';
 import '../../public/brand/theme.css';
 import NavbarWrapper from '@/components/NavbarWrapper';

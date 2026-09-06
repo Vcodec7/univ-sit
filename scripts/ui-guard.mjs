@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const css = fs.readFileSync(path.join(root, 'src/app/globals.css'), 'utf8');
+const layoutSrc = fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8');
 const providers = fs.readFileSync(path.join(root, 'src/components/Providers.tsx'), 'utf8');
 const gamesCss = fs.readFileSync(path.join(root, 'src/app/games/games.css'), 'utf8');
 
@@ -46,6 +47,10 @@ const navEndSmear = lastMatch(
 );
 if (navEndSmear && /#fff/.test(navEndSmear) && /box-shadow/.test(navEndSmear)) {
   fails.push('desktop .glass-nav-end still paints a white smear over header icons');
+}
+
+if (!/layout-unify\.css/.test(layoutSrc)) {
+  fails.push('app/layout.tsx must import layout-unify.css after globals');
 }
 
 if (!/html\.is-admin \.glass-nav/.test(css)) {

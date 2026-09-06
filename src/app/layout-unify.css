@@ -1,0 +1,152 @@
+/**
+ * Last-win layout: one shell, no overlapping chrome, aligned catalogs.
+ * Imported after globals.css from app/layout.tsx.
+ */
+
+.catalog-page {
+  padding-top: 1.15rem;
+  padding-bottom: 2.75rem;
+}
+
+.catalog-page-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem 1.15rem;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .catalog-page-header {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 28rem);
+    align-items: center;
+  }
+}
+
+.catalog-page-header__intro {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 0.4rem 0.65rem !important;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-page-header__intro .page-hero-title {
+  display: block !important;
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 100% !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.catalog-page-header__count {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+.catalog-page-header__search {
+  width: 100%;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  min-width: 0;
+}
+
+.grid-cards,
+.event-grid,
+.places-grid {
+  align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.25rem), 1fr));
+}
+
+.catalog-card,
+.event-card {
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-card-body,
+.catalog-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.catalog-card-meta {
+  margin-top: auto;
+}
+
+.main-content img:not(.site-brand-logo):not(.svc-hero__media img) {
+  max-width: 100%;
+}
+
+.admin-main,
+.admin-page-shell {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.admin-main table,
+.admin-page-shell table {
+  max-width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .glass-nav-inner {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+  .glass-nav-end {
+    flex-shrink: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --yp-hero-h: min(22.5rem, 52svh);
+  }
+  html.has-bottom-nav,
+  body.has-bottom-nav {
+    --yp-hero-h: min(20.5rem, 46svh);
+  }
+  .svc-hero--banner,
+  .svc-hero--banner.svc-hero {
+    min-height: var(--yp-hero-h) !important;
+    height: auto !important;
+    max-height: var(--yp-hero-h);
+  }
+  .pwa-install-banner,
+  .yp-pwa-install,
+  [data-yp-pwa-install] {
+    bottom: calc(0.75rem + var(--yp-bottom-nav-h, 0px)) !important;
+    z-index: 9000 !important;
+  }
+  .yp-cookie-banner,
+  .consent-banner {
+    bottom: calc(0.5rem + var(--yp-bottom-nav-h, 0px));
+  }
+}
+
+.faq-hub__chips,
+.places-chips,
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.dashboard-shell,
+.messages-root,
+.friends-page {
+  min-width: 0;
+  max-width: 100%;
+}
