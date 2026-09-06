@@ -347,6 +347,7 @@ export const authOptions: NextAuthOptions = {
               mustChangePassword: true,
               moderationApprovedAt: true,
               createdAt: true,
+              lastActiveAt: true,
             },
           });
           if (!dbUser) {
@@ -397,17 +398,26 @@ export const authOptions: NextAuthOptions = {
           token.nickname = dbUser.nickname ?? null;
           token.ecoPoints = typeof dbUser.ecoPoints === "number" ? dbUser.ecoPoints : 0;
           token.tv = dbUser.tokenVersion;
-          try {
-            const { touchUserPresence } = await import('@/lib/presence');
-            await touchUserPresence(token.id as string);
-          } catch {
-            /* presence is best-effort */
+          const idleMs = dbUser.lastActiveAt ? Date.now() - dbUser.lastActiveAt.getTime() : Number.POSITIVE_INFINITY;
+          if (idleMs >= 45_000) {
+            try {
+              const { touchUserPresence } = await import('@/lib/presence');
+              await touchUserPresence(token.id as string);
+            } catch {
+              /* presence is best-effort */
+            }
           }
           if (dbUser.name) token.name = dbUser.name;
           if (dbUser.email) token.email = dbUser.email;
           try {
-            const { syncAccountModeration } = await import("@/lib/account-moderation");
-            token.moderationPending = await syncAccountModeration(token.id as string);
+            const { isStaffRole, syncAccountModeration } = await import('@/lib/account-moderation');
+            if (isStaffRole(dbUser.role) && dbUser.moderationApprovedAt) {
+              token.moderationPending = false;
+            } else if (dbUser.moderationApprovedAt) {
+              token.moderationPending = false;
+            } else {
+              token.moderationPending = await syncAccountModeration(token.id as string);
+            }
           } catch {
             token.moderationPending = false;
           }

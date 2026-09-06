@@ -20941,7 +20941,7 @@ a.score-ring-link:hover {
 }
 
 .ops-console {
-  max-width: 860px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 1rem 3rem;
 }
@@ -22752,9 +22752,6 @@ html[data-eco-theme='theme_nightcity'] .profile-hero__role {
   background: #6e4bc4;
   color: #fff;
   border-color: #6e4bc4;
-}
-.ops-console {
-  max-width: 1080px;
 }
 .ops-pres {
   display: grid;

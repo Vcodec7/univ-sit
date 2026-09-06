@@ -1,2 +1,2 @@
 /** Public product version shown in the footer. Keep in sync with package.json + CHANGELOG.md. */
-export const APP_VERSION = '1.6.120';
+export const APP_VERSION = '1.6.121';
