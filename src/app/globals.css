@@ -30101,6 +30101,35 @@ html.is-admin .main-content {
 .admin-studio-hint { color: var(--muted); font-size: 0.82rem; margin: 0; }
 .admin-studio-warn { color: #b45309; font-weight: 600; }
 .admin-studio__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.studio-copy { gap: 0.45rem; }
+.studio-copy__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.studio-copy__chips button {
+  max-width: 100%;
+  text-align: left;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 12, 42, 0.12);
+  background: #fff;
+  color: #0a0c2a;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.studio-copy__chips button.is-on {
+  background: #0a0c2a;
+  color: #fff;
+  border-color: #0a0c2a;
+}
+.studio-copy__chips button.is-own.is-on {
+  background: #8562d8;
+  border-color: #8562d8;
+  color: #fff;
+}
 .admin-studio__join { display: grid; gap: 0.5rem; border: 0; padding: 0; }
 .admin-studio__join-opt { display: grid; gap: 0.15rem; padding: 0.7rem 0.85rem; border-radius: 12px; border: 1px solid rgba(15,23,42,0.1); }
 .admin-studio__join-opt.is-on { border-color: var(--primary); background: rgba(59,130,246,0.06); }

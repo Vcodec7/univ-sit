@@ -16,9 +16,11 @@ import {
   YOUTH_TEMPLATES,
   parseStudioJson,
   studioChecklist,
+  studioCopyChips,
   stripHtml,
   type JoinMode,
 } from '@/lib/youth-studio';
+import StudioCopyField from '@/components/admin/StudioCopyField';
 import { SPACE_CATEGORIES } from '@/lib/spaces';
 
 export type StudioKind = 'project' | 'club' | 'space' | 'page';
@@ -287,22 +289,34 @@ export default function AdminYouthStudioForm({
       </section>
 
       <section className="admin-studio__panel" hidden={stepId !== 'copy'}>
-        <label className="admin-studio__field">
-          <span>Зачем идти / читать</span>
-          <textarea name="mission" rows={2} value={mission} onChange={(e) => setMission(e.target.value)} />
-        </label>
-        <label className="admin-studio__field">
-          <span>Кому подойдёт</span>
-          <textarea name="audience" rows={2} value={audience} onChange={(e) => setAudience(e.target.value)} />
-        </label>
-        <label className="admin-studio__field">
-          <span>Что будет / о чём страница</span>
-          <textarea name="whatHappens" rows={2} value={whatHappens} onChange={(e) => setWhatHappens(e.target.value)} />
-        </label>
-        <label className="admin-studio__field">
-          <span>Что получит читатель</span>
-          <textarea name="goal" rows={2} value={goal} onChange={(e) => setGoal(e.target.value)} />
-        </label>
+        <StudioCopyField
+          name="mission"
+          label="Зачем идти / читать"
+          value={mission}
+          onChange={setMission}
+          options={studioCopyChips(kind, 'mission')}
+        />
+        <StudioCopyField
+          name="audience"
+          label="Кому подойдёт"
+          value={audience}
+          onChange={setAudience}
+          options={studioCopyChips(kind, 'audience')}
+        />
+        <StudioCopyField
+          name="whatHappens"
+          label="Что будет / о чём страница"
+          value={whatHappens}
+          onChange={setWhatHappens}
+          options={studioCopyChips(kind, 'whatHappens')}
+        />
+        <StudioCopyField
+          name="goal"
+          label="Что получит читатель"
+          value={goal}
+          onChange={setGoal}
+          options={studioCopyChips(kind, 'goal')}
+        />
         <label className="admin-studio__field">
           <span>
             {kind === 'page' ? 'Содержание' : 'Полное описание'} <em>*</em>
@@ -382,10 +396,13 @@ export default function AdminYouthStudioForm({
               </label>
             ))}
           </fieldset>
-          <label className="admin-studio__field">
-            <span>Как присоединиться (текст на странице)</span>
-            <textarea name="howToJoin" rows={2} value={howToJoin} onChange={(e) => setHowToJoin(e.target.value)} />
-          </label>
+          <StudioCopyField
+            name="howToJoin"
+            label="Как присоединиться (текст на странице)"
+            value={howToJoin}
+            onChange={setHowToJoin}
+            options={studioCopyChips(kind === 'page' ? 'page' : kind, 'howToJoin')}
+          />
           <label className="admin-studio__field">
             <span>Ссылка записи</span>
             <input name="signupUrl" defaultValue={studio0.signupUrl} placeholder="https://t.me/…" />

@@ -47,6 +47,87 @@ export const EMPTY_STUDIO: YouthStudio = {
   goal: '',
 };
 
+export type StudioCopyKind = 'project' | 'club' | 'space' | 'page';
+export type StudioCopyField = 'mission' | 'audience' | 'whatHappens' | 'goal' | 'howToJoin';
+
+const COPY_SHARED: Record<StudioCopyField, string[]> = {
+  mission: [
+    'Собрать команду и сделать результат для Сочи',
+    'Попробовать тему без длинного обязательства',
+    'Помочь городу и людям рядом',
+    'Набрать опыт, который видно в портфолио',
+  ],
+  audience: [
+    '14–18, школьники',
+    '18–35, студенты и молодые специалисты',
+    'Кто приходит впервые',
+    'Команды и компании друзей',
+    'Волонтёры',
+    'Молодые семьи',
+  ],
+  whatHappens: [
+    'Короткие встречи и понятный план сезона',
+    'Один вечер / интенсив',
+    'Регулярно каждую неделю',
+    'Очно + иногда онлайн',
+  ],
+  goal: [
+    'Навык и строка в портфолио',
+    'Новые люди и свои тусовки',
+    'М-баллы и значки',
+    'Готовый продукт, акция или выезд',
+  ],
+  howToJoin: [
+    'Заявка на сайте — куратор напишет',
+    'Запись по кнопке, пока есть места',
+    'Можно приходить без записи',
+    'Набор сейчас закрыт — следите за обновлениями',
+  ],
+};
+
+const COPY_KIND: Record<StudioCopyKind, Partial<Record<StudioCopyField, string[]>>> = {
+  project: {
+    mission: ['Делаем вместе результат для города — видно в портфолио.'],
+    audience: ['Тем, кто хочет собрать команду и довести идею до запуска.'],
+    whatHappens: ['Короткие спринты, разбор задач, публичный итог сезона.'],
+    goal: ['Опыт, ментор, строка в портфолио и М-баллы за вклад.'],
+  },
+  club: {
+    mission: ['Регулярные встречи с людьми с тем же интересом.'],
+    audience: ['Кто хочет ходить каждую неделю, а не разово.'],
+    whatHappens: ['Встречи по расписанию, темы сезона, мини-проекты.'],
+    goal: ['Свои люди, навыки и совместные выезды.'],
+  },
+  space: {
+    mission: ['Место, куда можно прийти учиться, работать и встречаться.'],
+    audience: ['Кто ищет зал, коворкинг или площадку в Сочи.'],
+    whatHappens: ['Свободные слоты, события, чекин по QR.'],
+    goal: ['Расписание, бронь и понятные правила дома.'],
+  },
+  page: {
+    mission: ['Понятный текст для гостя: зачем читать и что делать дальше.'],
+    audience: ['Посетители портала и участники программ.'],
+    whatHappens: ['Короткий лид, основной текст, ссылки дальше.'],
+    goal: ['Ответы, правила или история — без канцелярита.'],
+  },
+};
+
+function uniqueLines(list: string[]) {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const line of list) {
+    const t = line.trim();
+    if (!t || seen.has(t)) continue;
+    seen.add(t);
+    out.push(t);
+  }
+  return out;
+}
+
+export function studioCopyChips(kind: StudioCopyKind, field: StudioCopyField): string[] {
+  return uniqueLines([...(COPY_KIND[kind]?.[field] || []), ...COPY_SHARED[field]]);
+}
+
 export const YOUTH_TEMPLATES: Record<
   string,
   { label: string; why: string; audience: string; offer: string; whatHappens: string; howToJoin: string }

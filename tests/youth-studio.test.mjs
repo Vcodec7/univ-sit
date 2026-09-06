@@ -30,6 +30,8 @@ test('admin studio wizard and publish hide drafts', () => {
   assert.match(pages, /kind="page"/);
   assert.match(form, /STEPS_SPACE/);
   assert.match(form, /bookingMode/);
+  assert.match(form, /StudioCopyField/);
+  assert.match(studio, /studioCopyChips/);
   assert.match(faq, /Текущие категории/);
   assert.match(faq, /Категория создана/);
   assert.match(faq, /Редактировать/);
