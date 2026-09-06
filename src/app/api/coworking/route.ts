@@ -30,14 +30,12 @@ export async function GET(req: Request) {
       const session = await requireUser();
       const rows = await prisma.coworkingSignup.findMany({
         where: {
-          status: { in: [...activeSignupStatuses(), 'ATTENDED'] },
-          endTime: { gte: new Date(Date.now() - 2 * 86400000) },
           OR: [
             { userId: session.user.id },
-            { members: { some: { userId: session.user.id, status: 'APPROVED' } } },
+            { members: { some: { userId: session.user.id } } },
           ],
         },
-        orderBy: { startTime: 'asc' },
+        orderBy: { startTime: 'desc' },
         include: {
           space: { select: { id: true, title: true, address: true, image: true, capacity: true } },
           members: { select: { userId: true, status: true, role: true } },

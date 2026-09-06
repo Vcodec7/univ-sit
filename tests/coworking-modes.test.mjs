@@ -57,5 +57,13 @@ test('cabinet bookings keep group and cancel in a separate actions row', () => {
   const src = readFileSync(join(root, 'src/components/CoworkingCabinetList.tsx'), 'utf8');
   assert.match(src, /cw-cabinet-pill__actions/);
   assert.match(src, /cw-cabinet-pill__group/);
+  assert.match(src, /История/);
+  assert.match(src, /Отменить участие/);
   assert.doesNotMatch(src, /className="cw-cabinet-pill__cancel">\s*Группа/);
+});
+
+test('coworking mine list keeps cancelled and past visits', () => {
+  const src = readFileSync(join(root, 'src/app/api/coworking/route.ts'), 'utf8');
+  assert.match(src, /orderBy: \{ startTime: 'desc' \}/);
+  assert.doesNotMatch(src, /endTime: \{ gte: new Date\(Date.now\(\) - 2 \* 86400000\) \}/);
 });

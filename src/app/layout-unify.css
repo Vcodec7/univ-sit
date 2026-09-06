@@ -838,7 +838,44 @@ html[data-eco-frame] .dashboard-page .profile-hero__avatar,
 }
 .dashboard-page .cw-cabinet-head {
   align-items: center;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.55rem;
+}
+.dashboard-page .cw-cabinet-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin: 0 0 0.65rem;
+}
+.dashboard-page .cw-cabinet-tab {
+  min-height: 2rem;
+  border: 1px solid rgba(10, 12, 42, 0.1);
+  border-radius: 999px;
+  background: #fff;
+  color: #5a5670;
+  font-size: 0.78rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.dashboard-page .cw-cabinet-tab.is-on {
+  background: #0a0c2a;
+  border-color: #0a0c2a;
+  color: #fff;
+}
+.dashboard-page .cw-cabinet-tab span {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
+  margin-left: 0.2rem;
+}
+.dashboard-page .cw-cabinet-history-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #6e4bc4;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 .dashboard-page .cw-cabinet-head h2 {
   margin: 0;
