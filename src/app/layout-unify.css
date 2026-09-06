@@ -133,6 +133,96 @@
   .consent-banner {
     bottom: calc(0.5rem + var(--yp-bottom-nav-h, 0px));
   }
+
+  /* Home: light phone chrome — no navy shell */
+  .lift-hero {
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    padding: 0.65rem 0 0;
+  }
+  .lift-hero__stage {
+    margin: 0 max(1rem, env(safe-area-inset-left)) 0 max(1rem, env(safe-area-inset-right));
+    min-height: 11.75rem !important;
+    max-height: none !important;
+    height: auto !important;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(133, 98, 216, 0.1);
+    border: 1px solid rgba(133, 98, 216, 0.12);
+  }
+  .lift-hero__veil {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(250, 251, 244, 0.42) 48%,
+      rgba(250, 251, 244, 0.96) 100%
+    ) !important;
+  }
+  .lift-hero__glow {
+    background: radial-gradient(ellipse at 80% 0%, rgba(175, 202, 3, 0.18), transparent 46%) !important;
+  }
+  .lift-hero__copy {
+    color: #0a0c2a !important;
+    padding: 3.4rem 0.15rem 1rem !important;
+  }
+  .lift-hero__eyebrow {
+    color: #6e4bc4 !important;
+  }
+  .lift-hero__title {
+    color: #0a0c2a !important;
+    text-shadow: none !important;
+    font-size: 1.42rem !important;
+    line-height: 1.15 !important;
+  }
+  .lift-hero__title span {
+    color: #6e4bc4 !important;
+  }
+  .lift-hero__btn--ghost {
+    color: #6e4bc4 !important;
+  }
+  .lift-deck {
+    margin-top: 0.85rem !important;
+    margin-bottom: 0.35rem !important;
+    padding: 0 !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.7rem !important;
+  }
+  .lift-deck__card {
+    min-height: 8.4rem;
+    padding: 0.95rem 0.9rem 0.95rem !important;
+    border-radius: 1.15rem !important;
+    background: #fff !important;
+    border: 1px solid #e6e2f2 !important;
+    color: #0a0c2a !important;
+    box-shadow: 0 6px 20px rgba(133, 98, 216, 0.08) !important;
+    backdrop-filter: none !important;
+    gap: 0.35rem;
+  }
+  .lift-deck__card:hover {
+    background: #fbfaff !important;
+    transform: none;
+  }
+  .lift-deck__kicker {
+    color: #8562d8 !important;
+    font-size: 0.68rem;
+  }
+  .lift-deck__card strong {
+    font-size: 1.05rem !important;
+    color: #0a0c2a;
+  }
+  .lift-deck__card p {
+    color: #5a5670 !important;
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+    -webkit-line-clamp: 3;
+  }
+  .lift-deck__go {
+    color: #6e4bc4 !important;
+  }
+  .lift-sochi {
+    padding-top: 1.1rem;
+  }
 }
 
 .faq-hub__chips,
