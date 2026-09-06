@@ -39,4 +39,7 @@ test('profile card stacks identity then actions then extras', () => {
   const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
   assert.match(unify, /profile-hero--cabinet \.profile-hero__main/);
   assert.match(unify, /0 0 0 5px #afca03/);
+  assert.match(unify, /profile-hero__showcase--shelf/);
+  assert.match(unify, /--chip-accent/);
+  assert.match(profile, /--chip-accent/);
 });

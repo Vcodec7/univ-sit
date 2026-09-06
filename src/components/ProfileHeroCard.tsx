@@ -567,11 +567,7 @@ export default function ProfileHeroCard({
                 <span
                   key={def.code}
                   className="profile-hero__chip"
-                  style={{
-                    borderColor: `color-mix(in srgb, ${def.accent} 40%, transparent)`,
-                    background: `color-mix(in srgb, ${def.accent} 12%, #fff)`,
-                    color: def.accent,
-                  }}
+                  style={{ '--chip-accent': def.accent } as CSSProperties}
                 >
                   <BadgeIcon def={def} size={13} />
                   {def.title}
