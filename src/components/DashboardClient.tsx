@@ -830,8 +830,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                           Выбрать фото
                           <input
                             type="file"
-                            accept="image/png,image/jpeg,image/webp,image/gif"
-                            capture="environment"
+                            accept="image/*"
                             style={{ display: 'none' }}
                             onChange={(e) => {
                               const file = e.target.files?.[0] || null;

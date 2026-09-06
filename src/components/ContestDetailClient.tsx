@@ -306,7 +306,7 @@ export default function ContestDetailClient() {
                 <input
                   ref={fileRef}
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  accept="image/*"
                   hidden
                   onChange={(e) => {
                     const f = e.target.files?.[0];

@@ -385,8 +385,7 @@ export default function ProfileHeroCard({
                 <Camera size={12} />
                 <input
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  capture="environment"
+                  accept="image/*"
                   hidden
                   onChange={(e) => {
                     const file = e.target.files?.[0];

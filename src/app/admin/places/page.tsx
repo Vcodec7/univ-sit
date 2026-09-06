@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import RichTextInput from '@/components/RichTextInput';
 import CoverImageField from '@/components/admin/CoverImageField';
+import GalleryPickerField from '@/components/admin/GalleryPickerField';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
@@ -222,10 +223,6 @@ function featuresTextareaValue(raw?: string | null) {
   return features.map((f) => `${f.icon}|${f.title}|${f.text}`).join('\n');
 }
 
-function galleryTextareaValue(raw?: string | null) {
-  return parseGalleryJson(raw).join(', ');
-}
-
 export default async function AdminPlaces({
   searchParams,
 }: {
@@ -343,8 +340,7 @@ export default async function AdminPlaces({
         <textarea name="featuresJson" rows={4} defaultValue={featuresTextareaValue(item?.featuresJson)} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)', fontFamily: 'ui-monospace, monospace', fontSize: '0.85rem' }} />
       </div>
       <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Галерея (URL через запятую)</label>
-        <textarea name="gallery" rows={2} defaultValue={galleryTextareaValue(item?.galleryJson)} style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(0,0,0,0.1)' }} />
+        <GalleryPickerField name="gallery" label="Галерея" defaultValue={item?.galleryJson} />
       </div>
       <div>
         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500 }}>Советы</label>

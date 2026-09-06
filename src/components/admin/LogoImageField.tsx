@@ -97,7 +97,7 @@ export default function LogoImageField({
               className="btn btn-secondary"
               style={{ cursor: 'pointer', margin: 0, padding: '0.5rem 0.9rem', fontSize: '0.85rem' }}
             >
-              {shown ? 'Заменить' : 'Загрузить логотип'}
+              {shown ? 'Заменить' : 'Из галереи или файлов'}
             </label>
             {shown && (
               <button
@@ -121,7 +121,7 @@ export default function LogoImageField({
         id={inputId}
         type="file"
         name={name}
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/*"
         style={{ display: 'none' }}
         onChange={(e) => onFile(e.target.files?.[0] || null)}
       />

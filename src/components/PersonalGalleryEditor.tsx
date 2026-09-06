@@ -125,10 +125,10 @@ export default function PersonalGalleryEditor() {
         {items.length < max ? (
           <label className="personal-gallery-editor__add">
             <ImagePlus size={18} />
-            <span>Добавить</span>
+            <span>Из галереи</span>
             <input
               type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
+              accept="image/*"
               hidden
               disabled={busy}
               onChange={(e) => {

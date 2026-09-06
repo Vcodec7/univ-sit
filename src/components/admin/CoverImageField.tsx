@@ -104,7 +104,7 @@ export default function CoverImageField({
               background: 'rgba(255,255,255,0.95)',
             }}
           >
-            {preview ? 'Заменить' : 'Выбрать файл'}
+            {preview ? 'Заменить' : 'Из галереи или файлов'}
           </label>
           {preview && (
             <button
@@ -131,12 +131,12 @@ export default function CoverImageField({
         id={inputId}
         type="file"
         name={name}
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/*"
         style={{ display: 'none' }}
         onChange={(e) => onFile(e.target.files?.[0] || null)}
       />
       <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '0.45rem 0 0' }}>
-        Рекомендуем горизонтальное фото 1600×900. Пустой выбор сохраняет текущее изображение.
+        Рекомендуем горизонтальное фото 1600×900. Выберите снимок из галереи телефона или файл на компьютере.
       </p>
     </div>
   );
