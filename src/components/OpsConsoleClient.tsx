@@ -6,8 +6,9 @@ import OpsFlagsClient from '@/components/OpsFlagsClient';
 import OpsAccountPanel from '@/components/OpsAccountPanel';
 import OpsPresentationClient from '@/components/OpsPresentationClient';
 import OpsTopologyClient from '@/components/OpsTopologyClient';
+import OpsSitePanel from '@/components/OpsSitePanel';
 
-type Tab = 'modules' | 'topology' | 'presentation' | 'account';
+type Tab = 'modules' | 'site' | 'topology' | 'presentation' | 'account';
 
 export default function OpsConsoleClient() {
   const [tab, setTab] = useState<Tab>('modules');
@@ -29,6 +30,7 @@ export default function OpsConsoleClient() {
         {(
           [
             { id: 'modules' as const, label: 'Модули' },
+            { id: 'site' as const, label: 'Площадка' },
             { id: 'topology' as const, label: 'Топология' },
             { id: 'presentation' as const, label: 'Презентация' },
             { id: 'account' as const, label: 'Безопасность учётки' },
@@ -55,6 +57,8 @@ export default function OpsConsoleClient() {
 
       {tab === 'modules' ? (
         <OpsFlagsClient embedded />
+      ) : tab === 'site' ? (
+        <OpsSitePanel />
       ) : tab === 'presentation' ? (
         <OpsPresentationClient />
       ) : (

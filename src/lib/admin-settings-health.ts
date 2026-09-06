@@ -1,13 +1,16 @@
 import { prisma } from '@/lib/prisma';
+import { identityFromSettings, isLocalOrigin } from '@/lib/site-identity-shared';
 
 export type SettingsHealthItem = { id: string; label: string; ok: boolean; href: string; group: 'core' | 'more' };
 
 export async function getSettingsHealth() {
   const s = await prisma.siteSettings.findUnique({ where: { id: '1' } });
+  const origin = identityFromSettings(s).publicOrigin;
+  const urlOk = Boolean(s?.publicSiteUrl) || Boolean(origin && !isLocalOrigin(origin));
   const core: SettingsHealthItem[] = [
     { id: 'name', label: 'Название портала', ok: Boolean(s?.siteName), href: '/admin/settings?tab=general', group: 'core' },
     { id: 'logo', label: 'Логотип', ok: Boolean(s?.logoUrl), href: '/admin/settings?tab=general', group: 'core' },
-    { id: 'url', label: 'Публичный адрес', ok: Boolean(s?.publicSiteUrl), href: '/admin/settings?tab=general', group: 'core' },
+    { id: 'url', label: 'Публичный адрес', ok: urlOk, href: '/admin/settings?tab=general', group: 'core' },
     {
       id: 'contact',
       label: 'Контакты',

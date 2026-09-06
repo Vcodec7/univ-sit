@@ -2,7 +2,7 @@ import { requireAdmin, requireAdminPage, requireSuperAdmin } from '@/lib/acl';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { tgSend, tgSetWebhook } from '@/lib/telegram';
-import { maxSend, maxSetWebhook, maxEnsureWebhook } from '@/lib/max';
+import { maxSend } from '@/lib/max';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { sendEmail } from '@/lib/email';
@@ -36,6 +36,7 @@ import {
 } from '@/lib/moderation-config';
 import { getModuleFlags, isTechRole, type ModuleFlagKey } from '@/lib/module-flags';
 import { getSettingsHealth } from '@/lib/admin-settings-health';
+import { getSiteIdentity } from '@/lib/site-identity';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,8 +111,6 @@ async function updateSettings(formData: FormData) {
     data.siteName = (formData.get('siteName') as string) || 'YoungPortal';
     data.publicEventsVisibility = formData.get('publicEventsVisibility') === 'true';
     data.heroAnimationMode = (formData.get('heroAnimationMode') as string) === 'static' ? 'static' : 'animated';
-    const publicSiteUrl = ((formData.get('publicSiteUrl') as string) || '').trim();
-    data.publicSiteUrl = publicSiteUrl || null;
     const logoFile = formData.get('logoFile') as File | null;
     const existingLogo = ((formData.get('logoUrl') as string) || '').trim();
     if (logoFile && logoFile.size > 0) {
@@ -426,23 +425,6 @@ async function registerTelegramWebhook() {
   redirect(`/admin/settings?tab=notifications&tghook=${r.ok ? 'ok' : 'fail'}`);
 }
 
-async function registerMaxWebhook(formData: FormData) {
-  'use server';
-  await requireAdmin();
-  const rawSecret = String(formData.get('maxWebhookSecret') || '').trim();
-  if (rawSecret) {
-    await prisma.siteSettings.upsert({
-      where: { id: '1' },
-      update: { maxWebhookSecret: rawSecret },
-      create: { id: '1', maxWebhookSecret: rawSecret },
-    });
-  }
-  const { maxEnsureWebhook } = await import('@/lib/max');
-  const r = await maxEnsureWebhook();
-  const { redirect } = await import('next/navigation');
-  redirect(`/admin/settings?tab=notifications&maxhook=${r.ok ? 'ok' : 'fail'}`);
-}
-
 export default async function AdminSettings({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string }> }) {
   const session = await requireAdminPage();
   const resolvedParams = await searchParams;
@@ -451,6 +433,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
   const justSaved  = resolvedParams.saved === '1';
 
   const settings = await prisma.siteSettings.findUnique({ where: { id: '1' } });
+  const identity = await getSiteIdentity();
   const flags = await getModuleFlags();
   const tech = isTechRole(session.user.role);
   const health = await getSettingsHealth();
@@ -635,20 +618,12 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={labelStyle}>Адрес сайта</label>
-                  <input
-                    name="publicSiteUrl"
-                    type="url"
-                    defaultValue={(settings as any)?.publicSiteUrl || ''}
-                    className="settings-input"
-                    placeholder="https://py.idivles.ru"
-                  />
-                  <details className="settings-more">
-                    <summary>Зачем это поле</summary>
-                    <p>
-                      Письма, календарь, приглашения и карта сайта. Если пусто — берётся адрес сервера.
-                      После смены домена на VPS обновите ещё <code>NEXTAUTH_URL</code> в .env.
-                    </p>
-                  </details>
+                  <p className="settings-input" style={{ margin: 0, background: '#f1f5f9' }}>
+                    {identity.publicOrigin}
+                  </p>
+                  <p className="settings-help">
+                    Публичный адрес и вебхуки мессенджеров задаёт техническая служба. Здесь только просмотр.
+                  </p>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <LogoImageField currentLogo={settings?.logoUrl || DEFAULT_LOGO} />
@@ -1375,10 +1350,9 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
             </div>
             <div style={cardStyle}>
               <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.05rem', fontWeight: 700 }}>MAX-бот</h3>
-              <label style={labelStyle}>Токен бота MAX</label>
-              <input name="maxBotToken" type="password" autoComplete="off" defaultValue="" placeholder="Оставьте пустым — не менять" className="settings-input" />
-              <label style={labelStyle}>Секрет вебхука</label>
-              <input name="maxWebhookSecret" type="password" autoComplete="off" defaultValue="" placeholder="Оставьте пустым — не менять" className="settings-input" />
+              <p style={{ margin: '0 0 0.75rem', color: 'var(--muted)', fontSize: '0.9rem' }}>
+                Токен и регистрацию вебхука ведёт техническая служба. Здесь — получатели и тест.
+              </p>
               <label style={labelStyle}>MAX user id получателей (через запятую)</label>
               <textarea name="maxAlertChatIds" rows={3} defaultValue={(settings as any)?.maxAlertChatIds || ''} className="settings-input" />
               <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -1386,11 +1360,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
               </label>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
                 <button type="submit" formAction={testMaxAlert} className="btn">Тест MAX</button>
-                <button type="submit" formAction={registerMaxWebhook} className="btn">Зарегистрировать вебхук</button>
               </div>
-              <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: 'var(--muted)' }}>Бот: <a href="https://max.ru/se13771314_bot" target="_blank" rel="noopener noreferrer">max.ru/se13771314_bot</a>.
-                Личные уведомления идут по <b>user id</b> (не chat id): пользователь должен открыть бота и нажать Start / написать /start.
-                Затем ID из ответа бота — в профиль (поле MAX ID) или сюда в получатели. Вебхук: <code>/api/integrations/max/webhook</code> (нужен сертификат Минцифры на сервере).</p>
             </div>
           </div>
         )}

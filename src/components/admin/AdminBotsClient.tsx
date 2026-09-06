@@ -314,8 +314,6 @@ export default function AdminBotsClient() {
   const [status, setStatus] = useState<BotsStatus | null>(null);
 
   const [maxEnabled, setMaxEnabled] = useState(false);
-  const [maxToken, setMaxToken] = useState('');
-  const [maxSecret, setMaxSecret] = useState('');
   const [maxIds, setMaxIds] = useState<string[]>([]);
   const [maxTypes, setMaxTypes] = useState<string[]>(MAX_UPDATE_TYPES.map((t) => t.id));
   const [maxCfg, setMaxCfg] = useState<BotChannelConfig | null>(null);
@@ -406,8 +404,6 @@ export default function AdminBotsClient() {
         body: JSON.stringify({
           action: 'saveMax',
           enabled: maxEnabled,
-          token: maxToken || undefined,
-          secret: maxSecret || undefined,
           alertIds: maxIds,
           updateTypes: maxTypes,
           config: { ...maxCfg, updateTypes: maxTypes },
@@ -416,8 +412,6 @@ export default function AdminBotsClient() {
       const d = await readJson<{ message?: string } & BotsStatus>(res);
       if (!res.ok) throw new Error(d?.message || 'Не сохранено');
       toast.success(d?.message || 'MAX сохранён');
-      setMaxToken('');
-      setMaxSecret('');
       if (d && 'max' in d) applyStatus(d as BotsStatus);
       else await reload();
     } catch (e) {
@@ -604,30 +598,13 @@ export default function AdminBotsClient() {
                 <span />
               </label>
             </div>
-            <label className="bots-label">Токен бота</label>
-            <input
-              type="password"
-              autoComplete="off"
-              className="settings-input"
-              value={maxToken}
-              onChange={(e) => setMaxToken(e.target.value)}
-              placeholder={status?.max?.hasToken ? 'Оставьте пустым — не менять' : 'Токен из кабинета MAX'}
-            />
-            <label className="bots-label">Секрет вебхука</label>
-            <input
-              type="password"
-              autoComplete="off"
-              className="settings-input"
-              value={maxSecret}
-              onChange={(e) => setMaxSecret(e.target.value)}
-              placeholder={status?.max?.hasSecret ? 'Оставьте пустым — не менять' : 'a-z A-Z 0-9 _ - от 5 символов'}
-            />
+            <p className="bots-muted">
+              Токен, секрет и регистрацию вебхука задаёт техническая служба. Здесь — включение, тексты и получатели.
+            </p>
             <p className="bots-hint">
-              API: <code>{status?.max?.apiBase}</code>
               {status?.max?.webhookUrl ? (
                 <>
-                  {' '}
-                  · вебхук: <code>{status.max.webhookUrl}</code>
+                  Вебхук этого сайта: <code>{status.max.webhookUrl}</code>
                 </>
               ) : null}
               {status?.max?.webhookRegisteredUrl &&
@@ -635,9 +612,7 @@ export default function AdminBotsClient() {
                 (status.max.webhookUrl || '').replace(/\/$/, '') ? (
                 <>
                   <br />
-                  Зарегистрирован у MAX на другом хосте:{' '}
-                  <code>{status.max.webhookRegisteredUrl}</code> — нажмите «Зарегистрировать вебхук»,
-                  чтобы переключить на этот сайт.
+                  Сейчас у MAX другой адрес: <code>{status.max.webhookRegisteredUrl}</code>
                 </>
               ) : null}
             </p>
@@ -663,15 +638,9 @@ export default function AdminBotsClient() {
               <code>./certs/</code>.
             </p>
             <div className="bots-actions">
-              <button
-                type="button"
-                className="bots-btn bots-btn--secondary"
-                disabled={busy === 'ensureMaxWebhook'}
-                onClick={() => void runAction('ensureMaxWebhook', { updateTypes: maxTypes })}
-              >
-                {busy === 'ensureMaxWebhook' ? <Loader2 size={14} className="bots-spin" /> : <RefreshCw size={14} />}
-                Зарегистрировать вебхук
-              </button>
+              <p className="bots-muted" style={{ margin: 0, flex: '1 1 12rem' }}>
+                Регистрацию вебхука MAX делает техническая служба.
+              </p>
               <button
                 type="button"
                 className="bots-btn bots-btn--ghost"

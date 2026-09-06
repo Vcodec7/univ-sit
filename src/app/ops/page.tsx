@@ -23,7 +23,7 @@ export default async function OpsPage() {
         <div className="ops-page-shell__hero-row">
           <div>
             <h1>Ops</h1>
-            <p>Техконсоль: модули, карта связей, презентация и безопасность учётки.</p>
+            <p>Техконсоль: адрес сайта, вебхуки, модули, карта связей и безопасность учётки.</p>
           </div>
           <nav className="ops-page-shell__exits" aria-label="Выход из Ops">
             <Link href="/" className="ops-exit-home">
