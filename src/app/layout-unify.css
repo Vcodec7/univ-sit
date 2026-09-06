@@ -438,3 +438,64 @@
 .home-page--lift .free-now-avatar::after {
   display: none !important;
 }
+
+/* Phone/touch: stop sticky-blur, glow loops and hover paints that hitch profile scroll */
+@media (max-width: 900px), (pointer: coarse) {
+  .glass-nav,
+  .yp-profile__top,
+  .yp-bottom-nav,
+  .glass,
+  .mobile-menu,
+  .samsung-sidebar,
+  .samsung-drawer__panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glass-nav,
+  .yp-profile__top {
+    background: #fff !important;
+  }
+  .dashboard-page .presence-panel,
+  .dashboard-page .profile-hero,
+  .dashboard-page .cw-cabinet {
+    content-visibility: visible !important;
+    contain: none !important;
+  }
+  .profile-hero__avatar-inner {
+    transform: none !important;
+  }
+  .nav-icon-btn--ghost,
+  .achievement-complete-ring,
+  .avatar-legend-frame,
+  .home-hero--animated .home-hero-media,
+  .home-hero--animated .home-hero-glow,
+  html[data-eco-aura] .profile-hero__avatar,
+  html[data-eco-aura] .profile-hero__avatar-inner,
+  html[data-eco-ticket] .yp-ticket-qr,
+  .yp-eco-surface[data-eco-aura] .yp-profile__avatar-wrap,
+  .yp-eco-surface[data-eco-aura] .user-avatar-wrap > span:first-child {
+    animation: none !important;
+  }
+  html[data-eco-aura] .profile-hero__avatar,
+  html[data-eco-aura] .profile-hero__avatar-inner,
+  html[data-eco-frame='frame_neon'] .profile-hero__avatar,
+  html[data-eco-frame='frame_cyber'] .profile-hero__avatar,
+  .yp-eco-surface[data-eco-aura] .yp-profile__avatar-wrap,
+  .yp-eco-surface[data-eco-aura] .user-avatar-wrap > span:first-child {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px #8562d8 !important;
+    filter: none !important;
+  }
+  .yp-profile__collectible-glyph {
+    filter: none !important;
+  }
+}
+
+@media (hover: none) {
+  .svc-space-card:hover,
+  .yp-feed-card:hover,
+  .catalog-card:hover,
+  .yp-profile__collectible:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
