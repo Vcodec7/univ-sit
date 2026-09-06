@@ -1281,11 +1281,24 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 }
 
 .admin-layout-wrapper {
-  --admin-sidebar-w: 292px;
+  --admin-sidebar-w: 268px;
+  overflow-x: clip;
+}
+.samsung-sidebar,
+.samsung-drawer__panel,
+.samsung-drawer__nav-scroll,
+.admin-nav-board {
+  overflow-x: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+.samsung-sidebar .samsung-nav__link.is-active::before {
+  display: none !important;
 }
 .samsung-drawer__panel {
-  width: min(96vw, 26rem) !important;
+  width: min(96vw, 22.5rem) !important;
   background: #f5fbfe !important;
+  box-sizing: border-box;
 }
 .admin-nav-search {
   display: flex;
@@ -1326,45 +1339,58 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 .admin-nav-board {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.45rem;
+  overflow-x: hidden;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  padding: 0 0.2rem 0.4rem;
+  padding: 0 0.15rem 0.25rem;
   scrollbar-width: thin;
 }
 .admin-nav-board__status {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #5a5670;
-  padding: 0 0.2rem;
+  padding: 0 0.15rem;
 }
 .admin-nav-board__label {
-  margin: 0 0 0.35rem;
-  font-size: 0.66rem;
+  margin: 0 0 0.22rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #5a5670;
 }
-.admin-nav-board__grid {
+.samsung-sidebar .admin-nav-board__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.22rem;
+}
+.samsung-drawer__panel .admin-nav-board__grid,
+.samsung-sidebar.is-collapsed .admin-nav-board__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.4rem;
+  gap: 0.28rem;
+}
+.samsung-sidebar.is-collapsed .admin-nav-board__grid {
+  grid-template-columns: 1fr;
 }
 .admin-nav-card {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.4rem;
-  min-height: 3.05rem;
-  padding: 0.4rem 0.45rem;
-  border-radius: 0.75rem;
+  gap: 0.32rem;
+  min-height: 2.15rem;
+  max-width: 100%;
+  padding: 0.22rem 0.4rem;
+  border-radius: 0.55rem;
   border: 1px solid rgba(120, 176, 206, 0.3);
   background: #fff;
   text-decoration: none;
   color: #0a0c2a;
   min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .admin-nav-card:hover {
   border-color: #0a7aa8;
@@ -1374,16 +1400,17 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 .admin-nav-card.is-hot {
   border-color: #8562d8;
   background: #f4f0fc;
-  box-shadow: inset 3px 0 0 #8562d8;
+  box-shadow: inset 0 0 0 1px #8562d8;
 }
 .admin-nav-card__icon {
-  width: 1.7rem;
-  height: 1.7rem;
-  border-radius: 0.5rem;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 0.4rem;
   display: grid;
   place-items: center;
   background: #eef6fb;
   color: #0a7aa8;
+  flex: 0 0 auto;
 }
 .admin-nav-card.is-active .admin-nav-card__icon {
   background: #afca03;
@@ -1394,7 +1421,7 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
 }
 .admin-nav-card__copy strong {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   line-height: 1.15;
   font-weight: 800;
   white-space: nowrap;
@@ -1402,21 +1429,122 @@ html[data-eco-frame='frame_cyber'] .dashboard-page .profile-hero__avatar {
   text-overflow: ellipsis;
 }
 .admin-nav-card__copy small {
-  display: block;
-  font-size: 0.62rem;
-  color: #5a5670;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: none;
 }
 .admin-nav-card__badge {
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 800;
   background: #afca03;
   color: #0a0c2a;
   border-radius: 999px;
-  padding: 0.08rem 0.35rem;
+  padding: 0.04rem 0.28rem;
+}
+.admin-nav-card.is-icon {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 0.35rem 0.2rem;
+  position: relative;
+}
+.admin-nav-card__dot {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 99px;
+  background: #c2410c;
+}
+.admin-nav-foot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.28rem;
+  margin-top: auto;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(120, 176, 206, 0.28);
+}
+.admin-nav-foot.is-icons {
+  grid-template-columns: 1fr;
+}
+.admin-nav-foot__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 2.05rem;
+  min-width: 0;
+  padding: 0.2rem 0.3rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(120, 176, 206, 0.3);
+  background: #fff;
+  color: #0a0c2a;
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 750;
+  font-family: inherit;
+  cursor: pointer;
+  overflow: hidden;
+}
+.admin-nav-foot__btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-nav-foot__btn:hover {
+  border-color: #0a7aa8;
+  background: #eef6fb;
+}
+
+/* Site / cabinet / bottom menus: no overflow, wrap instead of colliding */
+.glass-nav-inner,
+.mobile-menu,
+.mobile-menu__nav {
+  overflow-x: hidden;
+  max-width: 100%;
+  min-width: 0;
+}
+.yp-bottom-nav__item {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.yp-bottom-nav__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 899px) {
+  .cabinet-rail-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    overflow: hidden;
+    max-width: 100%;
+  }
+  .cabinet-rail-strip__btn.dashboard-nav-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+.cabinet-rail-strip__btn .dashboard-nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mobile-menu__row {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.dashboard-nav--labeled .dashboard-nav-btn {
+  min-width: 0;
+  max-width: 100%;
+}
+.dashboard-nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Friends / messages / tickets stay inside cabinet chrome */

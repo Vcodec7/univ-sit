@@ -269,82 +269,41 @@ export default function AdminSidebar({
     }
   };
 
-  const recentItems = useMemo(() => {
-    if (searching) return [];
-    return recent
-      .map((href) => visible.find((i) => i.href === href || href.startsWith(`${i.href}/`)))
-      .filter((x, i, arr): x is AdminNavDef => Boolean(x) && arr.findIndex((y) => y?.href === x?.href) === i)
-      .slice(0, 4);
-  }, [recent, visible, searching]);
-
-  const renderCards = (opts: { compact: boolean; idPrefix: string }) => {
-    if (opts.compact) {
-      return (
-        <nav className="samsung-nav" aria-label="Админ-навигация">
-          {filtered.map((item) => {
-            const Icon = ICONS[item.icon] || LayoutDashboard;
-            const active = isActivePath(pathname, item.href);
-            const badge = badgeFor(item);
-            return (
-              <Link
-                key={`${opts.idPrefix}-${item.href}`}
-                href={item.href}
-                className={`samsung-nav__link${active ? ' is-active' : ''}`}
-                aria-current={active ? 'page' : undefined}
-                title={item.label}
-                onClick={() => setDrawerOpen(false)}
-              >
-                <span className="samsung-nav__icon">
-                  <Icon size={18} />
-                </span>
-                {badge ? <span className="samsung-nav__dot" aria-label={badge} /> : null}
-              </Link>
-            );
-          })}
-        </nav>
-      );
-    }
-
+  const renderCards = (opts: { iconOnly: boolean; idPrefix: string }) => {
     const groups: AdminNavGroup[] = ['main', 'content', 'ops', 'system'];
-    const showFlat = searching;
-
     return (
-      <nav className="admin-nav-board" aria-label="Разделы панели">
+      <nav
+        className={`admin-nav-board${opts.iconOnly ? ' is-icons' : ''}`}
+        aria-label="Разделы панели"
+      >
         {searching ? (
           <p className="admin-nav-board__status">
             {filtered.length ? `${filtered.length} раздел(а)` : 'Ничего не найдено — смените запрос'}
           </p>
-        ) : recentItems.length ? (
-          <div className="admin-nav-board__group">
-            <p className="admin-nav-board__label">Недавние</p>
-            <div className="admin-nav-board__grid">
-              {recentItems.map((item) => renderCard(item, opts.idPrefix, -1))}
-            </div>
-          </div>
         ) : null}
-        {showFlat
-          ? (
-              <div className="admin-nav-board__grid">
-                {filtered.map((item, i) => renderCard(item, opts.idPrefix, i))}
-              </div>
-            )
-          : groups.map((group) => {
-              const groupItems = filtered.filter((i) => i.group === group);
-              if (!groupItems.length) return null;
-              return (
-                <div key={group} className="admin-nav-board__group">
-                  <p className="admin-nav-board__label">{ADMIN_NAV_GROUP_LABELS[group]}</p>
-                  <div className="admin-nav-board__grid">
-                    {groupItems.map((item) => renderCard(item, opts.idPrefix, filtered.indexOf(item)))}
-                  </div>
+        {searching ? (
+          <div className="admin-nav-board__grid">
+            {filtered.map((item, i) => renderCard(item, opts.idPrefix, i, opts.iconOnly))}
+          </div>
+        ) : (
+          groups.map((group) => {
+            const groupItems = filtered.filter((i) => i.group === group);
+            if (!groupItems.length) return null;
+            return (
+              <div key={group} className="admin-nav-board__group">
+                {opts.iconOnly ? null : <p className="admin-nav-board__label">{ADMIN_NAV_GROUP_LABELS[group]}</p>}
+                <div className="admin-nav-board__grid">
+                  {groupItems.map((item) => renderCard(item, opts.idPrefix, filtered.indexOf(item), opts.iconOnly))}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })
+        )}
       </nav>
     );
   };
 
-  const renderCard = (item: AdminNavDef, idPrefix: string, index: number) => {
+  const renderCard = (item: AdminNavDef, idPrefix: string, index: number, iconOnly: boolean) => {
     const Icon = ICONS[item.icon] || LayoutDashboard;
     const active = isActivePath(pathname, item.href);
     const badge = badgeFor(item);
@@ -353,18 +312,24 @@ export default function AdminSidebar({
       <Link
         key={`${idPrefix}-${item.href}`}
         href={item.href}
-        className={`admin-nav-card${active ? ' is-active' : ''}${hot ? ' is-hot' : ''}`}
+        className={`admin-nav-card${active ? ' is-active' : ''}${hot ? ' is-hot' : ''}${iconOnly ? ' is-icon' : ''}`}
         aria-current={active ? 'page' : undefined}
+        title={`${item.label} — ${item.hint}`}
         onClick={() => setDrawerOpen(false)}
       >
         <span className="admin-nav-card__icon">
-          <Icon size={16} />
+          <Icon size={15} />
         </span>
-        <span className="admin-nav-card__copy">
-          <strong>{item.label}</strong>
-          <small>{item.hint}</small>
-        </span>
-        {badge ? <span className="admin-nav-card__badge">{badge}</span> : null}
+        {iconOnly ? (
+          badge ? <span className="admin-nav-card__dot" aria-label={badge} /> : null
+        ) : (
+          <>
+            <span className="admin-nav-card__copy">
+              <strong>{item.label}</strong>
+            </span>
+            {badge ? <span className="admin-nav-card__badge">{badge}</span> : null}
+          </>
+        )}
       </Link>
     );
   };
@@ -393,25 +358,19 @@ export default function AdminSidebar({
     </div>
   );
 
-  const foot = (compact: boolean) => (
-    <div className="samsung-nav__group samsung-nav__group--foot">
-      <Link href="/" className="samsung-nav__link samsung-nav__link--site" title="На главную сайта" onClick={() => setDrawerOpen(false)}>
-        <span className="samsung-nav__icon">
-          <Home size={18} />
-        </span>
-        {!compact ? <span className="samsung-nav__label">На сайт</span> : null}
+  const foot = (iconOnly: boolean) => (
+    <div className={`admin-nav-foot${iconOnly ? ' is-icons' : ''}`}>
+      <Link href="/" className="admin-nav-foot__btn" title="На главную сайта" onClick={() => setDrawerOpen(false)}>
+        <Home size={16} />
+        {iconOnly ? null : <span>Сайт</span>}
       </Link>
-      <Link href="/dashboard" className="samsung-nav__link" title="Профиль" onClick={() => setDrawerOpen(false)}>
-        <span className="samsung-nav__icon">
-          <UserCircle size={18} />
-        </span>
-        {!compact ? <span className="samsung-nav__label">Профиль</span> : null}
+      <Link href="/dashboard" className="admin-nav-foot__btn" title="Профиль" onClick={() => setDrawerOpen(false)}>
+        <UserCircle size={16} />
+        {iconOnly ? null : <span>Профиль</span>}
       </Link>
-      <button type="button" className="samsung-nav__link" title="Выйти" onClick={() => void signOutLogged({ callbackUrl: '/' })}>
-        <span className="samsung-nav__icon">
-          <LogOut size={18} />
-        </span>
-        {!compact ? <span className="samsung-nav__label">Выйти</span> : null}
+      <button type="button" className="admin-nav-foot__btn" title="Выйти" onClick={() => void signOutLogged({ callbackUrl: '/' })}>
+        <LogOut size={16} />
+        {iconOnly ? null : <span>Выйти</span>}
       </button>
     </div>
   );
@@ -473,7 +432,7 @@ export default function AdminSidebar({
           </div>
         </div>
         {!collapsed ? searchField(searchRef, 'admin-nav-search-desk') : null}
-        {renderCards({ compact: collapsed, idPrefix: 'desk' })}
+        {renderCards({ iconOnly: collapsed, idPrefix: 'desk' })}
         {foot(collapsed)}
       </aside>
 
@@ -506,7 +465,7 @@ export default function AdminSidebar({
                 </div>
                 {searchField(drawerSearchRef, 'admin-nav-search-drawer')}
                 <div className="samsung-drawer__nav-scroll">
-                  {renderCards({ compact: false, idPrefix: 'drawer' })}
+                  {renderCards({ iconOnly: false, idPrefix: 'drawer' })}
                   {foot(false)}
                 </div>
               </div>

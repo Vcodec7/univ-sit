@@ -16,5 +16,7 @@ test('admin nav search ranks labels and aliases', async () => {
   const sidebar = readFileSync(join(root, 'src/components/admin/AdminSidebar.tsx'), 'utf8');
   assert.match(sidebar, /admin-nav-card/);
   assert.match(sidebar, /admin-nav-board/);
+  assert.match(sidebar, /admin-nav-foot/);
   assert.match(sidebar, /Быстрый поиск по панели/);
+  assert.doesNotMatch(sidebar, /samsung-nav__link/);
 });
