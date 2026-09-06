@@ -583,7 +583,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         title="Профиль"
         aria-current={isActive(profileHref) ? 'page' : undefined}
       >
-        <UserCircle size={18} aria-hidden />
+        <UserCircle size={20} strokeWidth={2} aria-hidden />
       </Link>
     </div>
   );
@@ -815,12 +815,12 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
           </div>
           <button
             ref={menuButtonRef}
-            className="mobile-menu-btn"
+            className="mobile-menu-btn nav-icon-btn"
             onClick={toggleMenu}
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
           </button>
         </div>
       </div>

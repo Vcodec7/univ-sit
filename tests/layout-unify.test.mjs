@@ -17,6 +17,7 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /#afca03/);
   assert.match(css, /#eef6fb/);
   assert.match(css, /#f5fbfe/);
+  assert.match(css, /\.glass-nav-end \.nav-icon-btn/);
   assert.match(css, /catalog-page-header__intro/);
   assert.match(css, /flex-wrap: wrap/);
   assert.match(css, /--yp-hero-h: min\(22\.5rem/);
