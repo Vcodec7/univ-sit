@@ -28,6 +28,7 @@ test('mobile home keeps one booking CTA and actionable deck cards', () => {
   assert.match(unify, /full-viewport living sea/);
   assert.match(unify, /--yp-hero-h: calc\(100svh/);
   assert.match(unify, /sochi-sky|lift-hero__stage/);
+  assert.match(unify, /border-radius: 0 !important/);
   assert.match(hero, /SochiLivingSky/);
   assert.match(hero, /lift-deck__glyph/);
 });

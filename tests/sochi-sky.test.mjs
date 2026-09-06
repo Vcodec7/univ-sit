@@ -17,6 +17,7 @@ test('living Sochi sky uses Moscow time, fauna and reduced-motion', () => {
   assert.match(overlay, /sochi-sky__birds/);
   assert.match(overlay, /data-phase/);
   assert.match(css, /sochi-leap/);
+  assert.match(css, /\.sochi-sky__dolphin \{\s*display: none/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(layout, /sochi-living-sky\.css/);
   assert.ok(layout.indexOf('sochi-living-sky.css') > layout.indexOf('layout-unify.css'));

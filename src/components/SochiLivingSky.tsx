@@ -43,14 +43,20 @@ export default function SochiLivingSky() {
       <div
         className="sochi-sky__moon"
         style={{ left: `${sky.moonX}%`, top: `${sky.moonY}%`, opacity: sky.moonVisible ? 1 : 0 }}
-      />
+      >
+        <i />
+        <i />
+        <i />
+      </div>
       <div className="sochi-sky__swell sochi-sky__swell--a" />
       <div className="sochi-sky__swell sochi-sky__swell--b" />
       <div className="sochi-sky__swell sochi-sky__swell--c" />
-      <svg className="sochi-sky__birds" viewBox="0 0 240 40" fill="none">
-        <path d="M4 22c6-8 12-8 18 0-6-3-12-3-18 0Z" />
-        <path d="M38 14c7-9 14-9 20 0-7-3-13-3-20 0Z" />
-        <path d="M78 20c5-7 11-7 16 0-5-2-11-2-16 0Z" />
+      <svg className="sochi-sky__birds" viewBox="0 0 280 48" fill="none">
+        <path d="M6 28 Q18 14 30 28" />
+        <path d="M30 28 Q40 16 52 28" />
+        <path d="M78 18 Q88 8 98 18 Q108 9 118 18" />
+        <path d="M148 24 Q156 14 164 24 Q172 15 180 24" />
+        <path d="M208 16 Q214 10 220 16 Q226 10 232 16" />
       </svg>
       <svg className="sochi-sky__dolphin" viewBox="0 0 64 40" fill="none">
         <path

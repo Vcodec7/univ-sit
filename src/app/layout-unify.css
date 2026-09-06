@@ -191,7 +191,7 @@
   .lift-hero {
     position: relative !important;
     background: #06344a !important;
-    border-radius: 0 0 1.35rem 1.35rem !important;
+    border-radius: 0 !important;
     overflow: hidden !important;
     padding: 0;
     min-height: var(--yp-hero-h);
@@ -223,7 +223,7 @@
     position: absolute !important;
     left: 0;
     right: 0;
-    bottom: 4.6rem;
+    bottom: 1.15rem;
     z-index: 4;
     text-align: left;
     max-width: none;
@@ -283,18 +283,18 @@
     font-weight: 750 !important;
   }
   .lift-deck {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.55rem;
-    z-index: 4;
+    position: relative !important;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    z-index: 2;
     display: flex !important;
     justify-content: flex-start;
     align-items: center;
     flex-wrap: nowrap;
     gap: 0.55rem !important;
-    margin: 0 !important;
-    padding: 0 1.15rem 0.35rem !important;
+    margin: 0.7rem 0 0 !important;
+    padding: 0 1.15rem 0.45rem !important;
     grid-template-columns: none !important;
   }
   .lift-deck__card {
@@ -343,12 +343,13 @@
 @media (min-width: 861px) {
   .lift-hero {
     position: relative;
+    border-radius: 0 !important;
   }
   .lift-hero__copy {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 11.25rem;
+    bottom: 1.35rem;
     z-index: 3;
     color: #fff;
     padding-top: 0;
@@ -549,7 +550,7 @@
 
 @media (min-width: 861px) {
   .lift-hero {
-    border-radius: 0 0 2.35rem 2.35rem !important;
+    border-radius: 0 !important;
     background:
       linear-gradient(180deg, #06344a 0%, #0a0c2a 100%) !important;
   }
@@ -571,7 +572,7 @@
     color: #afca03 !important;
   }
   .lift-deck {
-    margin-top: -3.1rem;
+    margin-top: 0.85rem;
     padding-bottom: 2rem;
   }
   .lift-deck__card {

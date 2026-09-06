@@ -44,34 +44,64 @@
 .sochi-sky__sun,
 .sochi-sky__moon {
   position: absolute;
-  width: 5.2rem;
-  height: 5.2rem;
-  margin: -2.6rem 0 0 -2.6rem;
-  border-radius: 50%;
+  pointer-events: none;
   transition: left 1.4s ease, top 1.4s ease, opacity 0.8s ease;
 }
 
 .sochi-sky__sun {
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: -3.75rem 0 0 -3.75rem;
+  border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, #fff8d6 0 28%, #ffd56a 42%, rgba(255, 170, 60, 0.35) 62%, transparent 72%);
+    radial-gradient(circle at 50% 50%, #fff6c8 0 9%, #ffd45a 16%, rgba(255, 176, 64, 0.45) 28%, rgba(255, 140, 40, 0.12) 46%, transparent 68%);
+  filter: blur(0.4px);
 }
 
 .sochi-sky[data-phase='sunset'] .sochi-sky__sun,
 .sochi-sky[data-phase='dawn'] .sochi-sky__sun {
+  width: 8.2rem;
+  height: 8.2rem;
+  margin: -4.1rem 0 0 -4.1rem;
   background:
-    radial-gradient(circle at 50% 50%, #ffe7a8 0 26%, #ff8a3c 46%, rgba(255, 80, 40, 0.28) 64%, transparent 74%);
-  width: 6.4rem;
-  height: 6.4rem;
-  margin: -3.2rem 0 0 -3.2rem;
+    radial-gradient(circle at 50% 52%, #ffe0a0 0 8%, #ff7a32 18%, rgba(255, 70, 40, 0.28) 36%, transparent 58%);
 }
 
 .sochi-sky__moon {
-  width: 2.6rem;
-  height: 2.6rem;
-  margin: -1.3rem 0 0 -1.3rem;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin: -1.08rem 0 0 -1.08rem;
+  border-radius: 50%;
+  overflow: hidden;
   background:
-    radial-gradient(circle at 38% 38%, #f4f1e6 0 46%, #cfd6e4 70%, transparent 72%);
-  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.04);
+    radial-gradient(circle at 32% 30%, #e8e4d4 0 42%, #b7c0cc 78%, #8e99a8 100%);
+  box-shadow:
+    inset -10px -6px 0 0 rgba(18, 28, 48, 0.42),
+    0 0 18px rgba(220, 230, 245, 0.18);
+}
+
+.sochi-sky__moon i {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(90, 100, 112, 0.28);
+}
+.sochi-sky__moon i:nth-child(1) {
+  width: 0.42rem;
+  height: 0.42rem;
+  left: 28%;
+  top: 34%;
+}
+.sochi-sky__moon i:nth-child(2) {
+  width: 0.28rem;
+  height: 0.28rem;
+  left: 58%;
+  top: 22%;
+}
+.sochi-sky__moon i:nth-child(3) {
+  width: 0.34rem;
+  height: 0.34rem;
+  left: 48%;
+  top: 58%;
 }
 
 .sochi-sky__stars {
@@ -123,31 +153,24 @@
 
 .sochi-sky__birds {
   position: absolute;
-  top: 14%;
-  left: -30%;
-  width: 11rem;
-  height: 2rem;
-  fill: rgba(10, 12, 42, 0.42);
-  animation: sochi-flock 22s linear infinite;
+  top: 12%;
+  left: -18%;
+  width: 16rem;
+  height: 2.4rem;
+  stroke: rgba(12, 18, 32, 0.38);
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  fill: none;
+  animation: sochi-flock 28s linear infinite;
 }
 
 .sochi-sky[data-phase='night'] .sochi-sky__birds,
 .sochi-sky[data-phase='dusk'] .sochi-sky__birds {
-  fill: rgba(255, 255, 255, 0.45);
+  stroke: rgba(255, 255, 255, 0.28);
 }
 
 .sochi-sky__dolphin {
-  position: absolute;
-  left: 18%;
-  bottom: 18%;
-  width: 4.6rem;
-  height: 2.8rem;
-  color: rgba(10, 30, 50, 0.72);
-  animation: sochi-leap 16s ease-in-out infinite;
-}
-
-.sochi-sky[data-phase='night'] .sochi-sky__dolphin {
-  color: rgba(180, 210, 230, 0.55);
+  display: none;
 }
 
 @keyframes sochi-swell {

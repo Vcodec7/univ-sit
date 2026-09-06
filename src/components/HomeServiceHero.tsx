@@ -115,27 +115,27 @@ export default function HomeServiceHero({
         <div className="lift-hero__veil" aria-hidden />
         <div className="lift-hero__glow" aria-hidden />
         <SochiLivingSky />
-      </div>
-      <div className="container lift-hero__copy">
-        <p className="lift-hero__eyebrow">Сочи · сейчас · {brand}</p>
-        <h1 className="lift-hero__title">
-          Старт с Сочи
-          <span>море, люди, свои</span>
-        </h1>
-        <p className="lift-hero__lead">
-          Залы, коворкинг, клубы и афиша — один вход в город, без десяти чатов.
-        </p>
-        <div className="lift-hero__cta">
-          {primary ? (
-            <CtaLink href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
-              {primary.label}
-            </CtaLink>
-          ) : null}
-          {second ? (
-            <CtaLink href={second.href} className="lift-hero__btn lift-hero__btn--ghost">
-              {second.label}
-            </CtaLink>
-          ) : null}
+        <div className="container lift-hero__copy">
+          <p className="lift-hero__eyebrow">Сочи · сейчас · {brand}</p>
+          <h1 className="lift-hero__title">
+            Старт с Сочи
+            <span>море, люди, свои</span>
+          </h1>
+          <p className="lift-hero__lead">
+            Залы, коворкинг, клубы и афиша — один вход в город, без десяти чатов.
+          </p>
+          <div className="lift-hero__cta">
+            {primary ? (
+              <CtaLink href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
+                {primary.label}
+              </CtaLink>
+            ) : null}
+            {second ? (
+              <CtaLink href={second.href} className="lift-hero__btn lift-hero__btn--ghost">
+                {second.label}
+              </CtaLink>
+            ) : null}
+          </div>
         </div>
       </div>
 
