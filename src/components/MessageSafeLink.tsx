@@ -64,7 +64,12 @@ export default function MessageSafeLink({
     }
   };
 
-  const blocked = local.risk === 'blocked' || serverStatus === 'rkn' || serverStatus === 'invalid';
+  const blocked =
+    local.risk === 'blocked' ||
+    local.risk === 'suspicious' ||
+    serverStatus === 'rkn' ||
+    serverStatus === 'invalid' ||
+    serverStatus === 'suspicious';
   const display = local.href || href;
   const host = local.host || 'неизвестный адрес';
 
