@@ -138,7 +138,7 @@ function extractUrlsClient(text: string) {
 
 function isMediaOnlyBody(body: string) {
   const parts = splitMessageBodyMedia(body || '');
-  const meaningful = parts.filter((p) => (p.type === 'image' ? true : Boolean(p.value.trim())));
+  const meaningful = parts.filter((p) => (p.type === 'text' ? Boolean(p.value.trim()) : true));
   return meaningful.length > 0 && meaningful.every((p) => p.type === 'image');
 }
 
