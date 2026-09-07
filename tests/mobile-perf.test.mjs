@@ -39,8 +39,8 @@ test('mobile home hides the four-icon deck between hero and free-now', () => {
 });
 
 test('home defers heavy client rails without unmounting the sky', () => {
-  assert.match(page, /dynamic\(\(\) => import\('@\/components\/HomeSlideRail'\)/);
-  assert.doesNotMatch(page, /dynamic\(\(\) => import\('@\/components\/SochiLivingSky'\)/);
+  assert.match(page, /nextDynamic\(\(\) => import\('@\/components\/HomeSlideRail'\)/);
+  assert.doesNotMatch(page, /nextDynamic\(\(\) => import\('@\/components\/SochiLivingSky'\)/);
   assert.doesNotMatch(page, /WeeklyAfisha/);
 });
 
