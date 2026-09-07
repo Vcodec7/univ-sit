@@ -2156,4 +2156,28 @@ a.gov-chip:hover span {
   background: #afca03;
   color: #0a0c2a;
 }
+.home-page--lift .home-cta-split article,
+.home-page--lift .home-cta-split article:last-child {
+  background: linear-gradient(180deg, #f5fbfe 0%, #fff 58%) !important;
+  border: 1px solid rgba(120, 176, 206, 0.28) !important;
+  box-shadow: 0 14px 32px rgba(30, 90, 130, 0.08) !important;
+}
+.home-page--lift .home-cta-split article > p:first-child {
+  color: #6e8f02 !important;
+}
+.home-page--lift .home-cta-split h2 {
+  color: #0a0c2a !important;
+}
+.home-page--lift .home-cta--split .home-cta-text {
+  color: #5a5670 !important;
+}
+a.home-section-link:hover,
+.home-page--lift a.home-section-link:hover {
+  color: #0a7aa8 !important;
+}
+.home-page--lift .join-event-msg {
+  color: #5a5670;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
 
