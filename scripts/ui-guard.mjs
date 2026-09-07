@@ -89,8 +89,8 @@ if (!/\.nav-dropdown-portal\.dropdown[\s\S]{0,180}left:\s*auto/.test(unify)) {
 if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1fr\s*!important/.test(unify)) {
   fails.push('home feed card actions must stack at equal width');
 }
-if (!/home-section-title::after[\s\S]{0,80}display:\s*none\s*!important/.test(unify)) {
-  fails.push('home section titles must not keep a lime dash under the first letters');
+if (!/home-section-title::after[\s\S]{0,500}#afca03[\s\S]{0,120}#8562d8/.test(unify)) {
+  fails.push('home section titles must keep lime + purple dashes');
 }
 if (/html::-webkit-scrollbar\s*\{[^}]*width\s*:/.test(unify) || /html\s*\{[^}]*scrollbar-color:\s*#8562d8/.test(unify)) {
   fails.push('do not force a classic html scrollbar (header jumps on refresh)');

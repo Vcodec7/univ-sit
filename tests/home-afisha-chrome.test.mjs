@@ -18,8 +18,9 @@ test('weekly afisha uses the same section head as spaces, not a kicker hero or h
   assert.match(week, /Вся афиша/);
 });
 
-test('home titles have no lime dash under the first letter', () => {
-  assert.match(unify, /home-section-title::after[\s\S]{0,80}display:\s*none\s*!important/);
+test('home titles keep lime and purple dashes', () => {
+  assert.match(unify, /home-section-title::after[\s\S]{0,280}#afca03[\s\S]{0,80}#8562d8/);
+  assert.doesNotMatch(unify, /home-section-title::after,\s*\n\.home-section-title::after \{\s*display: none/);
 });
 
 test('html scrollbar is not forced into a layout column', () => {

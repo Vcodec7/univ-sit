@@ -223,11 +223,11 @@
   }
   .lift-hero {
     position: relative !important;
-    background: #06344a !important;
+    background: #eef6fb !important;
     border-radius: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     padding: 0;
-    min-height: var(--yp-hero-h);
+    min-height: 0;
   }
   .lift-hero__stage {
     position: relative !important;
@@ -241,7 +241,7 @@
     overflow: hidden;
     border: 0;
     box-shadow: none;
-    background: #06344a;
+    background: #cfeaf6;
   }
   .lift-hero__veil {
     display: block !important;
@@ -576,9 +576,22 @@
 }
 
 /* Sochi youth 2026: sea/sky/lime, magazine home — last-win */
+/* Two brand dashes under section titles: lime then purple */
 .home-page.home-page--lift .home-section-title::after,
-.home-section-title::after {
-  display: none !important;
+.home-section-title::after,
+.lift-sochi h2::after {
+  content: '' !important;
+  display: block !important;
+  width: 4.6rem !important;
+  height: 3px !important;
+  margin-top: 0.45rem !important;
+  border-radius: 99px;
+  background: linear-gradient(
+    90deg,
+    #afca03 0 1.85rem,
+    transparent 1.85rem 2.2rem,
+    #8562d8 2.2rem 100%
+  ) !important;
 }
 .home-page.home-page--lift .home-section-sub {
   max-width: 28rem;
@@ -593,8 +606,7 @@
 @media (min-width: 861px) {
   .lift-hero {
     border-radius: 0 !important;
-    background:
-      linear-gradient(180deg, #06344a 0%, #0a0c2a 100%) !important;
+    background: #eef6fb !important;
   }
   .lift-hero__veil {
     background:
@@ -655,15 +667,17 @@
     background:
       linear-gradient(180deg, #f5fbfe 0%, #fff 55%) !important;
   }
-  .home-page--lift .home-cta-split article {
-    background:
-      linear-gradient(165deg, #0a7aa8 0%, #06344a 100%) !important;
-    border: 0 !important;
-    box-shadow: 0 18px 40px rgba(30, 90, 130, 0.18) !important;
-  }
+  .home-page--lift .home-cta-split article,
   .home-page--lift .home-cta-split article:last-child {
-    background:
-      linear-gradient(165deg, #6e8f02 0%, #0a0c2a 88%) !important;
+    background: #fff !important;
+    border: 1px solid rgba(120, 176, 206, 0.28) !important;
+    box-shadow: 0 12px 28px rgba(133, 98, 216, 0.08) !important;
+    color: #0a0c2a !important;
+  }
+  .home-page--lift .home-cta-split article h2,
+  .home-page--lift .home-cta-split article p,
+  .home-page--lift .home-cta-text {
+    color: #0a0c2a !important;
   }
 }
 
@@ -2408,6 +2422,33 @@ a.home-section-link:hover,
 
 /* Never force a classic html scrollbar: width: on ::-webkit-scrollbar
  * turns overlay scrollbars into a purple column and the header jumps on refresh. */
+
+/* One shell: deck, Sochi strip, home rails — same as --yp-shell */
+.home-page--lift .lift-deck.container,
+.home-page--lift .lift-sochi > .container,
+.home-page--lift .home-sections.container {
+  max-width: var(--yp-shell) !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.15rem;
+  padding-right: 1.15rem;
+  box-sizing: border-box;
+}
+.home-page--lift .lift-sochi__grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0.85rem !important;
+}
+@media (max-width: 700px) {
+  .home-page--lift .lift-sochi__grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+.home-page--lift .lift-hero,
+.home-page.home-page--lift {
+  background-color: #eef6fb !important;
+}
 
 
 
