@@ -33,9 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const revalidate = 60;
-// ISR: phones must not wait on Prisma for every tap. Hero video still stays
-// poster-only on coarse pointers; admin mediaKind lands within a minute.
+export const dynamic = 'force-dynamic';
+// Request-time HTML so canonical/og:url follow Host (ISR bake is localhost).
+// Catalog still hits unstable_cache; phones are limited by GPU layers, not this.
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();

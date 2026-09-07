@@ -1,5 +1,10 @@
 # Changelog — YoungPortal
 
+## [1.6.141] — 2026-09-07
+
+### Fixed
+- Главная снова request-time: каноникал не localhost; на телефоне по-прежнему без видео/living-sky
+
 ## [1.6.140] — 2026-09-07
 
 ### Fixed
