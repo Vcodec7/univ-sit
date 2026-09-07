@@ -29,7 +29,6 @@ export default function EntityCoverImage({
   const thematic = fallback || DEFAULT_SECTION_COVER || PLACEHOLDER;
   const url = failed ? resolveEntityCover(null, thematic) : resolveEntityCover(src, thematic);
   const isSvg = /\.svg($|\?)/i.test(url);
-  const isUpload = url.startsWith('/uploads/');
 
   return (
     <Image
@@ -42,7 +41,7 @@ export default function EntityCoverImage({
       priority={priority}
       loading={priority ? undefined : 'lazy'}
       onError={() => setFailed(true)}
-      unoptimized={isSvg || isUpload}
+      unoptimized={isSvg}
     />
   );
 }

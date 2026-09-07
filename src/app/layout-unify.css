@@ -2485,9 +2485,17 @@ a.home-section-link:hover,
 }
 
 /* Tight home rhythm: no tall empty wells in news / gov / CTA */
+body:has(.home-page--lift) .glass-nav {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgba(255, 255, 255, 0.97);
+}
+
 .home-page--lift .home-section,
 .home-page--lift .afisha-week.home-section {
   margin-bottom: 0.85rem !important;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 420px;
 }
 .home-page--lift .home-section-head {
   margin-bottom: 0.4rem !important;
