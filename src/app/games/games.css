@@ -637,7 +637,7 @@ body:has(.games-root) .animated-bg {
 /* Hub can scroll lightly; play screens must not */
 .games-main:has(.games-hub) {
   overflow: auto;
-  max-width: min(1280px, 100%);
+  max-width: var(--yp-shell);
   padding: 0.45rem clamp(0.55rem, 1.5vw, 1rem) 0.65rem;
   justify-content: flex-start;
 }

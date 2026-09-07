@@ -29,6 +29,7 @@
   --radius-xl: 1.75rem;
   --radius-pill: 999px;
   --nav-h: 4.15rem;
+  --yp-shell: 72rem;
 }
 
 * {
@@ -108,7 +109,7 @@ button {
 
 .container {
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--yp-shell);
   margin: 0 auto;
   /* Unified gutters: 16 / 24 / 32 + safe-area — never flush to viewport edge */
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
@@ -1024,7 +1025,7 @@ html.mobile-nav-open {
   flex-direction: column;
   gap: 0;
   width: 100%;
-  max-width: min(1680px, 100%);
+  max-width: var(--yp-shell);
   margin-left: auto;
   margin-right: auto;
 }
@@ -6844,7 +6845,7 @@ a.dashboard-nav-btn {
 /* Public content shells — fill .container on desktop */
 .cms-page-shell {
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--yp-shell);
   margin: 0 auto;
   padding-left: clamp(1rem, 2.5vw, 2rem);
   padding-right: clamp(1rem, 2.5vw, 2rem);
@@ -19076,7 +19077,7 @@ body.is-admin .ops-page-shell__top .yp-notif-bell {
   padding: 1.25rem 1rem 2rem;
   min-height: auto;
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--yp-shell);
 }
 .catalog-page .catalog-page-header {
   margin-bottom: 1rem;
@@ -20735,7 +20736,7 @@ a.score-ring-link:hover {
 /* ===== FAQ page — full width hub (restored from PR #32, layout fixed) ===== */
 .faq-page {
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--yp-shell);
 }
 .faq-page__header {
   margin-bottom: 1.35rem;
@@ -23967,8 +23968,10 @@ body.yp-scroll-locked {
   background: #afca03;
   color: #0a0c2a;
 }
-.lift-hero__btn--lime:hover {
-  filter: brightness(1.06);
+.lift-hero__btn--lime:hover,
+a.lift-hero__btn--lime:hover {
+  filter: brightness(0.97);
+  color: #0a0c2a;
 }
 .lift-hero__btn--ghost {
   background: rgba(255, 255, 255, 0.08);

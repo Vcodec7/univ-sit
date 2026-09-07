@@ -33,6 +33,16 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /dashboard-page \.messages-root/);
   assert.match(css, /admin-nav-card/);
   assert.match(css, /--yp-shell/);
+  assert.match(css, /dashboard-page\.container/);
+  assert.match(css, /catalog-page/);
   assert.match(css, /gov-strip-actions/);
   assert.match(css, /object-position:\s*center 58%/);
+  assert.match(css, /transform:\s*none\s*!important/);
+  assert.match(css, /a\.lift-hero__btn--lime:hover/);
+});
+
+test('globals container uses the shared shell token', () => {
+  const globals = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
+  assert.match(globals, /--yp-shell:\s*72rem/);
+  assert.match(globals, /\.container \{[\s\S]*?max-width:\s*var\(--yp-shell\)/);
 });

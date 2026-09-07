@@ -2049,14 +2049,66 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   }
 }
 
-/* Home + chrome share one shell; feed media clips; gov chips fill the strip. */
+/* Site-wide content shell (nav, footer, home, catalogs, cabinet, games hub). */
 :root {
   --yp-shell: 72rem;
 }
 .container,
+.home-sections,
 .home-sections.container,
-.glass-nav-inner.container {
-  max-width: var(--yp-shell);
+.glass-nav-inner.container,
+.catalog-page,
+.faq-page,
+.cms-page-shell,
+.legal-page-inner,
+.dashboard-page.container,
+.games-main:has(.games-hub) {
+  max-width: var(--yp-shell) !important;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.main-content > .container,
+.site-footer > .container {
+  max-width: var(--yp-shell) !important;
+}
+
+/* Hover: no jump, no purple text on lime CTAs, no clipped junk under cards. */
+@media (hover: hover) and (pointer: fine) {
+  .catalog-card:hover,
+  .yp-feed-card:hover,
+  .free-now-card:hover,
+  .lift-feed-card:hover,
+  .svc-space-card:hover,
+  .places-card:hover {
+    transform: none !important;
+  }
+  .catalog-card:hover .catalog-img,
+  .yp-feed-card:hover img,
+  .free-now-card:hover img {
+    transform: none !important;
+  }
+}
+a.lift-hero__btn--lime,
+a.lift-hero__btn--lime:hover,
+a.lift-hero__btn--lime:focus-visible,
+.home-page--lift a.lift-hero__btn--lime:hover,
+.home-page--lift .join-event-btn:hover,
+.home-page--lift a.join-event-btn:hover {
+  color: #0a0c2a !important;
+}
+a.gov-chip:hover,
+a.gov-chip:hover strong,
+a.gov-chip:hover span {
+  color: inherit !important;
+}
+.home-page--lift .free-now-actions,
+.home-page--lift .join-event {
+  overflow: visible;
+}
+.home-page--lift .join-event-msg {
+  position: static;
+  max-width: 100%;
 }
 .home-page--lift .free-now-avatar,
 .home-page--lift .yp-feed-card__media,
