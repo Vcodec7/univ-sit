@@ -9,8 +9,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BASE = (process.argv[2] || process.env.BASE_URL || 'https://young.idivles.ru').replace(/\/$/, '');
 const PASS = process.env.QA_PASS || 'RolePass123!';
-const TECH_EMAIL = process.env.TECH_EMAIL || 'tech@young.idivles.ru';
-const TECH_PASS = process.env.TECH_PASS || '';
+const TECH_EMAIL = process.env.TECH_EMAIL || 'tech@sochi.ru';
+const TECH_PASS = process.env.TECH_PASS || PASS;
 
 const accounts = [
   { key: 'guest', email: null, role: 'GUEST', pass: null },

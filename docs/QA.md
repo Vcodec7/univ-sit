@@ -20,8 +20,8 @@ npm run presentation:refresh
 QA_REFRESH_PRESENTATION=1 npm run qa:all
 ```
 
-Учётки QA (пароль `RolePass123!`): см. `scripts/qa-deep-roles-ux.mjs`.  
-TECH: `TECH_PASS` / `TECH_EMAIL` в env.
+Учётки QA на ty (пароль `RolePass123!`): `qa-admin@`, `mod@`, `part@`, `user@`, `scanner@`, `private@`, **`tech@sochi.ru`** (роль TECH, вход `/login?callbackUrl=/ops`).  
+Прод-TECH по-прежнему только через `TECH_EMAIL` / `TECH_BOOTSTRAP_PASSWORD` в `.env`, не этот ящик.
 
 ## Что входит
 

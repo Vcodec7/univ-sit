@@ -32,7 +32,7 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 - **X-Frame-Options:** Next **без** этого заголовка; только nginx `DENY`. Не дублировать Next+nginx (конфликт). `apply-staging` / prebuilt патчит live nginx `SAMEORIGIN` → `DENY`.
 - **PWA:** `/sw.js` + rewrite `/service-worker.js` → `/sw.js`. Precache **не** включать `/offline-games/` (directory URL → 308). `cache.add` — per-file `catch`, не валить весь SW.
 - **Метрика:** idle-load; без clickmap / `accurateTrackBounce`. Виджеты госорганов на главной — **ссылки**, не iframe.
-- **QA на ty:** ящики `qa-admin@sochi.ru`, `mod@`, `part@`, `user@`, `scanner@`, `private@`. Пароль **не писать в скилл** — из `scripts/reset-staging-qa-passwords` / `apply-staging`. Не коммитить `.env`.
+- **QA на ty:** `qa-admin@sochi.ru`, `mod@`, `part@`, `user@`, `scanner@`, `private@`, **`tech@sochi.ru`** (TECH → `/ops`). Пароль **не писать в скилл** — из `scripts/reset-staging-qa-passwords` / `apply-staging`. Не коммитить `.env`.
 
 ## Скрипты
 

@@ -15,6 +15,7 @@ const QA_USERS = [
   { email: 'user@sochi.ru', role: 'USER', name: 'QA Пользователь' },
   { email: 'scanner@sochi.ru', role: 'SCANNER', name: 'QA Сканер' },
   { email: 'private@sochi.ru', role: 'USER', name: 'QA Приватный' },
+  { email: 'tech@sochi.ru', role: 'TECH', name: 'QA Техслужба' },
 ];
 
 const connectionString = process.env.DATABASE_URL;

@@ -7,8 +7,8 @@ import { join } from 'path';
 
 const BASE = (process.argv[2] || 'https://ty.idivles.ru').replace(/\/$/, '');
 const PASS = process.env.QA_PASS || 'RolePass123!';
-const TECH_EMAIL = process.env.TECH_EMAIL || 'tech@young.idivles.ru';
-const TECH_PASS = process.env.TECH_PASS || '';
+const TECH_EMAIL = process.env.TECH_EMAIL || 'tech@sochi.ru';
+const TECH_PASS = process.env.TECH_PASS || PASS;
 const nativeFetch = globalThis.fetch.bind(globalThis);
 
 async function fetchRetry(url, opts = {}, tries = 4) {
@@ -41,7 +41,7 @@ const accounts = [
   { key: 'mod', email: 'mod@sochi.ru', role: 'MODERATOR' },
   { key: 'admin', email: 'qa-admin@sochi.ru', role: 'ADMIN' },
   { key: 'scanner', email: 'scanner@sochi.ru', role: 'SCANNER' },
-  ...(TECH_PASS ? [{ key: 'tech', email: TECH_EMAIL, role: 'TECH', pass: TECH_PASS }] : []),
+  { key: 'tech', email: TECH_EMAIL, role: 'TECH', pass: TECH_PASS },
 ];
 
 const guestPages = ['/', '/events', '/projects', '/clubs', '/spaces', '/news', '/coworking', '/login', '/privacy', '/contacts'];
