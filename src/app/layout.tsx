@@ -49,7 +49,8 @@ const unbounded = localFont({
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
   const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
-  const ogImage = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
+  const ogImage = publicAssetUrl(publicOrigin, '/covers/photo/sochi-sea.jpg');
+  const ogIcon = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
   const titleDefault = `${siteName} | Официальный портал`;
   const description = `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости.`;
   return {
@@ -66,10 +67,17 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName,
       title: titleDefault,
       description,
-      ...(ogImage ? { images: [{ url: ogImage, width: 512, height: 512, alt: siteName }] } : {}),
+      ...(ogImage
+        ? {
+            images: [
+              { url: ogImage, width: 1600, height: 900, alt: siteName },
+              ...(ogIcon ? [{ url: ogIcon, width: 512, height: 512, alt: siteName }] : []),
+            ],
+          }
+        : {}),
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: siteName,
       description,
       ...(ogImage ? { images: [ogImage] } : {}),

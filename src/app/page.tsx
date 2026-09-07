@@ -29,7 +29,7 @@ const AuthAfishaSection = nextDynamic(() => import('@/components/AuthAfishaSecti
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
   const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
-  const ogImage = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
+  const ogImage = publicAssetUrl(publicOrigin, '/covers/photo/sochi-sea.jpg');
   return {
     title: { absolute: `${siteName} | Официальный портал` },
     description: `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости Центра развития молодёжи Сочи.`,
@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ? {
           openGraph: {
             url: publicUrl,
-            images: [{ url: ogImage, width: 512, height: 512, alt: siteName }],
+            images: [{ url: ogImage, width: 1600, height: 900, alt: siteName }],
           },
         }
       : {}),

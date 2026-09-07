@@ -19,7 +19,7 @@ export async function brandedMetadata(
     (canonicalPath
       ? `${publicOrigin}${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`
       : undefined);
-  const ogImage = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
+  const ogImage = publicAssetUrl(publicOrigin, '/covers/photo/sochi-sea.jpg');
   const safeBase = isLocalOrigin(publicOrigin) ? undefined : new URL(publicOrigin);
   const restOg =
     rest.openGraph && typeof rest.openGraph === 'object' ? (rest.openGraph as Record<string, unknown>) : {};
@@ -34,7 +34,7 @@ export async function brandedMetadata(
     },
     openGraph: {
       ...restOg,
-      ...(ogImage && !restOg.images ? { images: [{ url: ogImage, width: 512, height: 512, alt: siteName }] } : {}),
+      ...(ogImage && !restOg.images ? { images: [{ url: ogImage, width: 1600, height: 900, alt: siteName }] } : {}),
     },
   };
 }

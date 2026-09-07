@@ -12,5 +12,6 @@ const login = readFileSync(
 test('SMS login UI is hidden unless enabled and provider ready', () => {
   assert.match(login, /smsLoginShow = smsOn && smsReady/);
   assert.match(login, /smsLoginShow \?/);
+  assert.match(login, /yp-auth-swap/);
   assert.doesNotMatch(login, /провайдер не настроен/);
 });

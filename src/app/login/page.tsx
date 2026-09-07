@@ -489,8 +489,8 @@ function LoginForm() {
                 />
               </div>
 
-              {loginMode === 'password' || !smsLoginShow ? (
-                <>
+              <div className="yp-auth-swap">
+                <div className="yp-auth-swap__pane" hidden={loginMode === 'sms' && smsLoginShow} inert={loginMode === 'sms' && smsLoginShow || undefined}>
               <div>
                 <label className="yp-auth-label">Пароль</label>
                 <input
@@ -505,7 +505,8 @@ function LoginForm() {
                   onInvalid={(e) => {
                     e.currentTarget.setCustomValidity('Введите пароль');
                   }}
-                  required={loginMode === 'password'}
+                  required={loginMode !== 'sms' || !smsLoginShow}
+                  disabled={loginMode === 'sms' && smsLoginShow}
                   className="yp-auth-input"
                   placeholder="••••••••"
                 />
@@ -516,9 +517,9 @@ function LoginForm() {
                   Забыли пароль?
                 </Link>
               </div>
-                </>
-              ) : (
-                <>
+                </div>
+                {smsLoginShow ? (
+                <div className="yp-auth-swap__pane" hidden={loginMode !== 'sms'} inert={loginMode !== 'sms' || undefined}>
                   <button
                     type="button"
                     className="btn btn-secondary"
@@ -558,14 +559,15 @@ function LoginForm() {
                         autoComplete="one-time-code"
                         value={smsCode}
                         onChange={(e) => setSmsCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        required
+                        required={loginMode === 'sms'}
                         className="yp-auth-input"
                         placeholder="000000"
                       />
                     </div>
                   ) : null}
-                </>
-              )}
+                </div>
+                ) : null}
+              </div>
 
               <CaptchaField onToken={setCaptchaToken} />
               {smsLoginShow ? (

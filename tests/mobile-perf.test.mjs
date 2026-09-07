@@ -44,6 +44,12 @@ test('home defers heavy client rails without unmounting the sky', () => {
   assert.doesNotMatch(page, /WeeklyAfisha/);
 });
 
+test('hero photo uses next/image srcset for phones', () => {
+  assert.match(media, /from 'next\/image'/);
+  assert.match(media, /sizes="\(max-width: 860px\) 100vw, 1600px"/);
+  assert.match(media, /priority/);
+});
+
 test('home deck does not prefetch four routes on first paint', () => {
   assert.match(hero, /prefetch=\{false\}/);
 });
