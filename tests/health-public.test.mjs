@@ -12,7 +12,7 @@ const prebuilt = readFileSync(join(root, 'scripts/deploy-staging-prebuilt.sh'), 
 const workflow = readFileSync(join(root, 'scripts/workflow-deploy-staging.sh'), 'utf8');
 
 test('public health omits version/db unless loopback', () => {
-  assert.match(access, /x-forwarded-for/);
+  assert.match(access, /127\.0\.0\.1/);
   assert.match(health, /isLoopbackHealthRequest/);
   assert.match(payload, /maintenanceMode/);
   assert.match(payload, /X-YP-Version/);
