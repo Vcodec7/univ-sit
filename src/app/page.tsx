@@ -13,7 +13,6 @@ import HomeGalleryAuth from '@/components/HomeGalleryAuth';
 import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
-import WeeklyAfisha from '@/components/WeeklyAfisha';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
 import { ArrowRight } from 'lucide-react';
 import NewsCoverImage from '@/components/NewsCoverImage';
@@ -244,8 +243,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Ближайшие мероприятия</h2>
-              <p className="home-section-sub">События площадок ЦРМ на ближайшие дни</p>
+              <h2 className="home-section-title">Афиша</h2>
+              <p className="home-section-sub">Актуальные события площадок</p>
             </div>
             <Link href="/events" className="home-section-link">
               Календарь <ArrowRight size={18} />
@@ -260,12 +259,6 @@ export default async function Home() {
           )}
         </section>
         )}
-
-        <WeeklyAfisha
-          enabled={Boolean(siteSettings?.afishaWeekEnabled || siteSettings?.afishaWeekJson)}
-          json={siteSettings?.afishaWeekJson}
-          layout="home"
-        />
 
         {galleryPublic ? (
           <Suspense fallback={null}>
