@@ -8,6 +8,7 @@ import { Check, MessageCircle, Search, UserPlus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
 import CabinetSubpage from '@/components/CabinetSubpage';
+import { SOCIAL_TABS } from '@/lib/cabinet-nav';
 import '@/app/friends/friends.css';
 
 type Trust = {
@@ -217,7 +218,7 @@ export default function FriendsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <CabinetSubpage title="Друзья" lead="Поиск участников и заявки.">
+      <CabinetSubpage title="Общение" lead="Поиск участников и заявки." tabs={SOCIAL_TABS}>
         <div className="friends-page friends-page--cabinet">
           <div className="svc-skel" aria-busy="true" aria-label="Загрузка">
             <div className="svc-skel__pill" />
@@ -230,14 +231,8 @@ export default function FriendsPage() {
   }
 
   return (
-    <CabinetSubpage title="Друзья" lead="Поиск участников и заявки. Закрытые профили скрыты.">
+    <CabinetSubpage title="Общение" lead="Поиск участников и заявки. Закрытые профили скрыты." tabs={SOCIAL_TABS}>
       <div className="friends-page friends-page--cabinet">
-      <div className="friends-head friends-head--cabinet">
-        <Link href="/dashboard/messages" className="friends-head__msg">
-          <MessageCircle size={15} aria-hidden />
-          Чаты
-        </Link>
-      </div>
 
       <section className="friends-card">
         <h2>Поиск по сайту</h2>

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Award, BookOpen, Briefcase, ClipboardList, Medal, ScanLine, Shield, ShoppingBag, Ticket } from 'lucide-react';
+import { Award, BookOpen, Briefcase, ClipboardList, ScanLine, Shield, ShoppingBag, Ticket } from 'lucide-react';
 
 type Props = {
   ecoPoints?: number;
@@ -107,12 +107,12 @@ export default function CabinetQuickNav({
         </Link>
       ) : null}
       {showAchievements ? (
-        <Link href="/dashboard/awards" className="cabinet-quick__card">
+        <Link href="/dashboard/achievements" className="cabinet-quick__card">
           <span className="cabinet-quick__icon" aria-hidden>
-            <Medal size={18} />
+            <Award size={18} />
           </span>
-          <strong>Награды</strong>
-          <span>Дипломы и грамоты</span>
+          <strong>Достижения и награды</strong>
+          <span>Значки, дипломы и грамоты</span>
         </Link>
       ) : null}
     </nav>

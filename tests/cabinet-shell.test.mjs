@@ -12,6 +12,12 @@ test('dashboard layout keeps cabinet chrome across leaf routes', () => {
   assert.doesNotMatch(loading, /dashboard-page/);
   assert.doesNotMatch(sub, /CabinetMenu/);
   const nav = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/lib/cabinet-nav.ts'), 'utf8');
+  assert.match(nav, /label: 'Моя страница'/);
+  assert.match(nav, /label: 'Общение'/);
+  assert.match(nav, /label: 'Билеты и заявки'/);
+  assert.match(nav, /label: 'Мои достижения'/);
+  assert.match(nav, /label: 'Ещё'/);
+  assert.doesNotMatch(nav, /id: 'settings', label: 'Настройки'/);
   assert.match(nav, /href: '\/dashboard\/friends'/);
   assert.match(nav, /href: '\/dashboard\/messages'/);
   assert.match(nav, /href: '\/dashboard\/tickets'/);
