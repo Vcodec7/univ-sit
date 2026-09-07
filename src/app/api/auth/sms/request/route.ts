@@ -18,7 +18,7 @@ export async function POST(req: Request) {
   if (!access.smsLoginEnabled) {
     return NextResponse.json({ message: 'Вход по SMS выключен в настройках' }, { status: 403 });
   }
-  if (!smsProviderConfigured()) {
+  if (!(await smsProviderConfigured())) {
     return NextResponse.json({ message: 'SMS-провайдер не настроен' }, { status: 503 });
   }
 

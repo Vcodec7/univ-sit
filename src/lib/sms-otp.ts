@@ -1,17 +1,16 @@
 /**
  * Phone + SMS one-time codes for optional passwordless login.
- * Requires SiteSettings.smsLoginEnabled and SMS_API_URL.
+ * Requires SiteSettings.smsLoginEnabled and a configured SMS gateway.
  */
 import { createHash, randomInt } from 'crypto';
 import { getSharedRedis } from '@/lib/rateLimit';
 import { normalizePhone } from '@/lib/phone';
+import { dispatchSms, loadSmsDispatchConfig, smsConfigReady } from '@/lib/sms-dispatch';
 
 const TTL_SEC = 5 * 60;
 const MEM = new Map<string, { hash: string; exp: number; tries: number }>();
 
-export function smsProviderConfigured() {
-  return Boolean((process.env.SMS_API_URL || '').trim());
-}
+export { smsProviderConfigured } from '@/lib/sms-dispatch';
 
 export function nationalPhoneKey(raw: string) {
   const d = normalizePhone(raw);
@@ -36,12 +35,13 @@ export async function issueSmsOtp(phoneRaw: string): Promise<{ ok: true; codeLen
   if (phoneKey.length !== 10) {
     return { ok: false, message: 'Укажите российский телефон' };
   }
-  if (!smsProviderConfigured()) {
-    return { ok: false, message: 'SMS-вход не настроен (SMS_API_URL)' };
+  const cfg = await loadSmsDispatchConfig();
+  if (!smsConfigReady(cfg)) {
+    return { ok: false, message: 'SMS-вход не настроен' };
   }
   const code = String(randomInt(100000, 1000000));
   await store(phoneKey, hashCode(phoneKey, code));
-  const sent = await sendSms(`+7${phoneKey}`, `Код входа: ${code}. Действует 5 минут.`);
+  const sent = await dispatchSms(`+7${phoneKey}`, `Код входа: ${code}. Действует 5 минут.`, cfg);
   if (!sent.ok) {
     return { ok: false, message: sent.message || 'Не удалось отправить SMS' };
   }
@@ -86,30 +86,4 @@ export async function verifySmsOtp(phoneRaw: string, codeRaw: string): Promise<b
   }
   MEM.delete(phoneKey);
   return true;
-}
-
-async function sendSms(to: string, text: string): Promise<{ ok: boolean; message?: string }> {
-  const url = (process.env.SMS_API_URL || '').trim();
-  if (!url) return { ok: false, message: 'SMS_API_URL не задан' };
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  const key = (process.env.SMS_API_KEY || '').trim();
-  if (key) headers.Authorization = `Bearer ${key}`;
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        to,
-        text,
-        from: (process.env.SMS_FROM || '').trim() || undefined,
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) {
-      return { ok: false, message: 'SMS-провайдер отклонил запрос' };
-    }
-    return { ok: true };
-  } catch {
-    return { ok: false, message: 'SMS-провайдер недоступен' };
-  }
 }
