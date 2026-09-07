@@ -2049,3 +2049,59 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   }
 }
 
+/* Home + chrome share one shell; feed media clips; gov chips fill the strip. */
+:root {
+  --yp-shell: 72rem;
+}
+.container,
+.home-sections.container,
+.glass-nav-inner.container {
+  max-width: var(--yp-shell);
+}
+.home-page--lift .free-now-avatar,
+.home-page--lift .yp-feed-card__media,
+.home-page--lift .lift-feed-card__media {
+  overflow: hidden;
+  border-radius: inherit;
+}
+.home-page--lift .free-now-avatar img,
+.home-page--lift .yp-feed-card__media img,
+.home-page--lift .lift-feed-card__media img {
+  object-fit: cover;
+  object-position: center 58%;
+}
+.home-page--lift .lift-feed-card__media .free-now-badge {
+  z-index: 2;
+  max-width: calc(100% - 0.9rem);
+}
+.home-page--lift .free-now-actions > .join-event,
+.home-page--lift .free-now-actions > .join-event:only-child {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+.home-page--lift .lift-feed-card .join-event-btn,
+.home-page--lift .free-now-actions .join-event-btn {
+  width: 100%;
+  min-height: 2.45rem;
+  border-radius: 999px;
+  background: #afca03;
+  color: #0a0c2a;
+  font-weight: 800;
+}
+.home-page--lift .gov-strip-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.65rem;
+}
+.home-page--lift .gov-strip-actions .gov-chip {
+  width: 100%;
+  max-width: none;
+}
+.home-page--lift .home-cta-split article {
+  padding-top: 1.55rem;
+}
+.home-page--lift .home-cta-split .lift-hero__btn--lime {
+  background: #afca03;
+  color: #0a0c2a;
+}
+

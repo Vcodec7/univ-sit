@@ -170,6 +170,49 @@ function EventCard({
   const primaryContact = contacts[0];
   const rewards = eventRewardBadge({ ecoTagged: isEcoTagged(null, event.category) });
 
+  if (compact) {
+    const when = formatMskDate(event.startTime, { day: 'numeric', month: 'short' });
+    const line = [formatMskTimeRange(event.startTime, event.endTime), event.space.title].filter(Boolean).join(' · ');
+    return (
+      <article className="free-now-card yp-feed-card lift-feed-card">
+        <Link href="/events" className="lift-feed-card__media" aria-label={event.title}>
+          <div className="free-now-avatar yp-feed-card__media">
+            <EntityCoverImage
+              src={cover}
+              alt={event.title}
+              fallback={sectionCover('events')}
+              className="free-now-img"
+              sizes="(max-width: 768px) 85vw, 280px"
+            />
+            <span className="free-now-badge">{category}</span>
+          </div>
+        </Link>
+        <div className="free-now-body">
+          <h3>{event.title}</h3>
+          {line ? <p>{line}</p> : null}
+          <strong className="free-now-slot">
+            {when}
+            {isFull ? ' · мест нет' : ' · есть места'}
+          </strong>
+          <div className="free-now-actions">
+            <JoinEventButton
+              eventId={event.id}
+              initialIsJoined={isJoined}
+              initialIsFull={isFull}
+              initialAvailableSeats={availableSeats}
+              title={event.title}
+              startTime={event.startTime}
+              endTime={event.endTime}
+              location={[event.space?.title, event.space?.address].filter(Boolean).join(', ')}
+              description={event.description}
+              compact
+            />
+          </div>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article key={event.id} id={`event-${event.id}`} className={`event-card yp-feed-card${iconActions ? " event-card--compact" : ""}${compact ? " lift-feed-card free-now-card" : " glass"}`}>
       <div className="event-card-cover">

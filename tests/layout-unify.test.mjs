@@ -32,4 +32,7 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /profile-consent/);
   assert.match(css, /dashboard-page \.messages-root/);
   assert.match(css, /admin-nav-card/);
+  assert.match(css, /--yp-shell/);
+  assert.match(css, /gov-strip-actions/);
+  assert.match(css, /object-position:\s*center 58%/);
 });

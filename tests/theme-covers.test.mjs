@@ -15,10 +15,11 @@ test('Sochi venues map to CC photos, not random beaches', () => {
   assert.match(src, /function matchVenuePhoto/);
 });
 
-test('missing uploads use branded plates, not empty frames', () => {
+test('missing uploads use thematic photos, not empty frames', () => {
   assert.match(src, /brandCover/);
   assert.match(src, /\/brand\/covers\/ink-lime\.svg/);
-  assert.match(src, /return brandCover\(section, index\)/);
+  assert.match(src, /return photoBySeed\(/);
+  assert.match(src, /function newsCover/);
 });
 
 test('branded cover SVGs are valid UTF-8 with wordmark', () => {

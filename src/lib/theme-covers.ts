@@ -148,7 +148,9 @@ export function eventCover(
   if (spaceImg && !isWeakCover(spaceImg)) {
     return resolveEntityCover(spaceImg, brandCover('events', index));
   }
-  return brandCover('events', index);
+  const byTitle = titlePhoto(event.title || '');
+  if (byTitle) return byTitle;
+  return photoBySeed(event.title || event.space?.title || 'event', index);
 }
 
 export function sectionCover(section: string, index = 0): string {
@@ -187,7 +189,7 @@ function entityCover(
 ): string {
   const img = String(entity.image || '').trim();
   if (img && !isWeakCover(img)) return resolveEntityCover(img, sectionCover(section, index));
-  return brandCover(section, index);
+  return photoBySeed(entity.id || entity.title || section, index);
 }
 
 /** Project cover: real uploads win; weak SVGs → unique thematic photos. */
@@ -214,7 +216,7 @@ export function spaceCover(space: CoverEntity, index = 0): string {
     const h = hashSeed(`spaces:${space.id || title || index}::${index}`);
     return HALL_POOL[h % HALL_POOL.length];
   }
-  return brandCover('spaces', index);
+  return photoBySeed(space.id || space.title || 'spaces', index);
 }
 
 export function placeCover(place: CoverEntity, index = 0): string {
@@ -234,7 +236,11 @@ export function newsCover(
   news: { id?: string | null; title?: string | null; imageUrl?: string | null },
   index = 0
 ): string {
-  return entityCover({ id: news.id, title: news.title, image: news.imageUrl }, index, 'news');
+  const img = String(news.imageUrl || '').trim();
+  if (img && !isWeakCover(img)) return resolveEntityCover(img, photoBySeed(news.id || news.title || 'news', index));
+  const byTitle = titlePhoto(news.title || '');
+  if (byTitle) return byTitle;
+  return photoBySeed(news.id || news.title || 'news', index);
 }
 
 export { PHOTO as THEME_PHOTOS, PHOTO_POOL };

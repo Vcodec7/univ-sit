@@ -303,6 +303,7 @@ export default async function Home() {
                         <NewsCoverImage
                           src={item.imageUrl}
                           alt={title}
+                          seed={item.id}
                           className="free-now-img"
                           sizes="(max-width: 768px) 85vw, 280px"
                         />
@@ -345,15 +346,15 @@ export default async function Home() {
               <h2>Собрать людей</h2>
               <p className="home-cta-text">Зал под встречу или проект, который видно в портфолио.</p>
               {showSpaces ? (
-                <Link href="/spaces" className="lift-hero__btn lift-hero__btn--ghost">
+                <Link href="/spaces" className="lift-hero__btn lift-hero__btn--lime">
                   К площадкам
                 </Link>
               ) : showProjects ? (
-                <Link href="/projects" className="lift-hero__btn lift-hero__btn--ghost">
+                <Link href="/projects" className="lift-hero__btn lift-hero__btn--lime">
                   К проектам
                 </Link>
               ) : (
-                <Link href="/contacts" className="lift-hero__btn lift-hero__btn--ghost">
+                <Link href="/contacts" className="lift-hero__btn lift-hero__btn--lime">
                   Контакты
                 </Link>
               )}
