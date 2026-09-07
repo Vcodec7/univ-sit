@@ -1,0 +1,41 @@
+/**
+ * User-facing labels for youth points.
+ * Internal fields stay ecoPoints / mBall / ecoBall — only copy changes.
+ */
+export const POINTS = {
+  /** Spendable shop currency (ecoPoints) */
+  shop: {
+    brand: 'М-баллы',
+    short: 'МБ',
+    genitive: 'М-баллов',
+    dative: 'М-баллам',
+    accusative: 'М-баллы',
+    capital: 'М-баллы',
+    wallet: 'Кошелёк',
+    pool: 'Пул М-баллов',
+  },
+  /** Participation reputation (mBall) */
+  mBall: {
+    brand: 'Репутация',
+    short: 'реп.',
+  },
+  /** Eco-tagged event reputation (ecoBall) — not shop currency */
+  ecoBall: {
+    brand: 'Зелёный балл',
+    short: 'Зел.',
+  },
+} as const;
+
+/** «N М-баллов» with simple Russian pluralization. */
+export function shopPointsAmount(n: number): string {
+  const abs = Math.abs(Math.trunc(n));
+  const mod10 = abs % 10;
+  const mod100 = abs % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${n} М-балл`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} М-балла`;
+  return `${n} М-баллов`;
+}
+
+export function needShopPoints(n: number): string {
+  return `Нужно ${shopPointsAmount(n)}`;
+}

@@ -1,0 +1,48 @@
+# Build Next on GitHub (enough RAM), then load a small image on the VPS.
+# Never deploys production (py.idivles.ru).
+name: apply-staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ty-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy-ty:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SKIP_DB_AT_BUILD: '1'
+      NEXT_TELEMETRY_DISABLED: '1'
+      NODE_OPTIONS: '--max-old-space-size=4096'
+      PORT: '22'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run build
+      - name: Pack + deploy prebuilt to ty
+        env:
+          STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+        run: |
+          if [ -z "$STAGING_SSH_KEY" ]; then
+            echo "::error::Add GitHub secret STAGING_SSH_KEY (and optional STAGING_HOST) so ty.idivles.ru is updated automatically."
+            exit 1
+          fi
+          install -m 600 /dev/null "$HOME/.ssh/id_ed25519_gha"
+          printf '%s\n' "$STAGING_SSH_KEY" > "$HOME/.ssh/id_ed25519_gha"
+          export SSH_IDENTITY="$HOME/.ssh/id_ed25519_gha"
+          export HOST="${STAGING_HOST:-cursor-site@77.110.125.241}"
+          bash scripts/pack-staging-prebuilt.sh /tmp/yp-staging-prebuilt.tgz
+          bash scripts/deploy-staging-prebuilt.sh /tmp/yp-staging-prebuilt.tgz
+      - name: Smoke ty
+        run: bash scripts/smoke-sites.sh --staging-only
