@@ -28,6 +28,11 @@ test('html scrollbar is not forced into a layout column', () => {
   assert.match(unify, /glass-nav-inner\.container[\s\S]{0,80}max-width:\s*none\s*!important/);
 });
 
+test('home sections do not leave tall empty wells', () => {
+  assert.match(unify, /home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*1\.15rem\s*!important/);
+  assert.match(unify, /home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/);
+});
+
 test('home rails do not steal vertical wheel on phones', () => {
   assert.match(rail, /pointer: coarse/);
 });

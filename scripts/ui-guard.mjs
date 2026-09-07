@@ -98,6 +98,9 @@ if (/html::-webkit-scrollbar\s*\{[^}]*width\s*:/.test(unify) || /html\s*\{[^}]*s
 if (!/\.glass-nav-inner\.container[\s\S]{0,120}max-width:\s*none\s*!important/.test(unify)) {
   fails.push('header inner must span the bar so icons sit on the right edge');
 }
+if (!/\.home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*1\.15rem\s*!important/.test(unify)) {
+  fails.push('home sections must stay tight, not 2.5rem wells');
+}
 
 if (fails.length) {
   console.error('ui-guard FAIL');

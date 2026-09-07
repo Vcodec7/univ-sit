@@ -2450,5 +2450,84 @@ a.home-section-link:hover,
   background-color: #eef6fb !important;
 }
 
+/* Tight home rhythm: no tall empty wells in news / gov / CTA */
+.home-page--lift .home-section,
+.home-page--lift .afisha-week.home-section {
+  margin-bottom: 1.15rem !important;
+}
+.home-page--lift .home-section-head {
+  margin-bottom: 0.55rem !important;
+  gap: 0.4rem 0.75rem !important;
+}
+.home-page--lift .home-section-title {
+  margin-bottom: 0.25rem !important;
+}
+.home-page--lift .home-section-title::after,
+.home-page--lift .lift-sochi h2::after {
+  margin-top: 0.28rem !important;
+}
+.home-page--lift .home-rail-wrap {
+  margin-top: 0 !important;
+}
+.home-page--lift .home-rail__slide {
+  align-self: start !important;
+  height: auto !important;
+}
+.home-page--lift .home-rail__slide > * {
+  min-height: 0 !important;
+  height: auto !important;
+}
+.home-page--lift .free-now-body h3,
+.home-page--lift .free-now-body p {
+  min-height: 0 !important;
+}
+.home-page--lift .free-now-actions {
+  margin-top: 0.35rem !important;
+  padding-top: 0 !important;
+}
+.home-page--lift .gov-strip {
+  margin: 0.35rem 0 1rem !important;
+  padding: 0.75rem 0.9rem !important;
+  gap: 0.45rem !important;
+}
+.home-page--lift .home-cta.home-cta--split {
+  margin: 0.35rem 0 1.1rem !important;
+  padding: 0 !important;
+}
+.home-page--lift .home-cta-split {
+  align-items: start !important;
+  gap: 0.65rem !important;
+}
+.home-page--lift .home-cta-split article,
+.home-page--lift .home-cta-split article:last-child {
+  min-height: 0 !important;
+  padding: 0.95rem 1.05rem 1rem !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.home-page--lift .home-cta--split .home-cta-text {
+  margin: 0 0 0.4rem !important;
+}
+.home-page--lift .home-cta-split .lift-hero__btn {
+  margin-top: 0.1rem;
+  align-self: flex-start;
+}
+@media (max-width: 700px) {
+  .home-page--lift .home-section-head {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .home-page--lift .home-section-link,
+  .home-page--lift a.home-section-link {
+    align-self: flex-start !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+  .home-page--lift .home-cta-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 
 
