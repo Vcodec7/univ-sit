@@ -1,20 +1,20 @@
 /**
- * Reset passwords for documented staging QA emails only.
- * Never touches admin@sochi.ru.
- * Uses `pg` + `bcrypt` (present in the standalone image); no Prisma adapter.
+ * Reset or create documented staging QA emails. Never touches admin@sochi.ru.
+ * Uses `pg` + `bcrypt` (in the standalone image).
  *
  *   QA_RESET_STAGING=1 QA_SEED_PASSWORD='RolePass123!' node scripts/reset-staging-qa-passwords.mjs
  */
 import pg from 'pg';
 import bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 
-const QA_EMAILS = [
-  'qa-admin@sochi.ru',
-  'mod@sochi.ru',
-  'part@sochi.ru',
-  'user@sochi.ru',
-  'scanner@sochi.ru',
-  'private@sochi.ru',
+const QA_USERS = [
+  { email: 'qa-admin@sochi.ru', role: 'ADMIN', name: 'QA Администратор' },
+  { email: 'mod@sochi.ru', role: 'MODERATOR', name: 'QA Модератор' },
+  { email: 'part@sochi.ru', role: 'PARTICIPANT', name: 'QA Участник' },
+  { email: 'user@sochi.ru', role: 'USER', name: 'QA Пользователь' },
+  { email: 'scanner@sochi.ru', role: 'SCANNER', name: 'QA Сканер' },
+  { email: 'private@sochi.ru', role: 'USER', name: 'QA Приватный' },
 ];
 
 const connectionString = process.env.DATABASE_URL;
@@ -41,20 +41,35 @@ const pool = new pg.Pool({ connectionString, max: 1 });
 async function main() {
   const hash = await bcrypt.hash(pass, 10);
   let updated = 0;
-  let missing = 0;
-  for (const email of QA_EMAILS) {
-    const found = await pool.query('SELECT id FROM "User" WHERE email = $1', [email]);
-    if (!found.rowCount) {
-      missing += 1;
+  let created = 0;
+  const total = await pool.query('SELECT count(*)::int AS n FROM "User"');
+  for (const spec of QA_USERS) {
+    const found = await pool.query('SELECT id FROM "User" WHERE lower(email) = lower($1)', [spec.email]);
+    if (found.rowCount) {
+      await pool.query(
+        `UPDATE "User"
+         SET password = $1, role = $2::"Role", name = $3, "deletedAt" = NULL, "blockedAt" = NULL, "mustChangePassword" = false
+         WHERE id = $4`,
+        [hash, spec.role, spec.name, found.rows[0].id],
+      );
+      updated += 1;
       continue;
     }
+    const id = `c${randomBytes(12).toString('hex')}`;
     await pool.query(
-      'UPDATE "User" SET password = $1, "deletedAt" = NULL, "blockedAt" = NULL WHERE email = $2',
-      [hash, email],
+      `INSERT INTO "User" (
+         id, email, name, role, password, city, "isDemoData",
+         "privacyAcceptedAt", "rulesAcceptedAt", "cookiesAcceptedAt",
+         "createdAt", "updatedAt", "mustChangePassword"
+       ) VALUES (
+         $1, $2, $3, $4::"Role", $5, 'Сочи', true,
+         NOW(), NOW(), NOW(), NOW(), NOW(), false
+       )`,
+      [id, spec.email, spec.name, spec.role, hash],
     );
-    updated += 1;
+    created += 1;
   }
-  console.log(JSON.stringify({ ok: true, updated, missing, emails: QA_EMAILS.length }));
+  console.log(JSON.stringify({ ok: true, updated, created, usersInDb: total.rows[0].n }));
 }
 
 main()
