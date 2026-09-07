@@ -20,7 +20,7 @@ import YandexMetrika from '@/components/YandexMetrika';
 import StaffChrome from '@/components/StaffChrome';
 import HideOnPaths from '@/components/HideOnPaths';
 import MaintenanceStaffBanner from '@/components/MaintenanceStaffBanner';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
 import { getCachedPublicChromeSettings } from '@/lib/public-chrome-settings';
 
 /** Vendored fonts — Google Fonts fetch is flaky during Docker builds on the VPS. */
@@ -48,11 +48,11 @@ const unbounded = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
+  const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
   const titleDefault = `${siteName} | Официальный портал`;
   const description = `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости.`;
   return {
-    metadataBase: new URL(publicOrigin),
-    alternates: { canonical: publicOrigin },
+    ...(publicUrl ? { metadataBase: new URL(publicUrl), alternates: { canonical: publicUrl } } : {}),
     title: {
       default: titleDefault,
       template: `%s | ${siteName}`,
@@ -61,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       locale: 'ru_RU',
-      url: publicOrigin,
+      ...(publicUrl ? { url: publicUrl } : {}),
       siteName,
       title: titleDefault,
       description,

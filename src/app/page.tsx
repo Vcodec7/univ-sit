@@ -3,7 +3,7 @@ import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
 import HomeSlideRail from '@/components/HomeSlideRail';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
@@ -25,14 +25,15 @@ import { encodeRouteParam } from '@/lib/route-id';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
+  const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
   return {
     title: { absolute: `${siteName} | Официальный портал` },
     description: `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости Центра развития молодёжи Сочи.`,
-    alternates: { canonical: publicOrigin },
+    ...(publicUrl ? { alternates: { canonical: publicUrl } } : {}),
   };
 }
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 // Do not force-static: admin hero mediaKind must apply after deploy without a
 // long stale bake that shows photo while DB says video.
 
