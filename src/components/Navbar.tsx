@@ -83,6 +83,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const navCloseTimer = useRef<number | null>(null);
   const moreId = useId();
 
   const userRole = (session?.user as { role?: string } | undefined)?.role;
@@ -138,13 +139,34 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
 
   const toggleMenu = () => setIsMobileMenuOpen((open) => !open);
   const closeMenu = () => setIsMobileMenuOpen(false);
-  const closeDesktopMenus = () => setOpenMenu(null);
+  const closeDesktopMenus = () => {
+    if (navCloseTimer.current) {
+      window.clearTimeout(navCloseTimer.current);
+      navCloseTimer.current = null;
+    }
+    setOpenMenu(null);
+  };
+  const keepDesktopMenus = () => {
+    if (navCloseTimer.current) {
+      window.clearTimeout(navCloseTimer.current);
+      navCloseTimer.current = null;
+    }
+  };
+  const scheduleDesktopMenuClose = () => {
+    keepDesktopMenus();
+    navCloseTimer.current = window.setTimeout(() => {
+      setOpenMenu(null);
+      navCloseTimer.current = null;
+    }, 240);
+  };
 
   useEffect(() => {
     closeMenu();
     closeDesktopMenus();
     setSearchOpen(false);
   }, [pathname]);
+
+  useEffect(() => () => keepDesktopMenus(), []);
 
   useEffect(() => {
     if (!searchOpen) return;
@@ -294,16 +316,19 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       className={`nav-item${openMenu === id ? ' is-open' : ''}`}
       data-nav-id={id === 'more' ? undefined : id}
       onMouseEnter={() => {
-        if (hasItems) setOpenMenu(id);
+        if (hasItems) {
+          keepDesktopMenus();
+          setOpenMenu(id);
+        }
       }}
-      onMouseLeave={closeDesktopMenus}
+      onMouseLeave={scheduleDesktopMenuClose}
       onFocusCapture={() => {
         if (hasItems) setOpenMenu(id);
       }}
     >
       {trigger}
       {hasItems && (
-        <div className="dropdown" role="menu">
+        <div className="dropdown" role="menu" onMouseEnter={keepDesktopMenus} onMouseLeave={scheduleDesktopMenuClose}>
           {items}
         </div>
       )}
@@ -391,7 +416,8 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         )}
         <div
           className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}
-          onMouseLeave={closeDesktopMenus}
+          onMouseEnter={keepDesktopMenus}
+          onMouseLeave={scheduleDesktopMenuClose}
         >
           <button
             type="button"
@@ -406,7 +432,12 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             <ChevronDown size={12} className="nav-account-chevron" aria-hidden />
           </button>
             {openMenu === 'account' && (
-              <div className="dropdown nav-account-menu" role="menu">
+              <div
+                className="dropdown nav-account-menu"
+                role="menu"
+                onMouseEnter={keepDesktopMenus}
+                onMouseLeave={scheduleDesktopMenuClose}
+              >
                 <div className="nav-account-menu__head">
                   <strong>
                     {(session?.user as { nickname?: string | null } | undefined)?.nickname ||
@@ -574,7 +605,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     if (!drop || !trigger) return;
     const r = trigger.getBoundingClientRect();
     drop.style.position = 'fixed';
-    drop.style.top = `${Math.round(r.bottom + 6)}px`;
+    drop.style.top = `${Math.round(r.bottom - 4)}px`;
     drop.style.transform = 'none';
     drop.style.right = 'auto';
     drop.style.zIndex = '20050';

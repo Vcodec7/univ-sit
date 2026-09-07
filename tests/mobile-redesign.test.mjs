@@ -20,8 +20,10 @@ test('V-gesture quick access is not mounted for the public chrome', () => {
   assert.doesNotMatch(guides, /quick-access/);
 });
 
-test('desktop nav closes menus on mouse leave so hover does not leave a sliver', () => {
-  assert.match(nav, /onMouseLeave=\{closeDesktopMenus\}/);
+test('desktop nav keeps the dropdown reachable while moving the pointer', () => {
+  assert.match(nav, /scheduleDesktopMenuClose/);
+  assert.match(nav, /keepDesktopMenus/);
+  assert.match(nav, /r\.bottom - 4/);
   assert.match(nav, /position = 'fixed'/);
   assert.doesNotMatch(nav, /'events', 'news'/);
 });

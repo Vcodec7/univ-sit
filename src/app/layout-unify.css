@@ -2210,6 +2210,7 @@ a.home-section-link:hover,
   transform: translateX(-50%);
   overflow-x: hidden;
   overflow-y: auto;
+  padding-top: 0.45rem;
 }
 .nav-item .dropdown.nav-account-menu {
   transform: none;
