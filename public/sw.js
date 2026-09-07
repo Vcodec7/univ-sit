@@ -1,4 +1,4 @@
-const CACHE = "sochi-shell-v40-nav";
+const CACHE = "sochi-shell-v41-idle";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/offline.html",
@@ -99,11 +99,14 @@ self.addEventListener("fetch", (event) => {
 
   const path = url.pathname;
 
-  /* Never intercept API / Next data / RSC — substituting offline.html caused
-     "Failed to convert value to Response", Failed to fetch, and hung navigations. */
+  /* Never intercept API / Next data / RSC / the worker script itself.
+     Catch-all respondWith(fetch) kept aborted prefetches alive (networkidle)
+     and logged FetchEvent network errors on every page. */
   if (
+    path === "/sw.js" ||
+    path === "/service-worker.js" ||
     path.startsWith("/api/") ||
-    path.startsWith("/_next/data/") ||
+    path.startsWith("/_next/") ||
     isNextDataRequest(req, url)
   ) {
     return;
@@ -149,10 +152,6 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => caches.match(req).then((c) => c || offlinePage()))
     );
-    return;
-  }
-
-  if (path.startsWith("/_next/")) {
     return;
   }
 
@@ -217,8 +216,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* Default: network only — do not invent 503/504 for soft navigations / RSC leftovers. */
-  event.respondWith(fetch(req));
+  /* Default: do not intercept. Browser handles abort/prefetch; SW stays silent. */
+  return;
 });
 
 /** Web Push → system tray notification */

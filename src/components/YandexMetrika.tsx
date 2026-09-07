@@ -50,9 +50,11 @@ function initMetrika(id: string) {
 
   w.ym?.(num, 'init', {
     clickmap: false,
-    trackLinks: true,
+    trackLinks: false,
     accurateTrackBounce: false,
     webvisor: false,
+    ecommerce: false,
+    triggerEvent: false,
   });
 }
 
@@ -79,8 +81,8 @@ export default function YandexMetrika({ counterId, requireConsent = true }: Prop
       };
       const idle = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number })
         .requestIdleCallback;
-      if (typeof idle === 'function') idle(start, { timeout: 4000 });
-      else window.setTimeout(start, 2500);
+      if (typeof idle === 'function') idle(start, { timeout: 12000 });
+      else window.setTimeout(start, 8000);
     };
 
     tryLoad();

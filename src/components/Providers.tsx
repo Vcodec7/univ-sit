@@ -86,7 +86,7 @@ function PresenceHeartbeat() {
       }
     };
 
-    schedule(400);
+    schedule(12_000);
     const onVis = () => {
       if (document.visibilityState === 'visible' && !inFlight) {
         schedule(800);

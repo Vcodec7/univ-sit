@@ -21,7 +21,8 @@ function modOn(settings: any, key: string) {
 }
 
 
-import Link from 'next/link';
+import NextLink from 'next/link';
+import type { ComponentProps } from 'react';
 import { publicCmsTitle } from '@/lib/cms-page-copy';
 import {
   User,
@@ -71,6 +72,11 @@ import { fetchProfileCached } from '@/lib/user-data-client';
 import { persistSessionHint, readSessionHint } from '@/lib/session-hint';
 
 type OpenMenu = 'projects' | 'clubs' | 'spaces' | 'more' | 'account' | null;
+
+/** Chrome links: no viewport RSC prefetch (dozens of in-flight fetches on short pages). */
+function Link({ prefetch = false, ...props }: ComponentProps<typeof NextLink>) {
+  return <NextLink prefetch={prefetch} {...props} />;
+}
 
 export default function Navbar({ spaces = [], clubs = [], projects = [], pages = [], siteSettings }: any) {
   const { data: session, status } = useSession();
@@ -637,7 +643,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       {isAuthenticated ? (
         <Link
           href={profileHref}
-          prefetch
           className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
           aria-label="Профиль"
           title="Профиль"

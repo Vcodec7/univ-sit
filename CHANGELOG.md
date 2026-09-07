@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.153] — 2026-09-07
+
+### Fixed
+- Service Worker: не вызывать `update()` во время install (InvalidStateError на всех страницах)
+- SW больше не перехватывает RSC/prefetch/`/_next` — из-за этого висели соединения и networkidle
+- Шапка/подвал без массового viewport-prefetch; Метрика и heartbeat после idle
+
 ## [1.6.152] — 2026-09-07
 
 ### Fixed

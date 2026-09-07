@@ -21,3 +21,17 @@ test('service worker precache has no redirecting directory URLs', () => {
   assert.match(sw, /cache\.add\(u\)\.catch/);
   assert.match(sw, /\/offline-games\/index\.html/);
 });
+
+test('service worker does not catch-all intercept (aborted RSC / networkidle)', () => {
+  const sw = readFileSync(join(root, '../public/sw.js'), 'utf8');
+  assert.doesNotMatch(sw, /Default: network only[\s\S]*respondWith\(fetch\(req\)\)/);
+  assert.match(sw, /do not intercept/);
+  assert.match(sw, /path === "\/sw\.js"/);
+});
+
+test('PWA update waits until the worker is activated', () => {
+  const src = readFileSync(join(root, '../src/components/PwaUpdateBanner.tsx'), 'utf8');
+  assert.match(src, /reg\.installing/);
+  assert.match(src, /20_000/);
+  assert.doesNotMatch(src, /void reg\?\.update\(\)/);
+});

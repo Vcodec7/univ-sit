@@ -10,14 +10,25 @@ import { useEffect } from 'react';
 export default function PwaUpdateBanner() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
-    const check = () => {
-      navigator.serviceWorker.getRegistration().then((reg) => {
-        void reg?.update();
-      });
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (cancelled || !reg) return;
+        /* update() during install/activate throws InvalidStateError on every page. */
+        if (reg.installing || (reg.active && reg.active.state !== 'activated')) return;
+        await reg.update();
+      } catch {
+        /* InvalidStateError / abort while a new worker is installing */
+      }
     };
-    check();
-    const t = window.setInterval(check, 15 * 60_000);
-    return () => window.clearInterval(t);
+    const first = window.setTimeout(() => void check(), 20_000);
+    const t = window.setInterval(() => void check(), 15 * 60_000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(first);
+      window.clearInterval(t);
+    };
   }, []);
 
   return null;

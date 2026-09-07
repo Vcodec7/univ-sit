@@ -100,18 +100,28 @@ export default function NotificationsBell({ compact = false, useNavStyle = false
   }, [open]);
 
   useEffect(() => {
-    load('lite');
-    refreshPush();
+    const start = () => {
+      load('lite');
+      refreshPush();
+    };
+    const idle = (
+      window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }
+    ).requestIdleCallback;
+    const idleId =
+      typeof idle === 'function' ? idle(start, { timeout: 8000 }) : window.setTimeout(start, 2500);
     const t = setInterval(() => load('lite'), 45_000);
     const onVis = () => {
       if (document.visibilityState === 'visible') load(openRef.current ? 'full' : 'lite');
     };
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('focus', onVis);
-    // No persistent SSE — keeps Node connections down on the 2GB VPS.
-    // Full list loads when the panel opens; badge uses lite poll.
     return () => {
       clearInterval(t);
+      if (typeof idle === 'function' && typeof (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback === 'function') {
+        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId as number);
+      } else {
+        window.clearTimeout(idleId as number);
+      }
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('focus', onVis);
     };

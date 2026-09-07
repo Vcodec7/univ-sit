@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import NextLink from 'next/link';
+import type { ComponentProps } from 'react';
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import CookieSettingsLink from '@/components/CookieSettingsLink';
@@ -8,6 +9,10 @@ import { parseModuleFlagsJson } from '@/lib/module-flags';
 import { DEFAULT_SITE_NAME } from '@/lib/site-identity-shared';
 import { APP_VERSION } from '@/lib/app-version';
 import { isNextBuildPhase } from '@/lib/build-phase';
+
+function Link({ prefetch = false, ...props }: ComponentProps<typeof NextLink>) {
+  return <NextLink prefetch={prefetch} {...props} />;
+}
 
 type NavItem = {
   href: string;

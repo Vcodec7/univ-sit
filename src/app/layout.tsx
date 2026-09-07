@@ -129,7 +129,7 @@ export default async function RootLayout({
           id="yp-pwa-early"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{window.__ypPwa=window.__ypPwa||{deferred:null};window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__ypPwa.deferred=e;window.dispatchEvent(new Event('yp-beforeinstallprompt'))});window.addEventListener('appinstalled',function(){window.__ypPwa.deferred=null;window.dispatchEvent(new Event('yp-appinstalled'))});if('serviceWorker'in navigator){var reg=function(){navigator.serviceWorker.register('/sw.js').catch(function(){})};if(document.readyState==='complete')reg();else window.addEventListener('load',reg)}}catch(e){}})();`,
+            __html: `(function(){try{window.__ypPwa=window.__ypPwa||{deferred:null};window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__ypPwa.deferred=e;window.dispatchEvent(new Event('yp-beforeinstallprompt'))});window.addEventListener('appinstalled',function(){window.__ypPwa.deferred=null;window.dispatchEvent(new Event('yp-appinstalled'))});if('serviceWorker'in navigator){var reg=function(){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){})};if(document.readyState==='complete'){setTimeout(reg,1500)}else window.addEventListener('load',function(){setTimeout(reg,1500)})}}catch(e){}})();`,
           }}
         />
         <Providers>
