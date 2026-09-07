@@ -232,6 +232,12 @@ export async function GET(req: Request) {
         .catch(() => []),
     ]);
 
+    const { getVisitSnapshot } = await import('@/lib/visit-analytics');
+    const visits = await getVisitSnapshot({
+      ...(since ? { gte: since } : {}),
+      ...(rangeEndDate(range) ? { lte: rangeEndDate(range)! } : {}),
+    });
+
     return NextResponse.json({
       period: range.period,
       from: range.from,
@@ -253,6 +259,7 @@ export async function GET(req: Request) {
         messagesInPeriod: dmCount,
         openVacancies,
         openContests,
+        visits,
       },
       userStats,
       appStats,

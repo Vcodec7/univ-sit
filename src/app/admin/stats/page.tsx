@@ -58,9 +58,9 @@ function AdminStatsInner() {
           <Link href="/admin#admin-analytics" className="admin-stats-page__back">
             <ArrowLeft size={14} aria-hidden /> Дашборд
           </Link>
-          <h1 className="admin-stats-page__title">Статистика проходов</h1>
+          <h1 className="admin-stats-page__title">Посещаемость</h1>
           <p className="admin-stats-page__subtitle">
-            QR-сканер и отметки на входе · {periodLabel}
+            Афиша, коворкинг и залы · {periodLabel}
             {loading ? ' · обновление…' : ''}
           </p>
         </div>
@@ -106,6 +106,32 @@ function AdminStatsInner() {
           <div className="admin-stats-card__label">Всего за всё время</div>
         </div>
       </div>
+
+      {summary.visits ? (
+        <div className="admin-stats-page__cards" style={{ marginTop: '0.85rem' }}>
+          <div className="glass admin-stats-card">
+            <div className="admin-stats-card__value">{summary.visits.eventsCheckedIn}</div>
+            <div className="admin-stats-card__label">Афиша · пришли</div>
+            <p className="admin-stats-card__hint">Записей {summary.visits.eventsRegistered}</p>
+          </div>
+          <div className="glass admin-stats-card">
+            <div className="admin-stats-card__value">{summary.visits.coworkAttended}</div>
+            <div className="admin-stats-card__label">Коворкинг · визиты</div>
+            <p className="admin-stats-card__hint">
+              Записей {summary.visits.coworkSignups} · вход {summary.visits.coworkPresence}
+            </p>
+          </div>
+          <div className="glass admin-stats-card">
+            <div className="admin-stats-card__value">{summary.visits.hallBookings}</div>
+            <div className="admin-stats-card__label">Залы · брони</div>
+          </div>
+          <div className="glass admin-stats-card">
+            <div className="admin-stats-card__value">{summary.visits.uniquePeople}</div>
+            <div className="admin-stats-card__label">Разных людей</div>
+            <p className="admin-stats-card__hint">Неявки {summary.visits.noShows}</p>
+          </div>
+        </div>
+      ) : null}
 
       {(summary.openVacancies != null || summary.vacancyApplications != null) && (
         <div className="admin-stats-page__cards" style={{ marginTop: '0.85rem' }}>

@@ -210,8 +210,8 @@ export const ADMIN_NAV_ITEMS: AdminNavDef[] = [
     icon: 'BarChart3',
     requiredPermission: ['stats', 'bookings'],
     group: 'ops',
-    hint: 'Цифры портала',
-    keywords: 'статистика график stats аналитика',
+    hint: 'Афиша, коворкинг, залы, проходы',
+    keywords: 'статистика график stats аналитика посещаемость коворкинг афиша',
   },
   {
     href: '/admin/scanner',

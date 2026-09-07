@@ -75,6 +75,12 @@ export async function GET(req: Request) {
   const attendance = await settleNoShows(100);
   const { autoApproveDueAccounts } = await import('@/lib/account-moderation');
   const moderation = await autoApproveDueAccounts();
+  const forceMonthly = new URL(req.url).searchParams.get('monthly') === '1';
+  const { sendMonthlyVisitReport } = await import('@/lib/monthly-admin-report');
+  const monthly = await sendMonthlyVisitReport({ force: forceMonthly }).catch((e) => ({
+    ok: false,
+    error: e instanceof Error ? e.message : 'report_failed',
+  }));
 
   return NextResponse.json({
     ok: true,
@@ -83,5 +89,6 @@ export async function GET(req: Request) {
     hours,
     attendance,
     moderation,
+    monthly,
   });
 }
