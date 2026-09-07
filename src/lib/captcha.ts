@@ -200,8 +200,9 @@ export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVe
   }
 
   const token = signToken(id);
-  if (redis) {
-    await redis.set(`captcha:tok:${token}`, '1', 'EX', TTL_SEC);
+  const redisTok = getSharedRedis();
+  if (redisTok) {
+    await redisTok.set(`captcha:tok:${token}`, '1', 'EX', TTL_SEC);
   } else {
     MEM.set(`tok:${token}`, { answer: '1', exp: Date.now() + TTL_SEC * 1000 });
   }
