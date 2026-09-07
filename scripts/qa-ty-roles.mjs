@@ -9,6 +9,23 @@ const BASE = (process.argv[2] || 'https://ty.idivles.ru').replace(/\/$/, '');
 const PASS = process.env.QA_PASS || 'RolePass123!';
 const TECH_EMAIL = process.env.TECH_EMAIL || 'tech@young.idivles.ru';
 const TECH_PASS = process.env.TECH_PASS || '';
+const nativeFetch = globalThis.fetch.bind(globalThis);
+
+async function fetchRetry(url, opts = {}, tries = 4) {
+  const method = String(opts.method || 'GET').toUpperCase();
+  const max = method === 'GET' || method === 'HEAD' ? tries : 1;
+  let last;
+  for (let i = 0; i < max; i += 1) {
+    try {
+      const ctrl = AbortSignal.timeout(28000);
+      return await nativeFetch(url, { ...opts, signal: opts.signal || ctrl });
+    } catch (e) {
+      last = e;
+      await new Promise((r) => setTimeout(r, 900 * (i + 1)));
+    }
+  }
+  throw last;
+}
 
 const TAG_BY_TITLE = {
   деревья: 'tree',
@@ -48,7 +65,7 @@ function row(role, name, ok, severity, detail = '') {
 }
 
 async function solveCaptcha(jar) {
-  const chRes = await fetch(`${BASE}/api/captcha/challenge`, { headers: { cookie: cookieHeader(jar) } });
+  const chRes = await fetchRetry(`${BASE}/api/captcha/challenge`, { headers: { cookie: cookieHeader(jar) } });
   jarStore(jar, chRes);
   if (!chRes.ok) throw new Error(`captcha challenge HTTP ${chRes.status}`);
   const ch = await chRes.json();
@@ -64,7 +81,7 @@ async function solveCaptcha(jar) {
   } else {
     throw new Error(`unsupported captcha kind ${ch.kind}`);
   }
-  const solRes = await fetch(`${BASE}/api/captcha/challenge`, {
+  const solRes = await fetchRetry(`${BASE}/api/captcha/challenge`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', cookie: cookieHeader(jar) },
     body: JSON.stringify({ challengeId: ch.challengeId, selected, website: '' }),
@@ -77,7 +94,7 @@ async function solveCaptcha(jar) {
 
 async function login(email, pass = PASS) {
   const jar = new Map();
-  const csrfRes = await fetch(`${BASE}/api/auth/csrf`, { headers: { cookie: cookieHeader(jar) } });
+  const csrfRes = await fetchRetry(`${BASE}/api/auth/csrf`, { headers: { cookie: cookieHeader(jar) } });
   jarStore(jar, csrfRes);
   const { csrfToken } = await csrfRes.json();
   const captchaToken = await solveCaptcha(jar);
@@ -91,7 +108,7 @@ async function login(email, pass = PASS) {
     captchaToken,
     website: '',
   });
-  const loginRes = await fetch(`${BASE}/api/auth/callback/credentials`, {
+  const loginRes = await fetchRetry(`${BASE}/api/auth/callback/credentials`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', cookie: cookieHeader(jar) },
     body,
@@ -99,7 +116,7 @@ async function login(email, pass = PASS) {
   });
   jarStore(jar, loginRes);
   const loginBody = await loginRes.text();
-  const sessionRes = await fetch(`${BASE}/api/auth/session`, { headers: { cookie: cookieHeader(jar) } });
+  const sessionRes = await fetchRetry(`${BASE}/api/auth/session`, { headers: { cookie: cookieHeader(jar) } });
   jarStore(jar, sessionRes);
   const session = await sessionRes.json().catch(() => ({}));
   return {
@@ -114,7 +131,7 @@ async function login(email, pass = PASS) {
 }
 
 async function get(cookie, path) {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetchRetry(`${BASE}${path}`, {
     headers: cookie ? { cookie } : {},
     redirect: 'manual',
   });
@@ -222,14 +239,14 @@ async function main() {
 
   // Health / hero presence
   {
-    const health = await fetch(`${BASE}/api/health`).then((r) => r.json());
+    const health = await fetchRetry(`${BASE}/api/health`).then((r) => r.json());
     rows.push(row('SYSTEM', 'health ok', health?.ok && health?.db, 'critical', JSON.stringify(health)));
     let home = '';
     for (let i = 0; i < 3; i += 1) {
       try {
         const ctrl = new AbortController();
         const t = setTimeout(() => ctrl.abort(), 25000);
-        const res = await fetch(`${BASE}/`, { signal: ctrl.signal });
+        const res = await fetchRetry(`${BASE}/`, { signal: ctrl.signal });
         clearTimeout(t);
         if (res.ok) {
           home = await res.text();
