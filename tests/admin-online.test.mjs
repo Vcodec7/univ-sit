@@ -16,7 +16,7 @@ test('online dashboard uses session touch and login events, not only a slow hear
   assert.match(presence, /TOUCH_THROTTLE_MS/);
   assert.match(auth, /touchUserPresence/);
   assert.match(query, /loginEvent\.groupBy/);
-  assert.match(providers, /schedule\(400\)/);
+  assert.match(providers, /schedule\(12_000\)/);
   assert.match(providers, /backoffMs = 50_000/);
   assert.match(client, /useState\('all'\)/);
   assert.match(client, /в сети/);
