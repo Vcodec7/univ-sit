@@ -45,9 +45,13 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
 });
 
 test('free-now rail on lift home keeps full cards and hero buttons', () => {
-  assert.match(freeNow, /lift-hero__btn--lime/);
+  const card = readFileSync(join(root, '../src/components/HomeLiftFeedCard.tsx'), 'utf8');
+  assert.match(freeNow, /HomeLiftFeedCard/);
+  assert.match(card, /lift-hero__btn--lime/);
   const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
   assert.match(unify, /--rail-peek/);
+  assert.match(unify, /\.home-page--lift \.free-now-actions \{[\s\S]*?grid-template-columns:\s*1fr\s*!important/);
+  assert.match(unify, /min-width:\s*13\.75rem/);
   assert.match(css, /home-page--lift \.free-now-card/);
   assert.match(css, /home-page--lift \.home-rail::-webkit-scrollbar/);
   assert.match(css, /--rail-cols/);

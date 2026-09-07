@@ -2262,4 +2262,91 @@ a.home-section-link:hover,
   }
 }
 
+/* Feed cards: stacked equal pills, lavender rail, section chips like «Все пространства». */
+.home-page.home-page--lift {
+  background-color: #e8e1f4 !important;
+  background-image:
+    radial-gradient(rgba(10, 12, 42, 0.035) 0.55px, transparent 0.7px),
+    linear-gradient(180deg, #ddd4f0 0%, #e8e1f4 38%, #efeaf8 100%) !important;
+}
+.home-page--lift .free-now-card,
+.home-page--lift .lift-feed-card,
+.home-page--lift .lift-feed-card.event-card {
+  border-radius: 1.5rem !important;
+}
+.home-page--lift .free-now-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.5rem !important;
+  width: 100%;
+}
+.home-page--lift .free-now-actions > .join-event,
+.home-page--lift .free-now-actions > .join-event:only-child {
+  grid-column: 1 / -1;
+  display: grid;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn,
+.home-page--lift .free-now-actions .join-event-btn {
+  grid-column: 1 / -1;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 2.75rem !important;
+  height: 2.75rem !important;
+  box-sizing: border-box;
+  border-radius: 999px !important;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 800;
+  text-align: center;
+}
+.home-page--lift .free-now-actions .lift-hero__btn--ghost {
+  background: #f2f1f4 !important;
+  color: #0a0c2a !important;
+  border: 1px solid rgba(10, 12, 42, 0.08) !important;
+}
+.home-page--lift .free-now-actions .lift-hero__btn--lime,
+.home-page--lift .free-now-actions .join-event-btn.is-primary,
+.home-page--lift .free-now-actions .join-event-btn.is-waitlist {
+  background: #afca03 !important;
+  color: #0a0c2a !important;
+  border: 0 !important;
+}
+.home-page.home-page--lift .home-section-link,
+.home-page--lift a.home-section-link {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 13.75rem;
+  min-height: 2.55rem;
+  padding: 0.5rem 1.2rem !important;
+  border-radius: 999px !important;
+  background: #f3f2f5 !important;
+  border: 0 !important;
+  color: #6e4bc4 !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-page--lift .free-now-actions .lift-hero__btn--ghost:hover {
+    background: #e7e5ec !important;
+    color: #0a0c2a !important;
+  }
+  .home-page--lift .free-now-actions .lift-hero__btn--lime:hover,
+  .home-page--lift .free-now-actions .join-event-btn:hover {
+    filter: brightness(0.96);
+    color: #0a0c2a !important;
+  }
+  .home-page--lift a.home-section-link:hover {
+    background: #eceaf1 !important;
+    color: #5a38b0 !important;
+  }
+}
+
+
 

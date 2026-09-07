@@ -80,6 +80,12 @@ if (!/\.nav-item:hover \.dropdown[\s\S]{0,40}display:\s*none/.test(unify)) {
 if (!/\.nav-dropdown-bridge/.test(unify)) {
   fails.push('header dropdown must include a hover bridge so the menu stays open');
 }
+if (!/\.desktop-nav[\s\S]{0,80}overflow:\s*hidden\s*!important/.test(unify)) {
+  fails.push('desktop-nav must clip extra links so they do not cover Запись');
+}
+if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1fr\s*!important/.test(unify)) {
+  fails.push('home feed card actions must stack at equal width');
+}
 
 if (fails.length) {
   console.error('ui-guard FAIL');

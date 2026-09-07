@@ -9,7 +9,9 @@ import {
 } from '@/lib/hall-occupancy';
 import { spaceCover } from '@/lib/theme-covers';
 import EntityCoverImage from '@/components/EntityCoverImage';
+import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
 import HomeSlideRail from '@/components/HomeSlideRail';
+import { ArrowRight } from 'lucide-react';
 import { encodeRouteParam } from '@/lib/route-id';
 import { isCoworkingSpace } from '@/lib/coworking';
 import { isNextBuildPhase } from '@/lib/build-phase';
@@ -131,43 +133,39 @@ export default async function FreeNowSpaces({ limit = 6 }: { limit?: number }) {
           <p className="home-section-sub">Можно зайти без очереди — ближайшие окна ЦРМ</p>
         </div>
         <Link href="/spaces" className="home-section-link">
-          Все пространства
+          Все пространства <ArrowRight size={18} />
         </Link>
       </div>
       <HomeSlideRail label="Сейчас свободно">
-        {cards.map((card) => (
-          <article key={card.id} className="free-now-card yp-feed-card">
-            <div className="free-now-avatar yp-feed-card__media">
-              <EntityCoverImage
-                src={spaceCover(card, card.idx)}
-                alt={card.title}
-                fallback={spaceCover(card, card.idx + 2)}
-                className="free-now-img"
-                sizes="(max-width: 768px) 85vw, 280px"
-              />
-            </div>
-            <div className="free-now-body">
-              <span className="free-now-badge">{card.category || 'Площадка'}</span>
-              <h3>{card.title}</h3>
-              <p>{card.address || 'Сочи'}</p>
-              <strong className="free-now-slot">{card.slotLabel}</strong>
-              <div className="free-now-actions">
-                <Link href={`/spaces/${encodeRouteParam(card.id)}`} className="lift-hero__btn lift-hero__btn--ghost">
-                  Сетка
-                </Link>
-                {card.coworking ? (
-                  <Link href={`/coworking?space=${encodeURIComponent(card.id)}`} className="lift-hero__btn lift-hero__btn--lime">
-                    В коворкинг
-                  </Link>
-                ) : (
-                  <Link href={`/spaces/${encodeRouteParam(card.id)}/book?from=list`} className="lift-hero__btn lift-hero__btn--lime">
-                    Забронировать
-                  </Link>
-                )}
-              </div>
-            </div>
-          </article>
-        ))}
+        {cards.map((card) => {
+          const href = `/spaces/${encodeRouteParam(card.id)}`;
+          return (
+            <HomeLiftFeedCard
+              key={card.id}
+              href={href}
+              badge={card.category || 'Площадка'}
+              title={card.title}
+              line={card.address || 'Сочи'}
+              highlight={card.slotLabel}
+              secondary={{ href, label: 'Сетка' }}
+              primary={{
+                href: card.coworking
+                  ? `/coworking?space=${encodeURIComponent(card.id)}`
+                  : `${href}/book?from=list`,
+                label: card.coworking ? 'В коворкинг' : 'Забронировать',
+              }}
+              cover={
+                <EntityCoverImage
+                  src={spaceCover(card, card.idx)}
+                  alt={card.title}
+                  fallback={spaceCover(card, card.idx + 2)}
+                  className="free-now-img"
+                  sizes="(max-width: 768px) 85vw, 280px"
+                />
+              }
+            />
+          );
+        })}
       </HomeSlideRail>
     </section>
   );
