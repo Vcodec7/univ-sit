@@ -30045,10 +30045,24 @@ html.is-admin .main-content {
   display: block;
   color: #0f172a;
 }
-.house-rules__venue p {
-  margin: 0.15rem 0 0;
-  color: #334155;
+.house-rules__venues {
+  list-style: none;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.house-rules__venues li {
+  display: grid;
+  gap: 0.1rem;
+  color: #0a0c2a;
   font-size: 0.9rem;
+}
+.house-rules__venues b {
+  font-weight: 800;
+}
+.house-rules__venues span {
+  color: #5a5670;
 }
 .house-rules__muted {
   color: #64748b !important;

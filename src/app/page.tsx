@@ -13,6 +13,7 @@ import HomeGalleryAuth from '@/components/HomeGalleryAuth';
 import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
+import WeeklyAfisha from '@/components/WeeklyAfisha';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
 import { ArrowRight } from 'lucide-react';
 import NewsCoverImage from '@/components/NewsCoverImage';
@@ -20,12 +21,13 @@ import EntityCoverImage from '@/components/EntityCoverImage';
 import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { encodeRouteParam } from '@/lib/route-id';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
   return {
     title: { absolute: `${siteName} | Официальный портал` },
-    description: `Официальный портал ${siteName}. Участвуй в проектах, находи единомышленников в клубах и бронируй пространства.`,
+    description: `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости Центра развития молодёжи Сочи.`,
     alternates: { canonical: publicOrigin },
   };
 }
@@ -120,7 +122,7 @@ export default async function Home() {
           ) : (
             <HomeSlideRail label="Свежие проекты">
               {latestProjects.map((project, idx) => {
-                const href = `/projects/${encodeURIComponent(project.id)}`;
+                const href = `/projects/${encodeRouteParam(project.id)}`;
                 return (
                   <HomeLiftFeedCard
                     key={project.id}
@@ -128,7 +130,7 @@ export default async function Home() {
                     badge="Проект"
                     title={project.title}
                     line={stripHtml(project.description)}
-                    highlight="Открыт для заявок"
+                    highlight="Центр развития молодёжи"
                     secondary={{ href, label: 'Подробнее' }}
                     primary={{ href, label: 'Участвовать' }}
                     cover={
@@ -165,15 +167,15 @@ export default async function Home() {
           ) : (
             <HomeSlideRail label="Клубы по интересам">
               {latestClubs.map((club, idx) => {
-                const href = `/clubs/${encodeURIComponent(club.id)}`;
+                const href = `/clubs/${encodeRouteParam(club.id)}`;
                 return (
                   <HomeLiftFeedCard
                     key={club.id}
                     href={href}
                     badge="Клуб"
                     title={club.title}
-                    line={stripHtml(club.description)}
-                    highlight="Открыт для заявок"
+                    line={club.meetingPlace || stripHtml(club.description)}
+                    highlight={club.meetingSchedule || 'Расписание на странице клуба'}
                     secondary={{ href, label: 'Подробнее' }}
                     primary={{ href, label: 'В клуб' }}
                     cover={
@@ -209,7 +211,7 @@ export default async function Home() {
           ) : (
             <HomeSlideRail label="Пространства">
               {latestSpaces.map((space, idx) => {
-                const href = `/spaces/${encodeURIComponent(space.id)}`;
+                const href = `/spaces/${encodeRouteParam(space.id)}`;
                 return (
                   <HomeLiftFeedCard
                     key={space.id}
@@ -219,7 +221,7 @@ export default async function Home() {
                     line={space.address || `до ${space.capacity} чел.`}
                     highlight="Можно забронировать"
                     secondary={{ href, label: 'Сетка' }}
-                    primary={{ href: `${href}/book`, label: 'Забронировать' }}
+                    primary={{ href: `${href}/book?from=list`, label: 'Забронировать' }}
                     cover={
                       <EntityCoverImage
                         src={spaceCover(space, idx)}
@@ -242,7 +244,7 @@ export default async function Home() {
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">Ближайшие мероприятия</h2>
-              <p className="home-section-sub">Что происходит в городе на этой неделе</p>
+              <p className="home-section-sub">События площадок ЦРМ на ближайшие дни</p>
             </div>
             <Link href="/events" className="home-section-link">
               Календарь <ArrowRight size={18} />
@@ -250,13 +252,19 @@ export default async function Home() {
           </div>
           {siteSettings?.publicEventsVisibility ? (
             <Suspense fallback={<div className="home-deferred-skel" aria-hidden />}>
-              <UpcomingEvents hideTitle compact withinDays={21} mode="carousel" />
+              <UpcomingEvents hideTitle compact withinDays={14} mode="carousel" />
             </Suspense>
           ) : (
             <AuthAfishaSection hideTitle />
           )}
         </section>
         )}
+
+        <WeeklyAfisha
+          enabled={Boolean(siteSettings?.afishaWeekEnabled || siteSettings?.afishaWeekJson)}
+          json={siteSettings?.afishaWeekJson}
+          layout="home"
+        />
 
         {galleryPublic ? (
           <Suspense fallback={null}>
@@ -288,7 +296,7 @@ export default async function Home() {
               {latestNews.map((item) => {
                 const when = item.publishedAt || item.createdAt;
                 const title = item.title?.trim() || stripHtml(item.text).slice(0, 80) || 'Новость';
-                const href = `/news/${item.id}`;
+                const href = `/news/${encodeRouteParam(item.id)}`;
                 return (
                   <HomeLiftFeedCard
                     key={item.id}

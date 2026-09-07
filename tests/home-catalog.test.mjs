@@ -15,7 +15,7 @@ const homeHero = readFileSync(join(root, '../src/lib/home-hero.ts'), 'utf8');
 test('home catalog stays slim for first paint', () => {
   assert.match(home, /HOME_FEED_TAKE = 8/);
   assert.match(home, /homeExcerpt/);
-  assert.match(home, /home-catalog-v9/);
+  assert.match(home, /home-catalog-v10/);
   assert.doesNotMatch(home, /_count/);
 });
 
@@ -72,6 +72,9 @@ test('home feeds reuse lift cards for projects clubs spaces news', () => {
   assert.match(page, /Клубы по интересам/);
   assert.match(page, /home-section-sub/);
   assert.match(page, /Инициативы, в которые можно включиться сейчас/);
-  assert.doesNotMatch(page, /home-section-kicker/);
+  assert.match(page, /book\?from=list/);
+  assert.match(page, /WeeklyAfisha/);
+  assert.match(page, /encodeRouteParam/);
+  assert.doesNotMatch(page, /Открыт для заявок/);
   assert.doesNotMatch(page, /home-feed-grid/);
 });

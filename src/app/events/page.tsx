@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getSiteIdentity, identityFromSettings } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
 import AuthAfishaSection from '@/components/AuthAfishaSection';
+import WeeklyAfisha from '@/components/WeeklyAfisha';
 import { isNextBuildPhase } from '@/lib/build-phase';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,6 +28,8 @@ export default async function EventsPage() {
           publicEventsVisibility: true,
           siteName: true,
           publicSiteUrl: true,
+          afishaWeekEnabled: true,
+          afishaWeekJson: true,
         },
       });
   const identity = identityFromSettings(settings);
@@ -79,8 +82,14 @@ export default async function EventsPage() {
         Афиша мероприятий
       </h1>
       <p style={{ color: 'var(--muted)', marginBottom: '1.15rem', fontSize: '0.98rem' }}>
-        Календарь и ближайшие события — запишитесь онлайн
+        Календарь, запись на клубы недели и ближайшие события площадок ЦРМ
       </p>
+
+      <WeeklyAfisha
+        enabled={Boolean(settings?.afishaWeekEnabled || settings?.afishaWeekJson)}
+        json={settings?.afishaWeekJson}
+        layout="embed"
+      />
 
       <section aria-label="Календарь" style={{ marginBottom: '1.75rem' }}>
         <GlobalCalendar />

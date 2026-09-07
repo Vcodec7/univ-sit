@@ -11,7 +11,7 @@ import {
   Users,
 } from 'lucide-react';
 import { publicCmsLead, publicCmsTitle } from '@/lib/cms-page-copy';
-import { HOUSE_LINKS, HOUSE_RULES, HOUSE_VENUE } from '@/lib/house-rules';
+import { HOUSE_LINKS, HOUSE_RULES, HOUSE_VENUE, HOUSE_VENUES } from '@/lib/house-rules';
 
 const RULE_ICONS = {
   staff: ClipboardList,
@@ -80,8 +80,15 @@ export default function HouseRulesPage({ page, siteName = '' }: { page: Page; si
             <div className="house-rules__venue">
               <MapPin size={18} aria-hidden />
               <div>
-                <strong>{HOUSE_VENUE.title}</strong>
-                <p>{HOUSE_VENUE.address}</p>
+                <strong>Площадки ЦРМ</strong>
+                <ul className="house-rules__venues">
+                  {HOUSE_VENUES.map((v) => (
+                    <li key={v.address}>
+                      <b>{v.title}</b>
+                      <span>{v.address}</span>
+                    </li>
+                  ))}
+                </ul>
                 <p className="house-rules__muted">{HOUSE_VENUE.also}</p>
               </div>
             </div>

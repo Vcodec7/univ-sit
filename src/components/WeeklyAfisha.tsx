@@ -261,7 +261,7 @@ export default function WeeklyAfisha({ enabled, json, layout = 'home' }: Props) 
           <p className="home-section-sub">{cfg.subtitle}</p>
         </div>
         <Link href="/events" className="home-section-link">
-          Вся афиша <ExternalLink size={16} />
+          Вся афиша <ArrowRight size={18} />
         </Link>
       </div>
       <div className="afisha-panel afisha-panel--cards">{grid}</div>

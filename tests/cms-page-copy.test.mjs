@@ -27,5 +27,8 @@ const house = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src
 test('house rules page uses cards not a skinny article', () => {
   assert.match(house, /HOUSE_RULES/);
   assert.match(house, /Навагинская/);
+  assert.match(house, /Тимирязева/);
+  assert.match(house, /Ульянова/);
+  assert.match(house, /Партизанская/);
   assert.match(mediaPage, /HouseRulesPage/);
 });

@@ -54,9 +54,26 @@ export function isLocalOrigin(origin: string) {
 
 export function originFromEnv(opts?: { allowLocal?: boolean }): string {
   const env = normalizeOrigin(process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL);
-  if (!env) return DEFAULT_PUBLIC_ORIGIN;
-  if (!opts?.allowLocal && isLocalOrigin(env)) return DEFAULT_PUBLIC_ORIGIN;
+  if (!env) return opts?.allowLocal === false ? '' : DEFAULT_PUBLIC_ORIGIN;
+  if (isLocalOrigin(env) && opts?.allowLocal === false) return '';
   return env;
+}
+
+/**
+ * Prefer a real public host: DB URL, then env, then the incoming request.
+ * Never advertise localhost on ty/py when the Host header is a real domain.
+ */
+export function resolvePublicOrigin(
+  settingsUrl?: string | null,
+  requestOrigin?: string | null
+): string {
+  const candidates = [
+    normalizeOrigin(settingsUrl),
+    originFromEnv({ allowLocal: true }),
+    normalizeOrigin(requestOrigin),
+  ].filter(Boolean);
+  const publicHost = candidates.find((o) => o && !isLocalOrigin(o));
+  return publicHost || candidates[0] || DEFAULT_PUBLIC_ORIGIN;
 }
 
 export function shortSiteName(name: string) {
@@ -79,7 +96,7 @@ export function identityFromSettings(settings?: {
 } | null): SiteIdentity {
   const siteName = normalizeDisplaySiteName(settings?.siteName);
   const fromSettings = normalizeOrigin(settings?.publicSiteUrl);
-  const publicOrigin = fromSettings || originFromEnv({ allowLocal: true });
+  const publicOrigin = resolvePublicOrigin(fromSettings);
   return {
     siteName,
     publicOrigin,

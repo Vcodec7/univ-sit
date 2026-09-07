@@ -49,7 +49,7 @@ const unbounded = localFont({
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
   const titleDefault = `${siteName} | Официальный портал`;
-  const description = `Проекты, клубы, гранты и мероприятия — ${siteName}.`;
+  const description = `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости.`;
   return {
     metadataBase: new URL(publicOrigin),
     alternates: { canonical: publicOrigin },

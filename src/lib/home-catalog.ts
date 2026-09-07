@@ -32,7 +32,9 @@ export const getHomeCatalog = unstable_cache(
           title: string;
           description: string;
           image: string | null;
-        }>,
+          meetingPlace: string | null;
+          meetingSchedule: string | null;
+        }),
         latestSpaces: [] as Array<{
           id: string;
           title: string;
@@ -63,6 +65,8 @@ export const getHomeCatalog = unstable_cache(
           orgGalleryJson: null,
           siteName: null,
           publicEventsVisibility: null,
+          afishaWeekEnabled: null,
+          afishaWeekJson: null,
         },
       };
     }
@@ -87,6 +91,8 @@ export const getHomeCatalog = unstable_cache(
           title: true,
           description: true,
           image: true,
+          meetingPlace: true,
+          meetingSchedule: true,
         },
       }),
       prisma.space.findMany({
@@ -131,6 +137,8 @@ export const getHomeCatalog = unstable_cache(
           publicEventsVisibility: true,
           orgGalleryJson: true,
           siteName: true,
+          afishaWeekEnabled: true,
+          afishaWeekJson: true,
         },
       }),
     ]);
@@ -152,6 +160,6 @@ export const getHomeCatalog = unstable_cache(
       siteSettings,
     };
   },
-  ['home-catalog-v9'],
+  ['home-catalog-v10'],
   { revalidate: 60, tags: ['yp-home-catalog', 'home-catalog'] }
 );
