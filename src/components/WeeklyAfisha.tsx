@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, ExternalLink, MapPin, MessageCircle, Phone, Send, Users } from 'lucide-react';
+import { ArrowRight, ExternalLink, MapPin, Phone, Send, Users } from 'lucide-react';
 import {
   afishaItemHref,
   parseAfishaWeekJson,
-  type AfishaWeekConfig,
   type AfishaWeekItem,
 } from '@/lib/afisha-week';
 import { afishaItemCover } from '@/lib/theme-covers';
@@ -19,15 +18,6 @@ function ActionIcon({ action }: { action: AfishaWeekItem['action'] }) {
   if (action === 'phone') return <Phone size={16} />;
   if (action === 'telegram') return <Send size={16} />;
   return <ExternalLink size={16} />;
-}
-
-function contactTelHref(note: string): string | null {
-  const m = note.match(/(?:\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}/);
-  if (!m) return null;
-  let digits = m[0].replace(/[^\d+]/g, '');
-  if (digits.startsWith('8') && digits.length === 11) digits = `+7${digits.slice(1)}`;
-  if (!digits.startsWith('+') && digits.startsWith('7')) digits = `+${digits}`;
-  return `tel:${digits}`;
 }
 
 function ctaLabel(item: AfishaWeekItem): string {
@@ -167,63 +157,17 @@ function ItemCard({ item, index }: { item: AfishaWeekItem; index: number }) {
   );
 }
 
-function AfishaFoot({ cfg }: { cfg: AfishaWeekConfig }) {
-  const tel = contactTelHref(cfg.contactNote);
-  return (
-    <div className="afisha-foot">
-      {cfg.contactNote ? (
-        <p className="afisha-foot-note">
-          <MessageCircle size={16} aria-hidden />{' '}
-          {tel ? (
-            <>
-              Ещё остались вопросы?{' '}
-              <a href={tel} className="afisha-foot-tel">
-                {cfg.contactNote.replace(/^Вопросы\s*[—\-]\s*/i, '')}
-              </a>
-            </>
-          ) : (
-            cfg.contactNote
-          )}
-        </p>
-      ) : null}
-      <div className="afisha-foot-links">
-        {cfg.vkLink ? (
-          <a href={cfg.vkLink} target="_blank" rel="noopener noreferrer" className="afisha-foot-link">
-            Пост во ВКонтакте <ExternalLink size={14} />
-          </a>
-        ) : null}
-        {cfg.rulesLink ? (
-          <a href={cfg.rulesLink} target="_blank" rel="noopener noreferrer" className="afisha-foot-link">
-            Правила ДМ (Telegram) <ExternalLink size={14} />
-          </a>
-        ) : null}
-        <Link href="/p/pravila-dm" className="afisha-foot-link">
-          #правилаДМ
-        </Link>
-        <Link href="/news" className="afisha-foot-link">
-          #анонс
-        </Link>
-        <span className="afisha-foot-hash">#афишанедели</span>
-      </div>
-    </div>
-  );
-}
-
 export default function WeeklyAfisha({ enabled, json, layout = 'home' }: Props) {
   if (!enabled) return null;
   const cfg = parseAfishaWeekJson(json);
   if (!cfg.items.length) return null;
 
   const grid = (
-    <>
-      <p className="afisha-list-lead">Запись на занятия и клубы на эту неделю</p>
-      <div className="grid-cards afisha-cards">
-        {cfg.items.map((item, i) => (
-          <ItemCard key={item.id} item={item} index={i} />
-        ))}
-      </div>
-      <AfishaFoot cfg={cfg} />
-    </>
+    <div className="grid-cards afisha-cards">
+      {cfg.items.map((item, i) => (
+        <ItemCard key={item.id} item={item} index={i} />
+      ))}
+    </div>
   );
 
   if (layout === 'embed') {
@@ -237,14 +181,15 @@ export default function WeeklyAfisha({ enabled, json, layout = 'home' }: Props) 
   if (layout === 'page') {
     return (
       <section className="afisha-week afisha-week--page afisha-week--cards" aria-label={cfg.title}>
-        <header className="afisha-hero">
-          <div className="afisha-hero-glow" aria-hidden />
-          <p className="afisha-kicker">
-            <CalendarDays size={16} /> ⚡ АФИША ⚡ · {cfg.period}
-          </p>
-          <h1 className="afisha-title">{cfg.title}</h1>
-          <p className="afisha-sub">{cfg.subtitle}</p>
-        </header>
+        <div className="home-section-head">
+          <div>
+            <h1 className="home-section-title">{cfg.title}</h1>
+            <p className="home-section-sub">Запись на занятия и клубы на эту неделю</p>
+          </div>
+          <Link href="/events" className="home-section-link">
+            Вся афиша <ArrowRight size={18} />
+          </Link>
+        </div>
         <div className="afisha-panel afisha-panel--page afisha-panel--cards">{grid}</div>
       </section>
     );
@@ -254,11 +199,8 @@ export default function WeeklyAfisha({ enabled, json, layout = 'home' }: Props) 
     <section className="home-section afisha-week afisha-week--cards" aria-label={cfg.title}>
       <div className="home-section-head">
         <div>
-          <p className="afisha-kicker afisha-kicker--inline">
-            <CalendarDays size={15} /> ⚡ АФИША ⚡ · {cfg.period}
-          </p>
           <h2 className="home-section-title">{cfg.title}</h2>
-          <p className="home-section-sub">{cfg.subtitle}</p>
+          <p className="home-section-sub">Запись на занятия и клубы на эту неделю</p>
         </div>
         <Link href="/events" className="home-section-link">
           Вся афиша <ArrowRight size={18} />

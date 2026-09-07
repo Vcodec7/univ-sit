@@ -195,6 +195,12 @@ function EventCard({
             {isFull ? ' · мест нет' : ' · есть места'}
           </strong>
           <div className="free-now-actions">
+            <Link
+              href={`/spaces/${encodeRouteParam(event.spaceId)}?from=list`}
+              className="lift-hero__btn lift-hero__btn--ghost"
+            >
+              Площадка
+            </Link>
             <JoinEventButton
               eventId={event.id}
               initialIsJoined={isJoined}

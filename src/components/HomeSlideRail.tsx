@@ -35,6 +35,8 @@ export default function HomeSlideRail({ label, children }: Props) {
     const el = railRef.current;
     if (!el) return;
 
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
     const onWheel = (e: WheelEvent) => {
       if (el.scrollWidth <= el.clientWidth + 8) return;
       const dominant = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;

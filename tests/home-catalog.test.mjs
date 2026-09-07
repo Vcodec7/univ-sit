@@ -61,6 +61,8 @@ test('free-now rail on lift home keeps full cards and hero buttons', () => {
 test('compact upcoming events reuse lift feed cards and lime venue CTA', () => {
   const events = readFileSync(join(root, '../src/components/UpcomingEvents.tsx'), 'utf8');
   assert.match(events, /free-now-card yp-feed-card lift-feed-card/);
+  assert.match(events, /lift-hero__btn--ghost/);
+  assert.match(events, /Площадка/);
   assert.match(page, /lift-hero__btn--lime/);
   assert.match(page, /К площадкам/);
   assert.doesNotMatch(page, /lift-hero__btn--ghost/);
