@@ -21,10 +21,14 @@ test('V-gesture quick access is not mounted for the public chrome', () => {
 });
 
 test('desktop nav keeps the dropdown reachable while moving the pointer', () => {
+  const portal = readFileSync(join(root, '../src/components/NavDropdownPortal.tsx'), 'utf8');
+  assert.match(nav, /NavDropdownPortal/);
   assert.match(nav, /scheduleDesktopMenuClose/);
   assert.match(nav, /keepDesktopMenus/);
-  assert.match(nav, /r\.bottom - 4/);
-  assert.match(nav, /position = 'fixed'/);
+  assert.match(nav, /data-nav-dropdown/);
+  assert.match(portal, /createPortal/);
+  assert.match(portal, /nav-dropdown-bridge/);
+  assert.match(portal, /r\.bottom/);
   assert.doesNotMatch(nav, /'events', 'news'/);
 });
 

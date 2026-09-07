@@ -2199,6 +2199,39 @@ a.home-section-link:hover,
   position: fixed !important;
   z-index: 20050 !important;
 }
+.nav-dropdown-portal.dropdown {
+  display: block !important;
+  position: fixed !important;
+  z-index: 20050 !important;
+  transform: none !important;
+  animation: none !important;
+  top: 0;
+  left: 0;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  min-width: 220px;
+}
+.nav-dropdown-bridge {
+  height: 16px;
+  margin-top: -16px;
+  pointer-events: auto;
+}
+.nav-dropdown-body {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  max-height: min(70vh, 28rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+}
+.nav-dropdown-portal.nav-account-menu .nav-dropdown-body {
+  min-width: 16rem;
+}
 @media (max-width: 1180px) {
   .nav-auth-desktop .nav-pill--register {
     display: none !important;

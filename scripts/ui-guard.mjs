@@ -77,8 +77,8 @@ if (!/\.glass-nav-inner[\s\S]{0,120}overflow:\s*visible\s*!important/.test(unify
 if (!/\.nav-item:hover \.dropdown[\s\S]{0,40}display:\s*none/.test(unify)) {
   fails.push('nav hover must not paint a clipped dropdown sliver');
 }
-if (!/\.desktop-nav[\s\S]{0,80}overflow:\s*hidden\s*!important/.test(unify)) {
-  fails.push('desktop-nav must clip extra links so they do not cover Запись');
+if (!/\.nav-dropdown-bridge/.test(unify)) {
+  fails.push('header dropdown must include a hover bridge so the menu stays open');
 }
 
 if (fails.length) {

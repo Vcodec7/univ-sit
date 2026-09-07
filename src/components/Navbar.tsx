@@ -59,6 +59,7 @@ import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import GuestAuthPrompt from '@/components/GuestAuthPrompt';
+import NavDropdownPortal from '@/components/NavDropdownPortal';
 import SiteBrand from '@/components/SiteBrand';
 import NavProfileCard from '@/components/NavProfileCard';
 import NotificationsBell from '@/components/NotificationsBell';
@@ -84,6 +85,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navCloseTimer = useRef<number | null>(null);
+  const menuAnchorRefs = useRef<Partial<Record<NonNullable<OpenMenu>, HTMLElement | null>>>({});
   const moreId = useId();
 
   const userRole = (session?.user as { role?: string } | undefined)?.role;
@@ -157,7 +159,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     navCloseTimer.current = window.setTimeout(() => {
       setOpenMenu(null);
       navCloseTimer.current = null;
-    }, 240);
+    }, 400);
   };
 
   useEffect(() => {
@@ -240,6 +242,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     const onPointer = (e: MouseEvent) => {
       const el = e.target as HTMLElement | null;
       if (navRef.current?.contains(el)) return;
+      if (el?.closest?.('[data-nav-dropdown]')) return;
       if (el?.closest?.('.nav-account')) return;
       closeDesktopMenus();
     };
@@ -310,11 +313,15 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     id: Exclude<OpenMenu, null>,
     trigger: ReactNode,
     items: ReactNode,
-    hasItems: boolean
+    hasItems: boolean,
+    menuDomId?: string
   ) => (
     <div
       className={`nav-item${openMenu === id ? ' is-open' : ''}`}
       data-nav-id={id === 'more' ? undefined : id}
+      ref={(el) => {
+        menuAnchorRefs.current[id] = el;
+      }}
       onMouseEnter={() => {
         if (hasItems) {
           keepDesktopMenus();
@@ -327,11 +334,18 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       }}
     >
       {trigger}
-      {hasItems && (
-        <div className="dropdown" role="menu" onMouseEnter={keepDesktopMenus} onMouseLeave={scheduleDesktopMenuClose}>
-          {items}
-        </div>
-      )}
+      <NavDropdownPortal
+        open={Boolean(hasItems && openMenu === id)}
+        align={id === 'more' ? 'end' : 'start'}
+        id={menuDomId}
+        getAnchor={() =>
+          menuAnchorRefs.current[id]?.querySelector<HTMLElement>('button, a') || null
+        }
+        onEnter={keepDesktopMenus}
+        onLeave={scheduleDesktopMenuClose}
+      >
+        {items}
+      </NavDropdownPortal>
     </div>
   );
 
@@ -416,7 +430,13 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         )}
         <div
           className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}
-          onMouseEnter={keepDesktopMenus}
+          ref={(el) => {
+            menuAnchorRefs.current.account = el;
+          }}
+          onMouseEnter={() => {
+            keepDesktopMenus();
+            setOpenMenu('account');
+          }}
           onMouseLeave={scheduleDesktopMenuClose}
         >
           <button
@@ -431,13 +451,16 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             <UserCircle size={18} />
             <ChevronDown size={12} className="nav-account-chevron" aria-hidden />
           </button>
-            {openMenu === 'account' && (
-              <div
-                className="dropdown nav-account-menu"
-                role="menu"
-                onMouseEnter={keepDesktopMenus}
-                onMouseLeave={scheduleDesktopMenuClose}
-              >
+            <NavDropdownPortal
+              open={openMenu === 'account'}
+              align="end"
+              className="nav-account-menu"
+              getAnchor={() =>
+                menuAnchorRefs.current.account?.querySelector<HTMLElement>('button') || null
+              }
+              onEnter={keepDesktopMenus}
+              onLeave={scheduleDesktopMenuClose}
+            >
                 <div className="nav-account-menu__head">
                   <strong>
                     {(session?.user as { nickname?: string | null } | undefined)?.nickname ||
@@ -545,8 +568,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                 >
                   <LogOut size={16} aria-hidden /> Выйти
                 </button>
-              </div>
-            )}
+            </NavDropdownPortal>
           </div>
         </div>
     </div>
@@ -593,28 +615,6 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       window.removeEventListener('resize', measure);
     };
   }, [headerMainPages.length, projects.length, clubs.length, spaces.length]);
-
-  useLayoutEffect(() => {
-    if (!openMenu) return;
-    const item =
-      openMenu === 'account'
-        ? document.querySelector<HTMLElement>('.glass-nav .nav-account.is-open')
-        : navRef.current?.querySelector<HTMLElement>('.nav-item.is-open');
-    const drop = item?.querySelector<HTMLElement>('.dropdown');
-    const trigger = item?.querySelector<HTMLElement>('button, a');
-    if (!drop || !trigger) return;
-    const r = trigger.getBoundingClientRect();
-    drop.style.position = 'fixed';
-    drop.style.top = `${Math.round(r.bottom - 4)}px`;
-    drop.style.transform = 'none';
-    drop.style.right = 'auto';
-    drop.style.zIndex = '20050';
-    const width = Math.max(drop.offsetWidth, 220);
-    let left = openMenu === 'more' || openMenu === 'account' ? r.right - width : r.left;
-    left = Math.max(12, Math.min(left, window.innerWidth - width - 12));
-    drop.style.left = `${Math.round(left)}px`;
-  }, [openMenu]);
-
 
   /** Mobile: Запись + Вход for guests; profile icon when signed in. */
   const renderMobileHeaderActions = () => (
@@ -855,7 +855,8 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                   </Link>
                 ))}
               </>,
-              true
+              true,
+              `${moreId}-menu`
             )}
         </nav>
 
