@@ -34,7 +34,7 @@ export const getHomeCatalog = unstable_cache(
           image: string | null;
           meetingPlace: string | null;
           meetingSchedule: string | null;
-        }),
+        }>,
         latestSpaces: [] as Array<{
           id: string;
           title: string;
