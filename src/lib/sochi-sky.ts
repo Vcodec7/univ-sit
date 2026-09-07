@@ -54,7 +54,8 @@ export function resolveSochiSky(date: Date = new Date()): SochiSky {
   const sunY = 10 + (1 - Math.sin(Math.min(1, Math.max(0, t)) * Math.PI)) * 14;
   const moonT = hour < 12 ? (hour + 12) / 24 : (hour - 12) / 24;
   const moonX = 10 + moonT * 80;
-  const moonY = 16 + (1 - Math.sin(moonT * Math.PI)) * 28;
+  /* Keep the disc in the opaque sky band (mask fades below ~42%). */
+  const moonY = 8 + (1 - Math.sin(moonT * Math.PI)) * 12;
 
   let phase: SkyPhase = 'day';
   if (hour < sunrise - 0.7 || hour >= sunset + 0.7) phase = 'night';

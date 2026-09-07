@@ -25604,9 +25604,12 @@ html.has-session .nav-auth-mobile {
   --yp-hero-h: min(38rem, calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - 3.5rem));
 }
 @media (max-width: 860px) {
+  :root {
+    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, calc(4.15rem + env(safe-area-inset-bottom, 0px))));
+  }
   html.has-bottom-nav,
   body.has-bottom-nav {
-    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, 0px));
+    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, calc(4.15rem + env(safe-area-inset-bottom, 0px))));
   }
 }
 .svc-hero--banner {

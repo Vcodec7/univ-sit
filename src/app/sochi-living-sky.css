@@ -72,16 +72,17 @@
 }
 
 .sochi-sky__moon {
-  width: 2.45rem;
-  height: 2.45rem;
-  margin: -1.22rem 0 0 -1.22rem;
+  width: 3.05rem;
+  height: 3.05rem;
+  margin: -1.52rem 0 0 -1.52rem;
   border-radius: 50%;
   overflow: hidden;
+  z-index: 4;
   background:
-    radial-gradient(circle at 34% 30%, #fffef8 0 16%, #ece6d6 48%, #b9b3a6 100%);
+    radial-gradient(circle at 34% 30%, #fffef8 0 18%, #f0ead8 46%, #c4bba8 100%);
   box-shadow:
-    inset -7px -5px 12px rgba(18, 28, 46, 0.4),
-    0 0 22px rgba(210, 224, 240, 0.35);
+    inset -7px -5px 12px rgba(18, 28, 46, 0.42),
+    0 0 28px 6px rgba(230, 238, 255, 0.55);
 }
 
 .sochi-sky__moon i {

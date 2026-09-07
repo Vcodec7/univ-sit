@@ -24,12 +24,15 @@ test('hero video does not autoplay until desktop motion is allowed', () => {
 });
 
 test('living sky stays mounted when the window shrinks; video still skips on phones', () => {
-  assert.match(sky, /if \(!enabled\) return null/);
-  assert.match(sky, /pointer: coarse/);
+  assert.doesNotMatch(sky, /if \(!enabled\) return null/);
   assert.doesNotMatch(sky, /max-width: 900px/);
   assert.doesNotMatch(skyCss, /\.sochi-sky \{\s*display: none !important;/);
   assert.doesNotMatch(unify, /\.sochi-sky \{\s*display: none !important;/);
   assert.match(media, /preferStillHeroVideo/);
+});
+
+test('mobile home hides the four-icon deck between hero and free-now', () => {
+  assert.match(unify, /@media \(max-width: 860px\)[\s\S]*?\.lift-deck \{\s*display: none !important;/);
 });
 
 test('home deck does not prefetch four routes on first paint', () => {
@@ -40,5 +43,5 @@ test('catalog titles wrap on words, search input keeps icon padding, moon is a s
   assert.match(unify, /catalog-page-header__intro \.page-hero-title[\s\S]{0,240}overflow-wrap:\s*break-word\s*!important/);
   assert.match(unify, /space-filter-bar__input[\s\S]{0,80}2\.5rem/);
   assert.doesNotMatch(skyCss, /inset -14px -5px 0 0/);
-  assert.match(skyCss, /\.sochi-sky__moon[\s\S]{0,320}inset -7px -5px 12px/);
+  assert.match(skyCss, /\.sochi-sky__moon[\s\S]{0,520}inset -7px -5px 12px/);
 });

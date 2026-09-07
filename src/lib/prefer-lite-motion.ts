@@ -1,5 +1,6 @@
-/** Touch, save-data, or reduced-motion: skip GPU loops. Do not use max-width —
- * shrinking a desktop window must not unmount the sky / moon. */
+/** Touch, save-data, or reduced-motion: skip GPU loops (video, swell). Do not use
+ * max-width and do not unmount the sky — shrinking a desktop window or a phone
+ * must keep the moon. */
 export function isLiteMotionDevice(): boolean {
   if (typeof window === 'undefined') return false;
   const mq = (q: string) => window.matchMedia(q).matches;

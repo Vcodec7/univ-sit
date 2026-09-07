@@ -210,11 +210,12 @@
 
 @media (max-width: 860px) {
   :root {
-    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px));
+    /* Same height with or without the dock class — otherwise the sea jumps on refresh. */
+    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, calc(4.15rem + env(safe-area-inset-bottom, 0px))));
   }
   html.has-bottom-nav,
   body.has-bottom-nav {
-    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, 0px));
+    --yp-hero-h: calc(100svh - var(--nav-h, 3.75rem) - env(safe-area-inset-top, 0px) - var(--yp-bottom-nav-h, calc(4.15rem + env(safe-area-inset-bottom, 0px))));
   }
   .svc-hero--banner,
   .svc-hero--banner.svc-hero {
@@ -335,19 +336,7 @@
     font-weight: 750 !important;
   }
   .lift-deck {
-    position: relative !important;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    z-index: 2;
-    display: flex !important;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 0.55rem !important;
-    margin: 0.7rem 0 0 !important;
-    padding: 0 1.15rem 0.45rem !important;
-    grid-template-columns: none !important;
+    display: none !important;
   }
   .lift-deck__card {
     width: 2.85rem;
@@ -2640,6 +2629,18 @@ a.home-section-link:hover,
 .faq-page__lead {
   max-width: 40rem;
 }
+
+@media (max-width: 860px) {
+  .home-page--lift .lift-deck {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+  }
+}
+
 
 
 

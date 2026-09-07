@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { isLiteMotionDevice } from '@/lib/prefer-lite-motion';
 import { resolveSochiSky, type SochiSky } from '@/lib/sochi-sky';
 
 const STARS = [
@@ -20,26 +19,14 @@ const STARS = [
 ];
 
 export default function SochiLivingSky() {
-  const [enabled, setEnabled] = useState(true);
   const [sky, setSky] = useState<SochiSky>(() => resolveSochiSky());
 
   useEffect(() => {
-    const sync = () => setEnabled(!isLiteMotionDevice());
-    sync();
-    const mq = window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)');
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) return;
     const tick = () => setSky(resolveSochiSky());
     tick();
     const id = window.setInterval(tick, 60_000);
     return () => window.clearInterval(id);
-  }, [enabled]);
-
-  if (!enabled) return null;
+  }, []);
 
   return (
     <div className="sochi-sky" data-phase={sky.phase} aria-hidden>
