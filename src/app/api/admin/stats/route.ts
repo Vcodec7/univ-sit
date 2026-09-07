@@ -238,6 +238,15 @@ export async function GET(req: Request) {
       ...(rangeEndDate(range) ? { lte: rangeEndDate(range)! } : {}),
     });
 
+    const { sendMonthlyVisitReport, previousCalendarMonth } = await import('@/lib/monthly-admin-report');
+    const monthly = await sendMonthlyVisitReport().catch(() => null);
+    const prev = previousCalendarMonth();
+    const lastMonthly = await prisma.adminAuditLog.findFirst({
+      where: { action: { startsWith: 'MONTHLY_VISIT_' } },
+      orderBy: { createdAt: 'desc' },
+      select: { action: true, createdAt: true, detail: true },
+    }).catch(() => null);
+
     return NextResponse.json({
       period: range.period,
       from: range.from,
@@ -260,6 +269,12 @@ export async function GET(req: Request) {
         openVacancies,
         openContests,
         visits,
+        monthlyReport: {
+          lastAction: lastMonthly?.action || null,
+          lastAt: lastMonthly?.createdAt || null,
+          expectedKey: prev.key,
+          justSent: monthly && !('skipped' in monthly && monthly.skipped) ? monthly : null,
+        },
       },
       userStats,
       appStats,

@@ -108,6 +108,7 @@ function AdminStatsInner() {
       </div>
 
       {summary.visits ? (
+        <>
         <div className="admin-stats-page__cards" style={{ marginTop: '0.85rem' }}>
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.visits.eventsCheckedIn}</div>
@@ -124,6 +125,9 @@ function AdminStatsInner() {
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.visits.hallBookings}</div>
             <div className="admin-stats-card__label">Залы · брони</div>
+            <p className="admin-stats-card__hint">
+              Слоты зала без участников афиши. Запись на мероприятие — в колонке «Афиша».
+            </p>
           </div>
           <div className="glass admin-stats-card">
             <div className="admin-stats-card__value">{summary.visits.uniquePeople}</div>
@@ -131,6 +135,16 @@ function AdminStatsInner() {
             <p className="admin-stats-card__hint">Неявки {summary.visits.noShows}</p>
           </div>
         </div>
+        {summary.monthlyReport ? (
+          <p className="admin-stats-page__subtitle" style={{ marginTop: '0.65rem' }}>
+            Месячный отчёт:{' '}
+            {summary.monthlyReport.lastAction
+              ? `${summary.monthlyReport.lastAction}`
+              : 'ещё не создавался'}
+            . Если cron или почта не настроены, отчёт всё равно пишется в уведомления админов при открытии этой страницы 1-го числа.
+          </p>
+        ) : null}
+        </>
       ) : null}
 
       {(summary.openVacancies != null || summary.vacancyApplications != null) && (

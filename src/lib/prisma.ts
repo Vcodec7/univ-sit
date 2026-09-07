@@ -11,16 +11,18 @@ const connectionString =
   process.env.DATABASE_URL ||
   "postgresql://sochi:sochi@127.0.0.1:5432/sochi_portal?schema=public";
 
+const poolMax = Math.max(1, Math.min(8, Number(process.env.YP_PG_POOL_MAX || 4) || 4));
+
 const pool =
   globalForPrisma.pgPool ||
   new Pool({
     connectionString,
-    max: 10,
+    max: poolMax,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 8_000,
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.pgPool = pool;
+globalForPrisma.pgPool = pool;
 
 const adapter = new PrismaPg(pool);
 
@@ -31,4 +33,4 @@ export const prisma =
     log: process.env.NODE_ENV === "production" ? ["error"] : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+globalForPrisma.prisma = prisma;

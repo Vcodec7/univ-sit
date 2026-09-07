@@ -106,7 +106,6 @@ export default function HomeServiceHero({
     showEvents && primary?.href !== '/events' && secondary?.href !== '/events'
       ? { href: '/events', label: 'Афиша' }
       : null;
-  const second = extra || secondary;
 
   return (
     <section className="lift-hero" aria-label="Главный баннер">
@@ -130,9 +129,14 @@ export default function HomeServiceHero({
                 {primary.label}
               </CtaLink>
             ) : null}
-            {second ? (
-              <CtaLink href={second.href} className="lift-hero__btn lift-hero__btn--ghost">
-                {second.label}
+            {secondary ? (
+              <CtaLink href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost">
+                {secondary.label}
+              </CtaLink>
+            ) : null}
+            {extra ? (
+              <CtaLink href={extra.href} className="lift-hero__btn lift-hero__btn--ghost">
+                {extra.label}
               </CtaLink>
             ) : null}
           </div>

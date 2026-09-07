@@ -35,6 +35,7 @@ services:
       - TECH_PASSWORD_HASH=${TECH_PASSWORD_HASH:-}
       # Heap under cgroup: leave ~128–160Mi for native/buffers to avoid GC thrash → nginx 503
       - NODE_OPTIONS=--max-old-space-size=320
+      - YP_PG_POOL_MAX=3
       # NODE_EXTRA_CA_CERTS set by scripts/docker-entrypoint.sh only if PEM exists
     volumes:
       # Share prod uploads so docs/avatars/gallery exist for next/image + /api/documents

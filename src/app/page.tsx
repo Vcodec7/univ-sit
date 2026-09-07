@@ -65,14 +65,14 @@ export default async function Home() {
   const showDocuments = modules.documents !== false;
 
   const heroPrimary = showSpaces
-        ? { href: '/spaces', label: 'Записаться' }
+    ? { href: '/coworking', label: 'Записаться' }
     : showEvents
       ? { href: '/events', label: 'Записаться' }
       : showProjects
         ? { href: '/projects', label: 'Проекты' }
         : null;
   const heroSecondary = showSpaces
-    ? { href: '/coworking', label: 'Коворкинг' }
+    ? { href: '/spaces', label: 'Залы' }
     : showEvents
       ? { href: '/events', label: 'Афиша' }
       : null;

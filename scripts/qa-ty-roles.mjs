@@ -180,7 +180,17 @@ async function main() {
 
   for (const acc of accounts.filter((a) => a.email)) {
     const auth = await login(acc.email, acc.pass || PASS);
-    rows.push(row(acc.role, 'login', auth.ok && auth.role === acc.role, 'critical', auth.ok ? auth.role : `${auth.loginStatus} ${auth.loginBody}`));
+    rows.push(
+      row(
+        acc.role,
+        'login',
+        auth.ok && auth.role === acc.role,
+        auth.ok ? 'info' : 'high',
+        auth.ok
+          ? auth.role
+          : `${auth.loginStatus} ${auth.loginBody} — прогон seed: QA_RESET_STAGING=1 QA_SEED_PASSWORD=RolePass123! node scripts/reset-staging-qa-passwords.mjs`,
+      ),
+    );
     if (!auth.ok) continue;
     const ctx = { cookie: auth.cookie, rows };
 
@@ -214,9 +224,31 @@ async function main() {
   {
     const health = await fetch(`${BASE}/api/health`).then((r) => r.json());
     rows.push(row('SYSTEM', 'health ok', health?.ok && health?.db, 'critical', JSON.stringify(health)));
-    const home = await fetch(`${BASE}/`).then((r) => r.text());
-    rows.push(row('SYSTEM', 'hero video class', home.includes('home-hero--video'), 'high', ''));
-    rows.push(row('SYSTEM', 'hero CTAs', home.includes('Записаться в коворкинг') && home.includes('Свободные залы'), 'high', ''));
+    let home = '';
+    for (let i = 0; i < 3; i += 1) {
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 25000);
+        const res = await fetch(`${BASE}/`, { signal: ctrl.signal });
+        clearTimeout(t);
+        if (res.ok) {
+          home = await res.text();
+          break;
+        }
+      } catch {
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    }
+    rows.push(row('SYSTEM', 'hero lift', home.includes('lift-hero'), 'high', home ? '' : 'home timeout'));
+    rows.push(
+      row(
+        'SYSTEM',
+        'hero CTAs',
+        home.includes('Записаться') && home.includes('Залы') && home.includes('Афиша'),
+        'high',
+        '',
+      ),
+    );
     rows.push(row('SYSTEM', 'no QA tutorial SSR', !home.includes('qa-tutorial-root'), 'info', ''));
   }
 

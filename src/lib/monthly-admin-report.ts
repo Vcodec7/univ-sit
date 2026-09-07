@@ -54,15 +54,16 @@ export async function sendMonthlyVisitReport(opts?: { force?: boolean; now?: Dat
   const snap = await getVisitSnapshot({ gte: month.gte, lte: month.lte });
   const { siteName, publicOrigin } = await getSiteIdentity();
   const subject = `${siteName}: отчёт за ${month.label}`;
-  const body = `<p>Сводка, кто приходил отдыхать, работать и на мероприятия.</p>
+  const body = `    <p>Сводка, кто приходил отдыхать, работать и на мероприятия.</p>
     <ul>
       <li>Афиша: записей ${snap.eventsRegistered}, проходов ${snap.eventsCheckedIn}</li>
       <li>Коворкинг: записей ${snap.coworkSignups}, визитов ${snap.coworkAttended}, отметок входа ${snap.coworkPresence}</li>
-      <li>Залы: одобренных броней ${snap.hallBookings}</li>
+      <li>Залы: броней площадки без записи на афишу ${snap.hallBookings}</li>
       <li>Неявки ${snap.noShows}</li>
       <li>Разных людей ${snap.uniquePeople}</li>
     </ul>
-    <p><a href="${publicOrigin}/admin/stats?period=month">Открыть статистику</a></p>`;
+    <p><a href="${publicOrigin}/admin/stats?period=month">Открыть статистику</a></p>
+    <p style="color:#64748b;font-size:13px">Письмо дублирует уведомление в кабинете. Если почта не настроена, отчёт всё равно сохранится в уведомлениях и журнале.</p>`;
 
   const staff = await prisma.user.findMany({
     where: {

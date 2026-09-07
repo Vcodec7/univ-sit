@@ -134,6 +134,14 @@ if [[ "$ok" != "1" ]]; then
   sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml logs --tail 40 web || true
   exit 1
 fi
+
+if sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T web test -f /app/scripts/reset-staging-qa-passwords.mjs; then
+  echo "==> reset staging QA passwords (RolePass123!, qa-*@sochi.ru only)"
+  sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T \
+    -e QA_RESET_STAGING=1 \
+    -e QA_SEED_PASSWORD=RolePass123! \
+    web node /app/scripts/reset-staging-qa-passwords.mjs || echo "WARN: QA password reset skipped"
+fi
 REMOTE
 
 yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-stg-pre-remote.sh"

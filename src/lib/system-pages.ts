@@ -307,9 +307,13 @@ const SEEDS: SeedDef[] = [
   },
 ];
 
+let lastEnsureMs = 0;
+const ENSURE_TTL_MS = 60 * 60 * 1000;
+
 /** Create missing system pages so admins always see Privacy / About editors. */
 export async function ensureSystemPages() {
   if (isNextBuildPhase()) return;
+  if (lastEnsureMs && Date.now() - lastEnsureMs < ENSURE_TTL_MS) return;
   for (const seed of SEEDS) {
     const existing = await prisma.pageContent.findUnique({ where: { slug: seed.slug } });
     if (existing) continue;
@@ -402,4 +406,5 @@ export async function ensureSystemPages() {
   } catch (e) {
     console.warn('ensureSystemPages legal upgrade', e);
   }
+  lastEnsureMs = Date.now();
 }

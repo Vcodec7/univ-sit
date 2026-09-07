@@ -261,10 +261,11 @@
   }
   .lift-hero__cta {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: stretch;
     margin-top: 0.85rem !important;
     gap: 0.45rem !important;
-    width: min(100%, 20rem);
+    width: min(100%, 22rem);
     margin-left: 0;
     margin-right: auto;
   }

@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getAccessSettings } from '@/lib/access-settings';
 import { getModerationConfig } from '@/lib/moderation-settings';
@@ -12,7 +13,7 @@ import {
   type LegalDynamicInput,
 } from '@/lib/legal-dynamic';
 
-export async function loadLegalDynamicInput(): Promise<LegalDynamicInput> {
+async function loadLegalDynamicInputUncached(): Promise<LegalDynamicInput> {
   if (isNextBuildPhase()) {
     const identity = await getSiteIdentity();
     return {
@@ -68,6 +69,12 @@ export async function loadLegalDynamicInput(): Promise<LegalDynamicInput> {
     modules,
   };
 }
+
+export const loadLegalDynamicInput = unstable_cache(
+  loadLegalDynamicInputUncached,
+  ['legal-dynamic-input-v1'],
+  { revalidate: 60 },
+);
 
 export async function withPrivacyDynamicHtml(rawHtml: string) {
   const cleaned = stripPreviousDynamicBlocks(rawHtml);

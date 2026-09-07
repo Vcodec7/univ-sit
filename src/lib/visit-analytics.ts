@@ -41,6 +41,7 @@ export async function getVisitSnapshot(window: DateWindow = {}): Promise<VisitSn
     coworkSignups,
     coworkAttended,
     coworkPresence,
+    participantUsers,
     coworkUsers,
     presenceUsers,
     hallBookings,
@@ -60,23 +61,38 @@ export async function getVisitSnapshot(window: DateWindow = {}): Promise<VisitSn
       where: { status: 'ATTENDED', ...(starts || created) },
     }),
     prisma.presenceCheckIn.count({ where: created }),
-    prisma.coworkingSignup.findMany({
-      where: starts || created,
-      select: { userId: true },
-      take: 4000,
-    }),
-    prisma.presenceCheckIn.findMany({
+    prisma.bookingParticipant.groupBy({
+      by: ['userId'],
       where: created,
-      select: { userId: true },
-      take: 4000,
+      _count: true,
+    }),
+    prisma.coworkingSignup.groupBy({
+      by: ['userId'],
+      where: starts || created,
+      _count: true,
+    }),
+    prisma.presenceCheckIn.groupBy({
+      by: ['userId'],
+      where: created,
+      _count: true,
     }),
     prisma.booking.count({
-      where: { status: 'APPROVED', ...(starts || {}) },
+      where: {
+        status: 'APPROVED',
+        ...(starts || {}),
+        space: { bookingMode: { in: ['HALL', 'BOTH'] } },
+        participants: { none: {} },
+      },
     }),
-    prisma.booking.findMany({
-      where: { status: 'APPROVED', ...(starts || {}) },
-      select: { userId: true },
-      take: 4000,
+    prisma.booking.groupBy({
+      by: ['userId'],
+      where: {
+        status: 'APPROVED',
+        ...(starts || {}),
+        space: { bookingMode: { in: ['HALL', 'BOTH'] } },
+        participants: { none: {} },
+      },
+      _count: true,
     }),
     prisma.bookingParticipant.count({
       where: { attendanceStatus: 'NO_SHOW', ...(created || {}) },
@@ -88,6 +104,7 @@ export async function getVisitSnapshot(window: DateWindow = {}): Promise<VisitSn
 
   const unique = new Set<string>();
   for (const row of eventUserRows) if (row.userId) unique.add(row.userId);
+  for (const row of participantUsers) if (row.userId) unique.add(row.userId);
   for (const row of coworkUsers) if (row.userId) unique.add(row.userId);
   for (const row of presenceUsers) if (row.userId) unique.add(row.userId);
   for (const row of hallUsers) if (row.userId) unique.add(row.userId);

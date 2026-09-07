@@ -32,6 +32,10 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
   assert.match(hero, /Старт с Сочи/);
   assert.match(hero, /Дом молодёжи/);
   assert.match(hero, /href: '\/coworking'/);
+  assert.match(hero, /extra \?/);
+  assert.doesNotMatch(hero, /extra \|\| secondary/);
+  assert.match(page, /href: '\/coworking', label: 'Записаться'/);
+  assert.match(page, /href: '\/spaces', label: 'Залы'/);
   assert.match(hero, /resolveHomeHeroPoster/);
   assert.match(page, /home-page--lift/);
   assert.match(page, /HomeSochiStrip/);
