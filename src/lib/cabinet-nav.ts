@@ -103,6 +103,18 @@ export function cabinetNavIdFromPath(pathname: string): CabinetNavId {
   return 'overview';
 }
 
+export function cabinetModuleOn(flags: Record<string, boolean> | null, key?: string) {
+  return !key || flags == null || flags[key] !== false;
+}
+
+export function filterCabinetLeaves(items: CabinetNavLeaf[], flags: Record<string, boolean> | null) {
+  return items.filter((item) => {
+    if (item.id === 'social') return cabinetModuleOn(flags, 'messaging') || cabinetModuleOn(flags, 'friends');
+    if (item.id === 'bookings') return cabinetModuleOn(flags, 'events') || cabinetModuleOn(flags, 'applications');
+    return cabinetModuleOn(flags, item.module);
+  });
+}
+
 export function cabinetLeafIdFromPath(pathname: string): CabinetNavId {
   const p = pathname.replace(/\/+$/, '') || '/';
   if (p.startsWith('/dashboard/friends') || p.startsWith('/friends')) return 'friends';

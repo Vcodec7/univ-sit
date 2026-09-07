@@ -28,7 +28,9 @@ import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import {
   CABINET_NAV,
   cabinetLeafIdFromPath,
+  cabinetModuleOn,
   cabinetNavIdFromPath,
+  filterCabinetLeaves,
   type CabinetNavId,
   type CabinetNavItem,
   type CabinetNavLeaf,
@@ -95,14 +97,8 @@ export default function CabinetMenu({
     if (activeId === 'more') setMoreOpen(true);
   }, [activeId]);
 
-  const modOn = (key?: string) => !key || moduleFlags == null || moduleFlags[key] !== false;
+  const modOn = (key?: string) => cabinetModuleOn(moduleFlags, key);
   const isStaff = role === 'ADMIN' || role === 'MODERATOR';
-
-  const filterLeaf = (item: CabinetNavLeaf) => {
-    if (item.id === 'social') return modOn('messaging') || modOn('friends');
-    if (item.id === 'bookings') return modOn('events') || modOn('applications');
-    return modOn(item.module);
-  };
 
   const resolveHref = (item: CabinetNavItem) => {
     if (item.id === 'social' && !modOn('messaging')) return '/dashboard/friends';
@@ -115,11 +111,11 @@ export default function CabinetMenu({
     items: section.items
       .map((item) => {
         if (!item.children) return item;
-        return { ...item, children: item.children.filter(filterLeaf) };
+        return { ...item, children: filterCabinetLeaves(item.children, moduleFlags) };
       })
       .filter((item) => {
         if (item.children) return item.children.length > 0;
-        return filterLeaf(item);
+        return filterCabinetLeaves([item], moduleFlags).length > 0;
       }),
   })).filter((section) => section.items.length > 0);
 

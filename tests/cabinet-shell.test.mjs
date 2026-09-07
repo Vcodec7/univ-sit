@@ -18,6 +18,10 @@ test('dashboard layout keeps cabinet chrome across leaf routes', () => {
   assert.match(nav, /label: 'Мои достижения'/);
   assert.match(nav, /label: 'Ещё'/);
   assert.doesNotMatch(nav, /id: 'settings', label: 'Настройки'/);
+  const hub = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/CabinetHubTabs.tsx'), 'utf8');
+  assert.match(hub, /filterCabinetLeaves/);
+  const faq = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/lib/faq-content.ts'), 'utf8');
+  assert.match(faq, /не в левом меню кабинета/);
   assert.match(nav, /href: '\/dashboard\/friends'/);
   assert.match(nav, /href: '\/dashboard\/messages'/);
   assert.match(nav, /href: '\/dashboard\/tickets'/);
