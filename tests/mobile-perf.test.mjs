@@ -35,3 +35,10 @@ test('living sky stays mounted when the window shrinks; video still skips on pho
 test('home deck does not prefetch four routes on first paint', () => {
   assert.match(hero, /prefetch=\{false\}/);
 });
+
+test('catalog titles wrap on words, search input keeps icon padding, moon is a sphere', () => {
+  assert.match(unify, /catalog-page-header__intro \.page-hero-title[\s\S]{0,240}overflow-wrap:\s*break-word\s*!important/);
+  assert.match(unify, /space-filter-bar__input[\s\S]{0,80}2\.5rem/);
+  assert.doesNotMatch(skyCss, /inset -14px -5px 0 0/);
+  assert.match(skyCss, /\.sochi-sky__moon[\s\S]{0,320}inset -7px -5px 12px/);
+});

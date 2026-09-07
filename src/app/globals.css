@@ -9831,7 +9831,8 @@ a.yp-modal-close {
   font-weight: 800;
   line-height: 1.15;
   margin: 0 0 0.5rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .page-hero-subtitle {
@@ -30521,7 +30522,6 @@ select:not([multiple]):not([size]):focus {
 }
 .admin-catalog-search input,
 .filter-bar__input,
-.space-filter-bar__input,
 .catalog-filter-pop__search input,
 .places-search input,
 .yp-engage__search input {
@@ -30535,7 +30535,6 @@ select:not([multiple]):not([size]):focus {
 }
 .admin-catalog-search input:focus,
 .filter-bar__input:focus,
-.space-filter-bar__input:focus,
 .catalog-filter-pop__search input:focus,
 .places-search input:focus,
 .yp-engage__search input:focus {

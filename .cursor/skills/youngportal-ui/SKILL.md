@@ -16,6 +16,9 @@ description: Visual/UX work on YoungPortal from screenshots — contrast, header
 - **Не вешать `display:none` / unmount неба на `max-width`.** Сужение окна на десктопе не должно снимать луну/солнце. Lite только `pointer: coarse`, `prefers-reduced-motion`, save-data.
 - **Иконки шапки — к правому краю бара** (`margin-left: auto`, без `min-width` колодца и без запасного gutter от кастомного скролла). Не сдвигать их внутрь «для красоты».
 - **Не растягивать слайды ленты в равную высоту.** `min-height: 100%` + `margin-top: auto` у кнопок делает пустые колодцы в новостях и между заголовком и карточками.
+- **Заголовки каталога** — `overflow-wrap: break-word`, не `anywhere`. Бейдж «N площадок» не в одной узкой строке с h1.
+- Поиск каталога: padding слева под иконку. Не обнулять padding у `.space-filter-bar__input`.
+- Луна: inset с blur, не `inset -14px … 0 0` (вертикальное ребро «монеты»).
 
 ## Чеклист по скрину (пройти и закрыть пункты)
 

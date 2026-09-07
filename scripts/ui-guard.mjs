@@ -107,6 +107,17 @@ if (!/\.home-page--lift \.home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!im
 if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/.test(unify)) {
   fails.push('feed card CTAs must not use margin-top:auto empty wells');
 }
+if (!/\.catalog-page-header__intro \.page-hero-title[\s\S]{0,240}overflow-wrap:\s*break-word\s*!important/.test(unify)) {
+  fails.push('catalog titles must wrap on words, not overflow-wrap:anywhere');
+}
+if (!/\.space-filter-bar__input[\s\S]{0,80}padding:\s*0\.55rem 2\.15rem 0\.55rem 2\.5rem/.test(unify)) {
+  fails.push('spaces search input must keep left padding so text is not under the icon');
+}
+
+const skyCss = fs.readFileSync(path.join(root, 'src/app/sochi-living-sky.css'), 'utf8');
+if (/sochi-sky__moon[\s\S]{0,280}inset -14px -5px 0 0/.test(skyCss)) {
+  fails.push('moon inset must use blur, not a hard coin-edge');
+}
 
 if (fails.length) {
   console.error('ui-guard FAIL');
