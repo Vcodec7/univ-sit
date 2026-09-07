@@ -2206,13 +2206,16 @@ a.home-section-link:hover,
   transform: none !important;
   animation: none !important;
   top: 0;
-  left: 0;
+  left: auto;
+  right: auto;
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 24px));
   padding: 0 !important;
   overflow: visible !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  min-width: 220px;
+  min-width: 0;
 }
 .nav-dropdown-bridge {
   height: 16px;

@@ -284,7 +284,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     } as const;
     if (count <= 0) {
       return (
-        <Link href={href} data-nav-trigger={id} style={style}>
+        <Link href={href} data-nav-trigger={id} data-nav-anchor={id} style={style}>
           {label}
         </Link>
       );
@@ -293,6 +293,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       <button
         type="button"
         data-nav-trigger={id}
+        data-nav-anchor={id}
         style={style}
         aria-expanded={openMenu === id}
         aria-haspopup="menu"
@@ -319,6 +320,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
     <div
       className={`nav-item${openMenu === id ? ' is-open' : ''}`}
       data-nav-id={id === 'more' ? undefined : id}
+      data-nav-menu={id}
       ref={(el) => {
         menuAnchorRefs.current[id] = el;
       }}
@@ -339,7 +341,8 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         align={id === 'more' ? 'end' : 'start'}
         id={menuDomId}
         getAnchor={() =>
-          menuAnchorRefs.current[id]?.querySelector<HTMLElement>('button, a') || null
+          menuAnchorRefs.current[id]?.querySelector<HTMLElement>('[data-nav-anchor], button.nav-more-btn, button, a') ||
+          document.querySelector<HTMLElement>(`[data-nav-menu="${id}"] [data-nav-anchor], [data-nav-menu="${id}"] button, [data-nav-menu="${id}"] a`)
         }
         onEnter={keepDesktopMenus}
         onLeave={scheduleDesktopMenuClose}
@@ -430,6 +433,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
         )}
         <div
           className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}
+          data-nav-menu="account"
           ref={(el) => {
             menuAnchorRefs.current.account = el;
           }}
@@ -442,6 +446,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
           <button
             type="button"
             className="nav-icon-btn nav-account-trigger"
+            data-nav-anchor="account"
             aria-expanded={openMenu === 'account'}
             aria-haspopup="menu"
             title="Аккаунт"
@@ -456,7 +461,8 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
               align="end"
               className="nav-account-menu"
               getAnchor={() =>
-                menuAnchorRefs.current.account?.querySelector<HTMLElement>('button') || null
+                menuAnchorRefs.current.account?.querySelector<HTMLElement>('[data-nav-anchor], button') ||
+                document.querySelector<HTMLElement>('[data-nav-menu="account"] [data-nav-anchor]')
               }
               onEnter={keepDesktopMenus}
               onLeave={scheduleDesktopMenuClose}
@@ -784,6 +790,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
                 id={moreId}
                 className="nav-more-btn"
                 data-nav-id="more"
+                data-nav-anchor="more"
                 style={{
                   cursor: 'pointer',
                   fontWeight: openMenu === 'more' ? 700 : 500,

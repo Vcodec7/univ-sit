@@ -27,8 +27,10 @@ test('desktop nav keeps the dropdown reachable while moving the pointer', () => 
   assert.match(nav, /keepDesktopMenus/);
   assert.match(nav, /data-nav-dropdown/);
   assert.match(portal, /createPortal/);
-  assert.match(portal, /nav-dropdown-bridge/);
-  assert.match(portal, /r\.bottom/);
+  assert.match(portal, /placeDropdown/);
+  assert.match(portal, /nav-dropdown-body/);
+  assert.match(nav, /data-nav-menu/);
+  assert.match(nav, /data-nav-anchor/);
   assert.doesNotMatch(nav, /'events', 'news'/);
 });
 

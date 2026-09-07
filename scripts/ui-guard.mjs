@@ -83,6 +83,9 @@ if (!/\.nav-dropdown-bridge/.test(unify)) {
 if (!/\.desktop-nav[\s\S]{0,80}overflow:\s*hidden\s*!important/.test(unify)) {
   fails.push('desktop-nav must clip extra links so they do not cover Запись');
 }
+if (!/\.nav-dropdown-portal\.dropdown[\s\S]{0,180}left:\s*auto/.test(unify)) {
+  fails.push('header dropdown portal must not default to left:0');
+}
 if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1fr\s*!important/.test(unify)) {
   fails.push('home feed card actions must stack at equal width');
 }
