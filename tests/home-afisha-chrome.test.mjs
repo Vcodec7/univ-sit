@@ -19,7 +19,7 @@ test('weekly afisha uses the same section head as spaces, not a kicker hero or h
 });
 
 test('home titles keep lime and purple dashes', () => {
-  assert.match(unify, /home-section-title::after[\s\S]{0,280}#afca03[\s\S]{0,80}#8562d8/);
+  assert.match(unify, /home-section-title::after[\s\S]{0,500}#afca03[\s\S]{0,120}#8562d8/);
   assert.doesNotMatch(unify, /home-section-title::after,\s*\n\.home-section-title::after \{\s*display: none/);
 });
 
@@ -29,8 +29,9 @@ test('html scrollbar is not forced into a layout column', () => {
 });
 
 test('home sections do not leave tall empty wells', () => {
-  assert.match(unify, /home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*1\.15rem\s*!important/);
+  assert.match(unify, /home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*0\.85rem\s*!important/);
   assert.match(unify, /home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/);
+  assert.match(unify, /home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/);
 });
 
 test('home rails do not steal vertical wheel on phones', () => {

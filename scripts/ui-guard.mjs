@@ -98,8 +98,14 @@ if (/html::-webkit-scrollbar\s*\{[^}]*width\s*:/.test(unify) || /html\s*\{[^}]*s
 if (!/\.glass-nav-inner\.container[\s\S]{0,120}max-width:\s*none\s*!important/.test(unify)) {
   fails.push('header inner must span the bar so icons sit on the right edge');
 }
-if (!/\.home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*1\.15rem\s*!important/.test(unify)) {
+if (!/\.home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*0\.85rem\s*!important/.test(unify)) {
   fails.push('home sections must stay tight, not 2.5rem wells');
+}
+if (!/\.home-page--lift \.home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/.test(unify)) {
+  fails.push('home rail cards must hug content, not stretch to equal height wells');
+}
+if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/.test(unify)) {
+  fails.push('feed card CTAs must not use margin-top:auto empty wells');
 }
 
 if (fails.length) {
