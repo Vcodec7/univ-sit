@@ -537,3 +537,34 @@ export async function promoteFromWaitlist(bookingId: string) {
   }
   return next.userId;
 }
+
+/** Organizer cancelled — tell every participant (in-app + email). */
+export async function notifyBookingCancelledToGuests(bookingId: string, reason = 'Мероприятие отменено') {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      space: { select: { title: true, address: true } },
+      participants: { select: { user: { select: { id: true, email: true } } } },
+    },
+  });
+  if (!booking) return;
+  const when = whenMsk(booking.startTime);
+  for (const p of booking.participants) {
+    await createUserNotification({
+      userId: p.user.id,
+      type: 'BOOKING_REQUEST',
+      title: 'Мероприятие отменено',
+      body: `«${booking.title}» · ${booking.space?.title || 'Площадка'} · ${when}. ${reason}`,
+      meta: { bookingId, href: '/tickets', audience: 'user', status: 'CANCELLED' },
+    }).catch(() => null);
+    if (p.user.email) {
+      const html = await shell(
+        'Мероприятие отменено',
+        `<p><b>${booking.title}</b> (${when}) отменено.</p>
+         <p>${reason}</p>
+         <p>Площадка: ${booking.space?.title || '—'}</p>`
+      );
+      await sendEmail(p.user.email, `Отмена: ${booking.title}`, html).catch(() => null);
+    }
+  }
+}

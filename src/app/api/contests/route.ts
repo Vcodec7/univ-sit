@@ -10,9 +10,6 @@ export async function GET(req: Request) {
     if (blocked) return blocked;
   }
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Войдите в аккаунт' }, { status: 401 });
-  }
 
   const { searchParams } = new URL(req.url);
   const kind = searchParams.get('kind');
@@ -34,11 +31,13 @@ export async function GET(req: Request) {
     },
   });
 
-  const mySubs = await prisma.contestSubmission.findMany({
-    where: { userId: session.user.id },
-    select: { contestId: true, status: true, id: true },
-    take: 100,
-  });
+  const mySubs = session?.user?.id
+    ? await prisma.contestSubmission.findMany({
+        where: { userId: session.user.id },
+        select: { contestId: true, status: true, id: true },
+        take: 100,
+      })
+    : [];
   const myByContest = Object.fromEntries(mySubs.map((s) => [s.contestId, s]));
 
   return NextResponse.json({

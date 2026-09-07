@@ -246,10 +246,8 @@ export default function ConsentBanner({ enabled = true }: Props) {
         </div>
       ) : (
         <p>
-          Нужны для входа и безопасности. Подробнее:{' '}
-          <Link href="/privacy">политика</Link>
-          {' · '}
-          <Link href="/rules">правила</Link>.
+          Нужны для входа и безопасности. Аналитика (Яндекс.Метрика) — только если включите её здесь.
+          Подробнее: <Link href="/privacy">политика</Link>.
           <span className="yp-onboard-meta"> v{COOKIES_POLICY_VERSION}</span>
         </p>
       )}

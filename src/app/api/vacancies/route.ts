@@ -10,16 +10,13 @@ import {
   vacancyPhaseLabel,
 } from '@/lib/vacancy-content';
 
-/** Open vacancies — members only */
+/** Open vacancies — list is public; apply still needs an account. */
 export async function GET(req: Request) {
   {
     const blocked = await rejectIfModuleDisabled('vacancies');
     if (blocked) return blocked;
   }
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Войдите в аккаунт' }, { status: 401 });
-  }
 
   const { searchParams } = new URL(req.url);
   const q = (searchParams.get('q') || '').trim();
@@ -65,11 +62,13 @@ export async function GET(req: Request) {
     },
   });
 
-  const myApps = await prisma.vacancyApplication.findMany({
-    where: { userId: session.user.id },
-    select: { vacancyId: true, status: true, autoScore: true, id: true },
-    take: 100,
-  });
+  const myApps = session?.user?.id
+    ? await prisma.vacancyApplication.findMany({
+        where: { userId: session.user.id },
+        select: { vacancyId: true, status: true, autoScore: true, id: true },
+        take: 100,
+      })
+    : [];
   const mine = Object.fromEntries(myApps.map((a) => [a.vacancyId, a]));
 
   const cities = await prisma.vacancy.findMany({

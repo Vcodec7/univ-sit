@@ -18,9 +18,6 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     if (blocked) return blocked;
   }
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Войдите в аккаунт' }, { status: 401 });
-  }
 
   const { id } = await ctx.params;
   const vacancy = await prisma.vacancy.findUnique({
@@ -49,22 +46,26 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     return NextResponse.json({ message: 'Вакансия недоступна' }, { status: 404 });
   }
 
-  const elig = await checkVacancyEligibility(session.user.id, id);
+  const elig = session?.user?.id
+    ? await checkVacancyEligibility(session.user.id, id)
+    : { ok: false, message: 'Чтобы откликнуться, войдите в аккаунт', code: 'AUTH' };
   const eligibility = elig.ok
     ? { ok: true as const }
     : { ok: false as const, message: elig.message, code: elig.code };
 
-  const myApp = await prisma.vacancyApplication.findUnique({
-    where: { userId_vacancyId: { userId: session.user.id, vacancyId: id } },
-    select: {
-      id: true,
-      status: true,
-      autoScore: true,
-      rejectReason: true,
-      createdAt: true,
-      coverLetter: true,
-    },
-  });
+  const myApp = session?.user?.id
+    ? await prisma.vacancyApplication.findUnique({
+        where: { userId_vacancyId: { userId: session.user.id, vacancyId: id } },
+        select: {
+          id: true,
+          status: true,
+          autoScore: true,
+          rejectReason: true,
+          createdAt: true,
+          coverLetter: true,
+        },
+      })
+    : null;
 
   const content = parseVacancyRequirements(vacancy.requirementsJson);
   const requirements = filterAgeDuplicateItems(content.items, vacancy.ageMin, vacancy.ageMax);

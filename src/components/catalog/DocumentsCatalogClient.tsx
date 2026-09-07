@@ -5,6 +5,7 @@ import { FileText, Eye, Download } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 import type { PublicDocumentCard } from '@/lib/public-catalogs';
+import { ORG_STATEMENT_TEMPLATES } from '@/lib/org-statement-templates';
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} Б`;
@@ -37,7 +38,8 @@ export default function DocumentsCatalogClient({ items }: { items: PublicDocumen
       <div>
         <h1 className="page-hero-title">Документы</h1>
         <p style={{ color: 'var(--muted)', marginBottom: '1.75rem', fontSize: '1.05rem' }}>
-          Положения, формы и правила портала. Откройте документ прямо на сайте или скачайте файл.
+          Положения, формы и правила портала. Откройте документ на сайте или скачайте файл (PDF, Word).
+          Шаблоны заявлений можно скопировать в Word или распечатать в PDF.
         </p>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -155,6 +157,25 @@ export default function DocumentsCatalogClient({ items }: { items: PublicDocumen
             ))}
           </div>
         )}
+
+        <section className="docs-templates" style={{ marginTop: '2rem' }}>
+          <h2 className="page-hero-title" style={{ fontSize: '1.2rem', marginBottom: '0.45rem' }}>
+            Шаблоны заявлений
+          </h2>
+          <p style={{ color: 'var(--muted)', margin: '0 0 1rem', fontSize: '0.92rem' }}>
+            Типовые формы для клуба, проекта, брони зала и согласия родителя. Скопируйте текст в Word (.docx)
+            или сохраните через печать браузера как PDF.
+          </p>
+          <div className="docs-templates__grid">
+            {ORG_STATEMENT_TEMPLATES.map((t) => (
+              <article key={t.id} className="docs-templates__card">
+                <h3>{t.title}</h3>
+                <p className="docs-templates__fmt">{t.format}</p>
+                <pre>{t.body}</pre>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

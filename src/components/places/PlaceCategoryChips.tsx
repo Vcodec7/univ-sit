@@ -23,6 +23,7 @@ export default function PlaceCategoryChips() {
     <div className="places-chips" role="tablist" aria-label="Категории мест">
       <Link
         href={hrefFor('ALL')}
+        scroll={false}
         className={`places-chip ${current === 'ALL' ? 'is-active' : ''}`}
         role="tab"
         aria-selected={current === 'ALL'}
@@ -35,6 +36,7 @@ export default function PlaceCategoryChips() {
           <Link
             key={code}
             href={hrefFor(code)}
+            scroll={false}
             className={`places-chip ${current === code ? 'is-active' : ''}`}
             role="tab"
             aria-selected={current === code}

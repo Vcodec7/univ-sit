@@ -1347,7 +1347,51 @@ body:has(.games-root) .animated-bg {
   }
 }
 
-/* Hub */
+/* Hub — light site chrome, readable text */
+.games-root.is-hub,
+.games-root.is-hub .games-hub {
+  color: #0a0c2a;
+  background: transparent;
+}
+.games-root.is-hub .games-hub__head h1,
+.games-root.is-hub .games-hub h1,
+.games-root.is-hub .games-hub__leader-head strong,
+.games-root.is-hub .games-hub__leaders h2,
+.games-root.is-hub .games-hub__kpi strong,
+.games-root.is-hub .games-hub__kpi span,
+.games-root.is-hub .games-hub__card-title {
+  color: #0a0c2a !important;
+}
+.games-root.is-hub .games-hub__intro,
+.games-root.is-hub .games-hub__card-desc,
+.games-root.is-hub .games-hub__leaders-intro {
+  color: #5a5670 !important;
+}
+.games-root.is-hub .games-hub__tabs {
+  background: #fff;
+  border-color: rgba(120, 176, 206, 0.28);
+}
+.games-root.is-hub .games-hub__tab {
+  color: #5a5670;
+}
+.games-root.is-hub .games-hub__tab.is-active {
+  background: #afca03;
+  color: #0a0c2a;
+}
+.games-root.is-hub .games-hub__leader-card,
+.games-root.is-hub .games-hub__kpi,
+.games-root.is-hub .games-hub__card {
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  color: #0a0c2a;
+}
+
+.games-root.is-play {
+  background:
+    linear-gradient(180deg, #eef6fb 0%, #f7faf4 100%) !important;
+  color: #0a0c2a !important;
+}
+
 .games-hub {
   display: flex;
   flex-direction: column;

@@ -1,5 +1,5 @@
 export const CATALOG_PAGE_SIZE = 12;
-export const NEWS_PAGE_SIZE = 12;
+export const NEWS_PAGE_SIZE = 6;
 
 export function parsePageParam(raw: string | number | undefined, maxPage = 500): number {
   const n = parseInt(String(raw ?? "1"), 10);

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
-import { notifyBookingStatus } from '@/lib/notifications';
+import { notifyBookingStatus, notifyBookingCancelledToGuests } from '@/lib/notifications';
 
 /**
  * User cancels own space booking (organizer request).
@@ -50,6 +50,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
         rejectReason: 'Отменено вами',
       }).catch(() => null);
     }
+    void notifyBookingCancelledToGuests(updated.id, 'Организатор отменил бронь').catch(() => null);
 
     return NextResponse.json(
       { message: 'Бронь отменена', booking: updated },

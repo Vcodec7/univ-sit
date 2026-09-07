@@ -133,7 +133,7 @@ const PLACE_SOFT_MATCH: Record<PlaceCategoryCode, RegExp> = {
   MUSEUM: /музей|галере|экспозиц/i,
   VIEWPOINT: /смотров|панорам|обзорн|вид на/i,
   UNIQUE: /уникал|необычн|секрет/i,
-  FAMILY: /семь|детск|для детей|пикник/i,
+  FAMILY: /семь|детск|для детей|пикник|зоопарк|аквапарк|детск(ий|ая|ое)|с детьми/i,
 };
 
 type PlaceCatSource = {
@@ -171,6 +171,9 @@ export function placeCategoryCodesFor(place: PlaceCatSource): PlaceCategoryCode[
   for (const code of PLACE_CATEGORIES) {
     if (out.includes(code)) continue;
     if (PLACE_SOFT_MATCH[code].test(hay)) out.push(code);
+  }
+  if (!out.includes('FAMILY') && (out.includes('PARK') || out.includes('BEACH'))) {
+    out.push('FAMILY');
   }
   return out.slice(0, 5);
 }

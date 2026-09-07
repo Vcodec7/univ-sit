@@ -172,7 +172,7 @@ export default function VacancyDetailClient() {
     vacancy.seats != null ? Math.max(0, vacancy.seats - (vacancy.seatsTaken || 0)) : null;
 
   return (
-    <div className="container yp-engage yp-vac" style={{ padding: '1.5rem 1rem 3rem', maxWidth: 760 }}>
+    <div className="container yp-engage yp-vac vacancy-detail" style={{ padding: '1rem 1rem 2.25rem', maxWidth: 760 }}>
       <Link href="/vacancies" style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
         ← Все вакансии
       </Link>

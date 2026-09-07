@@ -3,7 +3,6 @@ import ContentRenderer from '@/components/ContentRenderer';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
-import ApplyButton from '@/components/ApplyButton';
 import ShareButton from '@/components/ShareButton';
 import PhotoGallery from '@/components/PhotoGallery';
 import { Metadata } from 'next';
@@ -159,6 +158,7 @@ export default async function ClubDetail({ params }: { params: Promise<{ id: str
           kind="club"
           id={club.id}
           open={open}
+          hideApply
           studioJson={club.studioJson}
           signupUrl={club.signupUrl}
           curatorName={club.curatorName}
@@ -224,26 +224,6 @@ export default async function ClubDetail({ params }: { params: Promise<{ id: str
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1rem' }}>О клубе</h2>
             <div style={{ fontSize: '1.05rem', lineHeight: 1.75, color: '#334155' }}>
               <ContentRenderer template={club.template} content={descriptionHtml} />
-              {signupUrl ? (
-                <div style={{ marginTop: '1.15rem' }}>
-                  <a
-                    href={signupUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '0.75rem 1.2rem',
-                      fontSize: '0.95rem',
-                    }}
-                  >
-                    {/t\.me|telegram/i.test(signupUrl) ? <Send size={16} /> : <ExternalLink size={16} />}
-                    {signupCtaLabel(signupUrl)}
-                  </a>
-                </div>
-              ) : null}
             </div>
             {galleryImages.length > 0 && (
               <div style={{ marginTop: '1.5rem' }}>
@@ -295,46 +275,6 @@ export default async function ClubDetail({ params }: { params: Promise<{ id: str
               open={open}
               showApply={false}
             />
-
-            {open && (
-              <div
-                id="club-apply"
-                style={{
-                  background: 'linear-gradient(145deg, rgba(37,99,235,0.08), #fff 55%)',
-                  padding: '1.1rem 1.15rem',
-                  borderRadius: 16,
-                  border: '1px solid rgba(37,99,235,0.15)',
-                }}
-              >
-                <h3 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '0.35rem' }}>Хотите вступить?</h3>
-                <p style={{ margin: '0 0 0.85rem', color: 'var(--muted)', fontSize: '0.88rem', lineHeight: 1.45 }}>
-                  {signupUrl
-                    ? 'Можно записаться по внешней ссылке или оставить заявку на сайте — куратор ответит в личном кабинете.'
-                    : 'Оставьте короткое сообщение — так куратору проще вас принять. Заявку можно подать только один раз.'}
-                </p>
-                {signupUrl ? (
-                  <a
-                    href={signupUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      width: '100%',
-                      marginBottom: '0.65rem',
-                      padding: '0.75rem 1rem',
-                    }}
-                  >
-                    {/t\.me|telegram/i.test(signupUrl) ? <Send size={16} /> : <ExternalLink size={16} />}
-                    {signupCtaLabel(signupUrl)}
-                  </a>
-                ) : null}
-                <ApplyButton clubId={club.id} withMessage />
-              </div>
-            )}
           </aside>
         </div>
 

@@ -1,12 +1,15 @@
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GlobalCalendar from '@/components/GlobalCalendar';
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getSiteIdentity, identityFromSettings } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
 import AuthAfishaSection from '@/components/AuthAfishaSection';
 import WeeklyAfisha from '@/components/WeeklyAfisha';
 import { isNextBuildPhase } from '@/lib/build-phase';
+import { getCachedPublicClubs } from '@/lib/public-catalogs';
+import { encodeRouteParam } from '@/lib/route-id';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName } = await getSiteIdentity();
@@ -33,6 +36,7 @@ export default async function EventsPage() {
         },
       });
   const identity = identityFromSettings(settings);
+  const clubs = await getCachedPublicClubs().catch(() => []);
 
   const upcoming =
     isNextBuildPhase() || !settings?.publicEventsVisibility
@@ -82,7 +86,7 @@ export default async function EventsPage() {
         Афиша мероприятий
       </h1>
       <p style={{ color: 'var(--muted)', marginBottom: '1.15rem', fontSize: '0.98rem' }}>
-        Календарь, запись на клубы недели и ближайшие события площадок ЦРМ
+        Календарь, ближайшие события площадок и клубы, куда можно записаться
       </p>
 
       <WeeklyAfisha
@@ -101,6 +105,27 @@ export default async function EventsPage() {
       ) : (
         <AuthAfishaSection hideTitle />
       )}
+
+      {clubs.length ? (
+        <section className="home-section" style={{ marginTop: '1.75rem' }} aria-label="Клубы">
+          <div className="home-section-head">
+            <h2 className="home-section-title" style={{ fontSize: '1.2rem' }}>
+              Клубы
+            </h2>
+            <Link href="/clubs" className="home-section-link">
+              Все клубы
+            </Link>
+          </div>
+          <ul className="events-clubs-list">
+            {clubs.slice(0, 6).map((c) => (
+              <li key={c.id}>
+                <Link href={`/clubs/${encodeRouteParam(c.id)}`}>{c.title.replace(/^Клуб:\s*/i, '')}</Link>
+                {c.meetingSchedule ? <span>{c.meetingSchedule}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

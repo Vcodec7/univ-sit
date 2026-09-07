@@ -120,6 +120,7 @@ export async function waitForPlaySession(
 
 /** Start a server-validated play session before the match begins. */
 export async function beginGameSession(game: string): Promise<GameSessionCreds | null> {
+  bumpLocalPlayCount(game);
   try {
     const res = await fetch('/api/user/games/start', {
       method: 'POST',

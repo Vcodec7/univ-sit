@@ -12,6 +12,7 @@ export default function YouthJoinBlock({
   curatorPublic,
   coworkingHref,
   hallHref,
+  hideApply,
 }: {
   kind: 'project' | 'club' | 'space';
   id: string;
@@ -23,6 +24,7 @@ export default function YouthJoinBlock({
   curatorPublic?: boolean;
   coworkingHref?: string | null;
   hallHref?: string | null;
+  hideApply?: boolean;
 }) {
   const s = parseStudioJson(studioJson);
   const url = s.signupUrl || signupUrl || '';
@@ -50,12 +52,12 @@ export default function YouthJoinBlock({
           {contact ? ` · ${contact}` : ''}
         </p>
       ) : null}
-      {mode === 'link' && url ? (
+      {hideApply ? null : mode === 'link' && url ? (
         <a className="btn btn-primary" href={url} target="_blank" rel="noreferrer">
           Записаться
         </a>
       ) : null}
-      {mode === 'apply' || !mode ? (
+      {hideApply ? null : (mode === 'apply' || !mode) ? (
         kind === 'space' ? (
           <div className="youth-join-block__actions">
             {coworkingHref ? (

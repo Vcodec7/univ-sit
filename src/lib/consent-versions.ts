@@ -5,8 +5,8 @@
  * Bump INSTRUCTIONS_VERSION when a new profile guide is added — the
  * «инструктаж пройден» badge clears until the user completes all current guides.
  */
-export const PRIVACY_POLICY_VERSION = '2026-08-15-members-engage';
-export const COOKIES_POLICY_VERSION = '2026-08-09-views';
+export const PRIVACY_POLICY_VERSION = '2026-09-07-portal';
+export const COOKIES_POLICY_VERSION = '2026-09-07-portal';
 export const RULES_POLICY_VERSION = '2026-08-15-members-engage';
 export const TERMS_POLICY_VERSION = '2026-08-15-members-engage';
 

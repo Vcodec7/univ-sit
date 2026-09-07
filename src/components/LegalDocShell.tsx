@@ -79,11 +79,7 @@ export default function LegalDocShell({
         </div>
 
         <p className="legal-foot-link">
-          <Link href="/">На главную</Link>
-          <span aria-hidden>·</span>
           <Link href="/contacts">Контакты</Link>
-          <span aria-hidden>·</span>
-          <Link href="/rules">Правила сайта</Link>
         </p>
       </div>
     </div>

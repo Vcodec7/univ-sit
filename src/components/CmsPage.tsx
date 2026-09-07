@@ -72,7 +72,7 @@ export default function CmsPage({ page, siteName = '', publicOrigin = '' }: CmsP
       <section
         style={{
           position: 'relative',
-          minHeight: 'min(72vh, 620px)',
+          minHeight: 'min(42vh, 320px)',
           display: 'flex',
           alignItems: 'flex-end',
           background: cover

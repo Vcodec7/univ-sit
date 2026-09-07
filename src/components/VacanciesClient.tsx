@@ -29,7 +29,6 @@ const APP_STATUS_RU = VACANCY_APP_STATUS_RU;
 export default function VacanciesClient() {
   const [items, setItems] = useState<Item[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-  const [q, setQ] = useState('');
   const [format, setFormat] = useState('');
   const [needAuth, setNeedAuth] = useState(false);
   const [city, setCity] = useState('');
@@ -40,7 +39,6 @@ export default function VacanciesClient() {
     setLoading((prev) => (items.length === 0 ? true : prev));
     try {
       const qs = new URLSearchParams();
-      if (q.trim()) qs.set('q', q.trim());
       if (format) qs.set('format', format);
       if (city) qs.set('city', city);
       if (scope) qs.set('scope', scope);
@@ -58,7 +56,7 @@ export default function VacanciesClient() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- soft-load keeps list while filters change
-  }, [q, format, city, scope]);
+  }, [format, city, scope]);
 
   useEffect(() => {
     void load();
@@ -80,24 +78,6 @@ export default function VacanciesClient() {
           <Building2 size={16} /> Стать партнёром
         </Link>
       </div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void load();
-        }}
-        className="yp-engage__search"
-      >
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Поиск по названию или городу…"
-          aria-label="Поиск вакансий"
-        />
-        <button type="submit" className="btn btn-primary">
-          Найти
-        </button>
-      </form>
 
       <div className="yp-engage__filters">
         {[

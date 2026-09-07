@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Check, X, Users, X as XIcon } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
-import { notifyBookingStatus } from '@/lib/notifications';
+import { notifyBookingStatus, notifyBookingCancelledToGuests } from '@/lib/notifications';
 import { promoteToParticipant } from '@/lib/participant';
 import { formatMskDate, formatMskTimeRange } from '@/lib/booking-hours';
 import AdminPendingButton from '@/components/admin/AdminPendingButton';
@@ -82,6 +82,11 @@ async function updateStatus(formData: FormData) {
         status,
         rejectReason: booking.rejectReason,
       }).catch(() => null);
+    }
+    if (status === 'REJECTED') {
+      void notifyBookingCancelledToGuests(booking.id, booking.rejectReason || 'Администрация отменила мероприятие').catch(
+        () => null
+      );
     }
 
     void import('@/lib/moderation-outcome')

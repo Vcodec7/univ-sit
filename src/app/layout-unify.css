@@ -2556,5 +2556,90 @@ a.home-section-link:hover,
   }
 }
 
+.catalog-filter-pop__panel {
+  z-index: 80 !important;
+}
+.yp-bottom-nav,
+.qa-fab,
+.qa-edge-tab {
+  z-index: 28;
+}
+.places-page .places-hero {
+  min-height: 8.5rem !important;
+}
+.places-page .places-toolbar {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+.places-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.events-clubs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.events-clubs-list a {
+  font-weight: 750;
+  color: #0a0c2a;
+  text-decoration: none;
+}
+.events-clubs-list span {
+  display: block;
+  color: #5a5670;
+  font-size: 0.82rem;
+}
+.contacts-col-card {
+  min-height: 0 !important;
+}
+.docs-templates__grid {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 720px) {
+  .docs-templates__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.docs-templates__card {
+  background: #fff;
+  border: 1px solid rgba(120, 176, 206, 0.28);
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+}
+.docs-templates__card h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+.docs-templates__fmt {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  color: #5a5670;
+}
+.docs-templates__card pre {
+  white-space: pre-wrap;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  margin: 0;
+  color: #0a0c2a;
+}
+.vacancy-detail,
+.yp-vac {
+  min-width: 0;
+}
+.prog-hub .text-gradient {
+  color: #0a0c2a !important;
+  background: none !important;
+  -webkit-text-fill-color: #0a0c2a;
+}
+.faq-page__lead {
+  max-width: 40rem;
+}
+
 
 
