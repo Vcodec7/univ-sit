@@ -22,8 +22,9 @@ test('home titles have no lime dash under the first letter', () => {
   assert.match(unify, /home-section-title::after[\s\S]{0,80}display:\s*none\s*!important/);
 });
 
-test('document scrollbar is brand purple', () => {
-  assert.match(unify, /scrollbar-color:\s*#8562d8/);
+test('html scrollbar is not forced into a layout column', () => {
+  assert.doesNotMatch(unify, /html::-webkit-scrollbar\s*\{/);
+  assert.match(unify, /glass-nav-inner\.container[\s\S]{0,80}max-width:\s*none\s*!important/);
 });
 
 test('home rails do not steal vertical wheel on phones', () => {

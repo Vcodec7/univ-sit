@@ -19,15 +19,17 @@ test('home stays request-time so canonical is not baked as localhost', () => {
 
 test('hero video does not autoplay until desktop motion is allowed', () => {
   assert.match(media, /allowMotionVideo/);
-  assert.match(media, /isLiteMotionDevice/);
+  assert.match(media, /preferStillHeroVideo/);
   assert.match(media, /showVideo = wantVideo && Boolean\(video\) && !videoFailed && allowMotionVideo/);
 });
 
-test('living sky is not mounted on lite / phone devices', () => {
+test('living sky stays mounted when the window shrinks; video still skips on phones', () => {
   assert.match(sky, /if \(!enabled\) return null/);
-  assert.match(sky, /isLiteMotionDevice/);
-  assert.match(skyCss, /\.sochi-sky \{\s*display: none !important;/);
-  assert.match(unify, /\.sochi-sky \{\s*display: none !important;/);
+  assert.match(sky, /pointer: coarse/);
+  assert.doesNotMatch(sky, /max-width: 900px/);
+  assert.doesNotMatch(skyCss, /\.sochi-sky \{\s*display: none !important;/);
+  assert.doesNotMatch(unify, /\.sochi-sky \{\s*display: none !important;/);
+  assert.match(media, /preferStillHeroVideo/);
 });
 
 test('home deck does not prefetch four routes on first paint', () => {

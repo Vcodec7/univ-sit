@@ -12,6 +12,10 @@ description: Visual/UX work on YoungPortal from screenshots — contrast, header
 - Жест V по всей странице. Доступ = `.qa-edge-tab` + `attachEdgeSwipe` (край справа).
 - Катить py без «одобряю».
 - Полноэкранный иммерсив на `/games` (хаб). Иммерсив только `/games/<игра>`.
+- **Не красить скролл `html`/`body` через `::-webkit-scrollbar { width }`.** Это превращает overlay-скролл в колонку (часто фиолетовую) справа от шапки и **прыжок при обновлении**. Цвет скролла — только у внутренних рельс (`.home-rail`), не у документа.
+- **Не вешать `display:none` / unmount неба на `max-width`.** Сужение окна на десктопе не должно снимать луну/солнце. Lite только `pointer: coarse`, `prefers-reduced-motion`, save-data.
+- **Иконки шапки — к правому краю бара** (`margin-left: auto`, без `min-width` колодца и без запасного gutter от кастомного скролла). Не сдвигать их внутрь «для красоты».
+- На телефоне колода сценариев (кружки зал/коворкинг) **под фото**, не поверх моря. Stage героя `position: relative`, не `absolute` на весь section.
 
 ## Чеклист по скрину (пройти и закрыть пункты)
 
@@ -21,12 +25,13 @@ description: Visual/UX work on YoungPortal from screenshots — contrast, header
 4. Навигация: «назад» возвращает туда, откуда пришли (каталог `?from=list`), не на другой макет.
 5. Профиль: аватар-кольцо; пропуск / репутация / М-баллы иконками; витрина-полка; история за иконкой.
 6. Контраст: не фиолетовый текст на бледно-фиолетовом; не светло-серый на сером. CTA брони — `#fff` на `#6e4bc4`.
-7. Ширина: `auto-fit` / `1fr`, не узкая колонка слева и пустота справа.
+7. Ширина: `auto-fit` / `1fr`, не узкая колонка слева и пустота справа. Шапка — на всю ширину окна, контент — `--yp-shell`.
 8. Хром: шапка + нижняя панель на публичных страницах и хабе игр.
+9. CLS: высота `.glass-nav-inner` = `--nav-h`; не включать ширину системного скролла после first paint; не `useState(false)` на слоях героя, которые видны на десктопе.
 
 ## Файлы
 
-- Герой: `HomeServiceHero.tsx`, `.svc-hero*` в `globals.css`
+- Герой: `HomeServiceHero.tsx`, `.svc-hero*` в `globals.css`, `sochi-living-sky.css`
 - Каталог: `SpacesCatalogClient.tsx`, `BookBackLink.tsx`
 - Профиль: `ProfileHeroCard.tsx`, `PersonalQrPanel.tsx`
 - Доступ: `QuickAccess.tsx`, `src/lib/v-gesture.ts`

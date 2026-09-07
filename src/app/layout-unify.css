@@ -109,15 +109,21 @@
 @media (max-width: 1199px) {
   .glass-nav-inner {
     grid-template-columns: minmax(0, 1fr) auto !important;
+    padding-right: 0.45rem !important;
+    padding-left: 0.75rem !important;
   }
   .glass-nav-end {
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-end !important;
     flex-shrink: 0;
     gap: 0.4rem !important;
     min-width: 0 !important;
     min-height: 2.25rem;
+    margin-left: auto !important;
+    margin-right: 0 !important;
     padding-left: 0.15rem !important;
+    padding-right: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
   }
@@ -125,6 +131,7 @@
   .glass-nav-end .nav-auth-mobile__row {
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-end !important;
     gap: 0.4rem !important;
     min-width: 0 !important;
     min-height: 0 !important;
@@ -223,8 +230,8 @@
     min-height: var(--yp-hero-h);
   }
   .lift-hero__stage {
-    position: absolute;
-    inset: 0;
+    position: relative !important;
+    inset: auto;
     margin: 0;
     min-height: var(--yp-hero-h) !important;
     max-height: none !important;
@@ -547,9 +554,6 @@
   }
   .yp-profile__collectible-glyph {
     filter: none !important;
-  }
-  .sochi-sky {
-    display: none !important;
   }
   .lift-hero__btn--ghost,
   .lift-hero__btn--solid {
@@ -2062,7 +2066,6 @@ body:has(.dashboard-page .messages-root) .main-content > div {
 .container,
 .home-sections,
 .home-sections.container,
-.glass-nav-inner.container,
 .catalog-page,
 .faq-page,
 .cms-page-shell,
@@ -2073,6 +2076,12 @@ body:has(.dashboard-page .messages-root) .main-content > div {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+}
+.glass-nav-inner.container {
+  max-width: none !important;
+  width: 100%;
+  padding-left: 0.85rem;
+  padding-right: 0.4rem;
 }
 .main-content > .container,
 .site-footer > .container {
@@ -2362,15 +2371,18 @@ a.home-section-link:hover,
   }
 }
 
-/* Desktop header icons: one even row, no leftover min-width well */
+/* Desktop header icons: flush to the right edge, even row */
 @media (min-width: 1200px) {
   .glass-nav-end {
     display: flex !important;
     align-items: center !important;
+    justify-content: flex-end !important;
     gap: 0.4rem !important;
     min-width: 0 !important;
-    padding-left: 0.35rem !important;
-    margin-left: 0.15rem !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
   }
@@ -2394,26 +2406,8 @@ a.home-section-link:hover,
   }
 }
 
-/* Site scrollbar: lavender track, purple thumb (brand) */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #8562d8 #efeaf8;
-}
-html::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-html::-webkit-scrollbar-track {
-  background: #efeaf8;
-}
-html::-webkit-scrollbar-thumb {
-  background: #8562d8;
-  border-radius: 999px;
-  border: 2px solid #efeaf8;
-}
-html::-webkit-scrollbar-thumb:hover {
-  background: #6e4bc4;
-}
+/* Never force a classic html scrollbar: width: on ::-webkit-scrollbar
+ * turns overlay scrollbars into a purple column and the header jumps on refresh. */
 
 
 

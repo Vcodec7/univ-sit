@@ -20,13 +20,13 @@ const STARS = [
 ];
 
 export default function SochiLivingSky() {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [sky, setSky] = useState<SochiSky>(() => resolveSochiSky());
 
   useEffect(() => {
     const sync = () => setEnabled(!isLiteMotionDevice());
     sync();
-    const mq = window.matchMedia('(max-width: 900px), (pointer: coarse), (prefers-reduced-motion: reduce)');
+    const mq = window.matchMedia('(pointer: coarse), (prefers-reduced-motion: reduce)');
     mq.addEventListener('change', sync);
     return () => mq.removeEventListener('change', sync);
   }, []);

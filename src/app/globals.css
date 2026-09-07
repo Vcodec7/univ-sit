@@ -43,7 +43,8 @@ html {
   overflow-y: scroll;
   max-width: 100%;
   background-color: #f4f0fb;
-  scrollbar-gutter: stable;
+  /* Overlay/classic scrollbar must not reserve a second column beside the header. */
+  scrollbar-gutter: auto;
 }
 
 /* First paint: freeze motion so late CSS/fonts don't animate every box into place */

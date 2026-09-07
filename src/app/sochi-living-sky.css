@@ -58,9 +58,8 @@
   border-radius: 50%;
   z-index: 2;
   background:
-    radial-gradient(circle at 50% 50%, #fff8d2 0 14%, #ffd45a 26%, rgba(255, 176, 64, 0.4) 42%, transparent 68%);
-  filter: none;
-  box-shadow: 0 0 22px rgba(255, 196, 64, 0.35);
+    radial-gradient(circle at 50% 50%, #fff8d2 0 12%, #ffd45a 22%, rgba(255, 176, 64, 0.28) 40%, transparent 68%);
+  box-shadow: 0 0 48px 10px rgba(255, 196, 80, 0.28);
 }
 
 .sochi-sky[data-phase='sunset'] .sochi-sky__sun,
@@ -73,40 +72,20 @@
 }
 
 .sochi-sky__moon {
-  width: 2.15rem;
-  height: 2.15rem;
-  margin: -1.08rem 0 0 -1.08rem;
+  width: 2.55rem;
+  height: 2.55rem;
+  margin: -1.28rem 0 0 -1.28rem;
   border-radius: 50%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 32% 30%, #e8e4d4 0 42%, #b7c0cc 78%, #8e99a8 100%);
+    radial-gradient(circle at 34% 32%, #f7f4ea 0 38%, #d5dbe3 72%, #9aa6b4 100%);
   box-shadow:
-    inset -10px -6px 0 0 rgba(18, 28, 48, 0.42),
-    0 0 18px rgba(220, 230, 245, 0.18);
+    inset -14px -5px 0 0 rgba(6, 14, 28, 0.62),
+    0 0 28px rgba(210, 224, 240, 0.32);
 }
 
 .sochi-sky__moon i {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(90, 100, 112, 0.28);
-}
-.sochi-sky__moon i:nth-child(1) {
-  width: 0.42rem;
-  height: 0.42rem;
-  left: 28%;
-  top: 34%;
-}
-.sochi-sky__moon i:nth-child(2) {
-  width: 0.28rem;
-  height: 0.28rem;
-  left: 58%;
-  top: 22%;
-}
-.sochi-sky__moon i:nth-child(3) {
-  width: 0.34rem;
-  height: 0.34rem;
-  left: 48%;
-  top: 58%;
+  display: none;
 }
 
 .sochi-sky__stars {
@@ -185,10 +164,12 @@
   50% { opacity: 0.95; }
 }
 
-@media (max-width: 900px), (pointer: coarse) {
-  /* Mask + blend layers still cost compositor time even with animations off. */
-  .sochi-sky {
-    display: none !important;
+@media (pointer: coarse) {
+  .sochi-sky__swell {
+    display: none;
+  }
+  .sochi-sky__stars span {
+    animation: none;
   }
 }
 
