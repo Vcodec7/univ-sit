@@ -13,7 +13,7 @@ const workflow = readFileSync(join(root, 'scripts/workflow-deploy-staging.sh'), 
 
 test('public health omits version/db unless loopback', () => {
   assert.match(access, /127\.0\.0\.1/);
-  assert.match(health, /isLoopbackHealthRequest/);
+  assert.match(access, /x-forwarded-proto/);
   assert.match(payload, /maintenanceMode/);
   assert.match(payload, /X-YP-Version/);
 });
