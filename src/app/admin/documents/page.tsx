@@ -45,9 +45,19 @@ async function createItem(formData: FormData) {
     assertCleanText(title, description, category);
 
     const file = formData.get('docFile') as File | null;
+    const name = (file?.name || '').toLowerCase();
+    if (!file || file.size <= 0) {
+      redirect('/admin/documents?error=file');
+    }
+    if (file.type && file.type !== 'application/pdf' && !name.endsWith('.pdf')) {
+      redirect('/admin/documents?error=pdf');
+    }
     const saved = await saveUploadedDocument(file, 'documents');
     if (!saved) {
       redirect('/admin/documents?error=file');
+    }
+    if (saved.mimeType !== 'application/pdf') {
+      redirect('/admin/documents?error=pdf');
     }
 
     const { status, publishedAt } = parsePublishFields(formData);
@@ -90,7 +100,7 @@ export default async function AdminDocumentsPage({
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>Документы</h1>
           <p style={{ color: 'var(--muted)', margin: '0.35rem 0 0' }}>
-            Загрузка PDF и файлов с просмотром на сайте —{' '}
+            Загрузка PDF для публичного каталога —{' '}
             <a href="/documents" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>
               /documents
             </a>
@@ -117,7 +127,11 @@ export default async function AdminDocumentsPage({
       )}
       {sp.error && (
         <div style={{ padding: '0.85rem 1rem', background: 'rgba(220,38,38,0.1)', color: '#b91c1c', borderRadius: 10, marginBottom: '1rem', fontWeight: 600 }}>
-          {sp.error === 'file' ? 'Прикрепите файл (PDF / изображение / TXT)' : 'Не удалось сохранить документ'}
+          {sp.error === 'file'
+            ? 'Прикрепите PDF'
+            : sp.error === 'pdf'
+              ? 'Нужен файл PDF. Шаблоны Word — в публичной категории «Шаблоны».'
+              : 'Не удалось сохранить документ'}
         </div>
       )}
 
@@ -158,7 +172,13 @@ export default async function AdminDocumentsPage({
           <textarea name="description" rows={2} placeholder="Кратко, о чём документ" style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
         <div style={{ gridColumn: '1 / -1' }}>
-          <DocumentFileField name="docFile" label="Файл" required />
+          <DocumentFileField
+            name="docFile"
+            label="Файл PDF"
+            required
+            accept=".pdf,application/pdf"
+            hint="Только PDF до 20 МБ. Шаблоны заявлений в Word портал отдаёт сам."
+          />
         </div>
         <div style={{ gridColumn: '1 / -1' }}>
           <button type="submit" className="btn btn-primary">

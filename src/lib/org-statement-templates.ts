@@ -1,9 +1,11 @@
-/** Typical youth-centre statement templates (HTML → print / save as PDF or copy to Word). */
+/** Youth-centre statement templates — catalog category «Шаблоны», download as .docx. */
+
+export const STATEMENT_TEMPLATES_CATEGORY = 'Шаблоны';
 
 export type StatementTemplate = {
   id: string;
   title: string;
-  format: 'PDF / Word';
+  format: 'DOCX';
   body: string;
 };
 
@@ -11,7 +13,7 @@ export const ORG_STATEMENT_TEMPLATES: StatementTemplate[] = [
   {
     id: 'join-club',
     title: 'Заявление о вступлении в клуб',
-    format: 'PDF / Word',
+    format: 'DOCX',
     body: `Директору {{ORG}}
 от _______________________________
 (ФИО полностью)
@@ -27,7 +29,7 @@ export const ORG_STATEMENT_TEMPLATES: StatementTemplate[] = [
   {
     id: 'join-project',
     title: 'Заявление об участии в проекте',
-    format: 'PDF / Word',
+    format: 'DOCX',
     body: `Директору {{ORG}}
 от _______________________________
 
@@ -41,7 +43,7 @@ export const ORG_STATEMENT_TEMPLATES: StatementTemplate[] = [
   {
     id: 'space-book',
     title: 'Заявка на предоставление помещения',
-    format: 'PDF / Word',
+    format: 'DOCX',
     body: `Директору {{ORG}}
 от _______________________________
 организация / инициатива ________________
@@ -57,7 +59,7 @@ export const ORG_STATEMENT_TEMPLATES: StatementTemplate[] = [
   {
     id: 'parent-consent',
     title: 'Согласие законного представителя',
-    format: 'PDF / Word',
+    format: 'DOCX',
     body: `Я, ________________________________, законный представитель
 несовершеннолетнего ________________________________, дата рождения ___________,
 даю согласие на участие в мероприятиях {{SITE_NAME}} и на обработку персональных

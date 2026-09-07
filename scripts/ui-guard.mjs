@@ -113,6 +113,9 @@ if (!/\.catalog-page-header__intro \.page-hero-title[\s\S]{0,240}overflow-wrap:\
 if (!/\.space-filter-bar__input[\s\S]{0,80}padding:\s*0\.55rem 2\.15rem 0\.55rem 2\.5rem/.test(unify)) {
   fails.push('spaces search input must keep left padding so text is not under the icon');
 }
+if (!/\.filter-bar__input[\s\S]{0,80}padding:\s*0\.65rem 2\.25rem 0\.65rem 2\.5rem/.test(unify)) {
+  fails.push('catalog search inputs must keep left padding so text is not under the icon');
+}
 
 const skyCss = fs.readFileSync(path.join(root, 'src/app/sochi-living-sky.css'), 'utf8');
 if (/sochi-sky__moon[\s\S]{0,280}inset -14px -5px 0 0/.test(skyCss)) {

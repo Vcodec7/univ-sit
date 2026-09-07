@@ -30524,10 +30524,7 @@ select:not([multiple]):not([size]):focus {
   color: #64748b;
 }
 .admin-catalog-search input,
-.filter-bar__input,
-.catalog-filter-pop__search input,
-.places-search input,
-.yp-engage__search input {
+.catalog-filter-pop__search input {
   min-height: 0;
   height: auto;
   padding: 0.55rem 0;
@@ -30537,10 +30534,7 @@ select:not([multiple]):not([size]):focus {
   box-shadow: none;
 }
 .admin-catalog-search input:focus,
-.filter-bar__input:focus,
-.catalog-filter-pop__search input:focus,
-.places-search input:focus,
-.yp-engage__search input:focus {
+.catalog-filter-pop__search input:focus {
   box-shadow: none;
   border: 0;
 }
