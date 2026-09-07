@@ -13,4 +13,4 @@ alwaysApply: true
 - Площадки могут быть бронь и коворкинг сразу (`BOTH`). Из каталога бронь: `?from=list`, назад — к списку.
 - На хабе `/games` показывать шапку и нижнюю панель; прятать только в `/games/<id>`.
 - Не коммитить `.env` и пароли. Статусы в UI по-русски.
-- Скиллы: `.cursor/skills/youngportal-ops`, `.cursor/skills/youngportal-ui`.
+- Скиллы (читать сразу): `.cursor/skills/youngportal-ops`, `.cursor/skills/youngportal-ui` — чеклист «не делать заново» (герой/луна, lift-deck, афиша, SW, X-Frame, QA).
