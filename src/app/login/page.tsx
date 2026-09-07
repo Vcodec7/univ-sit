@@ -95,6 +95,16 @@ function LoginForm() {
     };
   }, []);
 
+  const smsLoginShow = smsOn && smsReady;
+
+  useEffect(() => {
+    if (!smsLoginShow && loginMode === 'sms') {
+      setLoginMode('password');
+      setSmsSent(false);
+      setSmsCode('');
+    }
+  }, [smsLoginShow, loginMode]);
+
   const finishLogin = async (loginValue: string, pwd: string) => {
     setError('');
     await offerSavePassword(loginValue, pwd, formRef.current);
@@ -209,6 +219,11 @@ function LoginForm() {
     }
 
     if (loginMode === 'sms') {
+      if (!smsLoginShow) {
+        setLoading(false);
+        setError('Войдите с паролем');
+        return;
+      }
       if (!captchaToken && !authTicket) {
         setLoading(false);
         setError('Пройдите проверку «я не робот»');
@@ -474,7 +489,7 @@ function LoginForm() {
                 />
               </div>
 
-              {loginMode === 'password' ? (
+              {loginMode === 'password' || !smsLoginShow ? (
                 <>
               <div>
                 <label className="yp-auth-label">Пароль</label>
@@ -553,7 +568,7 @@ function LoginForm() {
               )}
 
               <CaptchaField onToken={setCaptchaToken} />
-              {smsOn ? (
+              {smsLoginShow ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -572,11 +587,7 @@ function LoginForm() {
                     textAlign: 'left',
                   }}
                 >
-                  {loginMode === 'sms'
-                    ? 'Войти с паролем'
-                    : smsReady
-                      ? 'Войти по телефону и SMS'
-                      : 'Войти по SMS (провайдер не настроен)'}
+                  {loginMode === 'sms' ? 'Войти с паролем' : 'Войти по телефону и SMS'}
                 </button>
               ) : null}
             </>

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getSiteIdentity, withSiteBrand } from '@/lib/site-identity';
+import { getSiteIdentity, isLocalOrigin, publicAssetUrl, withSiteBrand } from '@/lib/site-identity';
 
 /** Dynamic page metadata branded with current SiteSettings.siteName. */
 export async function brandedMetadata(
@@ -19,14 +19,22 @@ export async function brandedMetadata(
     (canonicalPath
       ? `${publicOrigin}${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`
       : undefined);
+  const ogImage = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
+  const safeBase = isLocalOrigin(publicOrigin) ? undefined : new URL(publicOrigin);
+  const restOg =
+    rest.openGraph && typeof rest.openGraph === 'object' ? (rest.openGraph as Record<string, unknown>) : {};
   return {
     ...rest,
     // absolute: full "Page | Brand"; default: fragment for layout title.template
     title: titleAbsolute ? { absolute: `${clean} | ${siteName}` } : clean,
-    metadataBase: rest.metadataBase || new URL(publicOrigin),
+    ...(safeBase ? { metadataBase: rest.metadataBase || safeBase } : {}),
     alternates: {
       ...(canonical ? { canonical } : {}),
       ...(rest.alternates || {}),
+    },
+    openGraph: {
+      ...restOg,
+      ...(ogImage && !restOg.images ? { images: [{ url: ogImage, width: 512, height: 512, alt: siteName }] } : {}),
     },
   };
 }

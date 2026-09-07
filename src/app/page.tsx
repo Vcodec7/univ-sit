@@ -1,16 +1,14 @@
 import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
-import HomeSlideRail from '@/components/HomeSlideRail';
-import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
+import { getSiteIdentity, isLocalOrigin, publicAssetUrl } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
 import { formatRuDate } from '@/lib/format-date';
 import { getModuleFlags } from '@/lib/module-flags';
-import HomeGalleryAuth from '@/components/HomeGalleryAuth';
-import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
@@ -22,13 +20,28 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { encodeRouteParam } from '@/lib/route-id';
 
+const HomeSlideRail = dynamic(() => import('@/components/HomeSlideRail'), {
+  loading: () => <div className="home-deferred-skel" aria-hidden />,
+});
+const HomeGalleryAuth = dynamic(() => import('@/components/HomeGalleryAuth'));
+const AuthAfishaSection = dynamic(() => import('@/components/AuthAfishaSection'));
+
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();
   const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
+  const ogImage = publicAssetUrl(publicOrigin, '/icons/icon-512.png');
   return {
     title: { absolute: `${siteName} | Официальный портал` },
     description: `Официальный портал ${siteName}: залы, коворкинг, клубы, афиша и новости Центра развития молодёжи Сочи.`,
     ...(publicUrl ? { alternates: { canonical: publicUrl } } : {}),
+    ...(ogImage
+      ? {
+          openGraph: {
+            url: publicUrl,
+            images: [{ url: ogImage, width: 512, height: 512, alt: siteName }],
+          },
+        }
+      : {}),
   };
 }
 

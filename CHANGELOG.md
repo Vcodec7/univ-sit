@@ -1,5 +1,19 @@
 # Changelog — YoungPortal
 
+## [1.6.155] — 2026-09-07
+
+### Security
+- Капча: плитки — PNG (`/api/captcha/tile/...`), без emoji в DOM
+- Публичный `https://…/api/health` отдаёт только `{ok, maintenanceMode}` (без version/db). Версия — на `http://127.0.0.1:3001/api/health` без `X-Forwarded-For`, заголовок `X-YP-Version`, либо `/api/health/detail` с loopback. Docker healthcheck по-прежнему смотрит `r.ok`.
+
+### Fixed
+- og:image / metadataBase не используют localhost — только публичный origin
+- Вход по SMS скрыт, пока шлюз не включён и не настроен (без текста «провайдер не настроен»)
+- Главная: `next/dynamic` для ленты / галереи-для-своих / афиши по сессии (небо SochiLivingSky не снимается)
+
+### Ops
+- `deploy-staging-prebuilt.sh` и workflow staging сверяют версию по loopback, публичный health — только `ok`
+
 ## [1.6.154] — 2026-09-07
 
 ### Added
