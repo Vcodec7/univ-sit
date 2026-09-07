@@ -296,6 +296,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       onMouseEnter={() => {
         if (hasItems) setOpenMenu(id);
       }}
+      onMouseLeave={closeDesktopMenus}
       onFocusCapture={() => {
         if (hasItems) setOpenMenu(id);
       }}
@@ -388,7 +389,10 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
             <Bell size={18} />
           </span>
         )}
-        <div className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}>
+        <div
+          className={`nav-item nav-account${openMenu === 'account' ? ' is-open' : ''}`}
+          onMouseLeave={closeDesktopMenus}
+        >
           <button
             type="button"
             className="nav-icon-btn nav-account-trigger"

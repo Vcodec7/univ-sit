@@ -41,6 +41,9 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /a\.lift-hero__btn--lime:hover/);
   assert.match(css, /home-cta-split article:last-child/);
   assert.match(css, /a\.home-section-link:hover/);
+  assert.match(css, /\.glass-nav-inner/);
+  assert.match(css, /overflow:\s*visible\s*!important/);
+  assert.match(css, /\.nav-item:hover \.dropdown/);
 });
 
 test('globals container uses the shared shell token', () => {

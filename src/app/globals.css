@@ -159,7 +159,7 @@ button {
   top: 0;
   z-index: 10100; /* above cookie/onboarding sheets so «Вход» stays clickable */
   overflow: visible;
-  contain: layout;
+  contain: none;
   min-height: var(--nav-h);
   padding-top: env(safe-area-inset-top, 0px);
 }
@@ -590,7 +590,7 @@ html.has-session .nav-auth-slot {
   flex: 1 1 auto;
   min-width: 0;
   justify-content: flex-start !important;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .desktop-nav a {

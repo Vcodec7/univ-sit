@@ -70,6 +70,14 @@ if (lastRailNav && /position\s*:\s*absolute/i.test(lastRailNav) && !/static/i.te
   fails.push('home-rail-nav is absolutely over cards');
 }
 
+const unify = fs.readFileSync(path.join(root, 'src/app/layout-unify.css'), 'utf8');
+if (!/\.glass-nav-inner[\s\S]{0,120}overflow:\s*visible\s*!important/.test(unify)) {
+  fails.push('glass-nav-inner must stay overflow:visible so header menus are not clipped');
+}
+if (!/\.nav-item:hover \.dropdown[\s\S]{0,40}display:\s*none/.test(unify)) {
+  fails.push('nav hover must not paint a clipped dropdown sliver');
+}
+
 if (fails.length) {
   console.error('ui-guard FAIL');
   for (const f of fails) console.error(' -', f);
