@@ -46,6 +46,8 @@ test('home lift hero keeps Sochi copy, product deck and exclusive media', () => 
 
 test('free-now rail on lift home keeps full cards and hero buttons', () => {
   assert.match(freeNow, /lift-hero__btn--lime/);
+  const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
+  assert.match(unify, /--rail-peek/);
   assert.match(css, /home-page--lift \.free-now-card/);
   assert.match(css, /home-page--lift \.home-rail::-webkit-scrollbar/);
   assert.match(css, /--rail-cols/);

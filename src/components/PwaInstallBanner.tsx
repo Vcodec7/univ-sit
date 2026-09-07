@@ -28,6 +28,35 @@ declare global {
 const DISMISS_SESSION = 'yp-pwa-install-dismissed-session';
 const DISMISS_FOREVER = 'yp-pwa-install-never';
 const DISMISS_USER_PREFIX = 'yp-pwa-install-never-user:';
+const DISMISS_COOKIE = 'yp_pwa_never=1';
+
+function writePwaNever() {
+  try {
+    localStorage.setItem(DISMISS_FOREVER, '1');
+  } catch {
+    /* private mode */
+  }
+  try {
+    document.cookie = `${DISMISS_COOKIE};path=/;max-age=31536000;SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
+}
+
+function readPwaNever(userId = '') {
+  try {
+    if (localStorage.getItem(DISMISS_FOREVER) === '1') return true;
+    if (userId && localStorage.getItem(DISMISS_USER_PREFIX + userId) === '1') return true;
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (document.cookie.split(';').some((c) => c.trim().startsWith('yp_pwa_never='))) return true;
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
 
 function readDeferred(): BeforeInstallPromptEvent | null {
   if (typeof window === 'undefined') return null;
@@ -58,9 +87,7 @@ export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const forever =
-      localStorage.getItem(DISMISS_FOREVER) === '1' ||
-      (userId && localStorage.getItem(DISMISS_USER_PREFIX + userId) === '1');
+    const forever = readPwaNever(userId);
     let sessionDismissed = sessionStorage.getItem(DISMISS_SESSION) === '1';
     try {
       // After a silent service-worker reload, do not pop the install sheet again.
@@ -97,7 +124,9 @@ export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи
 
     const onBip = () => {
       const ev = readDeferred();
-      if (ev) setDeferred(ev);
+      if (!ev) return;
+      setDeferred(ev);
+      if (canShowPwa()) setVisible(true);
     };
     const onInstalled = () => {
       setDeferred(null);
@@ -120,6 +149,11 @@ export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи
       pendingReveal = false;
       const existing = readDeferred();
       if (existing) setDeferred(existing);
+      const ua = window.navigator.userAgent || '';
+      const iosNow =
+        /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      // Do not nag if the browser cannot install and this is not iOS add-to-home.
+      if (!existing && !iosNow) return;
       setVisible(true);
     };
 
@@ -174,9 +208,19 @@ export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи
   };
 
   const dismissForever = () => {
-    localStorage.setItem(DISMISS_FOREVER, '1');
-    if (userId) localStorage.setItem(DISMISS_USER_PREFIX + userId, '1');
-    sessionStorage.setItem(DISMISS_SESSION, '1');
+    writePwaNever();
+    if (userId) {
+      try {
+        localStorage.setItem(DISMISS_USER_PREFIX + userId, '1');
+      } catch {
+        /* ignore */
+      }
+    }
+    try {
+      sessionStorage.setItem(DISMISS_SESSION, '1');
+    } catch {
+      /* ignore */
+    }
     setVisible(false);
   };
 

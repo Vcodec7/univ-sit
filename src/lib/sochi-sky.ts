@@ -51,7 +51,7 @@ export function resolveSochiSky(date: Date = new Date()): SochiSky {
   const t = (hour - sunrise) / span;
   const sunVisible = hour >= sunrise - 0.15 && hour <= sunset + 0.15;
   const sunX = Math.min(0.92, Math.max(0.08, t)) * 100;
-  const sunY = 14 + (1 - Math.sin(Math.min(1, Math.max(0, t)) * Math.PI)) * 36;
+  const sunY = 10 + (1 - Math.sin(Math.min(1, Math.max(0, t)) * Math.PI)) * 14;
   const moonT = hour < 12 ? (hour + 12) / 24 : (hour - 12) / 24;
   const moonX = 10 + moonT * 80;
   const moonY = 16 + (1 - Math.sin(moonT * Math.PI)) * 28;

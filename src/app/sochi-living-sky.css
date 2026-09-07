@@ -6,6 +6,9 @@
   z-index: 3;
   overflow: hidden;
   pointer-events: none;
+  /* Keep sun/moon in the sky band — do not paint over the sea in the photo. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.45) 52%, transparent 64%);
+  mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.45) 52%, transparent 64%);
 }
 
 .sochi-sky__grade {
@@ -49,22 +52,22 @@
 }
 
 .sochi-sky__sun {
-  width: 9.2rem;
-  height: 9.2rem;
-  margin: -4.6rem 0 0 -4.6rem;
+  width: 5.6rem;
+  height: 5.6rem;
+  margin: -2.8rem 0 0 -2.8rem;
   border-radius: 50%;
   z-index: 2;
   background:
-    radial-gradient(circle at 50% 50%, #fff8d2 0 11%, #ffd45a 18%, rgba(255, 176, 64, 0.55) 30%, rgba(255, 140, 40, 0.16) 48%, transparent 70%);
+    radial-gradient(circle at 50% 50%, #fff8d2 0 14%, #ffd45a 26%, rgba(255, 176, 64, 0.4) 42%, transparent 68%);
   filter: none;
-  box-shadow: 0 0 42px rgba(255, 196, 64, 0.45);
+  box-shadow: 0 0 22px rgba(255, 196, 64, 0.35);
 }
 
 .sochi-sky[data-phase='sunset'] .sochi-sky__sun,
 .sochi-sky[data-phase='dawn'] .sochi-sky__sun {
-  width: 8.2rem;
-  height: 8.2rem;
-  margin: -4.1rem 0 0 -4.1rem;
+  width: 5.2rem;
+  height: 5.2rem;
+  margin: -2.6rem 0 0 -2.6rem;
   background:
     radial-gradient(circle at 50% 52%, #ffe0a0 0 8%, #ff7a32 18%, rgba(255, 70, 40, 0.28) 36%, transparent 58%);
 }
@@ -180,6 +183,21 @@
 @keyframes sochi-twinkle {
   0%, 100% { opacity: 0.25; }
   50% { opacity: 0.95; }
+}
+
+@media (max-width: 900px) {
+  .sochi-sky__swell {
+    display: none;
+  }
+  .sochi-sky__stars span {
+    animation: none;
+  }
+  .sochi-sky__sun {
+    width: 4.4rem;
+    height: 4.4rem;
+    margin: -2.2rem 0 0 -2.2rem;
+    box-shadow: 0 0 14px rgba(255, 196, 64, 0.28);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

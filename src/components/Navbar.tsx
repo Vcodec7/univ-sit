@@ -560,7 +560,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
   }, [headerMainPages.length, projects.length, clubs.length, spaces.length]);
 
 
-  /** Mobile: CTA always the same width; profile slot reserved so refresh does not shove Запись. */
+  /** Mobile: Запись + Вход for guests; profile icon when signed in. */
   const renderMobileHeaderActions = () => (
     <div className="nav-auth-mobile__row">
       <GuestAuthPrompt
@@ -572,16 +572,22 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       >
         Запись
       </GuestAuthPrompt>
-      <Link
-        href={profileHref}
-        prefetch
-        className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
-        aria-label="Профиль"
-        title="Профиль"
-        aria-current={isActive(profileHref) ? 'page' : undefined}
-      >
-        <UserCircle size={20} strokeWidth={2} aria-hidden />
-      </Link>
+      {isAuthenticated ? (
+        <Link
+          href={profileHref}
+          prefetch
+          className={`nav-icon-btn nav-auth-mobile__profile${isActive(profileHref) ? ' is-active' : ''}`}
+          aria-label="Профиль"
+          title="Профиль"
+          aria-current={isActive(profileHref) ? 'page' : undefined}
+        >
+          <UserCircle size={20} strokeWidth={2} aria-hidden />
+        </Link>
+      ) : (
+        <Link href="/login" className="nav-pill nav-pill--ghost nav-pill--mobile-login" title="Вход">
+          Вход
+        </Link>
+      )}
     </div>
   );
 

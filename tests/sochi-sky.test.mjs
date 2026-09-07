@@ -14,6 +14,9 @@ test('living Sochi sky uses Moscow time, fauna and reduced-motion', () => {
   assert.match(sky, /Europe\/Moscow/);
   assert.match(sky, /sunrise: 6\.55 - tilt/);
   assert.match(sky, /moonVisible: phase === 'night' \|\| phase === 'dusk'/);
+  assert.match(sky, /\* 14/);
+  assert.match(css, /mask-image/);
+  assert.match(css, /max-width: 900px/);
   assert.doesNotMatch(overlay, /sochi-sky__birds/);
   assert.doesNotMatch(overlay, /sochi-sky__dolphin/);
   assert.match(overlay, /data-phase/);

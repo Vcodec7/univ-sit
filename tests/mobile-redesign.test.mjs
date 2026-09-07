@@ -28,7 +28,9 @@ test('mobile sheet menu is chips, not a long row list', () => {
   assert.match(unify, /\.mobile-menu__chips \{/);
 });
 
-test('mobile home keeps one booking CTA and actionable deck cards', () => {
+test('mobile home keeps one booking CTA and visible login', () => {
+  assert.match(nav, /nav-pill--mobile-login/);
+  assert.match(nav, /href="\/login"/);
   assert.match(page, /label: 'Записаться'/);
   assert.match(hero, /lift-deck__go/);
   assert.match(css, /lift-hero__lead \{\s*display: none;/);
@@ -39,6 +41,13 @@ test('mobile home keeps one booking CTA and actionable deck cards', () => {
   assert.match(unify, /border-radius: 0 !important/);
   assert.match(hero, /SochiLivingSky/);
   assert.match(hero, /lift-deck__glyph/);
+});
+
+test('pwa install remembers never-show in cookie and storage', () => {
+  const src = readFileSync(join(root, '../src/components/PwaInstallBanner.tsx'), 'utf8');
+  assert.match(src, /yp_pwa_never/);
+  assert.match(src, /writePwaNever/);
+  assert.match(src, /!existing && !iosNow/);
 });
 
 test('profile card stacks identity then actions then extras', () => {

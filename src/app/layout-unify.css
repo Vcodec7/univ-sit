@@ -129,6 +129,24 @@
     min-width: 0 !important;
     min-height: 0 !important;
   }
+  .glass-nav-end .nav-pill--mobile-login {
+    height: 2.25rem !important;
+    min-height: 2.25rem !important;
+    width: auto !important;
+    min-width: 3.6rem;
+    padding: 0 0.7rem !important;
+    font-size: 0.8rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    color: #0a0c2a !important;
+    background: #fff !important;
+    border: 1px solid rgba(10, 12, 42, 0.14) !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    font-weight: 750 !important;
+  }
   .glass-nav-end .nav-pill--mobile-cta {
     height: 2.25rem !important;
     min-height: 2.25rem !important;
@@ -2008,3 +2026,26 @@ body:has(.dashboard-page .messages-root) .main-content > div {
     border-radius: 50% !important;
   }
 }
+
+/* Mobile rails: card almost full width, tiny peek — not 78vw/86vw leaving a hole. */
+@media (max-width: 899px) {
+  .home-page .home-rail,
+  .home-page.home-page--lift .home-rail,
+  .home-sections .free-now-grid,
+  .home-sections .grid-cards {
+    --rail-peek: 1.15rem;
+    gap: 0.55rem !important;
+  }
+  .home-page .home-rail__slide,
+  .home-page.home-page--lift .home-rail__slide,
+  .home-sections .free-now-card,
+  .home-sections .grid-cards > .catalog-card,
+  .home-sections .grid-cards > .yp-feed-card,
+  .home-sections .grid-cards > .free-now-card,
+  .home-sections .grid-cards > article {
+    flex: 0 0 calc(100% - var(--rail-peek, 1.15rem)) !important;
+    width: calc(100% - var(--rail-peek, 1.15rem)) !important;
+    max-width: none !important;
+  }
+}
+
