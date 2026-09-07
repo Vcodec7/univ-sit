@@ -185,18 +185,10 @@
   50% { opacity: 0.95; }
 }
 
-@media (max-width: 900px) {
-  .sochi-sky__swell {
-    display: none;
-  }
-  .sochi-sky__stars span {
-    animation: none;
-  }
-  .sochi-sky__sun {
-    width: 4.4rem;
-    height: 4.4rem;
-    margin: -2.2rem 0 0 -2.2rem;
-    box-shadow: 0 0 14px rgba(255, 196, 64, 0.28);
+@media (max-width: 900px), (pointer: coarse) {
+  /* Mask + blend layers still cost compositor time even with animations off. */
+  .sochi-sky {
+    display: none !important;
   }
 }
 

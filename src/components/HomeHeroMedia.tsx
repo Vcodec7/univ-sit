@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isLiteMotionDevice } from '@/lib/prefer-lite-motion';
 
 /** Exactly one layer: photo OR video (never both competing). */
 export default function HomeHeroMedia({
@@ -13,7 +14,13 @@ export default function HomeHeroMedia({
   wantVideo: boolean;
 }) {
   const [videoFailed, setVideoFailed] = useState(false);
-  const showVideo = wantVideo && Boolean(video) && !videoFailed;
+  const [allowMotionVideo, setAllowMotionVideo] = useState(false);
+
+  useEffect(() => {
+    setAllowMotionVideo(!isLiteMotionDevice());
+  }, []);
+
+  const showVideo = wantVideo && Boolean(video) && !videoFailed && allowMotionVideo;
 
   return (
     <div className="svc-hero__media">

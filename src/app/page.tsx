@@ -33,9 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const dynamic = 'force-dynamic';
-// Do not force-static: admin hero mediaKind must apply after deploy without a
-// long stale bake that shows photo while DB says video.
+export const revalidate = 60;
+// ISR: phones must not wait on Prisma for every tap. Hero video still stays
+// poster-only on coarse pointers; admin mediaKind lands within a minute.
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();

@@ -34,7 +34,7 @@ function CtaLink({ href, className, children }: { href: string; className: strin
     );
   }
   return (
-    <Link href={href} className={className} prefetch>
+    <Link href={href} className={className} prefetch={false}>
       {children}
     </Link>
   );
@@ -171,7 +171,7 @@ export default function HomeServiceHero({
                 {inner}
               </GuestAuthPrompt>
             ) : (
-              <Link key={card.id} href={card.href} className="lift-deck__card" prefetch aria-label={card.title}>
+              <Link key={card.id} href={card.href} className="lift-deck__card" prefetch={false} aria-label={card.title}>
                 {inner}
               </Link>
             );

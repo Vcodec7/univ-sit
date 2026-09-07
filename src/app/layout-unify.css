@@ -548,6 +548,17 @@
   .yp-profile__collectible-glyph {
     filter: none !important;
   }
+  .sochi-sky {
+    display: none !important;
+  }
+  .lift-hero__btn--ghost,
+  .lift-hero__btn--solid {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .svc-hero__video {
+    display: none !important;
+  }
 }
 
 @media (hover: none) {

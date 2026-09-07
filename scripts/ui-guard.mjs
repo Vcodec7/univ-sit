@@ -89,6 +89,9 @@ if (!/\.nav-dropdown-portal\.dropdown[\s\S]{0,180}left:\s*auto/.test(unify)) {
 if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1fr\s*!important/.test(unify)) {
   fails.push('home feed card actions must stack at equal width');
 }
+if (!/\.sochi-sky \{\s*display:\s*none\s*!important/.test(unify)) {
+  fails.push('phone layout must hide living-sky compositor layers');
+}
 
 if (fails.length) {
   console.error('ui-guard FAIL');
