@@ -376,7 +376,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
           Вход
         </Link>
         {modOn(siteSettings, 'registration') ? (
-          <Link href="/register" className="nav-pill nav-pill--solid" title="Регистрация">
+          <Link href="/register" className="nav-pill nav-pill--solid nav-pill--register" title="Регистрация">
             Регистрация
           </Link>
         ) : null}
@@ -535,7 +535,7 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       const reserveMore = 72;
       const budget = Math.max(120, nav.clientWidth - reserveMore);
       const hidden: string[] = [];
-      const keepVisible = new Set(['projects', 'clubs', 'spaces', 'events', 'news']);
+      const keepVisible = new Set(['projects', 'clubs', 'spaces']);
       for (const node of nodes) {
         const id = node.dataset.navId || '';
         if (!id || id === 'more') continue;
@@ -562,6 +562,27 @@ export default function Navbar({ spaces = [], clubs = [], projects = [], pages =
       window.removeEventListener('resize', measure);
     };
   }, [headerMainPages.length, projects.length, clubs.length, spaces.length]);
+
+  useLayoutEffect(() => {
+    if (!openMenu) return;
+    const item =
+      openMenu === 'account'
+        ? document.querySelector<HTMLElement>('.glass-nav .nav-account.is-open')
+        : navRef.current?.querySelector<HTMLElement>('.nav-item.is-open');
+    const drop = item?.querySelector<HTMLElement>('.dropdown');
+    const trigger = item?.querySelector<HTMLElement>('button, a');
+    if (!drop || !trigger) return;
+    const r = trigger.getBoundingClientRect();
+    drop.style.position = 'fixed';
+    drop.style.top = `${Math.round(r.bottom + 6)}px`;
+    drop.style.transform = 'none';
+    drop.style.right = 'auto';
+    drop.style.zIndex = '20050';
+    const width = Math.max(drop.offsetWidth, 220);
+    let left = openMenu === 'more' || openMenu === 'account' ? r.right - width : r.left;
+    left = Math.max(12, Math.min(left, window.innerWidth - width - 12));
+    drop.style.left = `${Math.round(left)}px`;
+  }, [openMenu]);
 
 
   /** Mobile: Запись + Вход for guests; profile icon when signed in. */

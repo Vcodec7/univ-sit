@@ -44,6 +44,8 @@ test('layout unify is last-win and catalog header wraps', () => {
   assert.match(css, /\.glass-nav-inner/);
   assert.match(css, /overflow:\s*visible\s*!important/);
   assert.match(css, /\.nav-item:hover \.dropdown/);
+  assert.match(css, /\.desktop-nav \{/);
+  assert.match(css, /overflow:\s*hidden\s*!important/);
 });
 
 test('globals container uses the shared shell token', () => {

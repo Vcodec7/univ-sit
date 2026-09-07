@@ -611,18 +611,14 @@
     -webkit-backdrop-filter: none !important;
     border-top: 3px solid #afca03 !important;
   }
-  .lift-deck__card:nth-child(2) {
-    border-top-color: #0a7aa8 !important;
-  }
-  .lift-deck__card:nth-child(3) {
-    border-top-color: #7ec8e3 !important;
-  }
+  .lift-deck__card:nth-child(2),
+  .lift-deck__card:nth-child(3),
   .lift-deck__card:nth-child(4) {
     border-top-color: #afca03 !important;
   }
   .lift-deck__card:hover {
     background: #f5fbfe !important;
-    transform: translateY(-4px);
+    transform: none;
   }
   .lift-deck__kicker {
     color: #0a7aa8 !important;
@@ -2182,10 +2178,31 @@ a.home-section-link:hover,
 
 /* Header menus: never clip a shadow sliver under the bar on hover. */
 .glass-nav,
-.glass-nav-inner,
-.desktop-nav {
+.glass-nav-inner {
   overflow: visible !important;
   contain: none !important;
+}
+.glass-nav-inner {
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+}
+.glass-nav-end {
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+}
+.desktop-nav {
+  overflow: hidden !important;
+  min-width: 0;
+  z-index: 1;
+}
+.nav-item.is-open .dropdown {
+  position: fixed !important;
+  z-index: 20050 !important;
+}
+@media (max-width: 1180px) {
+  .nav-auth-desktop .nav-pill--register {
+    display: none !important;
+  }
 }
 .nav-item .dropdown {
   max-height: min(70vh, 28rem);
