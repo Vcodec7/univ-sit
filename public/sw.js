@@ -1,4 +1,4 @@
-const CACHE = "sochi-shell-v39-nav";
+const CACHE = "sochi-shell-v40-nav";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/offline.html",
@@ -6,7 +6,6 @@ const PRECACHE = [
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
-  "/offline-games/",
   "/offline-games/index.html",
   "/offline-games/snake.html",
   "/offline-games/tetris.html",
@@ -63,7 +62,9 @@ function offlinePage() {
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).catch(() => undefined)
+    caches.open(CACHE).then((cache) =>
+      Promise.all(PRECACHE.map((u) => cache.add(u).catch(() => undefined)))
+    )
   );
 });
 

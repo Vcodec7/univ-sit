@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.152] — 2026-09-07
+
+### Fixed
+- Nginx: один `X-Frame-Options: DENY` (без пары DENY + SAMEORIGIN от Next)
+- PWA: `/service-worker.js` отдаёт SW; precache без 308 на `/offline-games/`
+- Меньше фоновых сессий: Метрика без bounce/clickmap, iframe Госуслуг не на главной
+
 ## [1.6.151] — 2026-09-07
 
 ### Fixed

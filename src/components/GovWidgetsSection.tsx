@@ -14,8 +14,8 @@ type Props = {
   variant?: 'compact' | 'full';
 };
 
-function WidgetLink({ widget }: { widget: GovWidget }) {
-  if (widget.kind === 'iframe') {
+function WidgetLink({ widget, allowIframe = true }: { widget: GovWidget; allowIframe?: boolean }) {
+  if (allowIframe && widget.kind === 'iframe') {
     return (
       <div className="gov-widget-card">
         <div className="gov-widget-card-head">
@@ -72,7 +72,7 @@ export default function GovWidgetsSection({
         </div>
         <div className="gov-strip-actions">
           {widgets.map((w) => (
-            <WidgetLink key={w.id} widget={w} />
+            <WidgetLink key={w.id} widget={w} allowIframe={false} />
           ))}
         </div>
       </aside>

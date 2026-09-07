@@ -78,6 +78,16 @@ if [[ -f "$EXTRACT/prisma.config.ts" ]]; then
   sudo -n rsync -a "$EXTRACT/prisma.config.ts" "$APP/prisma.config.ts"
 fi
 
+# Security headers live in nginx only (Next no longer sends X-Frame-Options).
+# DENY matches CSP frame-ancestors 'none' and drops the DENY+SAMEORIGIN pair.
+for f in /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf; do
+  [[ -f "$f" ]] || continue
+  sudo -n sed -i 's/add_header X-Frame-Options "SAMEORIGIN" always;/add_header X-Frame-Options "DENY" always;/' "$f" || true
+done
+if sudo -n nginx -t >/dev/null 2>&1; then
+  sudo -n systemctl reload nginx || sudo -n nginx -s reload || true
+fi
+
 NEW_SHA="$(sha256sum "$EXTRACT/prisma/schema.prisma" | awk '{print $1}')"
 OLD_SHA="$(sudo -n cat "$APP/.yp-schema-sha" 2>/dev/null || true)"
 

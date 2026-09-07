@@ -49,9 +49,9 @@ function initMetrika(id: string) {
   }
 
   w.ym?.(num, 'init', {
-    clickmap: true,
+    clickmap: false,
     trackLinks: true,
-    accurateTrackBounce: true,
+    accurateTrackBounce: false,
     webvisor: false,
   });
 }
@@ -69,12 +69,18 @@ export default function YandexMetrika({ counterId, requireConsent = true }: Prop
     if (!id || !/^\d+$/.test(id)) return;
 
     const tryLoad = () => {
-      if (!requireConsent) {
-        initMetrika(id);
-        return;
-      }
-      const consent = readCookieConsent();
-      if (consent?.analytics) initMetrika(id);
+      const start = () => {
+        if (!requireConsent) {
+          initMetrika(id);
+          return;
+        }
+        const consent = readCookieConsent();
+        if (consent?.analytics) initMetrika(id);
+      };
+      const idle = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number })
+        .requestIdleCallback;
+      if (typeof idle === 'function') idle(start, { timeout: 4000 });
+      else window.setTimeout(start, 2500);
     };
 
     tryLoad();
