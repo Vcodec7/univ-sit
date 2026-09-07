@@ -10,13 +10,14 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 1. Правки кода пакетом, не по файлу с пушем.
 2. Код: `npm test && npm run ui:guard`. Только скиллы/доки — тесты не обязательны.
 3. Commit + push + PR (ветка `cursor/home-feed-unify-a6b1`, PR #8 — не плодить параллельные PR без нужды).
-4. На ty: `bash scripts/apply-staging.sh` (или `npm run ty`). Скиллы-only — деплой не обязателен.
+4. На ty: `bash scripts/apply-staging.sh prebuilt` (или `npm run ty`). Скиллы-only — деплой не обязателен.
 5. `bash scripts/smoke-sites.sh --staging-only`
 6. Прод только после «одобряю»: `CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh`
+7. После кода (не полный org-kit): `SKIP_ORG_LIVE=1 SKIP_PUBLISH=1 bash scripts/post-request-handoff.sh`
 
 Не запускать `docker compose ... --build` на VPS (OOM). Только CSS бренда: `bash scripts/apply-staging.sh static`.
 
-Версию приложения бампать **только при смене app-кода**. Скиллы-only — без bump (или одна строка changelog). После кода: handoff `SKIP_ORG_LIVE=1`, если полный org-kit не нужен.
+Версию приложения бампать **только при смене app-кода**. Скиллы-only — без bump (или одна строка changelog).
 
 ## Домены и SSH
 
@@ -28,8 +29,8 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 
 ## Не делать заново (ops)
 
-- **X-Frame-Options:** только nginx `DENY`. Не Next `DENY` + nginx `SAMEORIGIN` (конфликт заголовков). `apply-staging` / prebuilt патчит live nginx `SAMEORIGIN` → `DENY`.
-- **PWA:** `/sw.js` + rewrite `/service-worker.js`. Precache **не** включать `/offline-games/` (308). `cache.add` — per-file `catch`, не валить весь SW.
+- **X-Frame-Options:** Next **без** этого заголовка; только nginx `DENY`. Не дублировать Next+nginx (конфликт). `apply-staging` / prebuilt патчит live nginx `SAMEORIGIN` → `DENY`.
+- **PWA:** `/sw.js` + rewrite `/service-worker.js` → `/sw.js`. Precache **не** включать `/offline-games/` (directory URL → 308). `cache.add` — per-file `catch`, не валить весь SW.
 - **Метрика:** idle-load; без clickmap / `accurateTrackBounce`. Виджеты госорганов на главной — **ссылки**, не iframe.
 - **QA на ty:** ящики `qa-admin@sochi.ru`, `mod@`, `part@`, `user@`, `scanner@`, `private@`. Пароль **не писать в скилл** — из `scripts/reset-staging-qa-passwords` / `apply-staging`. Не коммитить `.env`.
 
@@ -55,4 +56,4 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 
 ## Секреты
 
-Не коммитить `.env`, не печатать пароли БД/Redis/NextAuth из `docker inspect`. Не коммитить qa json / скрины webp из `docs/perf` без нужды.
+Не коммитить `.env`, не печатать пароли БД/Redis/NextAuth из `docker inspect`. Не коммитить `docs/perf/qa-ty-roles-*.json` и `homepage-layout-v1.6.90.webp`.

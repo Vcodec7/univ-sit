@@ -7,7 +7,7 @@ description: Visual/UX work on YoungPortal from screenshots — contrast, header
 
 Читай скилл **сразу**, если пользователь прислал скрины или пишет про полоску, пустое место, «не видно», профиль, бронь, V, футер, игры.
 
-Тексты в интерфейсе — **по-русски** (не сырые PENDING/APPROVED).
+Тексты в интерфейсе — **по-русски** (не сырые PENDING/APPROVED). Валюта — **М-баллы**.
 
 ## Не делать заново
 
@@ -16,10 +16,10 @@ description: Visual/UX work on YoungPortal from screenshots — contrast, header
 - Полноэкранный иммерсив на `/games` (хаб). Иммерсив только `/games/<игра>`.
 - **Не красить скролл `html`/`body` через `::-webkit-scrollbar { width }`.** Overlay превращается в колонку справа от шапки и прыгает при refresh. Цвет — только у внутренних рельс (`.home-rail`).
 - **Не unmount / `display:none` неба (`SochiLivingSky`) на `pointer:coarse` или узком `max-width`.** Луна пропадает, CLS после гидрации. Lite = CSS: выключить swell/звёзды, небо оставить.
-- **Мобилка: прятать `.lift-deck`** (четыре иконки между героем и «Сейчас свободно»). На десктопе колоду оставить.
-- **Высота героя:** на мобилке `--yp-hero-h` с fallback дока (`env(safe-area)` / фиксированный clamp), иначе refresh прыгает.
-- **Главная / события:** не возвращать `WeeklyAfisha` / «афиша недели». Только живой `UpcomingEvents`.
-- **Документы:** шаблоны = категория «Шаблоны», DOCX через `/api/documents/templates/[id]`. В официальном каталоге — только PDF. `/documents/verify` — свёрстанная форма, не сырой dump.
+- **Мобилка: прятать `.lift-deck`** при `max-width: 860px` (четыре иконки между героем и «Сейчас свободно»). На десктопе колоду оставить.
+- **Высота героя:** `--yp-hero-h` на мобилке **вычитает док** (`env(safe-area)` / clamp), иначе refresh прыгает. Луна: clamp Y, не уезжает за край.
+- **Главная / события:** не возвращать `WeeklyAfisha` / VK «афиша недели». Только `UpcomingEvents`, заголовок **Афиша**.
+- **Документы:** шаблоны = категория «Шаблоны», DOCX через `/api/documents/templates/[id]`. Не превью-карточки шаблонов на главной. В официальном каталоге — только PDF. `/documents/verify` — свёрстанная форма, не сырой dump.
 - **Поиск:** никогда нулевой `padding-left` у `.filter-bar__input` / `.space-filter-bar__input` (иконка наезжает на текст). Last-win в `layout-unify.css`.
 - **Луна:** inset blur-сфера, не `inset -14px … 0 0` (ребро «монеты»).
 - **Иконки шапки — к правому краю бара** (`margin-left: auto`, без `min-width` колодца и без gutter от кастомного скролла).
