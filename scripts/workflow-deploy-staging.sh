@@ -145,18 +145,33 @@ yp_ssh "bash /var/tmp/yp-staging-remote.sh; ec=\$?; rm -f /var/tmp/yp-staging-re
 
 rm -f "$ARCHIVE"
 
-# Verify public health reports the package version we just shipped (skip on sync-only).
+# Public health has no version (TZ). Confirm ok over HTTPS; version on loopback :3001.
 if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
-  echo "==> verify public version == $EXPECTED_VER"
+  echo "==> verify public health ok (no version)"
   ok=0
   for i in 1 2 3 4 5; do
     body="$(curl -fsS --max-time 25 "https://${STAGING_DOMAIN}/api/health" || true)"
     echo "  try $i: $body"
-    if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+    if echo "$body" | grep -q '"ok":true' && ! echo "$body" | grep -q '"version"'; then
       ok=1
       break
     fi
     sleep 3
+  done
+  if [[ "$ok" != "1" ]]; then
+    echo "ERROR: public health missing ok or still leaks version." >&2
+    exit 1
+  fi
+  echo "==> verify loopback version == $EXPECTED_VER"
+  ok=0
+  for i in 1 2 3 4 5; do
+    body="$(yp_ssh "curl -fsS --max-time 8 http://127.0.0.1:3001/api/health" || true)"
+    echo "  loopback try $i: $body"
+    if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+      ok=1
+      break
+    fi
+    sleep 2
   done
   if [[ "$ok" != "1" ]]; then
     echo "ERROR: staging health version mismatch (expected $EXPECTED_VER). Deploy NOT confirmed." >&2

@@ -120,6 +120,7 @@ bash scripts/verify-kit-scripts.sh
 | `REDIS_URL` | лимиты / кэш флагов |
 | `CRON_SECRET` | vk-sync / cron HTTP |
 | `TECH_EMAIL` / `TECH_BOOTSTRAP_PASSWORD` | TECH ops |
+| `SMS_API_URL` / `SMS_API_KEY` / `SMS_FROM` | запасной SMS-шлюз, если не заполнена админка → Настройки → SMS |
 | `MODULE_FLAGS_FORCE_ON` | аварийно всё on |
 | `NODE_EXTRA_CA_CERTS` | CA Минцифры для MAX |
 

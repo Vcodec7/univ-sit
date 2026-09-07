@@ -3,17 +3,19 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import type { CabinetNavId } from '@/lib/cabinet-nav';
+import type { CabinetNavId, CabinetNavLeaf } from '@/lib/cabinet-nav';
+import CabinetHubTabs from '@/components/CabinetHubTabs';
 
 type Props = {
   title: string;
   lead?: string;
   children: ReactNode;
   section?: CabinetNavId;
+  tabs?: CabinetNavLeaf[];
 };
 
 /** Cabinet leaf content. Sidebar lives in dashboard layout (CabinetShell). */
-export default function CabinetSubpage({ title, lead, children }: Props) {
+export default function CabinetSubpage({ title, lead, children, tabs }: Props) {
   return (
     <>
       <header className="profile-subhead">
@@ -25,6 +27,7 @@ export default function CabinetSubpage({ title, lead, children }: Props) {
           {lead ? <p className="profile-view__lead">{lead}</p> : null}
         </div>
       </header>
+      {tabs?.length ? <CabinetHubTabs tabs={tabs} /> : null}
       {children}
     </>
   );

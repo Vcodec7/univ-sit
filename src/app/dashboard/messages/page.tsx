@@ -40,6 +40,8 @@ import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
 import MessageBodyText from '@/components/MessageBodyText';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
+import CabinetHubTabs from '@/components/CabinetHubTabs';
+import { SOCIAL_TABS } from '@/lib/cabinet-nav';
 import {
   formatEventWhen,
   parseMessageMeta,
@@ -880,6 +882,7 @@ function MessagesInner() {
 
   return (
     <div className={`messages-root${inThread ? ' is-thread' : ''}`}>
+      {!inThread ? <CabinetHubTabs tabs={SOCIAL_TABS} /> : null}
       {!inThread ? (
         <div className="messages-tabs" role="tablist" aria-label="Разделы сообщений">
           {visibleTabs.map((t) => (

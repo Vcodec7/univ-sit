@@ -7,6 +7,7 @@ import {
   Award,
   BookOpen,
   Briefcase,
+  ChevronDown,
   Crown,
   FileText,
   Gamepad2,
@@ -15,9 +16,7 @@ import {
   LayoutGrid,
   Leaf,
   LogOut,
-  Medal,
   MessageCircle,
-  Settings,
   Shield,
   ShoppingBag,
   Ticket,
@@ -26,14 +25,25 @@ import {
 } from 'lucide-react';
 import { signOutLogged } from '@/lib/sign-out-logged';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
-import { CABINET_NAV, cabinetNavIdFromPath, type CabinetNavId } from '@/lib/cabinet-nav';
+import {
+  CABINET_NAV,
+  cabinetLeafIdFromPath,
+  cabinetModuleOn,
+  cabinetNavIdFromPath,
+  filterCabinetLeaves,
+  type CabinetNavId,
+  type CabinetNavItem,
+  type CabinetNavLeaf,
+} from '@/lib/cabinet-nav';
 
 const ICONS = {
   overview: User,
   showcase: LayoutGrid,
-  settings: Settings,
+  settings: FileText,
+  social: MessageCircle,
   friends: Users,
   messages: MessageCircle,
+  bookings: Ticket,
   tickets: Ticket,
   applications: FileText,
   portfolio: Briefcase,
@@ -41,8 +51,10 @@ const ICONS = {
   guides: BookOpen,
   games: Gamepad2,
   shop: ShoppingBag,
+  progress: Award,
   achievements: Award,
-  awards: Medal,
+  awards: Award,
+  more: ChevronDown,
 } as const;
 
 type Props = {
@@ -68,7 +80,9 @@ export default function CabinetMenu({
 }: Props) {
   const pathname = usePathname() || '/dashboard';
   const activeId = current || cabinetNavIdFromPath(pathname);
+  const leafId = cabinetLeafIdFromPath(pathname);
   const [moduleFlags, setModuleFlags] = useState<Record<string, boolean> | null>(null);
+  const [moreOpen, setMoreOpen] = useState(activeId === 'more');
 
   useEffect(() => {
     fetchPublicStatusCached()
@@ -79,38 +93,59 @@ export default function CabinetMenu({
       .catch(() => setModuleFlags({}));
   }, []);
 
-  const modOn = (key?: string) => !key || moduleFlags == null || moduleFlags[key] !== false;
+  useEffect(() => {
+    if (activeId === 'more') setMoreOpen(true);
+  }, [activeId]);
+
+  const modOn = (key?: string) => cabinetModuleOn(moduleFlags, key);
   const isStaff = role === 'ADMIN' || role === 'MODERATOR';
+
+  const resolveHref = (item: CabinetNavItem) => {
+    if (item.id === 'social' && !modOn('messaging')) return '/dashboard/friends';
+    if (item.id === 'bookings' && !modOn('events')) return '/dashboard/applications';
+    return item.href;
+  };
 
   const groups = CABINET_NAV.map((section) => ({
     ...section,
-    items: section.items.filter((item) => modOn(item.module)),
+    items: section.items
+      .map((item) => {
+        if (!item.children) return item;
+        return { ...item, children: filterCabinetLeaves(item.children, moduleFlags) };
+      })
+      .filter((item) => {
+        if (item.children) return item.children.length > 0;
+        return filterCabinetLeaves([item], moduleFlags).length > 0;
+      }),
   })).filter((section) => section.items.length > 0);
 
-  const renderLink = (item: (typeof groups)[number]['items'][number], compact?: boolean) => {
-    const Icon = ICONS[item.id];
-    const active = item.id === activeId;
+  const renderLink = (item: CabinetNavLeaf, compact?: boolean, hrefOverride?: string) => {
+    const Icon = ICONS[item.id] || FileText;
+    const href = hrefOverride || item.href;
+    const active = item.id === activeId || item.id === leafId;
+    const showMsgBadge = (item.id === 'social' || item.id === 'messages') && unreadMessages > 0;
+    const showTicketBadge = (item.id === 'bookings' || item.id === 'tickets') && upcomingCount > 0;
     return (
       <Link
         key={item.id}
-        href={item.href}
+        href={href}
         title={item.label}
         aria-label={item.label}
         aria-current={active ? 'page' : undefined}
         prefetch
         className={`dashboard-nav-btn${active ? ' is-active' : ''}${
-          item.id === 'achievements' ? ' is-achievements' : ''
+          item.id === 'progress' || item.id === 'achievements' ? ' is-achievements' : ''
         }${compact ? ' cabinet-rail-strip__btn' : ''}`}
       >
         <span className="dashboard-nav-icon-wrap">
           <Icon size={compact ? 16 : 17} />
-          {item.id === 'tickets' && upcomingCount > 0 ? (
+          {showTicketBadge ? (
             <span className="dashboard-nav-badge">{upcomingCount > 999 ? '999+' : upcomingCount}</span>
           ) : null}
-          {item.id === 'messages' && unreadMessages > 0 ? (
+          {showMsgBadge ? (
             <span className="dashboard-nav-badge">{unreadMessages > 99 ? '99+' : unreadMessages}</span>
           ) : null}
-          {item.id === 'achievements' && achievementLegend ? (
+          {(item.id === 'progress' || item.id === 'achievements') && achievementLegend ? (
             <Crown size={11} color="#ca8a04" className="dashboard-nav-crown" aria-hidden />
           ) : null}
         </span>
@@ -119,10 +154,57 @@ export default function CabinetMenu({
     );
   };
 
+  const renderMore = (item: CabinetNavItem, compact?: boolean) => {
+    const kids = item.children || [];
+    if (!kids.length) return null;
+    if (compact) {
+      return (
+        <details key="more" className="cabinet-rail-more" open={activeId === 'more'}>
+          <summary className="cabinet-rail-strip__btn dashboard-nav-btn">{item.label}</summary>
+          <div className="cabinet-rail-more__list">
+            {kids.map((child) => renderLink(child, true))}
+          </div>
+        </details>
+      );
+    }
+    return (
+      <div key="more" className="dashboard-nav-more">
+        <button
+          type="button"
+          className={`dashboard-nav-btn${activeId === 'more' ? ' is-active' : ''}`}
+          aria-expanded={moreOpen}
+          onClick={() => setMoreOpen((v) => !v)}
+        >
+          <span className="dashboard-nav-icon-wrap">
+            <ChevronDown size={17} className={moreOpen ? 'dashboard-nav-more__chev is-open' : 'dashboard-nav-more__chev'} />
+          </span>
+          <span className="dashboard-nav-label">{item.label}</span>
+        </button>
+        {moreOpen
+          ? kids.map((child) => (
+              <Link
+                key={child.id}
+                href={child.href}
+                className={`dashboard-nav-more__link${leafId === child.id ? ' is-on' : ''}`}
+                prefetch
+              >
+                {child.label}
+              </Link>
+            ))
+          : null}
+      </div>
+    );
+  };
+
+  const renderItem = (item: CabinetNavItem, compact?: boolean) => {
+    if (item.children?.length) return renderMore(item, compact);
+    return renderLink(item, compact, resolveHref(item));
+  };
+
   if (variant === 'strip') {
     return (
       <nav className="cabinet-rail-strip" aria-label="Разделы кабинета">
-        {groups.flatMap((section) => section.items.map((item) => renderLink(item, true)))}
+        {groups.flatMap((section) => section.items.map((item) => renderItem(item, true)))}
       </nav>
     );
   }
@@ -134,7 +216,7 @@ export default function CabinetMenu({
             <div key={section.group} className="dashboard-menu__group">
               <p className="dashboard-aside-nav-label">{section.group}</p>
               <div className="dashboard-nav dashboard-nav--labeled">
-                {section.items.map((item) => renderLink(item))}
+                {section.items.map((item) => renderItem(item))}
               </div>
             </div>
           ))}

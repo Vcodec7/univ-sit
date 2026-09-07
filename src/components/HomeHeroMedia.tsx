@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { preferStillHeroVideo } from '@/lib/prefer-lite-motion';
+
+function rasterPoster(src: string) {
+  return Boolean(src) && !/\.svg(\?|#|$)/i.test(src);
+}
 
 /** Exactly one layer: photo OR video (never both competing). */
 export default function HomeHeroMedia({
@@ -36,17 +41,20 @@ export default function HomeHeroMedia({
           preload="metadata"
           onError={() => setVideoFailed(true)}
         />
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+      ) : rasterPoster(poster) ? (
+        <Image
           className="svc-hero__img"
           src={poster}
           alt=""
-          width={1600}
-          height={900}
-          decoding="async"
+          fill
+          sizes="(max-width: 860px) 100vw, 1600px"
+          quality={70}
+          priority
           fetchPriority="high"
         />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="svc-hero__img" src={poster} alt="" decoding="async" fetchPriority="high" />
       )}
     </div>
   );

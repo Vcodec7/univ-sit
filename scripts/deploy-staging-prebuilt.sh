@@ -158,19 +158,34 @@ yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-stg-pre-remote.sh"
 rm -f "$REMOTE_SCRIPT"
 yp_ssh "bash /var/tmp/yp-stg-pre-remote.sh; ec=\$?; rm -f /var/tmp/yp-stg-pre-remote.sh; exit \$ec"
 
-echo "==> verify https://${STAGING_DOMAIN}/api/health == ${EXPECTED_VER}"
+echo "==> verify https://${STAGING_DOMAIN}/api/health is public (ok, no version)"
 ok=0
 for i in 1 2 3 4 5 6; do
   body="$(curl -fsS --max-time 12 "https://${STAGING_DOMAIN}/api/health" || true)"
   echo "  try $i: $body"
-  if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+  if echo "$body" | grep -q '"ok":true' && ! echo "$body" | grep -q '"version"'; then
     ok=1
     break
   fi
   sleep 3
 done
 if [[ "$ok" != "1" ]]; then
-  echo "ERROR: staging version mismatch (expected $EXPECTED_VER)" >&2
+  echo "ERROR: public health must be {ok} without version" >&2
+  exit 1
+fi
+echo "==> verify version ${EXPECTED_VER} via staging loopback :3001"
+ok=0
+for i in 1 2 3 4 5 6; do
+  body="$(yp_ssh "curl -fsS --max-time 8 http://127.0.0.1:3001/api/health" || true)"
+  echo "  loopback try $i: $body"
+  if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+    ok=1
+    break
+  fi
+  sleep 2
+done
+if [[ "$ok" != "1" ]]; then
+  echo "ERROR: staging version mismatch (expected $EXPECTED_VER on loopback)" >&2
   exit 1
 fi
 echo "==> ty ready https://${STAGING_DOMAIN}/"

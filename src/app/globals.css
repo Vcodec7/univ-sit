@@ -5750,6 +5750,11 @@ input, textarea, select {
   box-sizing: border-box;
 }
 
+.dashboard-nav--labeled {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
 a.dashboard-nav-btn {
   text-decoration: none;
   cursor: pointer;
@@ -5816,6 +5821,83 @@ a.dashboard-nav-btn {
   position: absolute;
   top: -5px;
   right: -6px;
+}
+
+.dashboard-nav-more {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.dashboard-nav-more__chev {
+  transition: transform 0.18s ease;
+}
+.dashboard-nav-more__chev.is-open {
+  transform: rotate(180deg);
+}
+
+.dashboard-nav-more__link {
+  display: block;
+  margin: 0 0.2rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 10px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.dashboard-nav-more__link:hover {
+  background: rgba(133, 98, 216, 0.08);
+  color: #3b0764;
+}
+.dashboard-nav-more__link.is-on {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+.cabinet-hub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+}
+.cabinet-hub-tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.15rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(133, 98, 216, 0.18);
+  background: rgba(133, 98, 216, 0.07);
+  color: #4c1d95;
+  font-weight: 750;
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+.cabinet-hub-tabs__btn.is-on {
+  background: #fff;
+  border-color: rgba(133, 98, 216, 0.45);
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+.cabinet-rail-more {
+  flex: 0 0 auto;
+}
+.cabinet-rail-more > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.cabinet-rail-more > summary::-webkit-details-marker {
+  display: none;
+}
+.cabinet-rail-more__list {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.15rem 0 0;
 }
 
 .dashboard-nav-btn.is-active {
@@ -23888,6 +23970,7 @@ body.yp-scroll-locked {
   min-height: 100%;
   height: 100%;
   width: 100%;
+  background: #06344a;
 }
 .lift-hero .svc-hero__img,
 .lift-hero .svc-hero__video {

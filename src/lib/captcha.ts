@@ -31,7 +31,7 @@ function cleanupMem() {
   }
 }
 
-export type CaptchaTile = { id: string; emoji: string; label: string };
+export type CaptchaTile = { id: string; imageUrl: string };
 
 export type CaptchaChallenge = {
   challengeId: string;
@@ -39,6 +39,8 @@ export type CaptchaChallenge = {
   kind: 'pick' | 'math';
   tiles?: CaptchaTile[];
 };
+
+type StoredChallenge = { answer: string; tiles: Record<string, string> };
 
 const PICK_POOL: Array<{ id: string; emoji: string; tag: string; label: string }> = [
   { id: 'tree-a', emoji: '🌳', tag: 'tree', label: 'дерево' },
@@ -71,13 +73,53 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-async function storeAnswer(challengeId: string, answer: string) {
+async function storeAnswer(challengeId: string, payload: string) {
   const redis = getSharedRedis();
   if (redis) {
-    await redis.set(`captcha:${challengeId}`, answer, 'EX', TTL_SEC);
+    await redis.set(`captcha:${challengeId}`, payload, 'EX', TTL_SEC);
   } else {
-    MEM.set(challengeId, { answer, exp: Date.now() + TTL_SEC * 1000 });
+    MEM.set(challengeId, { answer: payload, exp: Date.now() + TTL_SEC * 1000 });
   }
+}
+
+function parseStored(raw: string): StoredChallenge {
+  if (raw.startsWith('{')) {
+    try {
+      const j = JSON.parse(raw) as StoredChallenge;
+      if (j && typeof j.answer === 'string') {
+        return { answer: j.answer, tiles: j.tiles && typeof j.tiles === 'object' ? j.tiles : {} };
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+  return { answer: raw, tiles: {} };
+}
+
+async function readChallenge(challengeId: string, consume: boolean): Promise<StoredChallenge | null> {
+  const redis = getSharedRedis();
+  if (redis) {
+    const key = `captcha:${challengeId}`;
+    const stored = await redis.get(key);
+    if (stored == null) return null;
+    if (consume) await redis.del(key);
+    return parseStored(String(stored));
+  }
+  const row = MEM.get(challengeId);
+  if (!row || row.exp < Date.now()) {
+    MEM.delete(challengeId);
+    return null;
+  }
+  if (consume) MEM.delete(challengeId);
+  return parseStored(row.answer);
+}
+
+/** Lookup raster tile without consuming the challenge. */
+export async function peekCaptchaTile(challengeId: string, tileId: string): Promise<string | null> {
+  const stored = await readChallenge(challengeId, false);
+  if (!stored) return null;
+  const poolId = stored.tiles[tileId];
+  return poolId || null;
 }
 
 export async function createCaptchaChallenge(): Promise<CaptchaChallenge> {
@@ -87,18 +129,22 @@ export async function createCaptchaChallenge(): Promise<CaptchaChallenge> {
   const hits = shuffle(PICK_POOL.filter((t) => t.tag === target.tag)).slice(0, 2);
   const decoys = shuffle(PICK_POOL.filter((t) => t.tag !== target.tag)).slice(0, 4);
   const tiles = shuffle([...hits, ...decoys]).map((t) => ({
-    id: `${t.id}-${crypto.randomBytes(2).toString('hex')}`,
-    emoji: t.emoji,
-    label: t.label,
+    id: `${crypto.randomBytes(6).toString('hex')}`,
+    poolId: t.id,
     tag: t.tag,
   }));
   const correct = tiles.filter((t) => t.tag === target.tag).map((t) => t.id).sort().join(',');
-  await storeAnswer(challengeId, `pick:${correct}`);
+  const tileMap: Record<string, string> = {};
+  for (const t of tiles) tileMap[t.id] = t.poolId;
+  await storeAnswer(challengeId, JSON.stringify({ answer: `pick:${correct}`, tiles: tileMap }));
   return {
     challengeId,
     question: `Выберите все картинки: ${target.title}`,
     kind: 'pick',
-    tiles: tiles.map(({ id, emoji, label }) => ({ id, emoji, label })),
+    tiles: tiles.map(({ id }) => ({
+      id,
+      imageUrl: `/api/captcha/tile/${challengeId}/${id}`,
+    })),
   };
 }
 
@@ -124,24 +170,8 @@ export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVe
     return { ok: false, message: 'Обновите проверку и попробуйте снова' };
   }
 
-  let expected: string | null = null;
-  const redis = getSharedRedis();
-  if (redis) {
-    const key = `captcha:${id}`;
-    const stored = await redis.get(key);
-    if (stored != null) {
-      await redis.del(key);
-      expected = String(stored);
-    }
-  } else {
-    const row = MEM.get(id);
-    if (row && row.exp >= Date.now()) {
-      MEM.delete(id);
-      expected = row.answer;
-    } else {
-      MEM.delete(id);
-    }
-  }
+  const stored = await readChallenge(id, true);
+  const expected = stored?.answer ?? null;
 
   if (expected == null) {
     return { ok: false, message: 'Неверный ответ на проверку' };
@@ -170,8 +200,9 @@ export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVe
   }
 
   const token = signToken(id);
-  if (redis) {
-    await redis.set(`captcha:tok:${token}`, '1', 'EX', TTL_SEC);
+  const redisTok = getSharedRedis();
+  if (redisTok) {
+    await redisTok.set(`captcha:tok:${token}`, '1', 'EX', TTL_SEC);
   } else {
     MEM.set(`tok:${token}`, { answer: '1', exp: Date.now() + TTL_SEC * 1000 });
   }
