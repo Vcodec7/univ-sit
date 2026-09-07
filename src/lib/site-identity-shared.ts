@@ -52,6 +52,14 @@ export function isLocalOrigin(origin: string) {
   return /0\.0\.0\.0|127\.0\.0\.1|localhost/i.test(origin);
 }
 
+/** Absolute public asset URL. Never returns a localhost URL. */
+export function publicAssetUrl(origin: string | undefined | null, path: string): string | undefined {
+  const o = normalizeOrigin(origin);
+  if (!o || isLocalOrigin(o)) return undefined;
+  const p = path.startsWith('/') ? path : `/${path}`;
+  return `${o}${p}`;
+}
+
 export function originFromEnv(opts?: { allowLocal?: boolean }): string {
   const env = normalizeOrigin(process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL);
   if (!env) return opts?.allowLocal === false ? '' : DEFAULT_PUBLIC_ORIGIN;

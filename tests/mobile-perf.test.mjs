@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const page = readFileSync(join(root, '../src/app/page.tsx'), 'utf8');
+const layout = readFileSync(join(root, '../src/app/layout.tsx'), 'utf8');
 const media = readFileSync(join(root, '../src/components/HomeHeroMedia.tsx'), 'utf8');
 const sky = readFileSync(join(root, '../src/components/SochiLivingSky.tsx'), 'utf8');
 const skyCss = readFileSync(join(root, '../src/app/sochi-living-sky.css'), 'utf8');
@@ -15,6 +16,8 @@ const hero = readFileSync(join(root, '../src/components/HomeServiceHero.tsx'), '
 test('home stays request-time so canonical is not baked as localhost', () => {
   assert.match(page, /export const dynamic = 'force-dynamic'/);
   assert.doesNotMatch(page, /export const revalidate = 60/);
+  assert.match(page, /publicAssetUrl/);
+  assert.match(layout, /publicAssetUrl/);
 });
 
 test('hero video does not autoplay until desktop motion is allowed', () => {
@@ -33,6 +36,18 @@ test('living sky stays mounted when the window shrinks; video still skips on pho
 
 test('mobile home hides the four-icon deck between hero and free-now', () => {
   assert.match(unify, /@media \(max-width: 860px\)[\s\S]*?\.lift-deck \{\s*display: none !important;/);
+});
+
+test('home defers heavy client rails without unmounting the sky', () => {
+  assert.match(page, /nextDynamic\(\(\) => import\('@\/components\/HomeSlideRail'\)/);
+  assert.doesNotMatch(page, /nextDynamic\(\(\) => import\('@\/components\/SochiLivingSky'\)/);
+  assert.doesNotMatch(page, /WeeklyAfisha/);
+});
+
+test('hero photo uses next/image srcset for phones', () => {
+  assert.match(media, /from 'next\/image'/);
+  assert.match(media, /sizes="\(max-width: 860px\) 100vw, 1600px"/);
+  assert.match(media, /priority/);
 });
 
 test('home deck does not prefetch four routes on first paint', () => {

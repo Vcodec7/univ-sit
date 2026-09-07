@@ -16,6 +16,9 @@ const ident = readFileSync(
 test('public origin prefers a real host over localhost', () => {
   assert.match(src, /function resolvePublicOrigin/);
   assert.match(src, /candidates\.find/);
+  assert.match(src, /function publicAssetUrl/);
+  assert.match(src, /Never returns a localhost URL/);
   assert.match(ident, /x-forwarded-host/);
   assert.match(ident, /withRequestHost/);
+  assert.match(ident, /publicAssetUrl/);
 });

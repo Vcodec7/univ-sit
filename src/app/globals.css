@@ -23888,6 +23888,7 @@ body.yp-scroll-locked {
   min-height: 100%;
   height: 100%;
   width: 100%;
+  background: #06344a;
 }
 .lift-hero .svc-hero__img,
 .lift-hero .svc-hero__video {

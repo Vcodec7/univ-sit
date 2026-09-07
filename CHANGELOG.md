@@ -1,5 +1,33 @@
 # Changelog — YoungPortal
 
+## [1.6.156] — 2026-09-07
+
+### Fixed
+- Вход: переключение SMS/пароль без скачка полей; кнопка SMS только если шлюз готов
+- Герой: `next/image` с srcset на мобилке, море как запасной фон до LCP
+- OG/Twitter: абсолютный кадр моря `sochi-sea.jpg`, не localhost и не крошечная иконка
+- Loopback health: версия по `Host: 127.0.0.1`, даже если есть `X-Forwarded-*`
+
+## [1.6.155] — 2026-09-07
+
+### Security
+- Капча: плитки — PNG (`/api/captcha/tile/...`), без emoji в DOM
+- Публичный `https://…/api/health` отдаёт только `{ok, maintenanceMode}` (без version/db). Версия — на `http://127.0.0.1:3001/api/health` без `X-Forwarded-For`, заголовок `X-YP-Version`, либо `/api/health/detail` с loopback. Docker healthcheck по-прежнему смотрит `r.ok`.
+
+### Fixed
+- og:image / metadataBase не используют localhost — только публичный origin
+- Вход по SMS скрыт, пока шлюз не включён и не настроен (без текста «провайдер не настроен»)
+- Главная: `next/dynamic` для ленты / галереи-для-своих / афиши по сессии (небо SochiLivingSky не снимается)
+
+### Ops
+- `deploy-staging-prebuilt.sh` и workflow staging сверяют версию по loopback, публичный health — только `ok`
+
+## [1.6.154] — 2026-09-07
+
+### Added
+- Админка → Настройки → **SMS**: шлюз SMS.ru / SMSC / свой HTTPS, ключ, отправитель, тестовая отправка
+- Вход по SMS читает настройки из админки (env `SMS_*` остаётся запасным)
+
 ## [1.6.153] — 2026-09-07
 
 ### Fixed

@@ -21,6 +21,7 @@ export {
   isLocalOrigin,
   normalizeOrigin,
   originFromEnv,
+  publicAssetUrl,
   resolvePublicOrigin,
   shortSiteName,
   withSiteBrand,

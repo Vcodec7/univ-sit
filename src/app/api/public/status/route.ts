@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 /** Public lightweight status for middleware / PWA / uptime checks */
 export async function GET() {
-  const [state, access, bundle, visibility] = await Promise.all([
+  const [state, access, bundle, visibility, smsReady] = await Promise.all([
     getMaintenanceState(),
     getAccessSettings(),
     getModuleFlagsBundle(),
@@ -24,6 +24,7 @@ export async function GET() {
         },
       })
       .catch(() => null),
+    smsProviderConfigured(),
   ]);
   return NextResponse.json(
     {
@@ -36,7 +37,7 @@ export async function GET() {
       messagingEnabled: access.messagingEnabled,
       smsLoginEnabled: access.smsLoginEnabled,
       esiaLoginEnabled: access.esiaLoginEnabled,
-      smsLoginReady: access.smsLoginEnabled && smsProviderConfigured(),
+      smsLoginReady: access.smsLoginEnabled && smsReady,
       esiaLoginReady: access.esiaLoginEnabled && oauthProviderFlags().esia,
       modules: bundle.flags,
       offModes: bundle.offModes,
