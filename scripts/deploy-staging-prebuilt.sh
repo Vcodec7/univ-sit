@@ -144,7 +144,7 @@ echo "==> wait localhost:3001"
 ok=0
 for i in 1 2 3 4 5 6 7 8 9 10 12 14; do
   body="$(curl -sS --max-time 3 http://127.0.0.1:3001/api/health || true)"
-  if echo "$body" | grep -q '"ok":true'; then
+  if echo "$body" | grep -qE '"status":"ok"|"ok":true'; then
     echo "$body"
     ok=1
     break
