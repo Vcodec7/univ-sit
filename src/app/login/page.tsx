@@ -1,8 +1,13 @@
 'use client';
 
 import AuthHomeLink from '@/components/AuthHomeLink';
-import CaptchaField from '@/components/CaptchaField';
 import AuthStage from '@/components/AuthStage';
+import dynamic from 'next/dynamic';
+
+const CaptchaField = dynamic(() => import('@/components/CaptchaField'), {
+  ssr: false,
+  loading: () => <p className="yp-auth-label">Проверка…</p>,
+});
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';

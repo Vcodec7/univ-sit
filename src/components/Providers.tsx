@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useLayoutEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { SessionProvider, useSession } from 'next-auth/react';
-import { flushGameScoreQueue } from '@/lib/game-scores-client';
-import EcoAwardToast from '@/components/EcoAwardToast';
-import InstructionsWelcomeModal from '@/components/InstructionsWelcomeModal';
 import { VoiceProvider } from '@/components/VoiceProvider';
+
+const AuthSessionExtras = dynamic(() => import('@/components/AuthSessionExtras'), { ssr: false });
 
 function ChromePaintLock() {
   const { status } = useSession();
@@ -30,79 +30,6 @@ function ChromePaintLock() {
   return null;
 }
 
-function GameScoreSync() {
-  useEffect(() => {
-    const sync = () => {
-      void flushGameScoreQueue();
-    };
-    sync();
-    window.addEventListener('online', sync);
-    return () => window.removeEventListener('online', sync);
-  }, []);
-  return null;
-}
-
-function PresenceHeartbeat() {
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-    const role = (session?.user as { role?: string } | undefined)?.role;
-    // Scanner/TECH don't need presence chatter — was flooding 429s and RAM
-    if (role === 'SCANNER' || role === 'TECH') return;
-
-    let cancelled = false;
-    let backoffMs = 50_000;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    let inFlight = false;
-
-    const schedule = (ms: number) => {
-      if (cancelled) return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => void ping(), ms);
-    };
-
-    const ping = async () => {
-      if (cancelled || inFlight) return;
-      if (document.visibilityState === 'hidden') {
-        schedule(backoffMs);
-        return;
-      }
-      inFlight = true;
-      try {
-        const r = await fetch('/api/user/presence', {
-          method: 'POST',
-          credentials: 'same-origin',
-          cache: 'no-store',
-        });
-        if (r.status === 429) backoffMs = Math.min(180_000, Math.max(backoffMs * 2, 90_000));
-        else if (!r.ok) backoffMs = Math.min(120_000, backoffMs + 20_000);
-        else backoffMs = 50_000;
-      } catch {
-        backoffMs = Math.min(180_000, backoffMs + 20_000);
-      } finally {
-        inFlight = false;
-        schedule(backoffMs);
-      }
-    };
-
-    schedule(12_000);
-    const onVis = () => {
-      if (document.visibilityState === 'visible' && !inFlight) {
-        schedule(800);
-      }
-    };
-    document.addEventListener('visibilitychange', onVis);
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-      document.removeEventListener('visibilitychange', onVis);
-    };
-  }, [status, session?.user]);
-
-  return null;
-}
-
 export function Providers({
   children,
   minimal = false,
@@ -115,10 +42,7 @@ export function Providers({
     <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
       <VoiceProvider>
         {!minimal && <ChromePaintLock />}
-        {!minimal && <GameScoreSync />}
-        {!minimal && <PresenceHeartbeat />}
-        {!minimal && <EcoAwardToast />}
-        {!minimal && <InstructionsWelcomeModal />}
+        {!minimal && <AuthSessionExtras />}
         {children}
       </VoiceProvider>
     </SessionProvider>

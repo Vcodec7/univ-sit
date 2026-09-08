@@ -118,7 +118,7 @@ export const getCachedPublicProjects = unstable_cache(
     const rows = await prisma.project.findMany({
       where: publicCatalogWhere(),
       orderBy: { title: 'asc' },
-      take: 96,
+      take: 12,
       select: {
         id: true,
         title: true,
@@ -158,7 +158,7 @@ export const getCachedPublicProjects = unstable_cache(
       };
     });
   },
-  ['public-projects-catalog-v4'],
+  ['public-projects-catalog-v5'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 

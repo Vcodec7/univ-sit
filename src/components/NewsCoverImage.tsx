@@ -32,7 +32,6 @@ export default function NewsCoverImage({
   const weak = !raw || /\.svg($|\?)/i.test(raw) || /section-news|news-default|uploads\/covers\/news-seed/i.test(raw);
   const url = failed || weak ? thematic : raw;
   const isSvg = /\.svg($|\?)/i.test(url);
-  const isUpload = url.startsWith('/uploads/');
 
   return (
     <Image
@@ -44,7 +43,7 @@ export default function NewsCoverImage({
       sizes={sizes}
       priority={priority}
       onError={() => setFailed(true)}
-      unoptimized={isSvg || isUpload}
+      unoptimized={isSvg}
     />
   );
 }
