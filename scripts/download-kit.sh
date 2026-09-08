@@ -39,6 +39,10 @@ case "$KIT_PROFILE" in
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/f897e77da076d7363a67ba67035ad4a3/youngportal-org-runtime-kit-20260908-134736.tgz}"
     KIT_SHA256="${KIT_SHA256:-36d16b4947720362a2b212157c47e2a0360747b31f992f50c577cc6b9aa82fcc}"
     ;;
+  server|server-full|live-full)
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/c9062223ccf431aaf32da8d446934070/youngportal-server-full-20260908-200732.tgz}"
+    KIT_SHA256="${KIT_SHA256:-46aa82fd44861e49103efe4a1a4eb69dc107da1a4a4c6b4b4a2cae01efe7781e}"
+    ;;
   source|modernize|sale)
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/2d09f831b5ea8c19103c336fda9741ff/youngportal-sale-source-20260908-134736.tgz}"
     KIT_SHA256="${KIT_SHA256:-88823cf1891b080572324ed90b090b8c5134915b9ce3aae1bfd80da82e1b5dbc}"
@@ -52,7 +56,7 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-0d794fc5609eccf2d340e75865795871419671778b9d7321abf7c50ae14a1e1a}"
     ;;
   *)
-    echo "KIT_PROFILE=client|org|runtime|sale|portable|source|developer" >&2
+    echo "KIT_PROFILE=client|org|runtime|server|sale|portable|source|developer" >&2
     exit 1
     ;;
 esac
