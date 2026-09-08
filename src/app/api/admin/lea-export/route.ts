@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { AclError, aclJsonError, requireSuperAdmin } from '@/lib/acl';
 import { createLeaEncryptedExport } from '@/lib/lea-export';
 import { prisma } from '@/lib/prisma';
 import { createUserNotification } from '@/lib/security';
 
-function unauthorized() {
-  return NextResponse.json({ message: 'Нет доступа' }, { status: 403 });
-}
-
-/** ADMIN only: create one-time encrypted LEA archive for a user. */
+/** Super-admin only: create one-time encrypted LEA archive for a user. */
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id || session.user.role !== 'ADMIN') return unauthorized();
+    const session = await requireSuperAdmin();
 
     const body = await req.json().catch(() => ({}));
     const userId = typeof body.userId === 'string' ? body.userId : '';
@@ -74,6 +68,7 @@ export async function POST(req: Request) {
         'Ключ показывается один раз. Передайте архив и ключ отдельно уполномоченному органу. Ключ в БД не хранится.',
     });
   } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
     console.error('POST /api/admin/lea-export', e);
     return NextResponse.json({ message: 'Ошибка выдачи' }, { status: 500 });
   }
@@ -81,8 +76,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id || session.user.role !== 'ADMIN') return unauthorized();
+    await requireSuperAdmin();
     const url = new URL(req.url);
     const userId = url.searchParams.get('userId');
     const rows = await prisma.leaDataExport.findMany({
@@ -104,6 +98,7 @@ export async function GET(req: Request) {
     });
     return NextResponse.json({ items: rows });
   } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
     console.error('GET /api/admin/lea-export', e);
     return NextResponse.json({ message: 'Ошибка' }, { status: 500 });
   }

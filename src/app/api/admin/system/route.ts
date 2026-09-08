@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin, aclJsonError, AclError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError, AclError } from '@/lib/acl';
 import { collectServerStatus } from '@/lib/server-metrics';
 import { assertModuleEnabled, ModuleDisabledError, moduleDisabledJson } from '@/lib/module-flags';
 
@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const session = await requireAdmin();
+    const session = await requireSuperAdmin();
     await assertModuleEnabled('server_status', session.user.role);
     const data = await collectServerStatus();
     return NextResponse.json(data, {

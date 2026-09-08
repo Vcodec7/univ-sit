@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireAdmin, aclJsonError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError } from '@/lib/acl';
 import { grantEcoPoints, bumpEcoPoints } from '@/lib/eco-points';
 import {
   getEcoPoolStats,
@@ -34,7 +34,7 @@ const resetSchema = z.object({
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const stats = await getEcoPoolStats();
     return NextResponse.json({ pool: stats });
   } catch (e) {
@@ -44,7 +44,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const session = await requireAdmin();
+    const session = await requireSuperAdmin();
     const raw = await req.json().catch(() => ({}));
     const action = String((raw as { action?: string }).action || '');
 
