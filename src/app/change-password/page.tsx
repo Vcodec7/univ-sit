@@ -1,9 +1,10 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { shouldForcePasswordChange } from '@/lib/force-password-change';
 
 export default function ChangePasswordPage() {
   const { data: session, update, status } = useSession();
@@ -12,7 +13,14 @@ export default function ChangePasswordPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
-  const forced = Boolean((session?.user as { mustChangePassword?: boolean } | undefined)?.mustChangePassword);
+  const forced = shouldForcePasswordChange(session?.user?.mustChangePassword, session?.user?.hasPassword);
+
+  useEffect(() => {
+    if (status !== 'authenticated' || !session?.user) return;
+    if (session.user.hasPassword === false) {
+      router.replace('/dashboard');
+    }
+  }, [status, session?.user, router]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

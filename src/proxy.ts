@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { canBypassMaintenance, isMaintenanceBypassPath } from '@/lib/maintenance';
 import { canAccessAdminPath, canUseScanner, isTechRole } from '@/lib/acl-shared';
+import { shouldForcePasswordChange } from '@/lib/force-password-change';
 import { moduleKeyForPath } from '@/lib/module-flags-edge';
 import { clientIp, edgeRateAllow } from '@/lib/edge-rate-limit';
 
@@ -210,7 +211,10 @@ export default async function proxy(req: NextRequest) {
     : null;
   const role = token?.role as string | undefined;
   const permissions = (token?.permissions as string) || '';
-  const mustChangePassword = Boolean((token as { mustChangePassword?: boolean } | null)?.mustChangePassword);
+  const mustChangePassword = shouldForcePasswordChange(
+    Boolean((token as { mustChangePassword?: boolean } | null)?.mustChangePassword),
+    (token as { hasPassword?: boolean } | null)?.hasPassword
+  );
 
   // CSRF defense-in-depth for cookie-auth mutating APIs (skip webhooks / NextAuth / public / cron).
   if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
@@ -251,6 +255,7 @@ export default async function proxy(req: NextRequest) {
     token &&
     mustChangePassword &&
     !pathname.startsWith('/change-password') &&
+    !pathname.startsWith('/dashboard/guides') &&
     !pathname.startsWith('/api/auth') &&
     !pathname.startsWith('/_next') &&
     pathname !== '/login' &&
