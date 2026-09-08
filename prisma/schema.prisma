@@ -254,6 +254,10 @@ model User {
   telegramLinkedAt DateTime?
   maxUserId        String?
   maxLinkedAt      DateTime?
+
+  @@index([deletedAt])
+  @@index([lastActiveAt])
+  @@index([role, blockedAt])
 }
 
 /** Рекорды мини-игр (змейка, тетрис, шашки) */
@@ -736,6 +740,7 @@ model Booking {
   isDemoData Boolean @default(false)
 
   @@index([status, startTime])
+  @@index([status, endTime])
   @@index([spaceId, startTime])
   @@index([userId, createdAt])
 }

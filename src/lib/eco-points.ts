@@ -139,6 +139,32 @@ export function cosmeticSlot(id: string): CosmeticSlot | null {
   return item?.slot ?? null;
 }
 
+/**
+ * Atomic clamped balance change. Read-modify-write in JS loses concurrent
+ * awards (check-in + game + referral can land at the same moment), so the
+ * row is locked and updated in a single statement.
+ */
+async function applyEcoDelta(
+  userId: string,
+  delta: number
+): Promise<{ balance: number; delta: number } | null> {
+  const rows = await prisma.$queryRaw<Array<{ before: number; after: number }>>`
+    WITH prev AS (
+      SELECT "id", "ecoPoints" FROM "User" WHERE "id" = ${userId} FOR UPDATE
+    )
+    UPDATE "User" u
+       SET "ecoPoints" = LEAST(${ECO.MAX}::int, GREATEST(${ECO.MIN}::int, prev."ecoPoints" + ${delta}::int))
+      FROM prev
+     WHERE u."id" = prev."id"
+    RETURNING prev."ecoPoints" AS before, u."ecoPoints" AS after
+  `;
+  const row = rows[0];
+  if (!row) return null;
+  const actual = row.after - row.before;
+  if (!actual) return null;
+  return { balance: row.after, delta: actual };
+}
+
 export async function bumpEcoPoints(
   userId: string,
   delta: number,
@@ -171,14 +197,9 @@ export async function bumpEcoPoints(
   }
   if (!applied) return null;
 
-  const next = Math.max(ECO.MIN, Math.min(ECO.MAX, (user.ecoPoints ?? 0) + applied));
-  const actualDelta = next - (user.ecoPoints ?? 0);
-  if (!actualDelta) return null;
-  const updated = await prisma.user.update({
-    where: { id: userId },
-    data: { ecoPoints: next },
-    select: { id: true, ecoPoints: true },
-  });
+  const updated = await applyEcoDelta(userId, applied);
+  if (!updated) return null;
+  const { balance: next, delta: actualDelta } = updated;
   await logReputationEvent({
     userId,
     kind: 'ECO',
@@ -187,7 +208,7 @@ export async function bumpEcoPoints(
     reason,
     meta,
   });
-  return updated;
+  return { id: userId, ecoPoints: next };
 }
 
 /**
@@ -235,16 +256,12 @@ export async function grantEcoPoints(
     /* continue without hard fail if pool module unavailable */
   }
 
-  const next = Math.max(ECO.MIN, Math.min(ECO.MAX, (user.ecoPoints ?? 0) + n));
-  const actual = next - (user.ecoPoints ?? 0);
-  if (actual < 1) {
+  const applied = await applyEcoDelta(userId, n);
+  if (!applied || applied.delta < 1) {
     return { ok: false, message: 'Достигнут лимит баланса пользователя' };
   }
-  const updated = await prisma.user.update({
-    where: { id: userId },
-    data: { ecoPoints: next },
-    select: { ecoPoints: true },
-  });
+  const next = applied.balance;
+  const actual = applied.delta;
   await logReputationEvent({
     userId,
     kind: 'ECO',
@@ -253,7 +270,7 @@ export async function grantEcoPoints(
     reason,
     meta: { ...meta, grant: true },
   });
-  return { ok: true, ecoPoints: updated.ecoPoints };
+  return { ok: true, ecoPoints: next };
 }
 
 export async function spendEcoPoints(userId: string, cosmeticId: string) {

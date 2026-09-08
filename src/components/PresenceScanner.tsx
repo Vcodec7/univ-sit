@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import Link from 'next/link';
 
@@ -59,6 +59,9 @@ export default function PresenceScanner() {
     [busy, spaceId]
   );
 
+  const submitRef = useRef(submit);
+  submitRef.current = submit;
+
   useEffect(() => {
     let scanner: Html5Qrcode | null = null;
     let stopped = false;
@@ -69,7 +72,7 @@ export default function PresenceScanner() {
           { facingMode: 'environment' },
           { fps: 8, qrbox: { width: 240, height: 240 } },
           (decoded) => {
-            if (!stopped) void submit(decoded);
+            if (!stopped) void submitRef.current(decoded);
           },
           () => undefined
         );
@@ -86,7 +89,7 @@ export default function PresenceScanner() {
           .catch(() => undefined);
       }
     };
-  }, [submit]);
+  }, []);
 
   return (
     <div className="presence-scan">

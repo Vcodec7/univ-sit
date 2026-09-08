@@ -1,4 +1,4 @@
-const CACHE = "sochi-shell-v41-idle";
+const CACHE = "sochi-shell-v42-idle";
 const PRECACHE = [
   "/manifest.webmanifest",
   "/offline.html",
@@ -141,17 +141,9 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          if (res.ok && path.startsWith("/games")) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match(req).then((c) => c || offlinePage()))
-    );
+    /* HTML is always network-first with no cache write: pages carry session
+       state, so a cached shell would leak stale/foreign content after deploy. */
+    event.respondWith(fetch(req).catch(() => offlinePage()));
     return;
   }
 

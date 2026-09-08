@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { assertSameOrigin } from '@/lib/csrf-origin';
 import { aclJsonError, requireEndUser, requireUser } from '@/lib/acl';
@@ -124,60 +125,84 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'У вас уже есть запись на это время' }, { status: 409 });
   }
 
-  const usedAgg = await prisma.coworkingSignup.findMany({
-    where: {
-      spaceId,
-      dayKey,
-      status: { in: [...occupiedSeatStatuses()] },
-      startTime: { lt: end },
-      endTime: { gt: start },
-    },
-    select: { seats: true },
-  });
-  const used = usedAgg.reduce((a, s) => a + s.seats, 0);
-  const left = space.capacity - used;
+  /* Seat count and insert share one serializable transaction, otherwise two
+     parallel signups can both read the last free seat and oversubscribe. */
+  let created;
+  try {
+    created = await prisma.$transaction(
+      async (tx) => {
+        const usedAgg = await tx.coworkingSignup.findMany({
+          where: {
+            spaceId,
+            dayKey,
+            status: { in: [...occupiedSeatStatuses()] },
+            startTime: { lt: end },
+            endTime: { gt: start },
+          },
+          select: { seats: true },
+        });
+        const used = usedAgg.reduce((a, s) => a + s.seats, 0);
+        const left = space.capacity - used;
 
-  if (left < seatsToBook) {
-    if (!waitlist && left <= 0) {
+        if (left < seatsToBook && !waitlist) {
+          return { full: true as const, left: Math.max(0, left), canWaitlist: left <= 0 };
+        }
+
+        const status = left < seatsToBook ? 'WAITLIST' : 'CONFIRMED';
+        const inviteToken =
+          kind === 'GROUP' && status === 'CONFIRMED' ? newCoworkingInviteToken() : null;
+        const row = await tx.coworkingSignup.create({
+          data: {
+            spaceId,
+            userId: session.user.id,
+            dayKey,
+            period,
+            startTime: start,
+            endTime: end,
+            seats: seatsToBook,
+            purpose,
+            status,
+            kind,
+            inviteToken,
+            joinOpen: kind === 'GROUP',
+            members:
+              kind === 'GROUP' && status === 'CONFIRMED'
+                ? {
+                    create: {
+                      userId: session.user.id,
+                      role: 'HOST',
+                      status: 'APPROVED',
+                    },
+                  }
+                : undefined,
+          },
+          include: groupInclude(),
+        });
+        return { full: false as const, row };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+    );
+  } catch (e) {
+    const code = (e as { code?: string })?.code;
+    if (code === 'P2034' || code === '40001') {
       return NextResponse.json(
-        { message: 'Мест нет', left: 0, canWaitlist: true },
+        { message: 'Место только что заняли. Обновите страницу и попробуйте снова.' },
         { status: 409 }
       );
     }
-    if (!waitlist) {
-      return NextResponse.json({ message: `Осталось мест: ${Math.max(0, left)}`, left }, { status: 409 });
-    }
+    throw e;
   }
 
-  const status = left < seatsToBook ? 'WAITLIST' : 'CONFIRMED';
-  const inviteToken = kind === 'GROUP' && status === 'CONFIRMED' ? newCoworkingInviteToken() : null;
-  const row = await prisma.coworkingSignup.create({
-    data: {
-      spaceId,
-      userId: session.user.id,
-      dayKey,
-      period,
-      startTime: start,
-      endTime: end,
-      seats: seatsToBook,
-      purpose,
-      status,
-      kind,
-      inviteToken,
-      joinOpen: kind === 'GROUP',
-      members:
-        kind === 'GROUP' && status === 'CONFIRMED'
-          ? {
-              create: {
-                userId: session.user.id,
-                role: 'HOST',
-                status: 'APPROVED',
-              },
-            }
-          : undefined,
-    },
-    include: groupInclude(),
-  });
+  if (created.full) {
+    return NextResponse.json(
+      created.canWaitlist
+        ? { message: 'Мест нет', left: 0, canWaitlist: true }
+        : { message: `Осталось мест: ${created.left}`, left: created.left },
+      { status: 409 }
+    );
+  }
+
+  const row = created.row;
 
   return NextResponse.json(
     {

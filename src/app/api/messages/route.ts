@@ -373,6 +373,7 @@ export async function GET(req: Request) {
         },
       },
       orderBy: { updatedAt: 'desc' },
+      take: 200,
     });
 
     const validRows = rows.filter((row) => {
