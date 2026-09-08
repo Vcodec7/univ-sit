@@ -11,7 +11,8 @@
 | [DEV-HANDBOOK.md](./DEV-HANDBOOK.md) | Разработчик |
 | [ORG-ADMIN-GUIDE.md](./ORG-ADMIN-GUIDE.md) | Администратор организации |
 | [REMOTE-DEPLOY.md](./REMOTE-DEPLOY.md) | Быстрый remote install + модули |
-| [ORG-HANDOFF.md](./ORG-HANDOFF.md) | Архивы, VPS security, handoff |
+| [VPS-RESTORE-LIVE.md](./VPS-RESTORE-LIVE.md) | Снимок py → другой VPS |
+| [ORG-HANDOFF.md](./ORG-HANDOFF.md) | Архивы китов и установка |
 | [WORKFLOW.md](./WORKFLOW.md) | GitHub → ty → одобрение → py |
 | [ops-modules.md](./ops-modules.md) | Kill-switch модулей |
 | [CODE-CHANGE-PROCESS.md](./CODE-CHANGE-PROCESS.md) | Защита изменений / CODEOWNERS |

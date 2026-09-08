@@ -36,7 +36,7 @@ STAGING_DOMAIN=""
 LE_EMAIL=""
 ADMIN_EMAIL=""
 ADMIN_PASSWORD=""
-SITE_NAME="${SITE_NAME:-Молодёжь Сочи}"
+SITE_NAME="${SITE_NAME:-Молодёжный портал}"
 REINSTALL=0
 EXTRA=()
 

@@ -108,7 +108,10 @@ bash install-remote.sh root@НОВЫЙ_IP --full \
 
 - Прод: `https://portal.example.ru/api/health`
 - Тест: `https://test.example.ru/api/health`
-- Админ: `/etc/yp-portal/admin-credentials.txt` (если создавался установщиком)
+- Отчёт: `/etc/yp-portal/INSTALL-REPORT.txt`
+- Админ / роли: `/etc/yp-portal/admin-credentials.txt`, `seed-accounts.txt`
+- Техслужба **только у разработчика**: `/etc/yp-portal/tech-credentials.txt` (не в отчёте заказчику)
+- Живой снимок на другой VPS: `docs/VPS-RESTORE-LIVE.md`
 
 Каталоги на сервере:
 
