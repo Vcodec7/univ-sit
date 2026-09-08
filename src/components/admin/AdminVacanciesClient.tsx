@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { EMPLOYER_STATUS_RU, VACANCY_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
 import { parseVacancyRequirements, vacancyHtmlToPlain, vacancyPlainToHtml } from '@/lib/vacancy-content';
+import { staffUserLabel } from '@/lib/staff-label';
 
 type Employer = {
   id: string;
@@ -402,9 +403,9 @@ export default function AdminVacanciesClient() {
             {applications.map((a) => (
               <li key={a.id} className="is-stack">
                 <div className="admin-entity-list__copy">
-                  <strong>{a.user.name}</strong>
+                  <strong>{staffUserLabel(a.user)}</strong>
                   <span>
-                    {a.user.email} → {a.vacancy.title} · балл {a.autoScore}%
+                    {a.user?.email || '—'} → {a.vacancy?.title || 'вакансия'} · балл {a.autoScore}%
                   </span>
                 </div>
                 <input

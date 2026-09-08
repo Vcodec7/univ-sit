@@ -3292,6 +3292,62 @@ footer.site-footer { margin-top: auto !important; }
 }
 .scanner-hub__hint { margin: 0.65rem 0.75rem 0; color: #4b5563; font-size: 0.88rem; }
 
+/* Audit: mobile hour rail, catalog search, home wrap, focus ring */
+@media (max-width: 860px) {
+  .cw-periods--hours {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    max-width: 100%;
+    padding-bottom: 0.25rem;
+  }
+  .cw-period--hour {
+    flex: 0 0 auto !important;
+    min-width: 80px;
+    scroll-snap-align: center;
+  }
+}
+.cw-period--hour.is-past {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.page-hero-title,
+.home-section-title,
+.svc-hero h1,
+.svc-hero p,
+.catalog-page-header__intro h1 {
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.catalog-page,
+.yp-shell {
+  overflow-x: clip;
+  max-width: 100%;
+}
+.space-filter-bar__search,
+.space-filter-bar__input,
+.space-filter-bar__toggle {
+  min-height: 48px;
+  height: 48px;
+  box-sizing: border-box;
+}
+.space-filter-bar__search {
+  background: transparent !important;
+}
+.space-filter-bar select,
+.catalog-filter-pop__search input {
+  min-height: 48px;
+  box-sizing: border-box;
+}
+.btn:focus-visible,
+.cw-period:focus-visible,
+.space-filter-bar__input:focus-visible {
+  outline: 2px solid #8562d8;
+  outline-offset: 2px;
+}
+
 
 
 

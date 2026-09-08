@@ -93,6 +93,15 @@ export function defaultCoworkingPeriodId(dayKey: string, now = new Date()) {
   return COWORKING_PERIODS[COWORKING_PERIODS.length - 1].id;
 }
 
+export function isCoworkingPeriodEnded(dayKey: string, periodId: string, now = new Date()) {
+  try {
+    const { end } = periodBounds(dayKey, periodId);
+    return end.getTime() <= now.getTime();
+  } catch {
+    return false;
+  }
+}
+
 export function canCancelFree(startTime: Date, now = new Date()) {
   return startTime.getTime() - now.getTime() >= 3 * 60 * 60 * 1000;
 }

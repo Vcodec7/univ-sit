@@ -154,12 +154,19 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (window.location.hash === '#pass') setPassOpen(true);
-    const onHash = () => {
-      if (window.location.hash === '#pass') setPassOpen(true);
+    const openQr = () => {
+      const q = new URLSearchParams(window.location.search);
+      if (
+        window.location.hash === '#pass' ||
+        q.get('action') === 'showQR' ||
+        q.get('qr') === '1'
+      ) {
+        setPassOpen(true);
+      }
     };
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
+    openQr();
+    window.addEventListener('hashchange', openQr);
+    return () => window.removeEventListener('hashchange', openQr);
   }, []);
 
   useEffect(() => {

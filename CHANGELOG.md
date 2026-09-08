@@ -1,5 +1,15 @@
 # Changelog — YoungPortal
 
+## [1.6.180] — 2026-09-08
+
+### Аудит UI (реестр багов)
+- Админ-списки и колокол уведомлений не падают без `user`/`space` (`staffUserLabel` + ErrorBoundary)
+- PDF: `Content-Type: application/pdf` без charset
+- Коворкинг: горизонтальный snap слотов на мобилке; прошедшие часы недоступны
+- Бронь зала: прошедшие HH:MM скрыты; ошибка у кнопки «Отправить заявку»
+- `/dashboard?action=showQR` открывает шторку QR; поиск площадок с `aria-label`
+- Даты с пробелом (`YYYY-MM-DD HH:mm`) парсятся на Safari
+
 ## [1.6.179] — 2026-09-08
 
 ### Staging / схема

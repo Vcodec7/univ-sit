@@ -9,6 +9,7 @@ import {
   COWORKING_MAX_SEATS,
   COWORKING_PERIODS,
   defaultCoworkingPeriodId,
+  isCoworkingPeriodEnded,
   resolveCoworkingPeriod,
 } from '@/lib/coworking';
 import type { CoworkingSpaceAvailability } from '@/lib/coworking-availability';
@@ -338,19 +339,25 @@ export default function CoworkingSignupFlow({
                 const slotLeft = info?.left;
                 const full = typeof slotLeft === 'number' && slotLeft <= 0;
                 const low = typeof slotLeft === 'number' && slotLeft > 0 && slotLeft <= 5;
+                const ended = isCoworkingPeriodEnded(dayKey, p.id);
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}${low ? ' is-low' : ''}`}
+                    disabled={ended || full}
+                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}${low ? ' is-low' : ''}${ended ? ' is-past' : ''}`}
                     aria-pressed={period === p.id}
-                    onClick={() => setPeriod(p.id)}
+                    onClick={() => {
+                      if (!ended && !full) setPeriod(p.id);
+                    }}
                   >
                     <strong>
                       {p.start}–{p.end}
                     </strong>
                     <em>
-                      {typeof slotLeft === 'number'
+                      {ended
+                        ? 'прошло'
+                        : typeof slotLeft === 'number'
                         ? slotLeft > 0
                           ? low
                             ? `Осталось ${slotLeft}`
