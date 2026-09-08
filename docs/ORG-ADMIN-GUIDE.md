@@ -21,7 +21,7 @@
 
 ## 2. Первый запуск (после установки на VPS)
 
-1. Откройте `https://ВАШ-ДОМЕН/api/health` — должно быть `"ok":true,"db":true`.
+1. Откройте `https://ВАШ-ДОМЕН/api/health` — `"ok":true`. Поля `db`/`version` с публичного HTTPS могут быть скрыты; версия — loopback приложения.
 2. Учётные данные первого ADMIN: файл на сервере  
    `/etc/yp-portal/admin-credentials.txt`  
    (или те, что задали при установке `--admin-email` / `--admin-password`).

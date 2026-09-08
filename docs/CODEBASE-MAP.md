@@ -1,4 +1,4 @@
-# Карта кодовой базы sochi-portal / y1.idivles.ru
+# Карта кодовой базы sochi-portal / py.idivles.ru (тест: ty.idivles.ru)
 
 Снимок 2026-08-13. Имена путей от корня репозитория.
 

@@ -10,9 +10,10 @@
 
 ## How to work (save time)
 
-- Batch code fixes, **one** git push, **one** apply to ty: `npm run ty` / `bash scripts/apply-staging.sh`
+- Batch code fixes, **one** git push, **one** apply to ty: `npm run ty` / `bash scripts/apply-staging.sh` (`prebuilt` / `static` / `sync`)
 - Before push: `npm run dev:loop` (tests + `ui:guard`). Visual bugs: skill `.cursor/skills/youngportal-ui`.
-  (builds Next off the VPS, then a small Docker image on staging). Do not `docker compose --build` on the 2GB box.
+  `prebuilt` builds Next off the VPS, then a small Docker image on staging. Do not `docker compose --build` on the 2GB box.
+- Pull requests: **ManagePullRequest** (`create_pr`). `gh` is **read-only** — never `gh pr create`.
 - Verify with scripts, not a browser: `bash scripts/smoke-sites.sh --staging-only`
 - SSH/SCP only via workflow scripts (`scripts/lib/vps.sh` retries Connection reset). No ad-hoc retry loops.
 - Brand CSS only: `bash scripts/apply-staging.sh static`
@@ -43,7 +44,9 @@ When the user’s task is finished (especially after approve/promote), always:
    - **portable**: source-only portable/dev kit.  
 4. Publish kits via existing `pack-dev-deploy-kit.sh` / `publish-public-backup.sh` and refresh `scripts/download-kit.sh` URLs + `docs/ORG-HANDOFF.md` when new public URLs appear.
 
-Do not skip this for “small” tasks that changed runnable code or ops scripts. Doc-only edits may use `SKIP_ORG_LIVE=1`.
+Do not skip this for “small” tasks that changed runnable code or ops scripts. Doc-only / small tasks: `SKIP_ORG_LIVE=1 SKIP_PUBLISH=1`.
+
+Public `GET /api/health` (HTTPS via nginx) is `{ok, maintenanceMode}` once health-hardening is live. **Version** is on loopback `:3000`/`:3001` **without** `X-Forwarded-Proto: https`. Deploy scripts must check loopback, not public JSON `version`.
 
 ## Domains (current)
 
@@ -55,7 +58,7 @@ Do **not** use legacy `young.idivles.ru` / `y1.idivles.ru` / `176.124.204.53` as
 
 ## Safety
 
-- Never commit `.env`, passwords, user uploads (avatars/gallery/portfolio).
+- Never commit `.env`, passwords, user uploads (avatars/gallery/portfolio), `docs/perf/qa-ty-roles-*.json`, `homepage-layout*.webp`.
 - Public MinTsifry CA `certs/russian_trusted_ca.pem` may be committed; other PEMs stay ignored.
 - Do not promote to production without explicit approval in the conversation.
 - Prefer SSH keys over root passwords; rotate if a password was pasted into chat.

@@ -1,7 +1,7 @@
 # YoungPortal — развёртывание для организации и модернизация
 
-Актуально на **2026-08-17**. Домены эталона: **py.idivles.ru** (прод), **ty.idivles.ru** (тест).  
-VPS эталона: `root@77.110.125.241`.
+Актуально на **2026-09-07**. Домены эталона: **py.idivles.ru** (прод), **ty.idivles.ru** (тест).  
+VPS эталона: `root@77.110.125.241` (также `cursor-site@` из `scripts/lib/vps.sh`).
 
 Этот документ — единая инструкция: что лежит в архивах, как поставить на VPS,
 как защитить сервер, как работать с сайтом и как пересобрать под другую организацию.
@@ -18,7 +18,7 @@ VPS эталона: `root@77.110.125.241`.
 
 ### Скачать актуальные (2026-08-17, после static ISR / promote)
 
-После каждого завершённого запроса агент обновляет киты через `bash scripts/post-request-handoff.sh`.
+После каждого завершённого запроса агент обновляет киты через `bash scripts/post-request-handoff.sh` (`SKIP_ORG_LIVE=1 SKIP_PUBLISH=1` для мелких/док-задач). Таблица URL ниже — снимок **2026-08-17**; свежие ссылки смотрите в `artifacts/HANDOFF-latest.txt` / после publish.
 
 | Назначение | Файл | SHA-256 | URL |
 |------------|------|---------|-----|
@@ -108,7 +108,7 @@ bash install-remote.sh root@НОВЫЙ_IP --full \
 
 После установки:
 
-- Прод: `https://portal.example.ru/api/health`
+- Прод: `https://portal.example.ru/api/health` (`ok`)
 - Тест: `https://test.example.ru/api/health`
 - Админ: `/etc/yp-portal/admin-credentials.txt` (если создавался установщиком)
 
@@ -176,7 +176,7 @@ ufw --force enable
 2. Включить 2FA у ADMIN  
 3. Прописать ботов MAX/Telegram в Admin → Боты, зарегистрировать webhook  
 4. Режим работы (Контакты и часы) — от него зависит тихая доставка уведомлений  
-5. `curl -sS https://ДОМЕН/api/health` → `"ok":true,"db":true`  
+5. `curl -sS https://ДОМЕН/api/health` → `"ok":true` (публично может не быть `db`/`version`; версия — loopback `:3000` без `X-Forwarded-Proto: https`)  
 6. Бэкап: `bash /opt/sochi-portal/scripts/full-backup.sh` (или cron)
 
 Подробнее по старым инцидентам: `docs/VPS-OS-SETUP.md`, `docs/related/hardening-ops.md`, `docs/related/security-plan.md`.

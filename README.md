@@ -71,13 +71,13 @@ Docker (как на проде): `docker compose up --build` — web на `127.0
 
 Поток: браузер → Nginx `:443` → Docker web `:3000` → PostgreSQL + Redis.
 
-- Health: `GET /api/health`
+- Health: публичный `GET /api/health` — `{ok, maintenanceMode}` после hardening; версия — loopback без `X-Forwarded-Proto: https`
 - Edge-гейт: `src/proxy.ts` (CSP nonce, maintenance, модули, роли)
 - Compose: `docker-compose.yml` + `docker-compose.staging.yml`
 
 ## Что не коммитится
 
-`.env`, TLS private keys, дампы БД, аватары/галереи/портфолио пользователей. Шаблон: [`.env.example`](.env.example).
+`.env`, TLS private keys, дампы БД, аватары/галереи/портфолио, `docs/perf/qa-ty-roles-*.json`, `homepage-layout*.webp`. Шаблон: [`.env.example`](.env.example).
 
 ## Тесты
 

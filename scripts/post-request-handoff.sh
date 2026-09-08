@@ -29,7 +29,7 @@ if [[ "$SKIP_CLEAN" != "1" ]]; then
   rm -f /tmp/yp-promote-*.tgz /tmp/yp-staging-*.tgz /var/tmp/yp-promote-*.tgz /var/tmp/yp-promote-remote-*.sh 2>/dev/null || true
   # Keep only the newest archive per kit family under artifacts/
   if [[ -d "$OUT_DIR" ]]; then
-    python3 - <<'PY' "$OUT_DIR"
+python3 - "$OUT_DIR" <<'PY'
 import os, re, sys
 from pathlib import Path
 root = Path(sys.argv[1])

@@ -4,10 +4,10 @@
 
 ## Онлайн
 
-- Страница: [`/presentation`](https://young.idivles.ru/presentation)
-- Слайды: [`/presentation/deck/index.html`](https://young.idivles.ru/presentation/deck/index.html)
-- Видео (~1 мин): [`/presentation/deck/tour.mp4`](https://young.idivles.ru/presentation/deck/tour.mp4)
-- Скачать: [`/downloads/youngportal-presentation-latest.tgz`](https://young.idivles.ru/downloads/youngportal-presentation-latest.tgz)
+- Страница: [`/presentation`](https://py.idivles.ru/presentation)
+- Слайды: [`/presentation/deck/index.html`](https://py.idivles.ru/presentation/deck/index.html)
+- Видео (~1 мин): [`/presentation/deck/tour.mp4`](https://py.idivles.ru/presentation/deck/tour.mp4)
+- Скачать: [`/downloads/youngportal-presentation-latest.tgz`](https://py.idivles.ru/downloads/youngportal-presentation-latest.tgz)
 
 ## TECH: вкл/выкл
 

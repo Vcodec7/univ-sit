@@ -82,9 +82,9 @@ Presets установки: `scripts/apply-module-selection.mjs`.
 npx prisma migrate dev --name describe_change   # dev
 npx prisma migrate deploy                       # prod/staging container
 
-# Деплой эталона
+# Деплой эталона (GitHub first, затем ty)
 git push
-bash scripts/workflow-deploy-staging.sh
+bash scripts/apply-staging.sh
 bash scripts/smoke-sites.sh --staging-only
 # после «одобряю»:
 CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh

@@ -1,4 +1,4 @@
-# Архитектура y1.idivles.ru
+# Архитектура YoungPortal (py.idivles.ru / ty.idivles.ru)
 
 ## Стек
 
@@ -9,7 +9,7 @@
 - NextAuth v4 + bcrypt (+ опционально TOTP 2FA)
 - TipTap, Framer Motion, Lucide, Recharts, Zod
 - Docker (`node:22-alpine`) + docker-compose (`web` + `db` + `redis`)
-- Nginx + Let’s Encrypt (`y1.idivles.ru`)
+- Nginx + Let’s Encrypt (`py.idivles.ru` прод `:3000`, `ty.idivles.ru` тест `:3001`)
 
 ## Поток запроса
 
