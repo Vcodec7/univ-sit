@@ -80,3 +80,37 @@
     max-width: 26.75rem !important;
   }
 }
+
+.yp-sso {
+  margin-top: 1.1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+.yp-sso__or {
+  margin: 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.yp-sso__grid {
+  display: grid;
+  gap: 0.45rem;
+}
+.yp-sso__btn {
+  width: 100%;
+}
+.yp-sso__tg {
+  display: flex;
+  justify-content: center;
+}
+.yp-sso__legal {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.yp-sso__legal a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+}

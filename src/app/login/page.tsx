@@ -9,12 +9,12 @@ const CaptchaField = dynamic(() => import('@/components/CaptchaField'), {
   loading: () => <p className="yp-auth-label">Проверка…</p>,
 });
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { isPhoneLikeLogin, normalizePhone, formatPhoneMaskInput } from '@/lib/phone';
 import { safeCallbackUrl } from '@/lib/safe-callback-url';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import SocialAuthButtons, { type SocialAuthFlags } from '@/components/SocialAuthButtons';
 
 async function offerSavePassword(login: string, password: string, form?: HTMLFormElement | null) {
   try {
@@ -48,13 +48,8 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [failCount, setFailCount] = useState(0);
   const [captchaToken, setCaptchaToken] = useState('');
-  const [oauth, setOauth] = useState<{ yandex?: boolean; vk?: boolean; esia?: boolean }>({});
-  const [smsOn, setSmsOn] = useState(false);
-  const [smsReady, setSmsReady] = useState(false);
+  const [oauth, setOauth] = useState<SocialAuthFlags>({});
   const [esiaOn, setEsiaOn] = useState(false);
-  const [loginMode, setLoginMode] = useState<'password' | 'sms'>('password');
-  const [smsCode, setSmsCode] = useState('');
-  const [smsSent, setSmsSent] = useState(false);
   const [authTicket, setAuthTicket] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,7 +69,6 @@ function LoginForm() {
     callbackUrl.startsWith('/scanner') ||
     callbackUrl.startsWith('/ops');
 
-  const phoneMode = useMemo(() => isPhoneLikeLogin(login), [login]);
   const role = session?.user?.role;
   const isStaffSession =
     role === 'ADMIN' || role === 'MODERATOR' || role === 'SCANNER' || role === 'TECH';
@@ -90,9 +84,6 @@ function LoginForm() {
           d?.registrationEnabled !== false &&
           d?.modules?.registration !== false;
         setRegistrationOn(reg);
-        setSmsOn(Boolean(d?.smsLoginEnabled));
-        setSmsReady(Boolean(d?.smsLoginReady));
-        if (!d?.smsLoginReady) setLoginMode('password');
         setEsiaOn(Boolean(d?.esiaLoginEnabled));
       })
       .catch(() => undefined);
@@ -168,7 +159,7 @@ function LoginForm() {
     setLoading(true);
 
     const trimmed = login.trim();
-    const loginValue = isPhoneLikeLogin(trimmed) ? normalizePhone(trimmed) : trimmed;
+    const loginValue = trimmed.toLowerCase();
     // Only trust a post-network session if this attempt could have created it
     // (guest → session). Never treat a pre-existing cookie as proof of success.
     const hadUserBeforeAttempt = Boolean(session?.user?.id);
@@ -214,42 +205,6 @@ function LoginForm() {
       return;
     }
 
-    if (loginMode === 'sms') {
-      if (!captchaToken && !authTicket) {
-        setLoading(false);
-        setError('Пройдите проверку «я не робот»');
-        return;
-      }
-      if (!smsSent || !smsCode) {
-        setLoading(false);
-        setError('Запросите код из SMS и введите его');
-        return;
-      }
-      let result: { error?: string | null; ok?: boolean } | undefined;
-      try {
-        result = await signIn('credentials', {
-          redirect: false,
-          email: loginValue,
-          password: '',
-          smsCode,
-          authTicket,
-          website: '',
-        });
-      } catch {
-        setLoading(false);
-        setError('Не удалось войти. Обновите страницу и попробуйте снова.');
-        return;
-      }
-      if (result?.error) {
-        setLoading(false);
-        setCaptchaToken('');
-        setError(mapAuthError(String(result.error), 'Неверный код из SMS'));
-        return;
-      }
-      await finishLogin(loginValue, '');
-      return;
-    }
-
     if (!captchaToken) {
       setLoading(false);
       setError('Пройдите проверку «я не робот»');
@@ -276,7 +231,7 @@ function LoginForm() {
         setLoading(false);
         setFailCount((n) => n + 1);
         setCaptchaToken('');
-        setError(chal.message || 'Неверный email/телефон или пароль');
+        setError(chal.message || 'Неверный email или пароль');
         return;
       }
       if (chal.needs2fa && chal.challengeToken) {
@@ -368,14 +323,38 @@ function LoginForm() {
       // Already signed in: leftover query from an old redirect, not this attempt.
       return;
     }
-    setError(mapAuthError(qErr, 'Неверный email/телефон или пароль'));
+    setError(mapAuthError(qErr, 'Неверный email или пароль'));
   }, [searchParams, sessionStatus]);
+
+  useEffect(() => {
+    const fromQuery = (searchParams.get('email') || '').trim();
+    if (fromQuery) setLogin(fromQuery);
+  }, [searchParams]);
 
   useEffect(() => {
     fetch('/api/auth/providers')
       .then((r) => r.json())
-      .then((p) => setOauth({ yandex: Boolean(p?.yandex), vk: Boolean(p?.vk), esia: Boolean(p?.esia) }))
+      .then((p) =>
+        setOauth({
+          yandex: Boolean(p?.yandex),
+          vk: Boolean(p?.vk),
+          telegram: Boolean(p?.telegram),
+          esia: Boolean(p?.esia),
+        })
+      )
       .catch(() => setOauth({}));
+    fetch('/api/public/status')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.oauth?.telegramBot) {
+          setOauth((prev) => ({
+            ...prev,
+            telegram: Boolean(d.oauth.telegram),
+            telegramBot: d.oauth.telegramBot,
+          }));
+        }
+      })
+      .catch(() => undefined);
   }, []);
 
   return (
@@ -452,36 +431,25 @@ function LoginForm() {
           {!needs2fa ? (
             <>
               <div>
-                <label className="yp-auth-label">
-                  {phoneMode ? 'Телефон' : 'Email или телефон'}
-                </label>
+                <label className="yp-auth-label">Email</label>
                 <input
-                  type="text"
+                  type="email"
                   name="username"
                   autoComplete="username"
                   value={login}
                   onChange={(e) => {
                     e.currentTarget.setCustomValidity('');
-                    const v = e.target.value;
-                    if (!v.includes('@') && /[\d+]/.test(v)) {
-                      setLogin(formatPhoneMaskInput(v));
-                    } else {
-                      setLogin(v);
-                    }
+                    setLogin(e.target.value);
                   }}
                   onInvalid={(e) => {
-                    e.currentTarget.setCustomValidity(
-                      phoneMode ? 'Укажите телефон' : 'Укажите email или телефон'
-                    );
+                    e.currentTarget.setCustomValidity('Укажите email');
                   }}
                   required
                   className="yp-auth-input"
-                  placeholder="email@example.com или +7…"
+                  placeholder="vash@mail.ru"
                 />
               </div>
 
-              {loginMode === 'password' ? (
-                <>
               <div>
                 <label className="yp-auth-label">Пароль</label>
                 <input
@@ -496,7 +464,7 @@ function LoginForm() {
                   onInvalid={(e) => {
                     e.currentTarget.setCustomValidity('Введите пароль');
                   }}
-                  required={loginMode === 'password'}
+                  required
                   className="yp-auth-input"
                   placeholder="••••••••"
                 />
@@ -507,80 +475,8 @@ function LoginForm() {
                   Забыли пароль?
                 </Link>
               </div>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    disabled={loading || !captchaToken}
-                    onClick={async () => {
-                      setError('');
-                      setLoading(true);
-                      try {
-                        const res = await fetch('/api/auth/sms/request', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ phone: login, captchaToken, website: '' }),
-                        });
-                        const data = await res.json().catch(() => ({}));
-                        if (!res.ok) {
-                          setError(data.message || 'Не удалось отправить код');
-                          setCaptchaToken('');
-                          return;
-                        }
-                        if (data.authTicket) setAuthTicket(String(data.authTicket));
-                        setSmsSent(true);
-                      } catch {
-                        setError('Не удалось отправить код');
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                  >
-                    {smsSent ? 'Отправить код ещё раз' : 'Получить код из SMS'}
-                  </button>
-                  {smsSent ? (
-                    <div>
-                      <label className="yp-auth-label">Код из SMS</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        value={smsCode}
-                        onChange={(e) => setSmsCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        required
-                        className="yp-auth-input"
-                        placeholder="000000"
-                      />
-                    </div>
-                  ) : null}
-                </>
-              )}
 
               <CaptchaField onToken={setCaptchaToken} />
-              {smsOn && smsReady ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMode((m) => (m === 'sms' ? 'password' : 'sms'));
-                    setSmsSent(false);
-                    setSmsCode('');
-                    setError('');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--primary)',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    padding: 0,
-                    textAlign: 'left',
-                  }}
-                >
-                  {loginMode === 'sms' ? 'Войти с паролем' : 'Войти по телефону и SMS'}
-                </button>
-              ) : null}
             </>
           ) : (
             <div>
@@ -621,35 +517,9 @@ function LoginForm() {
             {loading ? 'Вход...' : needs2fa ? 'Подтвердить' : 'Войти'}
           </button>
         </form>
-        {!needs2fa && (oauth.yandex || oauth.vk || esiaOn) && (
-          <div style={{ marginTop: '1rem', display: 'grid', gap: 8 }}>
-            <div style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--muted)' }}>или</div>
-            {oauth.yandex ? (
-              <button type="button" className="btn btn-secondary" style={{ width: '100%' }} onClick={() => void signIn('yandex', { callbackUrl })}>
-                Войти через Яндекс
-              </button>
-            ) : null}
-            {oauth.vk ? (
-              <button type="button" className="btn btn-secondary" style={{ width: '100%' }} onClick={() => void signIn('vk', { callbackUrl })}>
-                Войти через VK
-              </button>
-            ) : null}
-            {esiaOn ? (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ width: '100%' }}
-                disabled={!oauth.esia}
-                title={oauth.esia ? undefined : 'Задайте ESIA_CLIENT_ID / ESIA_CLIENT_SECRET на сервере'}
-                onClick={() => {
-                  if (oauth.esia) void signIn('esia', { callbackUrl });
-                }}
-              >
-                Войти через Госуслуги
-              </button>
-            ) : null}
-          </div>
-        )}
+        {!needs2fa ? (
+          <SocialAuthButtons oauth={oauth} callbackUrl={callbackUrl} showEsia={esiaOn} />
+        ) : null}
 
 
         {!maintenanceOn && !staffMode && registrationOn && (

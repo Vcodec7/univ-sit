@@ -16,6 +16,7 @@ import SvcDateField from '@/components/SvcDateField';
 import ServiceSplitModal from '@/components/ServiceSplitModal';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import CoworkingInviteScreen, { type CoworkingGroupPayload } from '@/components/CoworkingInviteScreen';
+import FeatureConsentModal from '@/components/FeatureConsentModal';
 
 type SpaceInfo = CoworkingSpaceAvailability;
 
@@ -76,6 +77,8 @@ export default function CoworkingSignupFlow({
   } | null>(null);
   const [qrUrl, setQrUrl] = useState('');
   const [inviteGroup, setInviteGroup] = useState<CoworkingGroupPayload | null>(null);
+  const [needCoworkingRules, setNeedCoworkingRules] = useState(false);
+  const [consentBusy, setConsentBusy] = useState(false);
   const spaceIdRef = useRef(spaceId);
   spaceIdRef.current = spaceId;
   const lastFetchedDay = useRef<string | null>(
@@ -162,6 +165,10 @@ export default function CoworkingSignupFlow({
         }),
       });
       const data = await r.json();
+      if (r.status === 412 && data.code === 'NEED_FEATURE_CONSENT') {
+        setNeedCoworkingRules(true);
+        return;
+      }
       if (!r.ok) {
         if (data.canWaitlist) {
           setError('Мест нет — можно встать в лист ожидания');
@@ -236,6 +243,26 @@ export default function CoworkingSignupFlow({
       </div>
     );
   }
+
+  const acceptCoworkingRules = async () => {
+    setConsentBusy(true);
+    try {
+      const r = await fetch('/api/user/consent', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature: 'coworking' }),
+      });
+      if (!r.ok) {
+        setError('Не удалось сохранить согласие');
+        return;
+      }
+      setNeedCoworkingRules(false);
+      await submit(false);
+    } finally {
+      setConsentBusy(false);
+    }
+  };
 
   return (
     <div className={`cw-layout${refreshing ? ' is-refreshing' : ''}`}>
@@ -480,6 +507,14 @@ export default function CoworkingSignupFlow({
           </p>
         ) : null}
       </ServiceSplitModal>
+      {needCoworkingRules ? (
+        <FeatureConsentModal
+          feature="coworking"
+          busy={consentBusy}
+          onAccept={() => void acceptCoworkingRules()}
+          onClose={() => setNeedCoworkingRules(false)}
+        />
+      ) : null}
     </div>
   );
 }

@@ -4,6 +4,8 @@
  * See docs/OAUTH-YANDEX-VK.md and docs/OAUTH-ESIA.md
  */
 
+import { telegramLoginReady, telegramBotUsername } from '@/lib/telegram-login';
+
 function esiaEnv() {
   const clientId = (process.env.ESIA_CLIENT_ID || '').trim();
   const clientSecret = (process.env.ESIA_CLIENT_SECRET || '').trim();
@@ -22,6 +24,7 @@ export function buildOptionalOAuthProviders(): any[] {
       YandexProvider({
         clientId: yandexId,
         clientSecret: yandexSecret,
+        allowDangerousEmailAccountLinking: true,
       })
     );
   }
@@ -35,6 +38,23 @@ export function buildOptionalOAuthProviders(): any[] {
       VkProvider({
         clientId: vkId,
         clientSecret: vkSecret,
+        allowDangerousEmailAccountLinking: true,
+        authorization: { params: { scope: 'email' } },
+        profile(profile: Record<string, unknown>) {
+          const first = String(profile.first_name || profile.given_name || '');
+          const last = String(profile.last_name || profile.family_name || '');
+          const name = [first, last].filter(Boolean).join(' ') || String(profile.name || 'VK');
+          const image = String(
+            profile.photo_200 || profile.photo_100 || profile.picture || profile.image || ''
+          );
+          return {
+            id: String(profile.id || profile.sub || ''),
+            name,
+            email: typeof profile.email === 'string' ? profile.email : null,
+            image: image || null,
+            bdate: profile.bdate ? String(profile.bdate) : null,
+          };
+        },
       })
     );
   }
@@ -47,6 +67,7 @@ export function buildOptionalOAuthProviders(): any[] {
       type: 'oauth',
       clientId: esia.clientId,
       clientSecret: esia.clientSecret,
+      allowDangerousEmailAccountLinking: true,
       checks: 'pkce',
       authorization: {
         url: (process.env.ESIA_AUTH_URL || 'https://esia.gosuslugi.ru/aas/oauth2/ac').trim(),
@@ -82,6 +103,8 @@ export function oauthProviderFlags() {
   return {
     yandex: Boolean((process.env.YANDEX_CLIENT_ID || "").trim() && (process.env.YANDEX_CLIENT_SECRET || "").trim()),
     vk: Boolean((process.env.VK_CLIENT_ID || "").trim() && (process.env.VK_CLIENT_SECRET || "").trim()),
+    telegram: telegramLoginReady(),
+    telegramBot: telegramLoginReady() ? telegramBotUsername() : '',
     esia: esiaEnv().ready,
   };
 }

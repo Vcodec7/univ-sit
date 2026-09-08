@@ -158,7 +158,7 @@ RESEND_FROM=noreply@young.idivles.ru
 15 3 * * * /opt/sochi-portal/scripts/full-backup.sh >> /var/log/sochi-backup.log 2>&1
 ```
 
-Хранение: ~7 full-архивов, ~14 дампов БД.
+Хранение: ~7 full-архивов, ~14 дампов БД. Off-box S3 и drill восстановления: `docs/OPS-BACKUP.md`.
 
 ### Ручной бэкап
 

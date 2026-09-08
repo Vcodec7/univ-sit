@@ -1,6 +1,6 @@
 {
   "name": "sochi-portal",
-  "version": "1.6.166",
+  "version": "1.6.168",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -49,6 +49,7 @@
     "better-sqlite3": "^13.0.2",
     "docx-preview": "^0.4.0",
     "framer-motion": "^12.43.0",
+    "fuse.js": "^7.1.0",
     "html5-qrcode": "^2.3.8",
     "ioredis": "^6.0.0",
     "isomorphic-dompurify": "^3.19.0",

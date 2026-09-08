@@ -21,7 +21,7 @@ export type RegistrationMeta = {
 export type RegistrationInput = {
   name: string;
   email: string;
-  phone: string;
+  phone: string | null;
   /** Already bcrypt-hashed */
   passwordHash: string;
   meta?: RegistrationMeta | null;
@@ -46,7 +46,7 @@ export async function completeRegistration(input: RegistrationInput) {
         data: {
           name: input.name,
           email,
-          phone: input.phone,
+          phone: input.phone?.startsWith('nophone:') ? null : input.phone || null,
           password: input.passwordHash,
           publicCode: generatePublicCode(),
           emailVerified: now,

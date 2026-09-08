@@ -16,6 +16,7 @@ import {
 import { getCoworkingAvailability } from '@/lib/coworking-availability';
 import { groupInclude, newCoworkingInviteToken } from '@/lib/coworking-group';
 import { adjustScore, M_BALL } from '@/lib/score-scales';
+import { hasFeatureConsent } from '@/lib/feature-consents';
 import { buildCoworkingCode } from '@/lib/tickets';
 
 export const dynamic = 'force-dynamic';
@@ -88,6 +89,17 @@ export async function POST(req: Request) {
   }
   if (!COWORKING_PERIODS.some((p) => p.id === period)) {
     return NextResponse.json({ message: 'Неверный интервал' }, { status: 400 });
+  }
+
+  const userRow = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { notificationPrefsJson: true },
+  });
+  if (!hasFeatureConsent(userRow?.notificationPrefsJson, 'coworking')) {
+    return NextResponse.json(
+      { message: 'Нужно коротко подтвердить правила коворкинга', code: 'NEED_FEATURE_CONSENT', feature: 'coworking' },
+      { status: 412 }
+    );
   }
 
   const space = await prisma.space.findUnique({ where: { id: spaceId } });

@@ -29,6 +29,7 @@ test('html scrollbar is not forced into a layout column', () => {
 
 test('home sections do not leave tall empty wells', () => {
   assert.match(unify, /home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*0\.85rem\s*!important/);
+  assert.doesNotMatch(unify, /contain-intrinsic-size:\s*1px 420px/);
   assert.match(unify, /home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/);
   assert.match(unify, /home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/);
 });

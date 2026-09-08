@@ -13,13 +13,13 @@ import { clientIp, edgeRateAllow } from '@/lib/edge-rate-limit';
 function buildCsp(): string {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://*.yandex.ru https://yastatic.net",
+    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://*.yandex.ru https://yastatic.net https://telegram.org https://*.telegram.org",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https: http:",
     "font-src 'self' data:",
     "connect-src 'self' https://mc.yandex.ru https://*.yandex.ru wss: https:",
     "media-src 'self' blob: https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru",
-    "frame-src 'self' https://yandex.ru https://*.yandex.ru https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://gosuslugi.ru https://*.gosuslugi.ru https://pos.gosuslugi.ru",
+    "frame-src 'self' https://yandex.ru https://*.yandex.ru https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://gosuslugi.ru https://*.gosuslugi.ru https://pos.gosuslugi.ru https://oauth.telegram.org https://telegram.org",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

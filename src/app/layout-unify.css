@@ -2522,8 +2522,6 @@ body:has(.home-page--lift) .home-page .glass {
 .home-page--lift .home-section,
 .home-page--lift .afisha-week.home-section {
   margin-bottom: 0.85rem !important;
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 420px;
 }
 .home-page--lift .home-section-head {
   margin-bottom: 0.4rem !important;

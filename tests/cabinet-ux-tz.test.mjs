@@ -20,8 +20,9 @@ test('cabinet hubs stay within Miller 7±2 and hide settings', () => {
 
 test('login SMS CTA is gated on ready provider', () => {
   const src = readFileSync(join(root, 'src/app/login/page.tsx'), 'utf8');
-  assert.match(src, /smsOn && smsReady/);
-  assert.doesNotMatch(src, /провайдер не настроен/);
+  assert.doesNotMatch(src, /Войти по телефону и SMS/);
+  assert.doesNotMatch(src, /smsOn && smsReady/);
+  assert.match(src, /SocialAuthButtons/);
 });
 
 test('edit intercepting route and shop grid exist', () => {
