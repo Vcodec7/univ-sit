@@ -64,8 +64,8 @@ export default function OnboardingSheet({
           {title}
         </div>
         <div className="yp-onboard-sheet__text">{children}</div>
-        <div className="yp-onboard-sheet__actions">{actions}</div>
       </div>
+      <div className="yp-onboard-sheet__actions">{actions}</div>
     </div>
   );
 }

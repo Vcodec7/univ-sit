@@ -1812,6 +1812,7 @@ a.home-hero-btn.btn-secondary {
   max-width: 520px;
   margin: 0 auto;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.7rem;
   align-items: flex-start;
   padding: 0.75rem 0.85rem;
@@ -1820,6 +1821,9 @@ a.home-hero-btn.btn-secondary {
   color: #fff;
   box-shadow: 0 14px 36px rgba(15, 23, 42, 0.4);
   animation: yp-onboard-in 0.28s ease-out both;
+  max-height: min(70dvh, calc(100dvh - env(safe-area-inset-bottom, 0px) - 1.5rem));
+  overflow: hidden;
+  box-sizing: border-box;
 }
 @keyframes yp-onboard-in {
   from { opacity: 0.92; transform: translateY(4px); }
@@ -1842,6 +1846,10 @@ a.home-hero-btn.btn-secondary {
 .yp-onboard-sheet__body {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .yp-onboard-sheet__title {
   font-weight: 700;
@@ -1852,6 +1860,10 @@ a.home-hero-btn.btn-secondary {
   font-size: 0.78rem;
   line-height: 1.4;
   color: rgba(255, 255, 255, 0.72);
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
 }
 .yp-onboard-sheet__text p {
   margin: 0;
@@ -1866,17 +1878,18 @@ a.home-hero-btn.btn-secondary {
 }
 .yp-onboard-sheet__actions {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 0.55rem;
+  margin-top: 0;
   align-items: center;
-  overflow-x: auto;
+  flex: 1 0 100%;
+  flex-shrink: 0;
 }
 .yp-onboard-btn {
   appearance: none;
   border: 0;
   border-radius: 9px;
-  padding: 0.42rem 0.7rem;
+  padding: 0.55rem 0.75rem;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 650;
@@ -1884,13 +1897,15 @@ a.home-hero-btn.btn-secondary {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.3rem;
   text-decoration: none;
   color: inherit;
+  min-height: 44px;
 }
 .yp-onboard-btn--primary {
-  background: #8b6fd4;
-  color: #042f2e;
+  background: #6e4bc4;
+  color: #fff;
 }
 .yp-onboard-btn--ghost {
   background: rgba(255, 255, 255, 0.08);
@@ -6831,6 +6846,14 @@ a.dashboard-nav-btn {
   font-weight: 700;
   cursor: pointer;
   text-decoration: underline;
+  min-height: 44px;
+}
+.legal-diff__body {
+  max-height: 28vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  margin-top: 0.4rem;
 }
 .legal-diff__line.is-add {
   background: #dcfce7;
@@ -6859,6 +6882,10 @@ a.dashboard-nav-btn {
   padding: 1.25rem 1.4rem;
   max-width: 28rem;
   width: 100%;
+  max-height: min(90dvh, calc(100dvh - 2rem));
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 16px 40px rgba(10, 12, 42, 0.2);
 }
 .feature-consent__card ul {
@@ -6869,6 +6896,11 @@ a.dashboard-nav-btn {
   display: flex;
   gap: 0.6rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 0.5rem;
 }
 .legal-aside .btn-primary {
   background: #fff;
@@ -8987,6 +9019,7 @@ a.dashboard-nav-btn {
 .privacy-gate__card {
   box-sizing: border-box;
   width: min(100%, 420px);
+  max-height: 100%;
   margin: 0;
   padding: 1.35rem 1.2rem 1.25rem;
   background: #fff;
@@ -8997,6 +9030,15 @@ a.dashboard-nav-btn {
   align-items: stretch;
   gap: 0;
   text-align: left;
+  overflow: hidden;
+}
+
+.privacy-gate__scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .privacy-gate__icon {
@@ -9068,6 +9110,11 @@ a.dashboard-nav-btn {
   gap: 0.55rem;
   margin-top: 1.15rem;
   width: 100%;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 0.35rem;
 }
 
 .privacy-gate__row {
@@ -9087,6 +9134,7 @@ a.dashboard-nav-btn {
   margin: 0;
   padding: 0.7rem 0.9rem;
   justify-content: center;
+  min-height: 44px;
 }
 
 /* Compact profile hero + showcase badges on avatar */
@@ -23510,7 +23558,7 @@ button.profile-hero__bio-cta {
   position: relative;
   z-index: 1;
   width: min(100%, 520px);
-  max-height: min(90vh, 720px);
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -23643,9 +23691,9 @@ body.yp-scroll-locked {
   overscroll-behavior: none;
 }
 
-/* Cookie sheet stays below sticky header (10100) so «Вход» remains clickable */
+/* Cookie sheet stays below privacy-gate (10060) so re-consent actions stay clickable */
 .yp-onboard-sheet.yp-cookie-banner {
-  z-index: 10050 !important;
+  z-index: 10040 !important;
 }
 
 /* === Sprint 1.6: occupancy / coworking / presence QR / scores === */
@@ -25353,7 +25401,7 @@ html.has-session .nav-auth-mobile {
   border-radius: 32px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  max-height: min(90vh, 640px);
+  max-height: 90dvh;
 }
 .svc-modal__aside {
   background: linear-gradient(160deg, #0d7377 0%, #095456 100%);
@@ -25404,6 +25452,8 @@ html.has-session .nav-auth-mobile {
   flex-wrap: nowrap;
   gap: 0.55rem;
   align-items: stretch;
+  flex-shrink: 0;
+  background: #fff;
 }
 .svc-modal__footer .btn {
   flex: 1 1 0;
@@ -25422,7 +25472,13 @@ html.has-session .nav-auth-mobile {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
+}
+.svc-modal__body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .svc-modal__close {
   position: absolute;

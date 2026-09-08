@@ -34,6 +34,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
   const [analyticsOn, setAnalyticsOn] = useState(false);
   const [preferencesOn, setPreferencesOn] = useState(false);
   const [forceOpen, setForceOpen] = useState(false);
+  const [privacyBlocking, setPrivacyBlocking] = useState(false);
 
   useEffect(() => {
     const onOpen = () => {
@@ -72,6 +73,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
         .then((data) => {
           if (!data) {
             setNeedProfileSign(false);
+            setPrivacyBlocking(false);
             const local = readCookieConsent();
             setVisible(!hasAnsweredCookieBanner() || local?.version !== COOKIES_POLICY_VERSION);
             return;
@@ -79,14 +81,16 @@ export default function ConsentBanner({ enabled = true }: Props) {
           const needCookies =
             !data?.cookiesAcceptedAt || data?.cookiesPolicyVersion !== COOKIES_POLICY_VERSION;
           const needPrivacy = Boolean(data?.needsPrivacyReconsent);
+          setPrivacyBlocking(needPrivacy);
           setNeedProfileSign(Boolean(needCookies || needPrivacy));
           const answered = hasAnsweredCookieBanner();
           const local = readCookieConsent();
           const versionGap = answered && local?.version !== COOKIES_POLICY_VERSION;
-          setVisible(needCookies || !answered || Boolean(versionGap));
+          setVisible(!needPrivacy && (needCookies || !answered || Boolean(versionGap)));
         })
         .catch(() => {
           setNeedProfileSign(false);
+          setPrivacyBlocking(false);
           const local = readCookieConsent();
           setVisible(!hasAnsweredCookieBanner() || local?.version !== COOKIES_POLICY_VERSION);
         });
@@ -94,6 +98,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
     }
 
     setNeedProfileSign(false);
+    setPrivacyBlocking(false);
     const local = readCookieConsent();
     setVisible(!hasAnsweredCookieBanner() || local?.version !== COOKIES_POLICY_VERSION);
   }, [session, status, enabled, forceOpen]);
@@ -126,7 +131,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
     setVisible(false);
   };
 
-  if (!enabled || !visible) return null;
+  if (!enabled || !visible || (privacyBlocking && !forceOpen)) return null;
 
   const loggedIn = Boolean(session?.user);
   const icon = customize ? (
@@ -153,7 +158,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
     <OnboardingSheet
       className="yp-cookie-banner"
       ariaLabel="Согласие на использование cookies"
-      zIndex={10060}
+      zIndex={10040}
       icon={icon}
       title={customize ? 'Настройки cookie' : 'Cookie'}
       onDismiss={forceOpen ? dismissSettings : undefined}

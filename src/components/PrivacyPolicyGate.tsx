@@ -126,6 +126,7 @@ export default function PrivacyPolicyGate() {
       aria-describedby="privacy-gate-desc"
     >
       <div className="privacy-gate__card allow-select">
+        <div className="privacy-gate__scroll">
         <div
           className={`privacy-gate__icon${refused ? ' is-refused' : ''}`}
           aria-hidden
@@ -153,6 +154,7 @@ export default function PrivacyPolicyGate() {
         </p>
 
         {error ? <p className="privacy-gate__error">{error}</p> : null}
+        </div>
 
         <div className="privacy-gate__actions">
           <button
