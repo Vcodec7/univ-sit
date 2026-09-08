@@ -14,10 +14,12 @@ export default function EtaCountdown({
   doneLabel?: string;
 }) {
   const deadline = parseEtaDeadline(eta);
-  const [now, setNow] = useState(() => Date.now());
+  /* Starts null so SSR and first client render match; the clock starts after mount. */
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
     if (!deadline) return;
+    setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, [deadline]);
@@ -31,6 +33,10 @@ export default function EtaCountdown({
       </p>
     );
   }
+
+  /* Both the countdown and the absolute date are locale/timezone dependent,
+     so nothing is rendered until the client clock is available. */
+  if (now === null) return null;
 
   const left = deadline.getTime() - now;
   if (left <= 0) {

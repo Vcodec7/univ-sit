@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { aclJsonError, requireAdmin, requirePermission } from '@/lib/acl';
 
+/** Cap so a growing table can't OOM the 2 GB staging box on one CSV click. */
+const EXPORT_LIMIT = 20_000;
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -11,6 +14,7 @@ export async function GET(req: Request) {
       await requireAdmin();
       const users = await prisma.user.findMany({
         orderBy: { createdAt: 'desc' },
+        take: EXPORT_LIMIT,
         select: {
           id: true,
           name: true,
@@ -52,6 +56,7 @@ export async function GET(req: Request) {
           program: true,
         },
         orderBy: { createdAt: 'desc' },
+        take: EXPORT_LIMIT,
       });
 
       let csvContent = 'ID,User Name,User Email,User Phone,Target,Status,Created At\n';

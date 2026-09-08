@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { profanityResponse } from "@/lib/censor";
 import { AclError, aclJsonError, requireEndUser } from "@/lib/acl";
@@ -115,7 +116,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Площадка недоступна" }, { status: 400 });
     }
 
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(
+      async (tx) => {
       const candidates = await tx.booking.findMany({
         where: {
           spaceId,
@@ -160,7 +162,11 @@ export async function POST(req: Request) {
           status: autoApprove ? "APPROVED" : "PENDING",
         },
       });
-    });
+      },
+      /* Serializable: the overlap check and the insert must not interleave,
+         otherwise two parallel requests both see a free slot. */
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+    );
 
     if (autoApprove) {
       await promoteToParticipant(userId);
@@ -228,6 +234,13 @@ export async function POST(req: Request) {
           message:
             'Интервал занят или слишком близко к другой брони (нужен зазор 10 мин., например после 10:00–11:00 — следующее с 11:10).',
         },
+        { status: 409 }
+      );
+    }
+    /* Serializable rollback: another request grabbed the same slot first. */
+    if (error?.code === "P2034" || error?.code === "40001") {
+      return NextResponse.json(
+        { message: "Этот интервал только что заняли. Обновите страницу и выберите другое время." },
         { status: 409 }
       );
     }

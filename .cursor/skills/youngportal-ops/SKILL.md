@@ -45,6 +45,7 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 | `bash scripts/apply-staging.sh prebuilt` | Next собирается здесь, на VPS только маленькая Docker-сборка |
 | `YP_REUSE_NEXT=1 bash scripts/apply-staging.sh prebuilt` | Повторная выкладка того же `.next` (только если сборка уже есть и код не менялся) |
 | `bash scripts/dev-loop.sh` | test + ui-guard одной командой |
+| `npm run health` | test + ui-guard + `tsc --noEmit` (`scripts/code-health-check.sh`) |
 
 ## Фирменные цвета
 
