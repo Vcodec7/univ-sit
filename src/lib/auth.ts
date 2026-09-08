@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { buildOptionalOAuthProviders } from "./oauth-providers";
+import { peekOAuthCreds } from "./oauth-settings";
 import { consumeCaptchaToken } from "@/lib/captcha";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
@@ -65,8 +66,9 @@ async function findUserByLogin(loginRaw: string) {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  providers: [
-    ...buildOptionalOAuthProviders(),
+  get providers() {
+    return [
+    ...buildOptionalOAuthProviders(peekOAuthCreds()),
     CredentialsProvider({
       id: "telegram",
       name: "Telegram",
@@ -339,7 +341,8 @@ export const authOptions: NextAuthOptions = {
         return user as any;
       },
     }),
-  ],
+  ];
+  },
   session: {
     strategy: "jwt",
   },

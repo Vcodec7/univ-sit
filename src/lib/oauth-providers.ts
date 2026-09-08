@@ -1,22 +1,17 @@
 /**
  * Optional OAuth providers (Yandex / VK / ESIA).
- * Enabled only when client id+secret env vars are set.
+ * Keys: техконсоль /ops (SiteSettings.oauthSsoJson), иначе .env.
  * See docs/OAUTH-YANDEX-VK.md and docs/OAUTH-ESIA.md
  */
 
-import { telegramLoginReady, telegramBotUsername } from '@/lib/telegram-login';
+import { type OAuthCreds, oauthFlagsFromCreds, peekOAuthCreds } from '@/lib/oauth-settings';
 
-function esiaEnv() {
-  const clientId = (process.env.ESIA_CLIENT_ID || '').trim();
-  const clientSecret = (process.env.ESIA_CLIENT_SECRET || '').trim();
-  return { clientId, clientSecret, ready: Boolean(clientId && clientSecret) };
-}
-
-export function buildOptionalOAuthProviders(): any[] {
+export function buildOptionalOAuthProviders(creds?: OAuthCreds): any[] {
+  const c = creds || peekOAuthCreds();
   const out: any[] = [];
 
-  const yandexId = (process.env.YANDEX_CLIENT_ID || "").trim();
-  const yandexSecret = (process.env.YANDEX_CLIENT_SECRET || "").trim();
+  const yandexId = c.yandexId;
+  const yandexSecret = c.yandexSecret;
   if (yandexId && yandexSecret) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const YandexProvider = require("next-auth/providers/yandex").default;
@@ -29,8 +24,8 @@ export function buildOptionalOAuthProviders(): any[] {
     );
   }
 
-  const vkId = (process.env.VK_CLIENT_ID || "").trim();
-  const vkSecret = (process.env.VK_CLIENT_SECRET || "").trim();
+  const vkId = c.vkId;
+  const vkSecret = c.vkSecret;
   if (vkId && vkSecret) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const VkProvider = require("next-auth/providers/vk").default;
@@ -59,14 +54,13 @@ export function buildOptionalOAuthProviders(): any[] {
     );
   }
 
-  const esia = esiaEnv();
-  if (esia.ready) {
+  if (c.esiaId && c.esiaSecret) {
     out.push({
       id: 'esia',
       name: 'Госуслуги',
       type: 'oauth',
-      clientId: esia.clientId,
-      clientSecret: esia.clientSecret,
+      clientId: c.esiaId,
+      clientSecret: c.esiaSecret,
       allowDangerousEmailAccountLinking: true,
       checks: 'pkce',
       authorization: {
@@ -100,11 +94,5 @@ export function buildOptionalOAuthProviders(): any[] {
 }
 
 export function oauthProviderFlags() {
-  return {
-    yandex: Boolean((process.env.YANDEX_CLIENT_ID || "").trim() && (process.env.YANDEX_CLIENT_SECRET || "").trim()),
-    vk: Boolean((process.env.VK_CLIENT_ID || "").trim() && (process.env.VK_CLIENT_SECRET || "").trim()),
-    telegram: telegramLoginReady(),
-    telegramBot: telegramLoginReady() ? telegramBotUsername() : '',
-    esia: esiaEnv().ready,
-  };
+  return oauthFlagsFromCreds(peekOAuthCreds());
 }

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { peekOAuthCreds } from '@/lib/oauth-settings';
 
 export type TelegramWidgetPayload = {
   id: string;
@@ -11,13 +12,12 @@ export type TelegramWidgetPayload = {
 };
 
 export function telegramLoginReady() {
-  return Boolean(
-    (process.env.TELEGRAM_BOT_TOKEN || '').trim() && (process.env.TELEGRAM_BOT_USERNAME || '').trim()
-  );
+  const c = peekOAuthCreds();
+  return Boolean(c.telegramToken && c.telegramUsername);
 }
 
 export function telegramBotUsername() {
-  return (process.env.TELEGRAM_BOT_USERNAME || '').trim().replace(/^@/, '');
+  return peekOAuthCreds().telegramUsername.replace(/^@/, '');
 }
 
 function dataCheckString(data: Record<string, string>) {
@@ -29,7 +29,7 @@ function dataCheckString(data: Record<string, string>) {
 }
 
 export function verifyTelegramWidget(raw: Record<string, unknown>): TelegramWidgetPayload | null {
-  const token = (process.env.TELEGRAM_BOT_TOKEN || '').trim();
+  const token = peekOAuthCreds().telegramToken;
   if (!token) return null;
   const flat: Record<string, string> = {};
   for (const [k, v] of Object.entries(raw)) {

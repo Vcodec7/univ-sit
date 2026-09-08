@@ -98,6 +98,18 @@ sudo -n chown -R 1000:1000 /opt/sochi-portal/public/uploads 2>/dev/null || sudo 
 sudo -n docker build -f "$EXTRACT/Dockerfile.prebuilt" -t sochi-staging_web:latest "$EXTRACT"
 sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml up -d --no-build web
 
+# Additive column: prisma db push is blocked by leftover User.featureConsentsJson
+# (do not --accept-data-loss). Nullable TEXT is safe on the shared DB.
+DB_CTR="$(sudo -n docker ps --format '{{.Names}}' | grep -E 'sochi-portal.*db|_db_' | head -1 || true)"
+if [[ -n "$DB_CTR" ]]; then
+  echo "==> ensure SiteSettings.oauthSsoJson exists ($DB_CTR)"
+  sudo -n docker exec "$DB_CTR" psql -U sochi -d sochi_portal -v ON_ERROR_STOP=1 \
+    -c 'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "oauthSsoJson" TEXT;' \
+    || echo "WARN: ALTER oauthSsoJson failed"
+else
+  echo "WARN: postgres container not found for oauthSsoJson" >&2
+fi
+
 if [[ "$NEW_SHA" == "$OLD_SHA" ]]; then
   echo "==> prisma schema unchanged, skip db push"
 else
