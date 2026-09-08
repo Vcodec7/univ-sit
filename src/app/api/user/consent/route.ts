@@ -10,6 +10,16 @@ import {
 } from '@/lib/consent';
 import { needsPrivacyReconsent } from '@/lib/privacy-consent';
 import { unlockAchievement } from '@/lib/award-achievements';
+import {
+  FEATURE_CONSENT_COPY,
+  FEATURE_CONSENT_KEYS,
+  parseFeatureConsents,
+  type FeatureConsentKey,
+} from '@/lib/feature-consents';
+
+function isFeatureKey(v: unknown): v is FeatureConsentKey {
+  return FEATURE_CONSENT_KEYS.includes(v as FeatureConsentKey);
+}
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -27,10 +37,12 @@ export async function GET() {
       cookiesAcceptedAt: true,
       cookiesSignature: true,
       cookiesPolicyVersion: true,
+      featureConsentsJson: true,
     },
   });
   return NextResponse.json({
     ...(user || {}),
+    featureConsents: parseFeatureConsents(user?.featureConsentsJson),
     currentPrivacyVersion: PRIVACY_POLICY_VERSION,
     currentCookiesVersion: COOKIES_POLICY_VERSION,
     needsPrivacyReconsent: needsPrivacyReconsent(user),
@@ -47,6 +59,7 @@ export async function POST(req: Request) {
   const refusePrivacy = Boolean(body.refusePrivacy);
   const wantPrivacy = Boolean(body.privacy);
   const wantCookies = Boolean(body.cookies);
+  const feature = isFeatureKey(body.feature) ? body.feature : null;
 
   if (refusePrivacy) {
     const user = await prisma.user.update({
@@ -65,6 +78,26 @@ export async function POST(req: Request) {
       user,
       needsPrivacyReconsent: true,
       currentPrivacyVersion: PRIVACY_POLICY_VERSION,
+    });
+  }
+
+  if (feature) {
+    const existing = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { featureConsentsJson: true },
+    });
+    const map = parseFeatureConsents(existing?.featureConsentsJson);
+    map[feature] = new Date().toISOString();
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data: { featureConsentsJson: JSON.stringify(map) },
+      select: { featureConsentsJson: true },
+    });
+    return NextResponse.json({
+      ok: true,
+      feature,
+      copy: FEATURE_CONSENT_COPY[feature],
+      featureConsents: parseFeatureConsents(user.featureConsentsJson),
     });
   }
 

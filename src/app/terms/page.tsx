@@ -51,8 +51,7 @@ export default async function TermsPage() {
         <span className="legal-pill">Версия {TERMS_POLICY_VERSION}</span>
       }
       toc={toc}
-    >
-      <div className="legal-prose" dangerouslySetInnerHTML={{ __html: html }} />
-    </LegalDocShell>
+      interactiveHtml={html}
+    />
   );
 }

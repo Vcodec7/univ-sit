@@ -44,8 +44,7 @@ export default async function RulesPage() {
         </>
       }
       toc={toc}
-    >
-      <div className="legal-prose" dangerouslySetInnerHTML={{ __html: html }} />
-    </LegalDocShell>
+      interactiveHtml={html}
+    />
   );
 }

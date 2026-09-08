@@ -58,6 +58,7 @@ export default async function PrivacyPolicy() {
         </>
       }
       toc={toc}
+      interactiveHtml={html}
       aside={
         <>
           <h2 className="legal-aside-title">Скачать и проверить</h2>
@@ -76,9 +77,7 @@ export default async function PrivacyPolicy() {
         </>
       }
     >
-      {html ? (
-        <div className="legal-prose" dangerouslySetInnerHTML={{ __html: html }} />
-      ) : (
+      {html ? null : (
         <div className="legal-prose" style={{ whiteSpace: 'pre-wrap' }}>
           {applySitePlaceholders(cms.body, identity)}
         </div>

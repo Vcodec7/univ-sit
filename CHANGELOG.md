@@ -1,5 +1,19 @@
 # Changelog — YoungPortal
 
+## [1.6.168] — 2026-09-08
+
+### Auth
+- `/login` и `/register` собираются как dynamic — контейнер больше не падает на «Page changed from static to dynamic»
+
+### Backups
+- Ежедневный `pg_dump` + опциональная копия в S3 через rclone (`docs/OPS-BACKUP.md`, `scripts/backup-offsite.sh`)
+- Учебное восстановление: `scripts/restore-db-drill.sh`
+
+### Legal UX
+- На /privacy, /rules, /terms: «человеческий язык», поиск с опечатками (fuse.js), подсветка найденного раздела
+- При обновлении политики — визуальный diff в окне согласия
+- Регистрация: согласие на политику ПДн; правила коворкинга/портфолио — в момент использования
+
 ## [1.6.167] — 2026-09-08
 
 ### Auth

@@ -382,15 +382,7 @@ function RegisterForm() {
               <Link href="/privacy" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
                 Политику конфиденциальности
               </Link>
-              {', '}
-              <Link href="/rules" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
-                Правила сайта
-              </Link>
-              {' и '}
-              <Link href="/terms" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
-                Пользовательское соглашение
-              </Link>
-              .
+              . Правила отдельных сервисов (коворкинг, портфолио) показываем в момент использования.
             </span>
           </label>
           {fieldErr.privacy ? <p className="yp-auth-hint" style={{ color: '#b91c1c' }}>{fieldErr.privacy}</p> : null}
