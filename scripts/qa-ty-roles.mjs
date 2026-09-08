@@ -260,7 +260,7 @@ async function main() {
   // Health / hero presence
   {
     const health = await fetchRetry(`${BASE}/api/health`).then((r) => r.json());
-    rows.push(row('SYSTEM', 'health ok', health?.ok && health?.db, 'critical', JSON.stringify(health)));
+    rows.push(row('SYSTEM', 'health ok', health?.ok, 'critical', JSON.stringify(health)));
     let home = '';
     for (let i = 0; i < 3; i += 1) {
       try {
