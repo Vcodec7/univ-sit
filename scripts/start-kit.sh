@@ -38,7 +38,15 @@ SSH_PORT="${SSH_PORT:-22}"
 ASSUME_YES="${ASSUME_YES:-0}"
 PROD_DOMAIN="${PROD_DOMAIN:-${DOMAIN:-}}"
 STAGING_DOMAIN="${STAGING_DOMAIN:-}"
-SITE_NAME="${SITE_NAME:-Молодёжь Сочи}"
+SITE_NAME="${SITE_NAME:-Молодёжный портал}"
+ORG_CITY="${ORG_CITY:-}"
+ORG_ADDRESS="${ORG_ADDRESS:-}"
+CONTACT_PHONE="${CONTACT_PHONE:-}"
+CONTACT_EMAIL_ORG="${CONTACT_EMAIL_ORG:-}"
+OPERATOR_NAME="${OPERATOR_NAME:-}"
+OPERATOR_INN="${OPERATOR_INN:-}"
+OPERATOR_OGRN="${OPERATOR_OGRN:-}"
+PDN_EMAIL="${PDN_EMAIL:-}"
 TLS_MODE="${TLS_MODE:-letsencrypt}"
 LE_EMAIL="${LE_EMAIL:-}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-}"
@@ -75,6 +83,14 @@ while [[ $# -gt 0 ]]; do
     --prod-domain|--domain) PROD_DOMAIN="$2"; shift 2 ;;
     --staging-domain) STAGING_DOMAIN="$2"; shift 2 ;;
     --site-name) SITE_NAME="$2"; shift 2 ;;
+    --org-city) ORG_CITY="$2"; shift 2 ;;
+    --org-address) ORG_ADDRESS="$2"; shift 2 ;;
+    --contact-phone) CONTACT_PHONE="$2"; shift 2 ;;
+    --contact-email) CONTACT_EMAIL_ORG="$2"; shift 2 ;;
+    --operator-name) OPERATOR_NAME="$2"; shift 2 ;;
+    --operator-inn) OPERATOR_INN="$2"; shift 2 ;;
+    --operator-ogrn) OPERATOR_OGRN="$2"; shift 2 ;;
+    --pdn-email) PDN_EMAIL="$2"; shift 2 ;;
     --tls-mode) TLS_MODE="$2"; shift 2 ;;
     --le-email) LE_EMAIL="$2"; shift 2 ;;
     --admin-email) ADMIN_EMAIL="$2"; shift 2 ;;
@@ -251,6 +267,22 @@ if [[ "$ASSUME_YES" != "1" ]] && need_domains; then
   fi
 fi
 
+if [[ "$ASSUME_YES" != "1" ]]; then
+  echo
+  read -r -p "Название портала [${SITE_NAME}]: " sn || true
+  SITE_NAME="${sn:-$SITE_NAME}"
+  read -r -p "Город: " ORG_CITY || true
+  read -r -p "Адрес: " ORG_ADDRESS || true
+  read -r -p "Телефон: " CONTACT_PHONE || true
+  read -r -p "Email для посетителей [${LE_EMAIL:-}]: " ce || true
+  CONTACT_EMAIL_ORG="${ce:-${LE_EMAIL:-}}"
+  read -r -p "Оператор ПДн (юрлицо): " OPERATOR_NAME || true
+  read -r -p "ИНН: " OPERATOR_INN || true
+  read -r -p "ОГРН: " OPERATOR_OGRN || true
+  read -r -p "Email ответственного за ПДн [${CONTACT_EMAIL_ORG}]: " pe || true
+  PDN_EMAIL="${pe:-$CONTACT_EMAIL_ORG}"
+fi
+
 reject_bad_domain "$PROD_DOMAIN" "Прод"
 reject_bad_domain "$STAGING_DOMAIN" "Тест"
 [[ "$PROD_DOMAIN" != "$STAGING_DOMAIN" ]] || die "Домены прод и тест должны отличаться"
@@ -281,6 +313,14 @@ if [[ -n "$REMOTE_HOST" ]]; then
   [[ -n "$SEED_PASSWORD" ]] && RARGS+=(--seed-password "$SEED_PASSWORD")
   [[ -n "$ADMIN_EMAIL" ]] && RARGS+=(--admin-email "$ADMIN_EMAIL")
   [[ -n "$ADMIN_PASSWORD" ]] && RARGS+=(--admin-password "$ADMIN_PASSWORD")
+  [[ -n "$ORG_CITY" ]] && RARGS+=(--org-city "$ORG_CITY")
+  [[ -n "$ORG_ADDRESS" ]] && RARGS+=(--org-address "$ORG_ADDRESS")
+  [[ -n "$CONTACT_PHONE" ]] && RARGS+=(--contact-phone "$CONTACT_PHONE")
+  [[ -n "$CONTACT_EMAIL_ORG" ]] && RARGS+=(--contact-email "$CONTACT_EMAIL_ORG")
+  [[ -n "$OPERATOR_NAME" ]] && RARGS+=(--operator-name "$OPERATOR_NAME")
+  [[ -n "$OPERATOR_INN" ]] && RARGS+=(--operator-inn "$OPERATOR_INN")
+  [[ -n "$OPERATOR_OGRN" ]] && RARGS+=(--operator-ogrn "$OPERATOR_OGRN")
+  [[ -n "$PDN_EMAIL" ]] && RARGS+=(--pdn-email "$PDN_EMAIL")
   RARGS+=(--modules "$MODULES")
   [[ -n "$MODULES_OFF" ]] && RARGS+=(--modules-off "$MODULES_OFF")
   [[ "$SEED_ORG" == "1" ]] && RARGS+=(--seed-org)
@@ -316,6 +356,14 @@ ARGS+=(--tls-mode "$TLS_MODE")
 [[ -n "$LE_EMAIL" ]] && ARGS+=(--le-email "$LE_EMAIL")
 [[ -n "$ADMIN_EMAIL" ]] && ARGS+=(--admin-email "$ADMIN_EMAIL")
 [[ -n "$ADMIN_PASSWORD" ]] && ARGS+=(--admin-password "$ADMIN_PASSWORD")
+[[ -n "$ORG_CITY" ]] && ARGS+=(--org-city "$ORG_CITY")
+[[ -n "$ORG_ADDRESS" ]] && ARGS+=(--org-address "$ORG_ADDRESS")
+[[ -n "$CONTACT_PHONE" ]] && ARGS+=(--contact-phone "$CONTACT_PHONE")
+[[ -n "$CONTACT_EMAIL_ORG" ]] && ARGS+=(--contact-email "$CONTACT_EMAIL_ORG")
+[[ -n "$OPERATOR_NAME" ]] && ARGS+=(--operator-name "$OPERATOR_NAME")
+[[ -n "$OPERATOR_INN" ]] && ARGS+=(--operator-inn "$OPERATOR_INN")
+[[ -n "$OPERATOR_OGRN" ]] && ARGS+=(--operator-ogrn "$OPERATOR_OGRN")
+[[ -n "$PDN_EMAIL" ]] && ARGS+=(--pdn-email "$PDN_EMAIL")
 ARGS+=(--modules "$MODULES")
 [[ -n "$MODULES_OFF" ]] && ARGS+=(--modules-off "$MODULES_OFF")
 [[ "$SEED_ORG" == "1" ]] && ARGS+=(--seed-org)

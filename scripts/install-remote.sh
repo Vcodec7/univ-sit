@@ -41,13 +41,21 @@ SSH_PORT="${SSH_PORT:-22}"
 VARIANT="${VARIANT:-}"
 INSTALL_PROFILE="${INSTALL_PROFILE:-}"
 ASSUME_YES="${ASSUME_YES:-1}"
-SITE_NAME="${SITE_NAME:-Молодёжь Сочи}"
+SITE_NAME="${SITE_NAME:-Молодёжный портал}"
 PROD_DOMAIN="${PROD_DOMAIN:-}"
 STAGING_DOMAIN="${STAGING_DOMAIN:-}"
 TLS_MODE="${TLS_MODE:-letsencrypt}"
 LE_EMAIL="${LE_EMAIL:-}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-}"
+ORG_CITY="${ORG_CITY:-}"
+ORG_ADDRESS="${ORG_ADDRESS:-}"
+CONTACT_PHONE="${CONTACT_PHONE:-}"
+CONTACT_EMAIL_ORG="${CONTACT_EMAIL_ORG:-}"
+OPERATOR_NAME="${OPERATOR_NAME:-}"
+OPERATOR_INN="${OPERATOR_INN:-}"
+OPERATOR_OGRN="${OPERATOR_OGRN:-}"
+PDN_EMAIL="${PDN_EMAIL:-}"
 MODULES="${MODULES:-all}"
 MODULES_OFF="${MODULES_OFF:-}"
 SEED_ORG="${SEED_ORG:-}"
@@ -91,6 +99,14 @@ while [[ $# -gt 0 ]]; do
     --prod-domain|--domain) PROD_DOMAIN="$2"; shift 2 ;;
     --staging-domain) STAGING_DOMAIN="$2"; shift 2 ;;
     --site-name) SITE_NAME="$2"; shift 2 ;;
+    --org-city) ORG_CITY="$2"; shift 2 ;;
+    --org-address) ORG_ADDRESS="$2"; shift 2 ;;
+    --contact-phone) CONTACT_PHONE="$2"; shift 2 ;;
+    --contact-email) CONTACT_EMAIL_ORG="$2"; shift 2 ;;
+    --operator-name) OPERATOR_NAME="$2"; shift 2 ;;
+    --operator-inn) OPERATOR_INN="$2"; shift 2 ;;
+    --operator-ogrn) OPERATOR_OGRN="$2"; shift 2 ;;
+    --pdn-email) PDN_EMAIL="$2"; shift 2 ;;
     --tls-mode) TLS_MODE="$2"; shift 2 ;;
     --le-email) LE_EMAIL="$2"; shift 2 ;;
     --admin-email) ADMIN_EMAIL="$2"; shift 2 ;;
@@ -317,6 +333,7 @@ export SEED_PASSWORD=$(printf '%q' "$SEED_PASSWORD")
 export MODULES=$(printf '%q' "$MODULES")
 export MODULES_OFF=$(printf '%q' "$MODULES_OFF")
 export SEED_ORG=$(printf '%q' "${SEED_ORG:-}")
+export PDN_EMAIL=$(printf '%q' "$PDN_EMAIL")
 export SSH_PORT=0
 export LOCK_SSH=0
 ARGS=(--yes --mode dual ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"} $VARIANT_FLAG ${REINSTALL_FLAG[@]+"${REINSTALL_FLAG[@]}"}
@@ -334,6 +351,14 @@ ARGS=(--yes --mode dual ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"} $VARIANT_FLAG ${
 [[ "\$SEED_ORG" == "0" ]] && ARGS+=(--no-seed-org)
 [[ -n "\$ADMIN_EMAIL" ]] && ARGS+=(--admin-email "\$ADMIN_EMAIL")
 [[ -n "\$ADMIN_PASSWORD" ]] && ARGS+=(--admin-password "\$ADMIN_PASSWORD")
+[[ -n "${ORG_CITY}" ]] && ARGS+=(--org-city $(printf '%q' "$ORG_CITY"))
+[[ -n "${ORG_ADDRESS}" ]] && ARGS+=(--org-address $(printf '%q' "$ORG_ADDRESS"))
+[[ -n "${CONTACT_PHONE}" ]] && ARGS+=(--contact-phone $(printf '%q' "$CONTACT_PHONE"))
+[[ -n "${CONTACT_EMAIL_ORG}" ]] && ARGS+=(--contact-email $(printf '%q' "$CONTACT_EMAIL_ORG"))
+[[ -n "${OPERATOR_NAME}" ]] && ARGS+=(--operator-name $(printf '%q' "$OPERATOR_NAME"))
+[[ -n "${OPERATOR_INN}" ]] && ARGS+=(--operator-inn $(printf '%q' "$OPERATOR_INN"))
+[[ -n "${OPERATOR_OGRN}" ]] && ARGS+=(--operator-ogrn $(printf '%q' "$OPERATOR_OGRN"))
+[[ -n "${PDN_EMAIL}" ]] && ARGS+=(--pdn-email $(printf '%q' "$PDN_EMAIL"))
 if [[ -f START.sh ]]; then
   bash START.sh "\${ARGS[@]}"
 elif [[ -f INSTALL.sh ]]; then
@@ -348,8 +373,23 @@ curl -skS --max-time 8 "https://127.0.0.1/api/health" -H "Host: \$PROD_DOMAIN" |
 echo
 [[ -f /etc/yp-portal/admin-credentials.txt ]] && { echo "==> первый ADMIN:"; cat /etc/yp-portal/admin-credentials.txt; }
 [[ -f /etc/yp-portal/seed-accounts.txt ]] && { echo "==> учётки ролей:"; cat /etc/yp-portal/seed-accounts.txt; }
+[[ -f /etc/yp-portal/INSTALL-REPORT.txt ]] && { echo "==> отчёт:"; cat /etc/yp-portal/INSTALL-REPORT.txt; }
 ss -lntp | grep -E ':80|:443' || true
 REMOTE
+
+echo
+echo "Готово. Пароль больше не нужен (ключ установлен)."
+if [[ "$INSTALL_PROFILE" == "client" ]]; then
+  echo "── Клиент: первый ADMIN ──"
+  "${SSH[@]}" '[[ -f /etc/yp-portal/admin-credentials.txt ]] && cat /etc/yp-portal/admin-credentials.txt || echo "(файл ещё не создан)"'
+  echo "  URL: https://${PROD_DOMAIN}"
+  echo "  Отчёт: ssh ${REMOTE} cat /etc/yp-portal/INSTALL-REPORT.txt"
+else
+  echo "── Роли + отчёт ──"
+  "${SSH[@]}" '[[ -f /etc/yp-portal/seed-accounts.txt ]] && cat /etc/yp-portal/seed-accounts.txt; echo; [[ -f /etc/yp-portal/INSTALL-REPORT.txt ]] && cat /etc/yp-portal/INSTALL-REPORT.txt'
+  echo "── Техслужба (только разработчик) ──"
+  "${SSH[@]}" '[[ -f /etc/yp-portal/tech-credentials.txt ]] && cat /etc/yp-portal/tech-credentials.txt || true'
+fi
 
 echo
 echo "Готово. Пароль больше не нужен (ключ установлен)."

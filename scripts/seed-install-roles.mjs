@@ -17,7 +17,7 @@
  *   scanner@DOMAIN   SCANNER
  *   private@DOMAIN   USER PRIVATE
  *
- * TECH — через TECH_EMAIL / TECH_BOOTSTRAP_PASSWORD в .env (не в БД).
+ * TECH — только TECH_EMAIL / TECH_BOOTSTRAP_PASSWORD в .env; в этот файл не пишется.
  *
  *   node scripts/seed-install-roles.mjs
  */
@@ -38,7 +38,8 @@ const DOMAIN = String(process.env.SEED_DOMAIN || 'local.yp')
   .replace(/^@/, '');
 const PASS = String(process.env.SEED_PASSWORD || 'InstallSeed1!').trim();
 const RESET = String(process.env.SEED_RESET_PASSWORDS || '1') !== '0';
-const siteName = String(process.env.SITE_NAME || 'Молодёжь Сочи').trim();
+const siteName = String(process.env.SITE_NAME || 'Молодёжный портал').trim();
+const orgCity = String(process.env.ORG_CITY || '').trim();
 const publicUrl = String(process.env.PUBLIC_URL || '').trim().replace(/\/$/, '');
 const outFile = process.env.SEED_ACCOUNTS_FILE || '';
 
@@ -102,7 +103,7 @@ async function upsertUser(spec, passwordHash) {
     permissions: spec.permissions ?? null,
     profileVisibility: spec.profileVisibility || 'PUBLIC',
     bio: spec.bio || null,
-    city: 'Сочи',
+    city: orgCity || null,
     deletedAt: null,
     blockedAt: null,
     mustChangePassword: false,
@@ -172,7 +173,7 @@ async function main() {
     '',
     ...created.map((c) => `${c.role.padEnd(12)}  ${c.email}`),
     '',
-    'TECH: задайте в .env TECH_EMAIL + TECH_BOOTSTRAP_PASSWORD (вход без записи в БД).',
+    'Техническая служба в этот список не входит.',
   ];
   const text = lines.join('\n') + '\n';
   console.log('\n' + text);
