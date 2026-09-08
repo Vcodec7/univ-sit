@@ -2855,6 +2855,76 @@ body:has(.home-page--lift) .home-page .glass {
   }
 }
 
+/* Visual cleanup 60-30-10: light canvas, lime only on CTA, no dual dashes */
+body:has(.home-page--lift) {
+  background: #f9fafb;
+}
+.home-page.home-page--lift {
+  background-color: #f9fafb !important;
+  background-image:
+    radial-gradient(rgba(15, 23, 42, 0.045) 0.6px, transparent 0.8px) !important;
+  background-size: 22px 22px !important;
+}
+.home-page--lift .lift-hero__eyebrow,
+.home-page--lift .lift-hero__title span {
+  color: #fff !important;
+}
+.home-page--lift .lift-hero__glow {
+  opacity: 0.28;
+}
+.home-page.home-page--lift .home-section-title,
+.home-page--lift .lift-sochi h2,
+.home-page--lift .home-cta-split h2 {
+  color: #111827 !important;
+  font-weight: 800 !important;
+}
+.home-page.home-page--lift .home-section-title::after,
+.home-section-title::after,
+.lift-sochi h2::after,
+.home-page--lift .home-cta-split h2::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  width: 0 !important;
+}
+.home-page--lift .free-now-slot,
+.home-page--lift .lift-feed-card .event-card-seats,
+.home-page--lift .lift-feed-card .event-card-date,
+.home-page--lift .lift-deck__go {
+  color: #4b5563 !important;
+}
+.home-page--lift .free-now-card,
+.home-page--lift .lift-feed-card,
+.home-page--lift .lift-feed-card.event-card,
+.home-page--lift .yp-feed-card,
+.home-page--lift .lift-deck__card,
+.home-page--lift .lift-sochi__card,
+.home-page--lift .home-cta-split article,
+.home-page--lift .home-cta-split article:last-child {
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+.home-page--lift .lift-deck__card {
+  border-top: 1px solid #e5e7eb !important;
+}
+.home-page--lift .free-now-body,
+.home-page--lift .lift-feed-card .event-card-body,
+.home-page--lift .lift-sochi__card {
+  background: #fff !important;
+}
+.home-page--lift .lift-hero__btn--lime,
+.home-page--lift .free-now-actions .lift-hero__btn--lime,
+.home-page--lift .free-now-actions .join-event-btn.is-primary,
+.home-page--lift .home-cta-split .lift-hero__btn--lime {
+  background: #afca03 !important;
+  border-color: #afca03 !important;
+  color: #0a0c2a !important;
+}
+
+
 
 
 

@@ -17,9 +17,9 @@ test('home and events show live afisha, not the weekly bulletin', () => {
   assert.match(page, /UpcomingEvents/);
 });
 
-test('home titles keep lime and purple dashes', () => {
-  assert.match(unify, /home-section-title::after[\s\S]{0,500}#afca03[\s\S]{0,120}#8562d8/);
-  assert.doesNotMatch(unify, /home-section-title::after,\s*\n\.home-section-title::after \{\s*display: none/);
+test('home titles skip dual-color dashes', () => {
+  assert.match(unify, /home-page\.home-page--lift \.home-section-title::after[\s\S]{0,200}display:\s*none\s*!important/);
+  assert.match(unify, /background-color:\s*#f9fafb\s*!important/);
 });
 
 test('html scrollbar is not forced into a layout column', () => {
