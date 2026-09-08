@@ -115,12 +115,12 @@ export default function HomeServiceHero({
         <div className="lift-hero__glow" aria-hidden />
         <SochiLivingSky />
         <div className="container lift-hero__copy">
-          <p className="lift-hero__eyebrow">Сочи · сейчас · {brand}</p>
-          <h1 className="lift-hero__title">
+          <p className="lift-hero__eyebrow break-words overflow-hidden">Сочи · сейчас · {brand}</p>
+          <h1 className="lift-hero__title break-words overflow-hidden">
             Старт с Сочи
-            <span>море, люди, свои</span>
+            <span className="break-words overflow-hidden">море, люди, свои</span>
           </h1>
-          <p className="lift-hero__lead">
+          <p className="lift-hero__lead break-words overflow-hidden">
             Залы, коворкинг, клубы и афиша — один вход в город, без десяти чатов.
           </p>
           <div className="lift-hero__cta">
@@ -200,13 +200,15 @@ export function HomeSochiStrip() {
   return (
     <section className="lift-sochi" aria-labelledby="lift-sochi-title">
       <div className="container">
-        <p className="lift-sochi__eyebrow">Это Сочи</p>
-        <h2 id="lift-sochi-title">Город, в котором тусуешь — не абстрактный портал</h2>
+        <p className="lift-sochi__eyebrow break-words overflow-hidden">Это Сочи</p>
+        <h2 id="lift-sochi-title" className="break-words overflow-hidden">
+          Город, в котором тусуешь — не абстрактный портал
+        </h2>
         <div className="lift-sochi__grid">
           {moments.map((m) => (
             <article key={m.title} className="lift-sochi__card">
-              <h3>{m.title}</h3>
-              <p>{m.text}</p>
+              <h3 className="break-words overflow-hidden">{m.title}</h3>
+              <p className="break-words overflow-hidden">{m.text}</p>
             </article>
           ))}
         </div>

@@ -1,5 +1,29 @@
 # Changelog — YoungPortal
 
+## [1.6.182] — 2026-09-08
+
+### Главная (аудит BUG-04 / BUG-06)
+- Корневой `generateMetadata` больше не вызывает `headers()` — ISR главной не сбрасывается в SSR на каждый запрос
+- Proxy не декодирует JWT без cookie сессии
+- Классы `break-words` / `overflow-hidden` на заголовках главной; на мобилке сброшен `min-width: 13.75rem` у ссылок секций и трекинг eyebrow
+
+## [1.6.181] — 2026-09-08
+
+### Аудит (остаток)
+- `/documents/rules.pdf` отдаёт PDF (`application/pdf`), а не HTML страницы `[id]`
+- Главная: `break-word` у h1–h5/p, `min-width: 0` у секций
+- Главная ISR `revalidate: 60` + `force-static` (каноникал из NEXTAUTH_URL/БД, без `headers()`)
+
+## [1.6.180] — 2026-09-08
+
+### Аудит UI (реестр багов)
+- Админ-списки и колокол уведомлений не падают без `user`/`space` (`staffUserLabel` + ErrorBoundary)
+- PDF: `Content-Type: application/pdf` без charset
+- Коворкинг: горизонтальный snap слотов на мобилке; прошедшие часы недоступны
+- Бронь зала: прошедшие HH:MM скрыты; ошибка у кнопки «Отправить заявку»
+- `/dashboard?action=showQR` открывает шторку QR; поиск площадок с `aria-label`
+- Даты с пробелом (`YYYY-MM-DD HH:mm`) парсятся на Safari
+
 ## [1.6.179] — 2026-09-08
 
 ### Staging / схема

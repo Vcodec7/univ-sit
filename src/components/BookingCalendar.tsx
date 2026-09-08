@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Clock, ArrowLeft } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,7 @@ import {
   formatMskTimeRange,
   bookingsConflictWithTurnover,
   BOOKING_TURNOVER_MINUTES,
+  isMoscowHhmmPastOnDate,
 } from '@/lib/booking-hours';
 import {
   EVENT_CATEGORIES,
@@ -120,6 +121,22 @@ export default function BookingCalendar({
 
   const [startTime, setStartTime] = useState(hhmmFromIso(initialStartIso, initialTimes.start));
   const [endTime, setEndTime] = useState(hhmmFromIso(initialEndIso, initialTimes.end));
+  const startOptions = useMemo(() => {
+    if (!selectedDate) return timeOptions;
+    return timeOptions.filter(
+      (t) =>
+        !isMoscowHhmmPastOnDate(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          t
+        )
+    );
+  }, [timeOptions, selectedDate]);
+  const endOptions = useMemo(() => {
+    const pool = startOptions.length ? startOptions : timeOptions;
+    return pool.filter((t) => t > startTime);
+  }, [startOptions, timeOptions, startTime]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<EventCategory>('Общее');
@@ -133,6 +150,7 @@ export default function BookingCalendar({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const [existingBookings, setExistingBookings] = useState<Booking[]>([]);
 
   useEffect(() => {
@@ -174,6 +192,24 @@ export default function BookingCalendar({
       })
       .catch(() => undefined);
   }, [session?.user]);
+
+  useEffect(() => {
+    if (startOptions.length && !startOptions.includes(startTime)) {
+      setStartTime(startOptions[0]);
+    }
+  }, [startOptions, startTime]);
+
+  useEffect(() => {
+    if (endOptions.length && !endOptions.includes(endTime)) {
+      setEndTime(endOptions[0]);
+    }
+  }, [endOptions, endTime]);
+
+  useEffect(() => {
+    if (message?.type === 'error') {
+      messageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [message]);
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -370,12 +406,6 @@ export default function BookingCalendar({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {message && (
-        <div style={{ padding: '0.75rem', margin: '1rem 1rem 0', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', backgroundColor: message.type === 'success' ? '#f0fdf4' : '#fef2f2', color: message.type === 'success' ? '#15803d' : '#b91c1c' }}>
-          {message.text}
-        </div>
-      )}
-
       {/* View 1: Calendar Grid (Shown when no date is selected) */}
       {!selectedDate && (
         <div className="booking-calendar-shell" style={{ padding: '1rem', backgroundColor: '#fafafa', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
@@ -564,7 +594,7 @@ export default function BookingCalendar({
                   onChange={e => setStartTime(e.target.value)}
                   style={selectStyle}
                 >
-                  {timeOptions.map(t => (
+                  {startOptions.map(t => (
                     <option key={`start-${t}`} value={t}>{t}</option>
                   ))}
                 </select>
@@ -579,7 +609,7 @@ export default function BookingCalendar({
                   onChange={e => setEndTime(e.target.value)}
                   style={selectStyle}
                 >
-                  {timeOptions.map(t => (
+                  {endOptions.map(t => (
                     <option key={`end-${t}`} value={t}>{t}</option>
                   ))}
                 </select>
@@ -687,6 +717,23 @@ export default function BookingCalendar({
                 </div>
               ) : null}
             </div>
+
+            {message ? (
+              <div
+                ref={messageRef}
+                role="alert"
+                style={{
+                  padding: '0.75rem',
+                  margin: '0.5rem 0 0',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.85rem',
+                  backgroundColor: message.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                  color: message.type === 'success' ? '#15803d' : '#b91c1c',
+                }}
+              >
+                {message.text}
+              </div>
+            ) : null}
 
             <button
               type="submit"

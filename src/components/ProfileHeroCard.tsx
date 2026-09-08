@@ -523,7 +523,7 @@ export default function ProfileHeroCard({
               </span>
             </button>
           ) : (
-            <a className="profile-hero__meter is-qr" href="#pass">
+            <a className="profile-hero__meter is-qr" href="/dashboard?action=showQR#pass">
               <QrCode size={22} aria-hidden />
               <span>
                 <small>QR-пропуск</small>

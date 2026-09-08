@@ -8,6 +8,7 @@ import { vacancyHtmlToPlain, vacancyPlainToHtml } from '@/lib/vacancy-content';
 import { adminFetch } from '@/lib/admin-fetch';
 import { useAdminDraft } from '@/lib/use-admin-draft';
 import AdminDraftBanner from '@/components/admin/AdminDraftBanner';
+import { staffUserLabel } from '@/lib/staff-label';
 
 type Contest = {
   id: string;
@@ -334,10 +335,10 @@ export default function AdminContestsClient() {
             {pending.map((s) => (
               <li key={s.id} className="is-stack">
                 <div className="admin-entity-list__copy">
-                  <strong>{s.user.name}</strong>
+                  <strong>{staffUserLabel(s.user)}</strong>
                   <span>
-                    {s.user.publicCode ? `${s.user.publicCode} · ` : ''}
-                    {s.contest.title}: {s.title || 'без названия'}
+                    {s.user?.publicCode ? `${s.user.publicCode} · ` : ''}
+                    {s.contest?.title || 'Конкурс'}: {s.title || 'без названия'}
                   </span>
                 </div>
                 <input

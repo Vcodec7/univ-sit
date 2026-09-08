@@ -42,7 +42,10 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [{ source: '/service-worker.js', destination: '/sw.js' }];
+    return [
+      { source: '/service-worker.js', destination: '/sw.js' },
+      { source: '/documents/:name.pdf', destination: '/api/documents/by-name/:name' },
+    ];
   },
   async headers() {
     return [
@@ -65,6 +68,12 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'Cache-Control', value: 'no-cache' },
           { key: 'Content-Type', value: 'application/manifest+json' },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
         ],
       },
       {

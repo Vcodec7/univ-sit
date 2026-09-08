@@ -102,6 +102,8 @@ export default function SpaceFilterBar({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
             className="space-filter-bar__input"
+            aria-label={placeholder}
+            id="space-filter-q"
           />
           {query ? (
             <button type="button" onClick={() => setQuery('')} className="space-filter-bar__clear" aria-label="Очистить">

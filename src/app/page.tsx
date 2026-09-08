@@ -3,7 +3,7 @@ import nextDynamic from 'next/dynamic';
 import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
-import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
+import { getSiteIdentityStatic, isLocalOrigin } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
@@ -27,7 +27,7 @@ const HomeGalleryAuth = nextDynamic(() => import('@/components/HomeGalleryAuth')
 const AuthAfishaSection = nextDynamic(() => import('@/components/AuthAfishaSection'));
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { siteName, publicOrigin } = await getSiteIdentity();
+  const { siteName, publicOrigin } = await getSiteIdentityStatic();
   const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
   return {
     title: { absolute: `${siteName} | Официальный портал` },
@@ -36,9 +36,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const dynamic = 'force-dynamic';
-// Request-time HTML so canonical/og:url follow Host (ISR bake is localhost).
-// Catalog still hits unstable_cache; phones are limited by GPU layers, not this.
+export const revalidate = 60;
+export const dynamic = 'force-static';
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -46,7 +45,7 @@ function stripHtml(html: string) {
 
 export default async function Home() {
   const [{ latestProjects, latestClubs, latestSpaces, latestNews, siteSettings }, modules, { siteName }] =
-    await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentity()]);
+    await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentityStatic()]);
   const heroUrl = resolveHomeHeroPoster(siteSettings?.heroImageUrl);
   // Both assets may be stored; display mode is exclusive (image | video).
   const heroVideo = (siteSettings?.heroVideoUrl || '').trim() || null;
@@ -114,8 +113,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Свежие проекты</h2>
-              <p className="home-section-sub">Инициативы, в которые можно включиться сейчас</p>
+              <h2 className="home-section-title break-words overflow-hidden">Свежие проекты</h2>
+              <p className="home-section-sub break-words overflow-hidden">Инициативы, в которые можно включиться сейчас</p>
             </div>
             <Link href="/projects" className="home-section-link">
               Смотреть все <ArrowRight size={18} />
@@ -159,8 +158,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Клубы по интересам</h2>
-              <p className="home-section-sub">Найти своих в Сочи — не в чате на 400 человек</p>
+              <h2 className="home-section-title break-words overflow-hidden">Клубы по интересам</h2>
+              <p className="home-section-sub break-words overflow-hidden">Найти своих в Сочи — не в чате на 400 человек</p>
             </div>
             <Link href="/clubs" className="home-section-link">
               Все клубы <ArrowRight size={18} />
@@ -203,8 +202,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Пространства</h2>
-              <p className="home-section-sub">Залы ЦРМ: бронь, учёба, встреча без переписки</p>
+              <h2 className="home-section-title break-words overflow-hidden">Пространства</h2>
+              <p className="home-section-sub break-words overflow-hidden">Залы ЦРМ: бронь, учёба, встреча без переписки</p>
             </div>
             <Link href="/spaces" className="home-section-link">
               Все пространства <ArrowRight size={18} />
@@ -247,8 +246,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Афиша</h2>
-              <p className="home-section-sub">Актуальные события площадок</p>
+              <h2 className="home-section-title break-words overflow-hidden">Афиша</h2>
+              <p className="home-section-sub break-words overflow-hidden">Актуальные события площадок</p>
             </div>
             <Link href="/events" className="home-section-link">
               Календарь <ArrowRight size={18} />
@@ -280,8 +279,8 @@ export default async function Home() {
         <section className="home-section">
           <div className="home-section-head">
             <div>
-              <h2 className="home-section-title">Новости</h2>
-              <p className="home-section-sub">Коротко: что уже случилось в городе</p>
+              <h2 className="home-section-title break-words overflow-hidden">Новости</h2>
+              <p className="home-section-sub break-words overflow-hidden">Коротко: что уже случилось в городе</p>
             </div>
             <Link href="/news" className="home-section-link">
               Все новости <ArrowRight size={18} />
@@ -334,9 +333,9 @@ export default async function Home() {
         <section className="home-cta home-cta--split" aria-label="Два сценария">
           <div className="home-cta-split">
             <article>
-              <p>Для себя</p>
-              <h2>Сесть и сделать</h2>
-              <p className="home-cta-text">Коворкинг на час — без переписки и без «есть ли место».</p>
+              <p className="break-words overflow-hidden">Для себя</p>
+              <h2 className="break-words overflow-hidden">Сесть и сделать</h2>
+              <p className="home-cta-text break-words overflow-hidden">Коворкинг на час — без переписки и без «есть ли место».</p>
               {showSpaces ? (
                 <Link href="/coworking" className="lift-hero__btn lift-hero__btn--lime">
                   Записаться
@@ -348,9 +347,9 @@ export default async function Home() {
               )}
             </article>
             <article>
-              <p>Командой</p>
-              <h2>Собрать людей</h2>
-              <p className="home-cta-text">Зал под встречу или проект, который видно в портфолио.</p>
+              <p className="break-words overflow-hidden">Командой</p>
+              <h2 className="break-words overflow-hidden">Собрать людей</h2>
+              <p className="home-cta-text break-words overflow-hidden">Зал под встречу или проект, который видно в портфолио.</p>
               {showSpaces ? (
                 <Link href="/spaces" className="lift-hero__btn lift-hero__btn--lime">
                   К площадкам

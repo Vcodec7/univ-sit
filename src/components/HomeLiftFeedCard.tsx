@@ -34,9 +34,9 @@ export default function HomeLiftFeedCard({
         </div>
       </Link>
       <div className="free-now-body">
-        <h3>{title}</h3>
-        {line ? <p>{line}</p> : null}
-        {highlight ? <strong className="free-now-slot">{highlight}</strong> : null}
+        <h3 className="break-words overflow-hidden">{title}</h3>
+        {line ? <p className="break-words overflow-hidden">{line}</p> : null}
+        {highlight ? <strong className="free-now-slot break-words overflow-hidden">{highlight}</strong> : null}
         <div className="free-now-actions">
           {actions ? (
             actions

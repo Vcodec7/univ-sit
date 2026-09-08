@@ -53,8 +53,17 @@ function withRequestHost(base: SiteIdentity, requestOrigin: string): SiteIdentit
  */
 export const getSiteIdentity = cache(async (): Promise<SiteIdentity> => {
   const hint = isNextBuildPhase() ? '' : await requestOriginHint();
+  return loadSiteIdentity(hint);
+});
+
+/** ISR pages must not call headers() or they become request-dynamic. */
+export async function getSiteIdentityStatic(): Promise<SiteIdentity> {
+  return loadSiteIdentity('');
+}
+
+async function loadSiteIdentity(requestHint: string): Promise<SiteIdentity> {
   if (isNextBuildPhase()) {
-    const publicOrigin = resolvePublicOrigin(null, hint);
+    const publicOrigin = resolvePublicOrigin(null, requestHint);
     return {
       siteName: DEFAULT_SITE_NAME,
       publicOrigin,
@@ -67,9 +76,9 @@ export const getSiteIdentity = cache(async (): Promise<SiteIdentity> => {
       where: { id: '1' },
       select: { siteName: true, publicSiteUrl: true },
     });
-    return withRequestHost(identityFromSettings(s), hint);
+    return withRequestHost(identityFromSettings(s), requestHint);
   } catch {
-    const publicOrigin = resolvePublicOrigin(null, hint);
+    const publicOrigin = resolvePublicOrigin(null, requestHint);
     return {
       siteName: DEFAULT_SITE_NAME,
       publicOrigin,
@@ -77,4 +86,4 @@ export const getSiteIdentity = cache(async (): Promise<SiteIdentity> => {
       host: hostFromOrigin(publicOrigin),
     };
   }
-});
+}

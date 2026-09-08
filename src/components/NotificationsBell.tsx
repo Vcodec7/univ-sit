@@ -10,6 +10,7 @@ import {
   getPushStatus,
   pushSupported,
 } from '@/lib/client-push';
+import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
 import {
   NOTIFICATION_TYPE_OPTIONS,
   notificationActorLine,
@@ -417,6 +418,7 @@ export default function NotificationsBell({ compact = false, useNavStyle = false
             </div>
 
             <div className="yp-notif-panel__list">
+              <AdminErrorBoundary>
               {filtered.length === 0 ? (
                 <div className="yp-notif-panel__empty">
                   {items.length === 0
@@ -495,6 +497,7 @@ export default function NotificationsBell({ compact = false, useNavStyle = false
                   );
                 })
               )}
+              </AdminErrorBoundary>
             </div>
             </div>
           </>,

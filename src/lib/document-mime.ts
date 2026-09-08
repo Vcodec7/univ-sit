@@ -42,8 +42,11 @@ export function sniffDocumentMime(
 }
 
 export function contentTypeHeader(mime: string) {
-  if (mime === 'application/pdf' || mime.includes('word') || mime.startsWith('image/')) {
-    return mime;
+  if (mime === 'application/pdf' || mime.startsWith('application/pdf')) {
+    return 'application/pdf';
+  }
+  if (mime.includes('word') || mime.startsWith('image/')) {
+    return mime.split(';')[0].trim();
   }
   return mime;
 }

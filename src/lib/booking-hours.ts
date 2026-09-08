@@ -178,3 +178,16 @@ export function calendarCellYmd(year: number, monthIndex: number, day: number): 
   const d = String(day).padStart(2, '0');
   return `${y}-${mo}-${d}`;
 }
+
+/** True if HH:MM on this calendar day is already in the past (Moscow). */
+export function isMoscowHhmmPastOnDate(
+  year: number,
+  monthIndex: number,
+  day: number,
+  hhmm: string,
+  now = new Date()
+): boolean {
+  const ymd = calendarCellYmd(year, monthIndex, day);
+  if (ymd !== getTzYmd(now)) return false;
+  return moscowWallDate(year, monthIndex, day, hhmm).getTime() <= now.getTime();
+}

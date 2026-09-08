@@ -7,6 +7,7 @@ import { authOptions } from '@/lib/auth';
 import { hasPermission, parsePermissions } from '@/lib/acl';
 import { redirect } from 'next/navigation';
 import { formatMskTimeRange } from '@/lib/booking-hours';
+import { staffUserLabel } from '@/lib/staff-label';
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -337,7 +338,7 @@ export default async function AdminDashboard() {
                   <li key={app.id}>
                     <Link href={`/admin/applications?status=${app.status}&focus=${app.id}`} prefetch>
                       <strong>{title}</strong>
-                      <span>{app.user.name || app.user.email}</span>
+                      <span>{staffUserLabel(app.user)}</span>
                       <em className={`is-${app.status.toLowerCase()}`}>{st}</em>
                     </Link>
                   </li>
