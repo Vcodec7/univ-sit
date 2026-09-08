@@ -306,7 +306,7 @@ export default function VacancyDetailClient() {
                   Пройти инструктаж
                 </Link>
               ) : elig.code === 'AGE_UNKNOWN' ? (
-                <Link href="/dashboard#profile-edit" className="btn btn-secondary">
+                <Link href="/dashboard/edit" className="btn btn-secondary">
                   Заполнить профиль
                 </Link>
               ) : null}

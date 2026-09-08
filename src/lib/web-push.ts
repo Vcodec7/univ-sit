@@ -144,7 +144,7 @@ export function defaultUrlForNotificationType(type: string): string {
     case 'MODERATION':
       return '/dashboard';
     case 'SECURITY':
-      return '/dashboard#profile-edit';
+      return '/dashboard/edit';
     case 'SYSTEM':
       return '/dashboard';
     default:

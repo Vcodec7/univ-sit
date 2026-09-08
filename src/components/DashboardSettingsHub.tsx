@@ -220,7 +220,7 @@ export default function DashboardSettingsHub({
               данных профиля
             </button>
           ) : (
-            <Link href="/dashboard#profile-edit">данных профиля</Link>
+            <Link href="/dashboard/edit">данных профиля</Link>
           )}
           .
         </p>
@@ -532,7 +532,7 @@ export default function DashboardSettingsHub({
       {section === 'messengers' ? (
         <p className="settings-hub-foot" style={{ marginTop: '1rem' }}>
           <Link2 size={14} aria-hidden /> Ссылки на соцсети также можно указать в{' '}
-          <Link href="/dashboard#profile-edit">данных профиля</Link>.
+          <Link href="/dashboard/edit">данных профиля</Link>.
         </p>
       ) : null}
     </div>

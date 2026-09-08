@@ -367,7 +367,7 @@ function PublicUserPageInner() {
           id: 'edit',
           label: 'Редактировать профиль',
           icon: <Pencil size={20} />,
-          href: '/dashboard#profile-edit',
+          href: '/dashboard/edit',
         },
         {
           id: 'copy',
@@ -495,7 +495,7 @@ function PublicUserPageInner() {
         ) : null}
 
         {profile.isSelf ? (
-          <Link href="/dashboard#profile-edit" className="yp-profile__cta">
+          <Link href="/dashboard/edit" className="yp-profile__cta">
             <Pencil size={18} /> Редактировать профиль
           </Link>
         ) : friendship?.status === 'ACCEPTED' ? (

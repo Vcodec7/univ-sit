@@ -26,3 +26,13 @@ test('mobile dashboard kills HUD spin and dock blur', () => {
   const shell = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/CabinetShell.tsx'), 'utf8');
   assert.match(shell, /min-width: 900px/);
 });
+
+test('profile edit is a page, captcha tiles are not labelled', () => {
+  const edit = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/app/dashboard/edit/page.tsx'), 'utf8');
+  assert.match(edit, /view="edit"/);
+  assert.doesNotMatch(edit, /router\.replace\('\/dashboard#profile-edit'\)/);
+  const dash = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/DashboardClient.tsx'), 'utf8');
+  assert.doesNotMatch(dash, /yp-sheet--profile/);
+  const pwa = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/PwaInstallBanner.tsx'), 'utf8');
+  assert.match(pwa, /\/dashboard\/edit/);
+});

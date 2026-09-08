@@ -471,7 +471,7 @@ export default function AdminBotsClient() {
           </h1>
           <p>
             Настройка MAX и Telegram. Сценарий модерации кнопками — в блоке «Как модерировать» ниже. ID указывают в{' '}
-            <a href="/dashboard#profile-edit">профиле → Данные профиля</a>.
+            <a href="/dashboard/edit">профиле → Данные профиля</a>.
           </p>
         </div>
         <button type="button" className="bots-btn bots-btn--ghost" onClick={() => void reload()} disabled={loading}>
@@ -488,7 +488,7 @@ export default function AdminBotsClient() {
         <ol className="bots-howto__steps">
           <li>
             <strong>Привяжите ID.</strong> У модератора в{' '}
-            <a href="/dashboard#profile-edit">профиле → Данные профиля</a> укажите MAX User ID и/или
+            <a href="/dashboard/edit">профиле → Данные профиля</a> укажите MAX User ID и/или
             Telegram chat ID. Без ID сообщения до вас не дойдут.
           </li>
           <li>
