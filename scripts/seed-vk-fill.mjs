@@ -21,6 +21,7 @@ import https from 'https';
 import http from 'http';
 import { fileURLToPath } from 'url';
 import { projectIdFromTitle } from './lib/slug-latin.mjs';
+import { buildPlainTextPdf } from './lib/plain-text-pdf.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -172,14 +173,19 @@ function download(url, dest) {
   });
 }
 
-function writeTxtDoc(stableName, body) {
+async function writePdfDoc(stableName, title, body) {
   const dir = path.join(PUBLIC, 'uploads', 'documents');
   fs.mkdirSync(dir, { recursive: true });
-  const stored = `${stableName}.txt`;
+  const stored = `${stableName}.pdf`;
   const full = path.join(dir, stored);
-  const buf = Buffer.from(body, 'utf8');
+  const buf = await buildPlainTextPdf(
+    { title, body: String(body), footer: 'Официальный документ портала · PDF' },
+    path.join(PUBLIC, 'fonts')
+  );
   fs.writeFileSync(full, buf);
-  return { url: `/uploads/documents/${stored}`, fileName: stored, sizeBytes: buf.length, mimeType: 'text/plain' };
+  const txtLegacy = path.join(dir, `${stableName}.txt`);
+  if (fs.existsSync(txtLegacy)) fs.unlinkSync(txtLegacy);
+  return { url: `/uploads/documents/${stored}`, fileName: stored, sizeBytes: buf.length, mimeType: 'application/pdf' };
 }
 
 async function ensureLocalImage(post, subdir) {
@@ -361,7 +367,7 @@ FAQ на портале: /p/faq
 `;
 
 async function upsertDoc(id, meta, body) {
-  const file = writeTxtDoc(id, body);
+  const file = await writePdfDoc(id, meta.title, body);
   const existing = await prisma.siteDocument.findUnique({ where: { id } });
   const data = {
     title: meta.title,
