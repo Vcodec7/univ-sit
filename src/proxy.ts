@@ -265,6 +265,15 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
+  // Staff JSON APIs: cookie JWT required. Public catalogs (/api/events, /api/places, …),
+  // captcha, health and NextAuth stay open — locking them would break the afisha.
+  if (
+    !token &&
+    (pathname.startsWith('/api/admin') || pathname.startsWith('/api/ops'))
+  ) {
+    return NextResponse.json({ message: 'Нужна авторизация' }, { status: 401 });
+  }
+
   if (pathname.startsWith('/ops')) {
     if (!token || !isTechRole(role)) {
       return NextResponse.redirect(new URL('/', req.url));

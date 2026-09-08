@@ -158,19 +158,19 @@ yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-stg-pre-remote.sh"
 rm -f "$REMOTE_SCRIPT"
 yp_ssh "bash /var/tmp/yp-stg-pre-remote.sh; ec=\$?; rm -f /var/tmp/yp-stg-pre-remote.sh; exit \$ec"
 
-echo "==> verify https://${STAGING_DOMAIN}/api/health == ${EXPECTED_VER}"
+echo "==> verify https://${STAGING_DOMAIN}/api/health (public: ok only; version on :3001)"
 ok=0
 for i in 1 2 3 4 5 6; do
   body="$(curl -fsS --max-time 12 "https://${STAGING_DOMAIN}/api/health" || true)"
   echo "  try $i: $body"
-  if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+  if echo "$body" | grep -q '"ok":true'; then
     ok=1
     break
   fi
   sleep 3
 done
 if [[ "$ok" != "1" ]]; then
-  echo "ERROR: staging version mismatch (expected $EXPECTED_VER)" >&2
+  echo "ERROR: staging public health not ok" >&2
   exit 1
 fi
 echo "==> ty ready https://${STAGING_DOMAIN}/"

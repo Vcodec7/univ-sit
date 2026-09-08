@@ -1,9 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 type Tile = { id: string; src: string };
+
+function CaptchaTileCanvas({ src }: { src: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    let dead = false;
+    const run = async () => {
+      const res = await fetch(src, { cache: 'no-store' });
+      if (!res.ok || dead) return;
+      const blob = await res.blob();
+      const bmp = await createImageBitmap(blob);
+      if (dead) return;
+      const c = ref.current;
+      if (!c) return;
+      c.width = 96;
+      c.height = 96;
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 96, 96);
+      ctx.drawImage(bmp, 0, 0, 96, 96);
+    };
+    void run();
+    return () => {
+      dead = true;
+    };
+  }, [src]);
+  return <canvas ref={ref} width={96} height={96} aria-hidden style={{ width: '100%', height: 'auto', display: 'block' }} />;
+}
 
 type Props = {
   /** Called whenever a fresh solved token is ready (or cleared) */
@@ -129,7 +156,7 @@ export default function CaptchaField({ onToken, className }: Props) {
             gap: '0.4rem',
           }}
         >
-          {tiles.map((t, idx) => {
+          {tiles.map((t) => {
             const on = selected.includes(t.id);
             return (
               <button
@@ -138,7 +165,7 @@ export default function CaptchaField({ onToken, className }: Props) {
                 onClick={() => toggle(t.id)}
                 disabled={busy || solved}
                 aria-pressed={on}
-                aria-label={`Вариант ${idx + 1}`}
+                aria-label={t.id}
                 style={{
                   padding: '0.35rem',
                   borderRadius: 10,
@@ -147,8 +174,7 @@ export default function CaptchaField({ onToken, className }: Props) {
                   cursor: busy || solved ? 'default' : 'pointer',
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={t.src} alt="" width={96} height={96} draggable={false} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                <CaptchaTileCanvas src={t.src} />
               </button>
             );
           })}

@@ -53,9 +53,7 @@ function LazyMapEmbed({
 
     const arm = () => setLoad(true);
     const idle = (fn: () => void) => {
-      const ric = window.requestIdleCallback;
-      if (typeof ric === 'function') ric.call(window, fn, { timeout: 2200 });
-      else window.setTimeout(fn, 600);
+      fn();
     };
 
     const io = new IntersectionObserver(
