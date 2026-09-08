@@ -17,6 +17,7 @@ import { normalizeEventCategory, normalizeEventContactMode } from '@/lib/event-m
 import EventHomeCarousel from './EventHomeCarousel';
 import HomeSlideRail from './HomeSlideRail';
 import HomeLiftFeedCard from './HomeLiftFeedCard';
+import ViewBeacon from '@/components/ViewBeacon';
 import { isJunkEventTitle } from '@/lib/afisha-filters';
 import { eventRewardBadge, isEcoTagged } from '@/lib/score-scales';
 import { POINTS } from '@/lib/points-labels';
