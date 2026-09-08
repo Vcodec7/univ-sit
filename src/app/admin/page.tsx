@@ -8,6 +8,8 @@ import { hasPermission, parsePermissions } from '@/lib/acl';
 import { redirect } from 'next/navigation';
 import { formatMskTimeRange } from '@/lib/booking-hours';
 import { staffUserLabel } from '@/lib/staff-label';
+import { updateBookingStatus } from '@/app/admin/bookings/actions';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -214,6 +216,40 @@ export default async function AdminDashboard() {
 
   const hotCount = attention.reduce((n, a) => n + a.value, 0);
 
+  const nowTick = new Date();
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date();
+  dayEnd.setHours(23, 59, 59, 999);
+  let hallLoadPct = 0;
+  let pendingToday: Array<{
+    id: string;
+    title: string;
+    startTime: Date;
+    endTime: Date;
+    space: { title: string } | null;
+    user: { name: string | null; email: string | null } | null;
+  }> = [];
+  if (can('bookings')) {
+    const [halls, busy, pending] = await Promise.all([
+      prisma.space.count({ where: { status: 'ACTIVE', bookingMode: { in: ['HALL', 'BOTH'] } } }),
+      prisma.booking.count({
+        where: { status: 'APPROVED', startTime: { lte: nowTick }, endTime: { gte: nowTick } },
+      }),
+      prisma.booking.findMany({
+        where: { status: 'PENDING', startTime: { gte: dayStart, lte: dayEnd } },
+        orderBy: { startTime: 'asc' },
+        take: 12,
+        include: {
+          space: { select: { title: true } },
+          user: { select: { name: true, email: true } },
+        },
+      }),
+    ]);
+    hallLoadPct = halls ? Math.min(100, Math.round((busy / halls) * 100)) : 0;
+    pendingToday = pending;
+  }
+
   return (
     <div className="admin-page-shell admin-dash">
       <header className="admin-dash__head">
@@ -245,6 +281,23 @@ export default async function AdminDashboard() {
           )}
         </nav>
       </header>
+
+      {can('bookings') ? (
+        <section className="admin-kpi" aria-label="Показатели дня">
+          <div className="admin-kpi__card">
+            <strong>{hallLoadPct}%</strong>
+            <span>Загрузка залов сейчас</span>
+          </div>
+          <div className="admin-kpi__card">
+            <strong>{pendingBookingsCount}</strong>
+            <span>Новых заявок на бронь</span>
+          </div>
+          <div className="admin-kpi__card">
+            <strong>{todayEvents.reduce((n, e) => n + (e.participants?.length || 0), 0)}</strong>
+            <span>Гостей на сегодня</span>
+          </div>
+        </section>
+      ) : null}
 
       {attention.length ? (
         <section className="admin-dash__now" aria-label="Очередь">
@@ -280,7 +333,57 @@ export default async function AdminDashboard() {
         </nav>
       ) : null}
 
-      {can('bookings') && (
+      {can('bookings') ? (
+        <section className="admin-dash__block">
+          <div className="admin-dash__block-head">
+            <h2>Бронь на сегодня — очередь</h2>
+            <Link href="/admin/bookings?status=PENDING" prefetch>
+              Все
+            </Link>
+          </div>
+          {pendingToday.length ? (
+            <div className="admin-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Событие</th>
+                    <th>Время</th>
+                    <th>Площадка</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingToday.map((row) => (
+                    <tr key={row.id}>
+                      <td>
+                        <strong>{row.title}</strong>
+                        <div style={{ color: 'var(--muted)', fontSize: '0.82rem' }}>
+                          {staffUserLabel(row.user)}
+                        </div>
+                      </td>
+                      <td>{formatMskTimeRange(row.startTime, row.endTime)}</td>
+                      <td>{row.space?.title || '—'}</td>
+                      <td>
+                        <form action={updateBookingStatus}>
+                          <input type="hidden" name="id" value={row.id} />
+                          <input type="hidden" name="status" value="APPROVED" />
+                          <button type="submit" className="btn btn-primary yp-btn yp-btn--sm">
+                            Одобрить
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState title="Ожидающих броней на сегодня нет" hint="Новые заявки появятся в этой таблице." />
+          )}
+        </section>
+      ) : null}
+
+      {can('bookings') ? (
         <section className="admin-dash__block">
           <div className="admin-dash__block-head">
             <h2>События сегодня</h2>
@@ -303,10 +406,10 @@ export default async function AdminDashboard() {
               ))}
             </ul>
           ) : (
-            <p className="admin-dash__empty">На сегодня ничего не стоит.</p>
+            <EmptyState title="На сегодня ничего не стоит" />
           )}
         </section>
-      )}
+      ) : null}
 
       {can('applications') && (
         <section className="admin-dash__block">
@@ -333,7 +436,11 @@ export default async function AdminDashboard() {
                         } «${app.program.title}»`
                       : 'Заявка';
                 const st =
-                  app.status === 'PENDING' ? 'Ждёт' : app.status === 'APPROVED' ? 'Ок' : 'Нет';
+                  app.status === 'PENDING'
+                    ? 'На рассмотрении'
+                    : app.status === 'APPROVED'
+                      ? 'Одобрено'
+                      : 'Отклонено';
                 return (
                   <li key={app.id}>
                     <Link href={`/admin/applications?status=${app.status}&focus=${app.id}`} prefetch>

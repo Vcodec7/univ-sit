@@ -62,12 +62,12 @@ export default function YouthJoinBlock({
           <div className="youth-join-block__actions">
             {coworkingHref ? (
               <a className="btn btn-primary" href={coworkingHref}>
-                Записаться в коворкинг
+                Забронировать место
               </a>
             ) : null}
             {hallHref ? (
               <a className="btn btn-secondary" href={hallHref}>
-                Бронь зала
+                Забронировать место
               </a>
             ) : null}
           </div>
