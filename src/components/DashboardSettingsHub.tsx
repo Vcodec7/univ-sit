@@ -363,9 +363,11 @@ export default function DashboardSettingsHub({
               <span>Новый пароль</span>
               <input name="password" type="password" autoComplete="new-password" minLength={10} required />
             </label>
-            <button type="submit" className="btn btn-primary" disabled={profileSaving}>
-              Обновить пароль
-            </button>
+            <div className="yp-form-z">
+              <button type="submit" className="btn btn-primary" disabled={profileSaving}>
+                Обновить пароль
+              </button>
+            </div>
           </form>
         </section>
       ) : null}

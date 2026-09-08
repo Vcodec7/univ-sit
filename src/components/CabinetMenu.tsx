@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Award,
   BookOpen,
@@ -17,21 +17,26 @@ import {
   LogOut,
   Medal,
   MessageCircle,
-  Settings,
   Shield,
   ShoppingBag,
+  Sparkles,
   Ticket,
   User,
   Users,
 } from 'lucide-react';
 import { signOutLogged } from '@/lib/sign-out-logged';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
-import { CABINET_NAV, cabinetNavIdFromPath, type CabinetNavId } from '@/lib/cabinet-nav';
+import {
+  CABINET_HUBS,
+  cabinetHubFromPath,
+  cabinetNavIdFromPath,
+  type CabinetHubId,
+  type CabinetNavId,
+} from '@/lib/cabinet-nav';
 
-const ICONS = {
+const ITEM_ICONS = {
   overview: User,
   showcase: LayoutGrid,
-  settings: Settings,
   friends: Users,
   messages: MessageCircle,
   tickets: Ticket,
@@ -43,6 +48,13 @@ const ICONS = {
   shop: ShoppingBag,
   achievements: Award,
   awards: Medal,
+} as const;
+
+const HUB_ICONS = {
+  page: User,
+  social: MessageCircle,
+  tasks: Briefcase,
+  progress: Sparkles,
 } as const;
 
 type Props = {
@@ -68,7 +80,13 @@ export default function CabinetMenu({
 }: Props) {
   const pathname = usePathname() || '/dashboard';
   const activeId = current || cabinetNavIdFromPath(pathname);
+  const activeHub = cabinetHubFromPath(pathname);
   const [moduleFlags, setModuleFlags] = useState<Record<string, boolean> | null>(null);
+  const [openHub, setOpenHub] = useState<CabinetHubId>(activeHub);
+
+  useEffect(() => {
+    setOpenHub(activeHub);
+  }, [activeHub]);
 
   useEffect(() => {
     fetchPublicStatusCached()
@@ -82,13 +100,17 @@ export default function CabinetMenu({
   const modOn = (key?: string) => !key || moduleFlags == null || moduleFlags[key] !== false;
   const isStaff = role === 'ADMIN' || role === 'MODERATOR';
 
-  const groups = CABINET_NAV.map((section) => ({
-    ...section,
-    items: section.items.filter((item) => modOn(item.module)),
-  })).filter((section) => section.items.length > 0);
+  const hubs = useMemo(
+    () =>
+      CABINET_HUBS.map((hub) => ({
+        ...hub,
+        items: hub.items.filter((item) => modOn(item.module)),
+      })).filter((hub) => hub.items.length > 0),
+    [moduleFlags]
+  );
 
-  const renderLink = (item: (typeof groups)[number]['items'][number], compact?: boolean) => {
-    const Icon = ICONS[item.id];
+  const renderItem = (item: (typeof hubs)[number]['items'][number], compact?: boolean) => {
+    const Icon = ITEM_ICONS[item.id];
     const active = item.id === activeId;
     return (
       <Link
@@ -122,49 +144,88 @@ export default function CabinetMenu({
   if (variant === 'strip') {
     return (
       <nav className="cabinet-rail-strip" aria-label="Разделы кабинета">
-        {groups.flatMap((section) => section.items.map((item) => renderLink(item, true)))}
+        {hubs.map((hub) => {
+          const Icon = HUB_ICONS[hub.id];
+          const active = hub.id === activeHub;
+          const unread =
+            hub.id === 'social' && unreadMessages > 0
+              ? unreadMessages
+              : hub.id === 'tasks' && upcomingCount > 0
+                ? upcomingCount
+                : 0;
+          return (
+            <Link
+              key={hub.id}
+              href={hub.href}
+              prefetch={false}
+              title={hub.label}
+              aria-current={active ? 'page' : undefined}
+              className={`dashboard-nav-btn cabinet-rail-strip__btn${active ? ' is-active' : ''}`}
+            >
+              <span className="dashboard-nav-icon-wrap">
+                <Icon size={16} />
+                {unread > 0 ? (
+                  <span className="dashboard-nav-badge">{unread > 99 ? '99+' : unread}</span>
+                ) : null}
+              </span>
+              <span className="dashboard-nav-label">{hub.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     );
   }
 
   return (
-      <aside className="glass dashboard-aside dashboard-aside--nav" aria-label="Кабинет">
-        <nav className="dashboard-menu" aria-label="Меню кабинета">
-          {groups.map((section) => (
-            <div key={section.group} className="dashboard-menu__group">
-              <p className="dashboard-aside-nav-label">{section.group}</p>
-              <div className="dashboard-nav dashboard-nav--labeled">
-                {section.items.map((item) => renderLink(item))}
-              </div>
+    <aside className="glass dashboard-aside dashboard-aside--nav" aria-label="Кабинет">
+      <nav className="dashboard-menu" aria-label="Меню кабинета">
+        {hubs.map((hub) => {
+          const HubIcon = HUB_ICONS[hub.id];
+          const expanded = openHub === hub.id;
+          return (
+            <div key={hub.id} className="dashboard-menu__group dashboard-menu__hub">
+              <button
+                type="button"
+                className={`dashboard-menu__hub-toggle${hub.id === activeHub ? ' is-current' : ''}`}
+                aria-expanded={expanded}
+                onClick={() => setOpenHub((cur) => (cur === hub.id ? cur : hub.id))}
+              >
+                <HubIcon size={16} aria-hidden />
+                <span>{hub.label}</span>
+              </button>
+              {expanded ? (
+                <div className="dashboard-nav dashboard-nav--labeled">{hub.items.map((item) => renderItem(item))}</div>
+              ) : null}
             </div>
-          ))}
-        </nav>
-        {showFoot ? (
-          <div className="dashboard-aside-foot">
-            {modOn('eco') && typeof ecoPoints === 'number' ? (
-              <Link href="/dashboard/shop" className="dashboard-aside-eco" title="Кошелёк магазина">
-                <Leaf size={15} />
-                <span>кошелёк</span>
-                <strong>{ecoPoints.toLocaleString('ru-RU')}</strong>
-              </Link>
-            ) : null}
-            <Link href="/" className="dashboard-aside-foot-link dashboard-aside-foot-link--home">
-              <Home size={16} /> На главную
+          );
+        })}
+      </nav>
+      {showFoot ? (
+        <div className="dashboard-aside-foot">
+          {modOn('eco') && typeof ecoPoints === 'number' ? (
+            <Link href="/dashboard/shop" className="dashboard-aside-eco" title="Кошелёк магазина">
+              <Leaf size={15} />
+              <span>кошелёк</span>
+              <strong>{ecoPoints.toLocaleString('ru-RU')}</strong>
             </Link>
-            {isStaff ? (
-              <Link href="/admin" className="dashboard-admin-btn">
-                <Shield size={16} /> Панель
-              </Link>
-            ) : null}
-            <button
-              type="button"
-              className="dashboard-aside-foot-link dashboard-aside-foot-link--logout"
-              onClick={() => void signOutLogged({ callbackUrl: '/' })}
-            >
-              <LogOut size={16} /> Выйти
-            </button>
-          </div>
-        ) : null}
-      </aside>
+          ) : null}
+          <Link href="/" className="dashboard-aside-foot-link dashboard-aside-foot-link--home">
+            <Home size={16} /> На главную
+          </Link>
+          {isStaff ? (
+            <Link href="/admin" className="dashboard-admin-btn">
+              <Shield size={16} /> Панель
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            className="dashboard-aside-foot-link dashboard-aside-foot-link--logout"
+            onClick={() => void signOutLogged({ callbackUrl: '/' })}
+          >
+            <LogOut size={16} /> Выйти
+          </button>
+        </div>
+      ) : null}
+    </aside>
   );
 }

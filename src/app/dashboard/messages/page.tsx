@@ -38,6 +38,7 @@ import {
 import { splitMessageBodyMedia } from '@/lib/message-body-media';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
+import EmptyStateCta from '@/components/EmptyStateCta';
 import MessageBodyText from '@/components/MessageBodyText';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import {
@@ -1029,14 +1030,16 @@ function MessagesInner() {
               ))
             )
           ) : dmList.length === 0 ? (
-            <div className="messages-list__empty">
-              <span className="messages-list__empty-ico" aria-hidden>
-                <MessageCircle size={28} />
-              </span>
-              <strong>{showArchived ? 'Архив пуст' : 'Диалогов пока нет'}</strong>
-              <p>{showArchived ? 'Архивные личные чаты появятся здесь.' : 'Напишите другу — переписка откроется в этом списке.'}</p>
-              {!showArchived && friendsOn ? <Link href="/dashboard/friends">Перейти к друзьям</Link> : null}
-            </div>
+            <EmptyStateCta
+              title={showArchived ? 'Архив пуст' : 'Диалогов пока нет'}
+              text={
+                showArchived
+                  ? 'Архивные личные чаты появятся здесь.'
+                  : 'Напишите участнику — переписка откроется в этом списке.'
+              }
+              href="/dashboard/friends"
+              cta="Найти единомышленников"
+            />
           ) : (
             dmList.map((conversation) => {
               const selected = conversation.id === selectedId;
