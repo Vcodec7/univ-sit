@@ -23,7 +23,7 @@ test('home uses ISR so TTFB is not request-dynamic', () => {
   assert.match(proxy, /hasAuthCookie/);
   assert.match(proxy, /process\.env\.PORT/);
   assert.match(proxy, /x-maintenance-check/);
-  assert.match(proxy, /api\/public\/status/);
+  assert.match(proxy, /publicHtmlGet/);
   assert.match(hero, /break-words overflow-hidden/);
   assert.match(page, /home-section-title break-words overflow-hidden/);
   assert.match(unify, /\.break-words \{/);

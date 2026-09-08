@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!project || !isPublicCatalogEntity(project)) return { title: 'Проект не найден' };
 
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName, publicOrigin } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName, publicOrigin } = await getSiteIdentityStatic();
   return {
     title: withSiteBrand(project.title, siteName),
     description: project.description.substring(0, 160),

@@ -34,8 +34,8 @@ export async function generateMetadata({
     select: { title: true, text: true, imageUrl: true, videoEmbedUrl: true },
   });
   if (!item) return { title: 'Новость не найдена' };
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName } = await getSiteIdentityStatic();
   const title = item.title || (item.videoEmbedUrl ? 'Видео' : 'Новость');
   const description = item.text.replace(/\s+/g, ' ').slice(0, 160);
   return {

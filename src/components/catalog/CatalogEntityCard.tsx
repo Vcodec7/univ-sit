@@ -36,7 +36,7 @@ export default function CatalogEntityCard({
   sizes?: string;
 }) {
   return (
-    <Link href={href} className="catalog-card">
+    <Link href={href} className="catalog-card" prefetch={false}>
       <div className={`catalog-badge${badgeDone ? ' status-completed' : ''}`}>{badge}</div>
       <div className="catalog-img-wrap" style={{ position: 'relative' }}>
         <EntityCoverImage

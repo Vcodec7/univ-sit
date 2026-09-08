@@ -38,8 +38,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const club = await prisma.club.findUnique({ where: { id } });
   if (!club || !isPublicCatalogEntity(club)) return { title: 'Клуб не найден' };
   const desc = stripHtml(club.description).slice(0, 160);
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName } = await getSiteIdentityStatic();
   return {
     title: withSiteBrand(club.title, siteName),
     description: desc,
