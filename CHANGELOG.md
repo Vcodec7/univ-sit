@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.189] — 2026-09-08
+
+### RSC / консоль
+- Статические страницы (`/privacy` и др.) больше не зовут `headers()` — уходит `Page changed from static to dynamic` / «Server Components render»
+- Ранний фильтр `PerformanceObserver`: записи без `startTime` не роняют web-vitals (`reportAllChanges`)
+- Логи Adobe Acrobat (`chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj`) к сайту не относятся
+
 ## [1.6.188] — 2026-09-08
 
 ### Вход через Яндекс

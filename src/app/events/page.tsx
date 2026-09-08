@@ -3,7 +3,7 @@ import GlobalCalendar from '@/components/GlobalCalendar';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { getSiteIdentity, identityFromSettings } from '@/lib/site-identity';
+import { getSiteIdentityStatic, identityFromSettings } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
 import AuthAfishaSection from '@/components/AuthAfishaSection';
 import { isNextBuildPhase } from '@/lib/build-phase';
@@ -11,7 +11,7 @@ import { getCachedPublicClubs } from '@/lib/public-catalogs';
 import { encodeRouteParam } from '@/lib/route-id';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { siteName } = await getSiteIdentity();
+  const { siteName } = await getSiteIdentityStatic();
   return brandedMetadata('Афиша мероприятий', {
     description: `Календарь мероприятий — ${siteName}. Запись на события и бронирование площадок.`,
     canonicalPath: '/events',

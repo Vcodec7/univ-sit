@@ -20,8 +20,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolved = await params;
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName } = await getSiteIdentityStatic();
   if (resolved.slug === 'privacy') {
     return { title: withSiteBrand('Политика конфиденциальности', siteName) };
   }
@@ -69,8 +69,8 @@ export default async function DynamicPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
-  const { getSiteIdentity } = await import('@/lib/site-identity');
-  const id = await getSiteIdentity();
+  const { getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const id = await getSiteIdentityStatic();
 
   if (resolved.slug === 'about') {
     return (
