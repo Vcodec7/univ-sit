@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import CaptchaField from '@/components/CaptchaField';
 import toast from 'react-hot-toast';
 import { EMPLOYER_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
@@ -16,6 +17,8 @@ type EmployerStatus = {
 
 
 export default function EmployerApplyClient() {
+  const { status } = useSession();
+  const loginHref = '/login?callbackUrl=%2Fvacancies%2Femployer';
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [contactName, setContactName] = useState('');
@@ -28,15 +31,20 @@ export default function EmployerApplyClient() {
   const [employer, setEmployer] = useState<EmployerStatus>(null);
 
   useEffect(() => {
+    if (status !== 'authenticated') return;
     fetch('/api/employers/apply')
       .then((r) => r.json())
       .then((d) => {
         if (d.employer) setEmployer(d.employer);
       })
       .catch(() => undefined);
-  }, []);
+  }, [status]);
 
   const submit = async () => {
+    if (status !== 'authenticated') {
+      window.location.href = loginHref;
+      return;
+    }
     if (!token) {
       toast.error('Пройдите проверку');
       return;
@@ -146,9 +154,15 @@ export default function EmployerApplyClient() {
             style={{ padding: 10, borderRadius: 10, border: '1px solid rgba(15,23,42,0.12)' }}
           />
           <CaptchaField onToken={setToken} />
-          <button type="button" className="btn btn-primary" disabled={busy || !title.trim()} onClick={() => void submit()}>
-            {busy ? 'Отправка…' : 'Отправить заявку'}
-          </button>
+          {status !== 'authenticated' ? (
+            <Link href={loginHref} className="btn btn-primary">
+              Войти, чтобы отправить заявку
+            </Link>
+          ) : (
+            <button type="button" className="btn btn-primary" disabled={busy || !title.trim()} onClick={() => void submit()}>
+              {busy ? 'Отправка…' : 'Отправить заявку'}
+            </button>
+          )}
         </div>
       )}
     </div>
