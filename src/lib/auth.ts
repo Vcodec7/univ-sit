@@ -356,7 +356,7 @@ export const authOptions: NextAuthOptions = {
           return "/login?error=" + encodeURIComponent("Регистрация доступна с 14 лет");
         }
       }
-      const isOAuth = Boolean(account?.provider) && account.provider !== "credentials";
+      const isOAuth = Boolean(account?.provider && account.provider !== "credentials");
       if (account?.provider && account.provider !== "credentials" && account.provider !== "telegram") {
         if (user?.id) {
           const row = await prisma.user.findUnique({
