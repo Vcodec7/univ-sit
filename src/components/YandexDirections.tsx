@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { ExternalLink, Navigation, Map as MapIcon } from 'lucide-react';
 import {
   yandexMapsDirectionsUrl,
@@ -43,36 +43,10 @@ function LazyMapEmbed({
   title: string;
   large?: boolean;
 }) {
-  const hostRef = useRef<HTMLDivElement>(null);
   const [load, setLoad] = useState(false);
 
-  useEffect(() => {
-    if (load) return;
-    const el = hostRef.current;
-    if (!el) return;
-
-    const arm = () => setLoad(true);
-    const idle = (fn: () => void) => {
-      fn();
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        io.disconnect();
-        idle(arm);
-      },
-      { rootMargin: '120px', threshold: 0.01 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [load]);
-
   return (
-    <div
-      ref={hostRef}
-      className={`yp-map-embed${large ? ' yp-map-embed--lg' : ''}`}
-    >
+    <div className={`yp-map-embed${large ? ' yp-map-embed--lg' : ''}`}>
       {load ? (
         <iframe
           title={title}
@@ -84,11 +58,7 @@ function LazyMapEmbed({
           allowFullScreen
         />
       ) : (
-        <button
-          type="button"
-          className="yp-map-embed__wake"
-          onClick={() => setLoad(true)}
-        >
+        <button type="button" className="yp-map-embed__wake" onClick={() => setLoad(true)}>
           Показать карту
         </button>
       )}

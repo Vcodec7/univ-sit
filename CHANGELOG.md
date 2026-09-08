@@ -1,5 +1,15 @@
 # Changelog — YoungPortal
 
+## [1.6.164] — 2026-09-08
+
+### Performance
+- Главная: галерея через `next/image`, битые URL не запрашиваются
+- Обложки новостей/загрузок идут в WebP/AVIF, не raw `/uploads`
+- Контакты: карта Яндекса только по кнопке «Показать карту», без авто-iframe
+- Проекты: первая выдача 12 карточек
+- Логин: капча и session-extras (`InstructionsWelcome`, eco toast, presence) не в общем бандле
+- Главная: без backdrop-filter на `.glass`, карточки ленты на GPU-слое
+
 ## [1.6.163] — 2026-09-08
 
 ### UX
