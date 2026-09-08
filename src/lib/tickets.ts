@@ -122,7 +122,7 @@ export function parsePassCode(raw: string): ParsedPass | null {
             : typeRaw === 'space'
               ? 'space'
               : null;
-      if (!type || type === 'presence') return null;
+      if (!type) return null;
       const userId = parsed.userId ? String(parsed.userId) : '';
       const sig = parsed.sig ? String(parsed.sig) : '';
       if (type === 'coworking') {
