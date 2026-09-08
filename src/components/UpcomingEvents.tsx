@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import {
+  ArrowRight,
   Calendar,
   Crown,
   MapPin,
@@ -30,6 +31,8 @@ type Props = {
   withinDays?: number;
   /** Home: fewer events, slimmer Prisma payload. */
   compact?: boolean;
+  /** Home: omit the whole block when the feed is empty. */
+  hideEmpty?: boolean;
 };
 
 function contactHref(kind: 'phone' | 'telegram' | 'vk' | 'max', value: string) {
@@ -332,7 +335,7 @@ function EventCard({
   );
 }
 
-export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, mode, compact }: Props = {}) {
+export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, mode, compact, hideEmpty }: Props = {}) {
   const useCarousel =
     mode === 'carousel' || (Boolean(hideTitle) && mode !== 'grid' && !spaceId);
 
@@ -344,6 +347,7 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
   }
 
   if (!events.length) {
+    if (hideEmpty) return null;
     return (
       <div className="event-empty">
         <h3>Ближайших мероприятий пока нет</h3>
@@ -366,7 +370,7 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
     />
   ));
 
-  return (
+  const list = (
     <div className={`event-list${useCarousel ? ' is-embedded is-slideshow' : ''}${hideTitle ? ' is-embedded' : ''} event-card-guest-safe`}>
       {!spaceId && !hideTitle && (
         <div className="event-list-head">
@@ -396,6 +400,25 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
       )}
     </div>
   );
+
+  if (hideEmpty && hideTitle && !spaceId) {
+    return (
+      <section className="home-section">
+        <div className="home-section-head">
+          <div>
+            <h2 className="home-section-title break-words overflow-hidden">Афиша</h2>
+            <p className="home-section-sub break-words overflow-hidden">Актуальные события площадок</p>
+          </div>
+          <Link href="/events" className="home-section-link">
+            Календарь <ArrowRight size={18} />
+          </Link>
+        </div>
+        {list}
+      </section>
+    );
+  }
+
+  return list;
 }
 
 function ClockIcon() {

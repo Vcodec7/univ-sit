@@ -17,7 +17,7 @@ type ApiEvent = {
 };
 
 /** Private afisha: no event payload in static HTML. Logged-in users fetch /api/events. */
-export default function AuthAfishaSection({ hideTitle }: { hideTitle?: boolean }) {
+export default function AuthAfishaSection({ hideTitle, hideEmpty }: { hideTitle?: boolean; hideEmpty?: boolean }) {
   const { status } = useSession();
   const [events, setEvents] = useState<ApiEvent[] | null>(null);
 
@@ -54,6 +54,7 @@ export default function AuthAfishaSection({ hideTitle }: { hideTitle?: boolean }
   }
 
   if (!events.length) {
+    if (hideEmpty) return null;
     return (
       <div className="event-empty">
         <h3>Ближайших мероприятий пока нет</h3>

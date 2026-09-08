@@ -8,7 +8,7 @@ const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/l
 
 test('Sochi venues map to CC photos, not random beaches', () => {
   assert.match(src, /навагин\|дом молод/);
-  assert.match(src, /sochi-navaginskaya\.jpg/);
+  assert.match(src, /hallYouth/);
   assert.match(src, /тимиряз/);
   assert.match(src, /партизан/);
   assert.match(src, /ульянов/);

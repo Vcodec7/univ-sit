@@ -7,14 +7,15 @@ import { fileURLToPath } from 'node:url';
 const root = dirname(fileURLToPath(import.meta.url));
 const page = readFileSync(join(root, '../src/app/page.tsx'), 'utf8');
 const events = readFileSync(join(root, '../src/app/events/page.tsx'), 'utf8');
+const upcoming = readFileSync(join(root, '../src/components/UpcomingEvents.tsx'), 'utf8');
 const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
 const rail = readFileSync(join(root, '../src/components/HomeSlideRail.tsx'), 'utf8');
 
 test('home and events show live afisha, not the weekly bulletin', () => {
   assert.doesNotMatch(page, /WeeklyAfisha/);
   assert.doesNotMatch(events, /WeeklyAfisha/);
-  assert.match(page, /home-section-title[^>]*>Афиша/);
   assert.match(page, /UpcomingEvents/);
+  assert.match(upcoming, /home-section-title[^>]*>Афиша/);
 });
 
 test('home titles skip dual-color dashes', () => {

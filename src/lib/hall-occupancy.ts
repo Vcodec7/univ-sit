@@ -138,14 +138,24 @@ export function buildOccupancyWeek(opts: {
 }
 
 export function nextFreeWindow(week: DayGrid[], after = new Date()): { dayKey: string; from: string; label: string } | null {
+  const now = after.getTime();
+  const todayKey = getTzYmd(after, BOOKING_TZ);
   for (const day of week) {
+    const firstFreeMin = day.slots.find((s) => s.status === 'free')?.startMin;
     for (const slot of day.slots) {
       if (slot.status !== 'free') continue;
-      if (new Date(slot.start).getTime() < after.getTime()) continue;
+      const start = new Date(slot.start).getTime();
+      const end = new Date(slot.end).getTime();
+      if (end <= now) continue;
+      if (start <= now) {
+        return { dayKey: day.dayKey, from: minutesToTime(slot.startMin), label: 'Свободно сейчас' };
+      }
+      const from = minutesToTime(slot.startMin);
+      const opensToday = day.dayKey === todayKey && slot.startMin === firstFreeMin;
       return {
         dayKey: day.dayKey,
-        from: minutesToTime(slot.startMin),
-        label: `свободно с ${minutesToTime(slot.startMin)}`,
+        from,
+        label: opensToday ? `Откроется в ${from}` : `свободно с ${from}`,
       };
     }
   }
