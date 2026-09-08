@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 type SiteStatus = {
   publicSiteUrl: string;
   effectiveOrigin: string;
+  nextAuthUrl?: string;
+  nextAuthUrlMismatch?: boolean;
   oauth?: { vk?: boolean; yandex?: boolean; telegram?: boolean; esia?: boolean; telegramBot?: string };
   sso?: {
     yandexClientId?: string;
@@ -84,6 +86,17 @@ export default function OpsSitePanel() {
   } catch {
     /* keep default */
   }
+  const yandexRedirect = `${originBase}/api/auth/callback/yandex`;
+  const vkRedirect = `${originBase}/api/auth/callback/vk`;
+
+  const copyUri = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Скопировано');
+    } catch {
+      toast.error('Не удалось скопировать — выделите URI вручную');
+    }
+  };
 
   return (
     <div className="ops-site">
@@ -105,6 +118,13 @@ export default function OpsSitePanel() {
         <p className="bots-muted">
           Сейчас в работе: <code>{data?.effectiveOrigin || '—'}</code>
         </p>
+        {data?.nextAuthUrlMismatch ? (
+          <p className="bots-hint" role="status" style={{ color: '#7c2d12' }}>
+            NEXTAUTH_URL в контейнере (<code>{data.nextAuthUrl || 'не задан'}</code>) не совпадает с
+            публичным HTTPS. Для Яндекса и VK callback должен быть на том же хосте, что открывает
+            пользователь. На ty это <code>https://ty.idivles.ru</code>.
+          </p>
+        ) : null}
         <button
           type="button"
           className="bots-btn bots-btn--primary"
@@ -184,24 +204,35 @@ export default function OpsSitePanel() {
             , бот в Telegram (BotFather).
           </li>
           <li>
-            В кабинетах укажите Redirect URI ровно так:
+            В кабинетах укажите Redirect URI ровно так (кнопка копирует строку целиком):
             <br />
-            <code>{originBase}/api/auth/callback/yandex</code>
+            Яндекс:{' '}
+            <code>{yandexRedirect}</code>{' '}
+            <button type="button" className="bots-btn bots-btn--secondary" onClick={() => void copyUri(yandexRedirect)}>
+              Скопировать
+            </button>
             <br />
-            <code>{originBase}/api/auth/callback/vk</code>
+            VK:{' '}
+            <code>{vkRedirect}</code>{' '}
+            <button type="button" className="bots-btn bots-btn--secondary" onClick={() => void copyUri(vkRedirect)}>
+              Скопировать
+            </button>
             <br />
             Для Telegram в BotFather: <code>/setdomain</code> → хост{' '}
             <code>{hostOnly}</code> (без https).
           </li>
-          <li>Вставьте ID и секреты ниже и нажмите «Сохранить SSO».</li>
           <li>
-            Откройте <a href="/login">/login</a> — кнопки появятся сразу. Пересоздавать контейнер web не
-            нужно.
+            Вставьте Client ID и секрет ниже. Пустое поле секрета — оставить уже сохранённый ключ.
+          </li>
+          <li>
+            Нажмите «Сохранить SSO». Откройте <a href="/login">/login</a> — кнопки берутся из статуса
+            сайта сразу. Пересоздавать контейнер web не нужно.
           </li>
         </ol>
         <p className="bots-hint">
-          Публичный HTTPS выше должен совпадать с адресом сайта (ty или py). Если OAuth ругается на
-          redirect_uri — проверьте, что в кабинете Яндекса/VK тот же хост, что в «Адрес сайта».
+          Хост callback Яндекса должен совпадать с публичным HTTPS (для стенда:{' '}
+          <code>https://ty.idivles.ru</code>). Если OAuth ругается на redirect_uri — скопируйте URI
+          ещё раз в кабинет Яндекса.
         </p>
         <label>
           Яндекс Client ID

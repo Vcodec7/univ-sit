@@ -332,28 +332,31 @@ function LoginForm() {
   }, [searchParams]);
 
   useEffect(() => {
-    fetch('/api/auth/providers')
-      .then((r) => r.json())
-      .then((p) =>
-        setOauth({
-          yandex: Boolean(p?.yandex),
-          vk: Boolean(p?.vk),
-          telegram: Boolean(p?.telegram),
-          esia: Boolean(p?.esia),
-        })
-      )
-      .catch(() => setOauth({}));
-    fetch('/api/public/status')
+    fetch('/api/public/status', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
-        if (d?.oauth?.telegramBot) {
-          setOauth((prev) => ({
-            ...prev,
+        if (d?.oauth) {
+          setOauth({
+            vk: Boolean(d.oauth.vk),
+            yandex: Boolean(d.oauth.yandex),
             telegram: Boolean(d.oauth.telegram),
-            telegramBot: d.oauth.telegramBot,
-          }));
+            telegramBot: d.oauth.telegramBot || '',
+            esia: Boolean(d.oauth.esia),
+          });
         }
       })
+      .catch(() => undefined);
+    fetch('/api/auth/providers', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((p) =>
+        setOauth((prev) => ({
+          ...prev,
+          yandex: Boolean(p?.yandex) || prev.yandex,
+          vk: Boolean(p?.vk) || prev.vk,
+          telegram: Boolean(p?.telegram) || prev.telegram,
+          esia: Boolean(p?.esia) || prev.esia,
+        }))
+      )
       .catch(() => undefined);
   }, []);
 

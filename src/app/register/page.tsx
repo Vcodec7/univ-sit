@@ -44,7 +44,7 @@ function RegisterForm() {
   // empty fallback: register may omit redirect
 
   useEffect(() => {
-    fetch('/api/public/status')
+    fetch('/api/public/status', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         if (d && d.registrationEnabled === false) setRegistrationEnabled(false);

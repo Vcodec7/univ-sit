@@ -42,9 +42,29 @@ export async function GET() {
   const expected = `${identity.publicOrigin.replace(/\/$/, '')}/api/integrations/max/webhook`;
   const creds = await loadOAuthCreds();
   const oauth = oauthFlagsFromCreds(creds);
+  const nextAuthUrl = String(process.env.NEXTAUTH_URL || '').replace(/\/$/, '');
+  const publicOrigin = identity.publicOrigin.replace(/\/$/, '');
+  let nextAuthHost = '';
+  let publicHost = '';
+  try {
+    nextAuthHost = nextAuthUrl ? new URL(nextAuthUrl).hostname : '';
+  } catch {
+    nextAuthHost = '';
+  }
+  try {
+    publicHost = publicOrigin ? new URL(publicOrigin).hostname : '';
+  } catch {
+    publicHost = '';
+  }
+  const nextAuthUrlMismatch = Boolean(
+    !nextAuthUrl ||
+      (publicHost && (nextAuthHost !== publicHost || !/^https:\/\//i.test(nextAuthUrl)))
+  );
   return NextResponse.json({
     publicSiteUrl: settings?.publicSiteUrl || '',
     effectiveOrigin: identity.publicOrigin,
+    nextAuthUrl,
+    nextAuthUrlMismatch,
     max: {
       enabled: max.enabled,
       hasToken: Boolean(max.token || settings?.maxBotToken),
