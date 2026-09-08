@@ -2177,7 +2177,11 @@ img.site-brand-logo {
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
+.catalog-card__facts {
   min-width: 0;
   max-width: 100%;
   flex-wrap: wrap;
