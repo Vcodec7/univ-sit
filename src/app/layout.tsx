@@ -66,13 +66,13 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName,
       title: titleDefault,
       description,
-      images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: siteName }],
+      images: [{ url: '/opengraph-image.png', width: 1200, height: 630, alt: siteName }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: siteName,
       description,
-      images: ['/icons/icon-512.png'],
+      images: ['/opengraph-image.png'],
     },
     manifest: '/manifest.webmanifest',
     appleWebApp: {

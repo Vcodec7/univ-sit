@@ -152,6 +152,7 @@ export default function ForgotPassword() {
 
             <div>
               <label
+                htmlFor="forgot-email"
                 style={{
                   display: 'block',
                   marginBottom: '0.4rem',
@@ -162,7 +163,15 @@ export default function ForgotPassword() {
               >
                 Ваш Email
               </label>
-              <input name="email" type="email" required className="modern-input" placeholder="mail@example.com" />
+              <input
+                id="forgot-email"
+                name="email"
+                type="email"
+                required
+                className="modern-input"
+                placeholder="mail@example.com"
+                aria-label="Электронная почта"
+              />
             </div>
 
             <button
@@ -193,6 +202,7 @@ export default function ForgotPassword() {
 
             <div>
               <label
+                htmlFor="forgot-phrase-email"
                 style={{
                   display: 'block',
                   marginBottom: '0.4rem',
@@ -203,11 +213,20 @@ export default function ForgotPassword() {
               >
                 Email
               </label>
-              <input name="email" type="email" required className="modern-input" placeholder="mail@example.com" />
+              <input
+                id="forgot-phrase-email"
+                name="email"
+                type="email"
+                required
+                className="modern-input"
+                placeholder="mail@example.com"
+                aria-label="Электронная почта"
+              />
             </div>
 
             <div>
               <label
+                htmlFor="forgot-phrase"
                 style={{
                   display: 'block',
                   marginBottom: '0.4rem',
@@ -219,17 +238,20 @@ export default function ForgotPassword() {
                 Фраза из 24 слов
               </label>
               <textarea
+                id="forgot-phrase"
                 name="phrase"
                 required
                 rows={5}
                 className="modern-input"
                 placeholder="слово1 слово2 … слово24"
+                aria-label="Фраза из 24 слов"
                 style={{ width: '100%', resize: 'vertical', fontFamily: 'ui-monospace, monospace', fontSize: '0.88rem' }}
               />
             </div>
 
             <div>
               <label
+                htmlFor="forgot-new-password"
                 style={{
                   display: 'block',
                   marginBottom: '0.4rem',
@@ -240,10 +262,20 @@ export default function ForgotPassword() {
               >
                 Новый пароль
               </label>
-              <input name="password" type="password" required minLength={8} className="modern-input" placeholder="••••••••" />
+              <input
+                id="forgot-new-password"
+                name="password"
+                type="password"
+                required
+                minLength={8}
+                className="modern-input"
+                placeholder="••••••••"
+                aria-label="Новый пароль"
+              />
             </div>
             <div>
               <label
+                htmlFor="forgot-confirm-password"
                 style={{
                   display: 'block',
                   marginBottom: '0.4rem',
@@ -254,7 +286,16 @@ export default function ForgotPassword() {
               >
                 Повторите пароль
               </label>
-              <input name="confirm" type="password" required minLength={8} className="modern-input" placeholder="••••••••" />
+              <input
+                id="forgot-confirm-password"
+                name="confirm"
+                type="password"
+                required
+                minLength={8}
+                className="modern-input"
+                placeholder="••••••••"
+                aria-label="Повторите пароль"
+              />
             </div>
 
             <button

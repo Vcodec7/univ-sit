@@ -181,7 +181,7 @@ export default function SiteBrand({
           <img
             className="site-brand-logo"
             src={src}
-            alt=""
+            alt={name}
             width={dims.box}
             height={dims.box}
             decoding="async"

@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: '/service-worker.js', destination: '/sw.js' },
+      { source: '/manifest.json', destination: '/manifest.webmanifest' },
+      { source: '/opengraph-image.png', destination: '/opengraph-image' },
+      { source: '/twitter-image.png', destination: '/twitter-image' },
       { source: '/documents/:name.pdf', destination: '/api/documents/by-name/:name' },
     ];
   },
@@ -65,6 +68,13 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/manifest.webmanifest',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache' },
+          { key: 'Content-Type', value: 'application/manifest+json' },
+        ],
+      },
+      {
+        source: '/manifest.json',
         headers: [
           { key: 'Cache-Control', value: 'no-cache' },
           { key: 'Content-Type', value: 'application/manifest+json' },

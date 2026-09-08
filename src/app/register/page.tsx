@@ -256,9 +256,14 @@ function RegisterForm() {
         >
           <div className="yp-auth-grid-2">
             <div>
-              <label className="yp-auth-label">Имя *</label>
+              <label htmlFor="register-first-name" className="yp-auth-label">
+                Имя *
+              </label>
               <input
+                id="register-first-name"
                 type="text"
+                autoComplete="given-name"
+                aria-label="Имя"
                 value={firstName}
                 onChange={(e) => {
                 setFirstName(e.target.value);
@@ -271,9 +276,14 @@ function RegisterForm() {
               />
             </div>
             <div>
-              <label className="yp-auth-label">Фамилия *</label>
+              <label htmlFor="register-last-name" className="yp-auth-label">
+                Фамилия *
+              </label>
               <input
+                id="register-last-name"
                 type="text"
+                autoComplete="family-name"
+                aria-label="Фамилия"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
@@ -285,11 +295,15 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label className="yp-auth-label">Email (РФ)</label>
+            <label htmlFor="register-email" className="yp-auth-label">
+              Email (РФ)
+            </label>
             <input
+              id="register-email"
               type="email"
               autoComplete="email"
               name="email"
+              aria-label="Электронная почта"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -311,11 +325,15 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label className="yp-auth-label">Пароль</label>
+            <label htmlFor="register-password" className="yp-auth-label">
+              Пароль
+            </label>
             <input
+              id="register-password"
               type="password"
               autoComplete="new-password"
               name="password"
+              aria-label="Пароль"
               minLength={10}
               value={password}
               onChange={(e) => {
@@ -339,11 +357,15 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label className="yp-auth-label">Повтор пароля</label>
+            <label htmlFor="register-password2" className="yp-auth-label">
+              Повтор пароля
+            </label>
             <input
+              id="register-password2"
               type="password"
               autoComplete="new-password"
               name="password2"
+              aria-label="Повтор пароля"
               minLength={10}
               value={password2}
               onChange={(e) => {
@@ -362,10 +384,14 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label className="yp-auth-label">Дата рождения *</label>
+            <label htmlFor="register-birth-date" className="yp-auth-label">
+              Дата рождения *
+            </label>
             <input
+              id="register-birth-date"
               type="date"
               name="birthDate"
+              aria-label="Дата рождения"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
               required

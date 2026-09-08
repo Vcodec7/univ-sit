@@ -14,7 +14,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     display: 'standalone',
     orientation: 'any',
     background_color: '#f8fafc',
-    theme_color: '#0d9488',
+    theme_color: '#8562d8',
     lang: 'ru',
     categories: ['lifestyle', 'social'],
     shortcuts: [
