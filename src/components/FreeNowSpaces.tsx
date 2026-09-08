@@ -116,7 +116,7 @@ const loadFreeNowCards = unstable_cache(
     });
     return cards.slice(0, limit);
   },
-  ['free-now-home-v1'],
+  ['free-now-home-v2'],
   { revalidate: 45, tags: ['yp-home-catalog'] }
 );
 
@@ -147,12 +147,12 @@ export default async function FreeNowSpaces({ limit = 6 }: { limit?: number }) {
               title={card.title}
               line={card.address || 'Сочи'}
               highlight={card.slotLabel}
-              secondary={{ href, label: 'Сетка' }}
+              secondary={{ href, label: 'Расписание' }}
               primary={{
                 href: card.coworking
                   ? `/coworking?space=${encodeURIComponent(card.id)}`
                   : `${href}/book?from=list`,
-                label: card.coworking ? 'В коворкинг' : 'Забронировать',
+                label: 'Записаться',
               }}
               cover={
                 <EntityCoverImage

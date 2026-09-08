@@ -220,8 +220,8 @@ export default async function Home() {
                     title={space.title}
                     line={space.address || `до ${space.capacity} чел.`}
                     highlight="Можно забронировать"
-                    secondary={{ href, label: 'Сетка' }}
-                    primary={{ href: `${href}/book?from=list`, label: 'Забронировать' }}
+                    secondary={{ href, label: 'Расписание' }}
+                    primary={{ href: `${href}/book?from=list`, label: 'Записаться' }}
                     cover={
                       <EntityCoverImage
                         src={spaceCover(space, idx)}
@@ -239,26 +239,13 @@ export default async function Home() {
         </section>
         )}
 
-        {showEvents && (
-        <section className="home-section">
-          <div className="home-section-head">
-            <div>
-              <h2 className="home-section-title break-words overflow-hidden">Афиша</h2>
-              <p className="home-section-sub break-words overflow-hidden">Актуальные события площадок</p>
-            </div>
-            <Link href="/events" className="home-section-link">
-              Календарь <ArrowRight size={18} />
-            </Link>
-          </div>
-          {siteSettings?.publicEventsVisibility ? (
-            <Suspense fallback={<div className="home-deferred-skel" aria-hidden />}>
-              <UpcomingEvents hideTitle compact withinDays={14} mode="carousel" />
-            </Suspense>
-          ) : (
-            <AuthAfishaSection hideTitle />
-          )}
-        </section>
-        )}
+        {showEvents && siteSettings?.publicEventsVisibility ? (
+        <Suspense fallback={<div className="home-deferred-skel" aria-hidden />}>
+          <UpcomingEvents hideTitle compact withinDays={14} mode="carousel" hideEmpty />
+        </Suspense>
+        ) : showEvents ? (
+          <AuthAfishaSection hideTitle hideEmpty />
+        ) : null}
 
         {galleryPublic ? (
           <Suspense fallback={null}>

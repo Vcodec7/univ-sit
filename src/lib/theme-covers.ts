@@ -171,10 +171,10 @@ type CoverEntity = {
 /** Real Sochi venues → CC street/theme photos (no press-kit interiors on Commons). */
 function matchVenuePhoto(entity: CoverEntity): string | null {
   const blob = `${entity.id || ''} ${entity.title || ''} ${entity.address || ''} ${entity.meetingPlace || ''} ${entity.category || ''}`;
-  if (/навагин|дом молод/i.test(blob)) return PHOTO.navaginskaya;
+  if (/навагин|дом молод/i.test(blob)) return PHOTO.hallYouth;
   if (/тимиряз/i.test(blob)) return PHOTO.cowork;
-  if (/партизан/i.test(blob)) return PHOTO.gym;
-  if (/ульянов/i.test(blob)) return PHOTO.sochiCity;
+  if (/партизан/i.test(blob)) return PHOTO.hallConference;
+  if (/ульянов/i.test(blob)) return PHOTO.hallLecture;
   const cat = String(entity.category || '').toLowerCase();
   if (/спорт/.test(cat)) return PHOTO.sport;
   if (/коворк/.test(cat)) return PHOTO.cowork;
@@ -211,12 +211,10 @@ export function spaceCover(space: CoverEntity, index = 0): string {
   const venue = matchVenuePhoto(space);
   if (venue) return venue;
   const title = String(space.title || '');
-  const hallish = /зал|павильон|аудитор|сцен|конференц|репетиц/i.test(title);
-  if (hallish) {
-    const h = hashSeed(`spaces:${space.id || title || index}::${index}`);
-    return HALL_POOL[h % HALL_POOL.length];
-  }
-  return photoBySeed(space.id || space.title || 'spaces', index);
+  const coworkish = /коворк/i.test(`${title} ${space.category || ''}`);
+  if (coworkish) return PHOTO.cowork;
+  const h = hashSeed(`spaces:${space.id || title || index}::${index}`);
+  return HALL_POOL[h % HALL_POOL.length];
 }
 
 export function placeCover(place: CoverEntity, index = 0): string {
