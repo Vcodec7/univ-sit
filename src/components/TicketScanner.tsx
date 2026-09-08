@@ -15,8 +15,16 @@ type ScanResult = {
   ok: boolean;
   status: string;
   message: string;
+  headline?: string;
+  passType?: string;
   guest?: { name?: string | null; phone?: string | null; image?: string | null };
-  event?: { id?: string; title?: string; space?: { title?: string } | string | null };
+  event?: {
+    id?: string;
+    title?: string;
+    startTime?: string;
+    endTime?: string;
+    space?: { title?: string } | string | null;
+  };
   stats?: { checkedCount: number; registeredCount: number };
   checkedAt?: string;
   checkInId?: string;
@@ -24,10 +32,31 @@ type ScanResult = {
 
 type CameraPhase = 'idle' | 'requesting' | 'active' | 'denied' | 'error';
 
-function statusHeadline(status: string, fallback: string) {
-  switch (status) {
+function guestInitials(name?: string | null) {
+  const parts = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return '?';
+  const a = parts[0].charAt(0);
+  const b = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+  return (a + b).toUpperCase();
+}
+
+function statusHeadline(result: ScanResult) {
+  if (result.headline && (result.status === 'OK' || result.status === 'LIVE' || result.status === 'ALREADY_CHECKED')) {
+    return result.headline;
+  }
+  switch (result.status) {
     case 'OK':
     case 'LIVE':
+      if (result.passType === 'coworking') {
+        const space =
+          typeof result.event?.space === 'object' ? result.event?.space?.title : result.event?.space;
+        const title = space || result.event?.title || 'Коворкинг';
+        return `Бронь подтверждена (${title})`;
+      }
+      if (result.event?.title) return `Участник подтвержден (${result.event.title})`;
       return 'Проход разрешён';
     case 'ALREADY_CHECKED':
       return 'Уже отмечен';
@@ -46,7 +75,7 @@ function statusHeadline(status: string, fallback: string) {
     case 'QUEUED':
       return 'В очереди';
     default:
-      return fallback || status;
+      return result.message || result.status;
   }
 }
 
@@ -556,7 +585,7 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
         setCameraPhase(denied ? 'denied' : 'error');
         setCameraError(
           denied
-            ? 'Нет доступа к камере. Разрешите камеру для этого сайта (замок у адреса → Камера) и снова нажмите «Включить камеру». Или введите / вставьте код TICKET-… вручную.'
+            ? 'Нет доступа к камере. Разрешите камеру для этого сайта (замок у адреса → Камера) и снова нажмите «Включить камеру». Или введите код TICKET-/COWORK- вручную.'
             : message || 'Не удалось открыть камеру. Разрешите доступ или введите код вручную.'
         );
         await safeStop(scanner);
@@ -696,7 +725,7 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
           <div className="scanner-camera-idle">
             <Camera size={36} aria-hidden />
             <p>Камера выключена — нажмите «Включить камеру», чтобы отсканировать QR с экрана или бумаги.</p>
-            <p className="scanner-camera-idle__hint">Или введите / вставьте код вида TICKET-… ниже.</p>
+            <p className="scanner-camera-idle__hint">Или введите / вставьте код TICKET-… или COWORK-… ниже.</p>
           </div>
         )}
         {cameraPhase === 'requesting' && cameraOn && (
@@ -751,7 +780,7 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
           <input
             value={manual}
             onChange={(e) => setManual(e.target.value)}
-            placeholder="TICKET-… (ввод или вставка)"
+            placeholder="TICKET-… / COWORK-… / JSON"
             aria-label="Код билета TICKET"
             autoComplete="off"
             spellCheck={false}
@@ -822,27 +851,34 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
             <div className="scanner-result-icon">
               {ok || last.status === 'ALREADY_CHECKED' ? <CheckCircle2 size={64} /> : <XCircle size={64} />}
             </div>
-            <p className="scanner-result-status">{last.status}</p>
-            <h2>{statusHeadline(last.status, last.message)}</h2>
+            {ok || last.status === 'ALREADY_CHECKED' ? null : (
+              <p className="scanner-result-status">{last.status === 'INVALID' ? 'Ошибка' : 'Отказ'}</p>
+            )}
+            {last.guest ? (
+              last.guest.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="scanner-result-avatar"
+                  src={last.guest.image}
+                  alt={last.guest.name || 'Владелец пропуска'}
+                  width={200}
+                  height={200}
+                />
+              ) : (
+                <div className="scanner-result-avatar scanner-result-avatar--fallback" aria-hidden>
+                  {guestInitials(last.guest.name)}
+                </div>
+              )
+            ) : null}
+            {last.guest?.name ? (
+              <p className="scanner-result-guest">
+                <strong>{last.guest.name}</strong>
+              </p>
+            ) : null}
+            <h2>{statusHeadline(last)}</h2>
             {last.message && last.status !== 'OK' && last.status !== 'LIVE' ? (
               <p className="scanner-result-message">{last.message}</p>
             ) : null}
-            {last.guest?.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                className="scanner-result-avatar"
-                src={last.guest.image}
-                alt=""
-                width={72}
-                height={72}
-              />
-            ) : null}
-            {last.guest?.name && (
-              <p className="scanner-result-guest">
-                <strong>{last.guest.name}</strong>
-                {last.guest.phone ? ` · ${last.guest.phone}` : ''}
-              </p>
-            )}
             {last.event?.title && (
               <p className="scanner-result-event">
                 {last.event.title}
@@ -858,11 +894,11 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
             ) : last.checkedAt && last.status === 'OK' ? (
               <p className="scanner-result-stats">Отмечен: {formatCheckedAt(last.checkedAt)}</p>
             ) : null}
-            {last.stats ? (
+            {last.stats && last.passType !== 'coworking' ? (
               <p className="scanner-result-stats">
                 На мероприятии: {last.stats.checkedCount} / {last.stats.registeredCount}
               </p>
-            ) : eventStats ? (
+            ) : eventStats && last.passType !== 'coworking' ? (
               <p className="scanner-result-stats">
                 На мероприятии: {eventStats.checkedCount} / {eventStats.registeredCount}
               </p>

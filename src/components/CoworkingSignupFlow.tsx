@@ -179,12 +179,17 @@ export default function CoworkingSignupFlow({
         end: periodDef.end || '',
         waitlist: wait,
       });
-      try {
-        const qrRes = await fetch('/api/presence-qr', { credentials: 'same-origin' });
-        const qrData = await qrRes.json();
-        if (qrRes.ok) setQrUrl(qrData.qr?.url || '');
-      } catch {
-        /* optional */
+      const pass = typeof data.signup?.passCode === 'string' ? data.signup.passCode : '';
+      if (pass) {
+        setQrUrl(pass);
+      } else {
+        try {
+          const qrRes = await fetch('/api/presence-qr', { credentials: 'same-origin' });
+          const qrData = await qrRes.json();
+          if (qrRes.ok) setQrUrl(qrData.qr?.url || '');
+        } catch {
+          /* optional */
+        }
       }
       if (mode === 'GROUP' && data.signup?.kind === 'GROUP' && !wait) {
         const signup = data.signup;

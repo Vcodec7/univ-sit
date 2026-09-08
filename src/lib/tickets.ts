@@ -2,8 +2,17 @@ import crypto from 'crypto';
 import { originFromEnv } from '@/lib/site-identity-shared';
 
 export const TICKET_PREFIX = 'TICKET';
+export const COWORK_PREFIX = 'COWORK';
+export const SPACE_PREFIX = 'SPACE';
 export const VENUE_PREFIX = 'VENUE';
 export const ORG_PREFIX = 'ORG';
+
+export type PassType = 'ticket' | 'coworking' | 'space' | 'presence';
+
+export type ParsedPass =
+  | { type: 'ticket' | 'space'; id: string; userId: string }
+  | { type: 'coworking'; id: string; userId: string | null }
+  | { type: 'presence'; token: string };
 
 function ticketSecret() {
   return process.env.NEXTAUTH_SECRET || process.env.TICKET_SECRET || '';
@@ -29,25 +38,19 @@ function signVenue(spaceId: string) {
   return crypto.createHmac('sha256', secret).update(`venue:${spaceId}`).digest('hex').slice(0, 20);
 }
 
-/** Signed ticket: TICKET-{bookingId}-{userId}-{sig} */
-export function buildTicketCode(bookingId: string, userId: string) {
-  const sig = signPayload(bookingId, userId);
-  return `${TICKET_PREFIX}-${bookingId}-${userId}-${sig}`;
-}
-
-export function parseTicketCode(raw: string): { bookingId: string; userId: string } | null {
-  const value = String(raw || '').trim();
+function parseSignedTriple(raw: string, prefix: string): { id: string; userId: string } | null {
+  const value = extractPassPayload(raw);
   const parts = value.split('-');
-  if (parts.length < 4 || parts[0].toUpperCase() !== TICKET_PREFIX) return null;
+  if (parts.length < 4 || parts[0].toUpperCase() !== prefix.toUpperCase()) return null;
 
   const sig = parts[parts.length - 1];
   const userId = parts[parts.length - 2];
-  const bookingId = parts.slice(1, -2).join('-');
-  if (!bookingId || !userId || !sig) return null;
+  const id = parts.slice(1, -2).join('-');
+  if (!id || !userId || !sig) return null;
 
   let expected: string;
   try {
-    expected = signPayload(bookingId, userId);
+    expected = signPayload(id, userId);
   } catch {
     return null;
   }
@@ -56,7 +59,114 @@ export function parseTicketCode(raw: string): { bookingId: string; userId: strin
   const b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
 
-  return { bookingId, userId };
+  return { id, userId };
+}
+
+export function extractPassPayload(raw: string) {
+  const value = String(raw || '').trim();
+  const fromQuery = value.match(/[?&]code=([^&]+)/i);
+  if (fromQuery) {
+    try {
+      return decodeURIComponent(fromQuery[1]);
+    } catch {
+      return fromQuery[1];
+    }
+  }
+  return value;
+}
+
+/** Signed ticket: TICKET-{bookingId}-{userId}-{sig} */
+export function buildTicketCode(bookingId: string, userId: string) {
+  const sig = signPayload(bookingId, userId);
+  return `${TICKET_PREFIX}-${bookingId}-${userId}-${sig}`;
+}
+
+export function buildSpaceCode(bookingId: string, userId: string) {
+  return `${SPACE_PREFIX}-${bookingId}-${userId}-${signPayload(bookingId, userId)}`;
+}
+
+export function buildCoworkingCode(signupId: string, userId: string) {
+  return `${COWORK_PREFIX}-${signupId}-${userId}-${signPayload(signupId, userId)}`;
+}
+
+export function buildPassJson(type: 'ticket' | 'coworking' | 'space', id: string, userId?: string) {
+  const payload: Record<string, string> = { type, id };
+  if (userId) {
+    payload.userId = userId;
+    payload.sig = signPayload(id, userId);
+  }
+  return JSON.stringify(payload);
+}
+
+export function parsePassCode(raw: string): ParsedPass | null {
+  const value = extractPassPayload(raw);
+  if (!value) return null;
+
+  const presenceMatch = value.match(/\/c\/([^/?#]+)/i);
+  if (presenceMatch || /^P[A-Za-z0-9_-]{16,}$/.test(value)) {
+    const token = presenceMatch ? decodeURIComponent(presenceMatch[1]) : value;
+    return { type: 'presence', token };
+  }
+
+  if (value.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(value) as { type?: string; id?: string; userId?: string; sig?: string };
+      const typeRaw = String(parsed.type || '').toLowerCase();
+      const id = String(parsed.id || '').trim();
+      if (!id) return null;
+      const type: PassType | null =
+        typeRaw === 'ticket' || typeRaw === 'event'
+          ? 'ticket'
+          : typeRaw === 'coworking'
+            ? 'coworking'
+            : typeRaw === 'space'
+              ? 'space'
+              : null;
+      if (!type || type === 'presence') return null;
+      const userId = parsed.userId ? String(parsed.userId) : '';
+      const sig = parsed.sig ? String(parsed.sig) : '';
+      if (type === 'coworking') {
+        if (userId && sig) {
+          const signed = parseSignedTriple(
+            `${COWORK_PREFIX}-${id}-${userId}-${sig}`,
+            COWORK_PREFIX
+          );
+          if (!signed) return null;
+          return { type: 'coworking', id, userId };
+        }
+        return { type: 'coworking', id, userId: null };
+      }
+      if (!userId || !sig) return null;
+      const prefix = type === 'space' ? SPACE_PREFIX : TICKET_PREFIX;
+      const signed = parseSignedTriple(`${prefix}-${id}-${userId}-${sig}`, prefix);
+      if (!signed) return null;
+      return { type, id, userId };
+    } catch {
+      return null;
+    }
+  }
+
+  const ticket = parseSignedTriple(value, TICKET_PREFIX);
+  if (ticket) return { type: 'ticket', id: ticket.id, userId: ticket.userId };
+  const space = parseSignedTriple(value, SPACE_PREFIX);
+  if (space) return { type: 'space', id: space.id, userId: space.userId };
+  const cowork = parseSignedTriple(value, COWORK_PREFIX);
+  if (cowork) return { type: 'coworking', id: cowork.id, userId: cowork.userId };
+
+  // Hotfix: bare coworking signup id (unsigned) — no hyphens in typical cuid
+  if (/^[cC][a-z0-9]{20,32}$/.test(value) && !/^(TICKET|SPACE|COWORK|VENUE|ORG)-/i.test(value)) {
+    return { type: 'coworking', id: value, userId: null };
+  }
+
+  return null;
+}
+
+export function parseTicketCode(raw: string): { bookingId: string; userId: string } | null {
+  const parsed = parsePassCode(raw);
+  if (parsed?.type === 'ticket' || parsed?.type === 'space') {
+    return { bookingId: parsed.id, userId: parsed.userId };
+  }
+  return null;
 }
 
 /** Permanent door QR payload: VENUE-{spaceId}-{sig} */

@@ -5127,13 +5127,28 @@ input, textarea, select {
   font-size: 0.95rem;
 }
 .scanner-result-avatar {
-  width: 72px;
-  height: 72px;
+  width: min(52vw, 200px);
+  height: min(52vw, 200px);
   border-radius: 50%;
   object-fit: cover;
   margin: 0 auto 0.75rem;
-  border: 2px solid rgba(15, 23, 42, 0.08);
+  border: 3px solid rgba(15, 23, 42, 0.1);
   display: block;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+.scanner-result-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: #ede9fe;
+  color: #4c1d95;
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.scanner-result-guest {
+  font-size: 1.35rem;
+  color: var(--foreground);
+  margin: 0 0 0.5rem;
 }
 .scanner-result-panel h2 {
   margin: 0 0 0.75rem;
@@ -5143,6 +5158,48 @@ input, textarea, select {
 .scanner-result-panel .btn {
   margin-top: 1rem;
   width: 100%;
+}
+
+.yp-qr-live {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  padding: 8px;
+  isolation: isolate;
+}
+.yp-qr-live__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: conic-gradient(#6e4bc4, #afca03, #38bdf8, #f97316, #6e4bc4);
+  animation: yp-qr-spin 1.8s linear infinite;
+  z-index: 0;
+}
+.yp-qr-live__hole {
+  position: absolute;
+  inset: 4px;
+  border-radius: 12px;
+  background: #fff;
+  z-index: 1;
+}
+.yp-qr-live img {
+  position: relative;
+  z-index: 2;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: block;
+}
+@keyframes yp-qr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yp-qr-live__ring {
+    animation: none;
+  }
 }
 
 /* ========== Admin tables (desktop) ========== */
@@ -27900,6 +27957,7 @@ body:has(.dashboard-page) .main-content {
 .cw-cabinet-pill__place { grid-area: place; }
 .cw-cabinet-pill__status { grid-area: status; }
 .cw-cabinet-pill__cancel { grid-area: cancel; justify-self: end; }
+.cw-cabinet-pill__qr { grid-column: 1 / -1; }
 
 .site-footer-nav-list a {
   color: #3d3754 !important;

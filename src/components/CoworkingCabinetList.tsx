@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { cabinetGet } from '@/lib/cabinet-fetch';
+import QRCodeDisplay from '@/components/QRCodeDisplay';
 
 type CwSignup = {
   id: string;
@@ -12,11 +13,13 @@ type CwSignup = {
   startTime: string;
   endTime: string;
   inviteToken?: string | null;
+  passCode?: string;
   space: { id: string; title: string };
 };
 
 type EventPart = {
   id: string;
+  ticketCode?: string;
   booking: {
     id: string;
     title?: string | null;
@@ -33,6 +36,7 @@ type HallBooking = {
   status: string;
   startTime: string;
   endTime: string;
+  passCode?: string;
   space?: { title?: string | null } | null;
 };
 
@@ -47,6 +51,7 @@ type Row = {
   canCancel: boolean;
   cancelLabel: string;
   groupHref?: string | null;
+  passCode?: string;
 };
 
 function isPast(end: string) {
@@ -160,6 +165,7 @@ export default function CoworkingCabinetList() {
         cancelLabel: 'Отменить',
         groupHref:
           row.kind === 'GROUP' && row.inviteToken ? `/coworking/group/${row.inviteToken}` : null,
+        passCode: row.passCode,
       });
     }
     for (const part of events) {
@@ -176,6 +182,7 @@ export default function CoworkingCabinetList() {
         status: live ? 'CONFIRMED' : 'ATTENDED',
         canCancel: live,
         cancelLabel: 'Отменить участие',
+        passCode: part.ticketCode,
       });
     }
     for (const booking of halls) {
@@ -191,6 +198,7 @@ export default function CoworkingCabinetList() {
         status: booking.status,
         canCancel: live,
         cancelLabel: 'Отменить бронь',
+        passCode: booking.passCode,
       });
     }
     out.sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime());
@@ -313,6 +321,11 @@ export default function CoworkingCabinetList() {
               <span className={`cw-cabinet-pill__status status-${row.status.toLowerCase()}`}>
                 {statusRu(row.kind, row.status)}
               </span>
+              {row.passCode && tab === 'now' && !['CANCELLED', 'REJECTED', 'WAITLIST'].includes(row.status) ? (
+                <div className="cw-cabinet-pill__qr">
+                  <QRCodeDisplay value={row.passCode} size={112} />
+                </div>
+              ) : null}
               {row.groupHref || row.canCancel || row.kind === 'event' ? (
                 <div className="cw-cabinet-pill__actions">
                   {row.groupHref ? (
