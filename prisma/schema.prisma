@@ -905,8 +905,14 @@ model SiteSettings {
   /** When false — silence mode: users cannot DM each other (ADMIN/MODERATOR exempt) */
   messagingEnabled    Boolean @default(true)
 
-  /** Allow login via phone + SMS code (see Admin → Доступ) */
+  /** Allow login via phone + SMS code (see Admin → Доступ / SMS) */
   smsLoginEnabled     Boolean @default(false)
+  /** generic | smsru | smsc — шлюз из админки; пустые поля падают на env SMS_* */
+  smsProvider         String  @default("generic")
+  smsApiUrl           String?
+  smsApiKey           String?
+  smsApiLogin         String?
+  smsFrom             String?
   /** Show Госуслуги (ЕСИА) login when ESIA_* env is configured */
   esiaLoginEnabled    Boolean @default(false)
 

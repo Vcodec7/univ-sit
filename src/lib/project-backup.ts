@@ -148,6 +148,7 @@ export async function collectProjectBackupPayload(issuedById: string) {
     ? {
         ...settings,
         smtpPass: settings.smtpPass ? '[REDACTED]' : null,
+        smsApiKey: (settings as { smsApiKey?: string | null }).smsApiKey ? '[REDACTED]' : null,
         vkApiToken: settings.vkApiToken ? '[REDACTED]' : null,
         rknPackJson: settings.rknPackJson ? '[REDACTED_OR_SENSITIVE]' : null,
       }

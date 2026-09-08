@@ -105,7 +105,7 @@ else
       COMPOSE_PROJECT_NAME="\${COMPOSE_PROJECT_NAME:-sochi-staging}"
       export COMPOSE_PROJECT_NAME
       yp_compose -f docker-compose.staging.yml up -d --build web
-      yp_compose -f docker-compose.staging.yml exec -T web npx prisma db push --accept-data-loss || echo "WARN: prisma db push failed"
+      yp_compose -f docker-compose.staging.yml exec -T web npx prisma db push || echo "WARN: prisma db push failed"
     else
       if grep -q "3001:3000" docker-compose.yml 2>/dev/null; then
         yp_compose up -d --build web

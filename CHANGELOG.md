@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.159] — 2026-09-08
+
+### Fixed
+- SiteSettings в Prisma снова содержит SMS-поля (`smsProvider`, `smsApiUrl`, `smsApiKey`, `smsApiLogin`, `smsFrom`) — `db push` больше не сносит колонки
+- Staging: `prisma db push` без `--accept-data-loss`
+- Админка: вкладка SMS рядом с почтой (шлюз + тест)
+
 ## [1.6.158] — 2026-09-07
 
 ### Performance
