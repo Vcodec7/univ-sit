@@ -18,7 +18,7 @@ import {
 } from '@/lib/feature-consents';
 
 function isFeatureKey(v: unknown): v is FeatureConsentKey {
-  return FEATURE_CONSENT_KEYS.includes(v as FeatureConsentKey);
+  return v === 'coworking' || v === 'portfolio';
 }
 
 export async function GET() {
