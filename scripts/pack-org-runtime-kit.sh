@@ -136,15 +136,15 @@ HEALTH="$(curl -sS --max-time 8 http://127.0.0.1:3000/api/health 2>/dev/null || 
 echo "LIVE_OK=1"
 REMOTE
 chmod +x "$PACK_LOCAL"
-yp_ssh "mkdir -p '$LIVE_SNAP_REMOTE' /var/tmp && rm -rf '${LIVE_SNAP_REMOTE:?}'/*"
-yp_scp "$PACK_LOCAL" "$HOST:/var/tmp/yp-org-runtime-live.sh"
-yp_ssh "chmod +x /var/tmp/yp-org-runtime-live.sh && bash /var/tmp/yp-org-runtime-live.sh '$LIVE_SNAP_REMOTE'"
-yp_scp "$HOST:${LIVE_SNAP_REMOTE}/db.dump" "$STAGE/snapshot/db.dump" || true
-yp_scp "$HOST:${LIVE_SNAP_REMOTE}/uploads.tgz" "$STAGE/snapshot/uploads.tgz" || true
-yp_scp "$HOST:${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
-yp_scp "$HOST:${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
-yp_ssh "cat '${LIVE_SNAP_REMOTE}/MANIFEST.txt'" >> "$STAGE/snapshot/MANIFEST.txt" || true
-yp_ssh "rm -rf '${LIVE_SNAP_REMOTE}' /var/tmp/yp-org-runtime-live.sh" || true
+yp_ssh "sudo mkdir -p '$LIVE_SNAP_REMOTE' /var/tmp && sudo rm -rf '${LIVE_SNAP_REMOTE:?}'/*"
+yp_put_root "$PACK_LOCAL" "/var/tmp/yp-org-runtime-live.sh"
+yp_ssh "sudo chmod +x /var/tmp/yp-org-runtime-live.sh && sudo bash /var/tmp/yp-org-runtime-live.sh '$LIVE_SNAP_REMOTE'"
+yp_get_root "${LIVE_SNAP_REMOTE}/db.dump" "$STAGE/snapshot/db.dump" || true
+yp_get_root "${LIVE_SNAP_REMOTE}/uploads.tgz" "$STAGE/snapshot/uploads.tgz" || true
+yp_get_root "${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
+yp_get_root "${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
+yp_ssh "sudo cat '${LIVE_SNAP_REMOTE}/MANIFEST.txt'" >> "$STAGE/snapshot/MANIFEST.txt" || true
+yp_ssh "sudo rm -rf '${LIVE_SNAP_REMOTE}' /var/tmp/yp-org-runtime-live.sh" || true
 rm -f "$PACK_LOCAL"
 
 [[ -f "$STAGE/snapshot/images.tar.gz" ]] || { echo "ERROR: images.tar.gz missing" >&2; exit 1; }
