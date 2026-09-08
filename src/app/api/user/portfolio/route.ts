@@ -144,9 +144,9 @@ export async function PUT(req: Request) {
     if (submit) {
       const consentRow = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { featureConsentsJson: true },
+        select: { notificationPrefsJson: true },
       });
-      if (!hasFeatureConsent(consentRow?.featureConsentsJson, 'portfolio')) {
+      if (!hasFeatureConsent(consentRow?.notificationPrefsJson, 'portfolio')) {
         return NextResponse.json(
           { message: 'Нужно коротко подтвердить правила портфолио', code: 'NEED_FEATURE_CONSENT', feature: 'portfolio' },
           { status: 412 }

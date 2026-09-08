@@ -12,8 +12,8 @@ import { needsPrivacyReconsent } from '@/lib/privacy-consent';
 import { unlockAchievement } from '@/lib/award-achievements';
 import {
   FEATURE_CONSENT_COPY,
-  FEATURE_CONSENT_KEYS,
   parseFeatureConsents,
+  writeFeatureConsent,
   type FeatureConsentKey,
 } from '@/lib/feature-consents';
 
@@ -37,12 +37,12 @@ export async function GET() {
       cookiesAcceptedAt: true,
       cookiesSignature: true,
       cookiesPolicyVersion: true,
-      featureConsentsJson: true,
+      notificationPrefsJson: true,
     },
   });
   return NextResponse.json({
     ...(user || {}),
-    featureConsents: parseFeatureConsents(user?.featureConsentsJson),
+    featureConsents: parseFeatureConsents(user?.notificationPrefsJson),
     currentPrivacyVersion: PRIVACY_POLICY_VERSION,
     currentCookiesVersion: COOKIES_POLICY_VERSION,
     needsPrivacyReconsent: needsPrivacyReconsent(user),
@@ -84,21 +84,24 @@ export async function POST(req: Request) {
   if (feature) {
     const existing = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { featureConsentsJson: true },
+      select: { notificationPrefsJson: true },
     });
-    const map = parseFeatureConsents(existing?.featureConsentsJson);
     const key: FeatureConsentKey = feature;
-    map[key] = new Date().toISOString();
+    const nextJson = writeFeatureConsent(
+      existing?.notificationPrefsJson,
+      key,
+      new Date().toISOString()
+    );
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: { featureConsentsJson: JSON.stringify(map) },
-      select: { featureConsentsJson: true },
+      data: { notificationPrefsJson: nextJson },
+      select: { notificationPrefsJson: true },
     });
     return NextResponse.json({
       ok: true,
-      feature,
-      copy: FEATURE_CONSENT_COPY[feature],
-      featureConsents: parseFeatureConsents(user.featureConsentsJson),
+      feature: key,
+      copy: FEATURE_CONSENT_COPY[key],
+      featureConsents: parseFeatureConsents(user.notificationPrefsJson),
     });
   }
 

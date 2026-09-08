@@ -23,24 +23,48 @@ export const FEATURE_CONSENT_COPY: Record<
   },
 };
 
-export function parseFeatureConsents(raw: string | null | undefined): Partial<Record<FeatureConsentKey, string>> {
+function asRecord(raw: string | null | undefined): Record<string, unknown> {
   if (!raw) return {};
   try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const out: Partial<Record<FeatureConsentKey, string>> = {};
-    for (const key of FEATURE_CONSENT_KEYS) {
-      const v = parsed[key];
-      if (typeof v === 'string' && v.trim()) out[key] = v;
-    }
-    return out;
+    const parsed = JSON.parse(raw) as unknown;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : {};
   } catch {
     return {};
   }
 }
 
+export function parseFeatureConsents(prefsJson: string | null | undefined): Partial<Record<FeatureConsentKey, string>> {
+  const parsed = asRecord(prefsJson);
+  const nestedRaw = parsed.featureConsents;
+  const nested =
+    nestedRaw && typeof nestedRaw === 'object' && !Array.isArray(nestedRaw)
+      ? (nestedRaw as Record<string, unknown>)
+      : {};
+  const out: Partial<Record<FeatureConsentKey, string>> = {};
+  for (const key of FEATURE_CONSENT_KEYS) {
+    const v = nested[key];
+    if (typeof v === 'string' && v.trim()) out[key] = v;
+  }
+  return out;
+}
+
+export function writeFeatureConsent(
+  prefsJson: string | null | undefined,
+  key: FeatureConsentKey,
+  at: string
+): string {
+  const parsed = asRecord(prefsJson);
+  const current = parseFeatureConsents(prefsJson);
+  current[key] = at;
+  parsed.featureConsents = current;
+  return JSON.stringify(parsed);
+}
+
 export function hasFeatureConsent(
-  raw: string | null | undefined,
+  prefsJson: string | null | undefined,
   key: FeatureConsentKey
 ): boolean {
-  return Boolean(parseFeatureConsents(raw)[key]);
+  return Boolean(parseFeatureConsents(prefsJson)[key]);
 }

@@ -126,8 +126,6 @@ model User {
   rulesAcceptedAt     DateTime?
   rulesSignature      String?
   rulesPolicyVersion  String?
-  /** JSON: контекстные согласия { coworking?: ISO, portfolio?: ISO } */
-  featureConsentsJson String?
 
   /** Расширенный профиль */
   birthDate   DateTime?

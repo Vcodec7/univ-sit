@@ -93,9 +93,9 @@ export async function POST(req: Request) {
 
   const userRow = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { featureConsentsJson: true },
+    select: { notificationPrefsJson: true },
   });
-  if (!hasFeatureConsent(userRow?.featureConsentsJson, 'coworking')) {
+  if (!hasFeatureConsent(userRow?.notificationPrefsJson, 'coworking')) {
     return NextResponse.json(
       { message: 'Нужно коротко подтвердить правила коворкинга', code: 'NEED_FEATURE_CONSENT', feature: 'coworking' },
       { status: 412 }
