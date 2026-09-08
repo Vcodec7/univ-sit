@@ -49,7 +49,7 @@ async function unlockIfLeader(userId: string, game: GameId) {
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ scores: [] });
   }
 
   const scores = await prisma.gameScore.findMany({
