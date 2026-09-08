@@ -25,7 +25,7 @@ import { assertSameOrigin } from '@/lib/csrf-origin';
 const registerSchema = z.object({
   name: z.string().min(2, 'Имя слишком короткое').max(100),
   email: z.string().email('Некорректный email'),
-  phone: z.string().min(10, 'Некорректный телефон').max(30),
+  phone: z.string().max(30).optional(),
   password: z
     .string()
     .min(10, 'Пароль должен быть минимум 10 символов')
@@ -118,13 +118,13 @@ export async function POST(req: Request) {
     const email = parseResult.data.email.trim().toLowerCase();
     const password = parseResult.data.password;
     const birthDateRaw = parseResult.data.birthDate.trim().slice(0, 10);
-    const phoneDigits = normalizePhone(parseResult.data.phone);
-    const phone = phoneDigits ? `+${phoneDigits}` : '';
+    const phoneDigits = parseResult.data.phone ? normalizePhone(parseResult.data.phone) : '';
+    const phone = phoneDigits ? `+${phoneDigits}` : `nophone:${email}`;
 
     if (!isRussianEmail(email)) {
       return NextResponse.json({ message: RU_EMAIL_HINT }, { status: 400 });
     }
-    if (phoneDigits.length < 11) {
+    if (phoneDigits && phoneDigits.length < 11) {
       return NextResponse.json({ message: 'Укажите корректный российский телефон' }, { status: 400 });
     }
 
@@ -158,9 +158,17 @@ export async function POST(req: Request) {
         success: false,
         reason: 'email_exists',
       });
-      return NextResponse.json({ message: EXISTING_ACCOUNT_MSG }, { status: 400 });
+      return NextResponse.json(
+        {
+          code: 'EMAIL_EXISTS',
+          message: 'Аккаунт с такой почтой уже существует',
+          email,
+        },
+        { status: 409 }
+      );
     }
 
+    if (phoneDigits) {
     const national = phoneDigits.slice(-10);
     const phoneConflict = await prisma.$queryRaw<Array<{ id: string }>>`
       SELECT id FROM "User"
@@ -178,6 +186,7 @@ export async function POST(req: Request) {
         reason: 'phone_exists',
       });
       return NextResponse.json({ message: EXISTING_ACCOUNT_MSG }, { status: 400 });
+    }
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);

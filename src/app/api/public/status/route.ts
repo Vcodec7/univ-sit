@@ -39,6 +39,7 @@ export async function GET() {
       esiaLoginEnabled: access.esiaLoginEnabled,
       smsLoginReady: access.smsLoginEnabled && smsReady,
       esiaLoginReady: access.esiaLoginEnabled && oauthProviderFlags().esia,
+      oauth: oauthProviderFlags(),
       modules: bundle.flags,
       offModes: bundle.offModes,
       publicEventsVisibility: Boolean(visibility?.publicEventsVisibility),

@@ -11,6 +11,7 @@ import {
   PRIVACY_POLICY_VERSION,
   RULES_POLICY_VERSION,
 } from "@/lib/consent-versions";
+import { ageFromVkBdate, verifyTelegramWidget } from "@/lib/telegram-login";
 
 async function findUserByLogin(loginRaw: string) {
   const raw = loginRaw.trim();
@@ -66,6 +67,65 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     ...buildOptionalOAuthProviders(),
+    CredentialsProvider({
+      id: "telegram",
+      name: "Telegram",
+      credentials: {
+        payload: { label: "payload", type: "text" },
+      },
+      async authorize(credentials) {
+        let raw: Record<string, unknown> = {};
+        try {
+          raw = JSON.parse(String(credentials?.payload || "{}"));
+        } catch {
+          throw new Error("Некорректные данные Telegram");
+        }
+        const verified = verifyTelegramWidget(raw);
+        if (!verified) {
+          throw new Error("Не удалось подтвердить вход через Telegram");
+        }
+        const name = [verified.first_name, verified.last_name].filter(Boolean).join(" ") || "Telegram";
+        const providerAccountId = String(verified.id);
+        const existingAcc = await prisma.account.findUnique({
+          where: { provider_providerAccountId: { provider: "telegram", providerAccountId } },
+          include: { user: true },
+        });
+        if (existingAcc?.user) {
+          if (existingAcc.user.blockedAt || existingAcc.user.deletedAt) {
+            throw new Error("Аккаунт недоступен");
+          }
+          return existingAcc.user as any;
+        }
+        const { getAccessSettings } = await import("./access-settings");
+        const access = await getAccessSettings();
+        if (!access.registrationEnabled) {
+          throw new Error("Регистрация временно закрыта");
+        }
+        const now = new Date();
+        const user = await prisma.user.create({
+          data: {
+            name,
+            image: verified.photo_url || null,
+            email: null,
+            privacyAcceptedAt: now,
+            privacyFirstAcceptedAt: now,
+            privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+            cookiesAcceptedAt: now,
+            cookiesPolicyVersion: COOKIES_POLICY_VERSION,
+            rulesAcceptedAt: now,
+            rulesPolicyVersion: RULES_POLICY_VERSION,
+            accounts: {
+              create: {
+                type: "oauth",
+                provider: "telegram",
+                providerAccountId,
+              },
+            },
+          },
+        });
+        return user as any;
+      },
+    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -157,24 +217,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (smsCode) {
-          const { getAccessSettings } = await import("./access-settings");
-          const access = await getAccessSettings();
-          if (!access.smsLoginEnabled) {
-            throw new Error("Вход по SMS выключен");
-          }
-          const { verifySmsOtp } = await import("./sms-otp");
-          if (!(await verifySmsOtp(loginRaw, smsCode))) {
-            await noteLoginFailure(rateKey);
-            await noteLoginFailure(`ip:${ip}`);
-            throw new Error("Неверный код из SMS");
-          }
-          const smsUser = await findUserByLogin(loginRaw);
-          if (!smsUser || (smsUser as { blockedAt?: Date | null }).blockedAt || (smsUser as { deletedAt?: Date | null }).deletedAt) {
-            throw new Error("Неверный логин или пароль");
-          }
-          await clearLoginFailures(rateKey);
-          await clearLoginFailures(`ip:${ip}`);
-          return smsUser as any;
+          throw new Error("Вход по SMS отключён. Войдите через VK, Telegram, Яндекс или email.");
         }
 
         let user = await findUserByLogin(loginRaw);
@@ -301,8 +344,15 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider && account.provider !== "credentials") {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "vk") {
+        const bdate = (profile as { bdate?: string } | undefined)?.bdate;
+        const age = ageFromVkBdate(bdate);
+        if (age !== null && age < 14) {
+          return "/login?error=" + encodeURIComponent("Регистрация доступна с 14 лет");
+        }
+      }
+      if (account?.provider && account.provider !== "credentials" && account.provider !== "telegram") {
         if (user?.id) {
           const row = await prisma.user.findUnique({
             where: { id: user.id },
@@ -456,6 +506,25 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
   },
+  events: {
+    async createUser({ user }) {
+      if (!user?.id) return;
+      const now = new Date();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          privacyAcceptedAt: now,
+          privacyFirstAcceptedAt: now,
+          privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+          cookiesAcceptedAt: now,
+          cookiesPolicyVersion: COOKIES_POLICY_VERSION,
+          rulesAcceptedAt: now,
+          rulesPolicyVersion: RULES_POLICY_VERSION,
+        },
+      }).catch(() => null);
+    },
+  },
+  allowDangerousEmailAccountLinking: true,
   pages: {
     signIn: "/login",
   },
