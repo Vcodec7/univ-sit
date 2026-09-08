@@ -18,6 +18,7 @@ import EventHomeCarousel from './EventHomeCarousel';
 import HomeSlideRail from './HomeSlideRail';
 import HomeLiftFeedCard from './HomeLiftFeedCard';
 import AfishaTagFilter from './AfishaTagFilter';
+import ViewBeacon from '@/components/ViewBeacon';
 import { isJunkEventTitle } from '@/lib/afisha-filters';
 import { eventRewardBadge, isEcoTagged } from '@/lib/score-scales';
 import { POINTS } from '@/lib/points-labels';
