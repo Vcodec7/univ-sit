@@ -163,7 +163,7 @@ ok=0
 for i in 1 2 3 4 5 6; do
   body="$(curl -fsS --max-time 12 "https://${STAGING_DOMAIN}/api/health" || true)"
   echo "  try $i: $body"
-  if echo "$body" | grep -q '"ok":true'; then
+  if echo "$body" | grep -qE '"status":"ok"|"ok":true'; then
     ok=1
     break
   fi

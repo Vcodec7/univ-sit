@@ -114,6 +114,13 @@ server {
 
     __COLLECTIBLES__
 
+    location = /login {
+        __RATE_AUTH__
+        limit_req_status 429;
+        proxy_pass http://yp_web_prod;
+        include /etc/nginx/snippets/yp-proxy.conf;
+    }
+
     location /api/auth/ {
         __RATE_AUTH__
         limit_req_status 429;
@@ -244,6 +251,13 @@ server {
         default_type application/octet-stream;
         add_header Content-Disposition "inline";
         try_files $uri =404;
+    }
+
+    location = /login {
+        __RATE_AUTH__
+        limit_req_status 429;
+        proxy_pass http://yp_web_staging;
+        include /etc/nginx/snippets/yp-proxy.conf;
     }
 
     location /api/auth/ {

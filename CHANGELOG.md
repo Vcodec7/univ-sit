@@ -1,5 +1,14 @@
 # Changelog — YoungPortal
 
+## [1.6.165] — 2026-09-08
+
+### Security
+- Вход: 5 попыток/мин с IP (middleware 429 + nginx `/login` и credentials)
+- Капча: без `aria-label` на плитках
+- `poweredByHeader: false`; nginx `server_tokens off` + `proxy_hide_header X-Powered-By`
+- Публичный `/api/health` → `{"status":"ok"}`; версия только loopback или `HEALTH_MONITOR_TOKEN`
+- CI: `npm audit` (critical) и запрет коммита `.env`
+
 ## [1.6.164] — 2026-09-08
 
 ### Performance

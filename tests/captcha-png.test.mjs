@@ -13,7 +13,7 @@ test('captcha challenge JSON is image tiles without labels or emoji', () => {
   assert.match(lib, /crypto\.randomBytes\(8\)/);
   assert.doesNotMatch(lib, /tiles: tiles\.map\(\(\{ id, emoji, label \}\)/);
   assert.match(field, /CaptchaTileCanvas/);
-  assert.match(field, /aria-label=\{t\.id\}/);
+  assert.doesNotMatch(field, /aria-label=\{t\.id\}/);
   assert.doesNotMatch(field, /aria-label=\{t\.label\}/);
   assert.doesNotMatch(field, /<img src=\{t\.src\}/);
   const route = readFileSync(join(root, 'src/app/api/captcha/tile/[challengeId]/[tileId]/route.ts'), 'utf8');
