@@ -449,11 +449,15 @@ function LoginForm() {
           {!needs2fa ? (
             <>
               <div>
-                <label className="yp-auth-label">Email</label>
+                <label htmlFor="login-email" className="yp-auth-label">
+                  Электронная почта
+                </label>
                 <input
+                  id="login-email"
                   type="email"
                   name="username"
                   autoComplete="username"
+                  aria-label="Электронная почта"
                   value={login}
                   onChange={(e) => {
                     e.currentTarget.setCustomValidity('');
@@ -469,11 +473,15 @@ function LoginForm() {
               </div>
 
               <div>
-                <label className="yp-auth-label">Пароль</label>
+                <label htmlFor="login-password" className="yp-auth-label">
+                  Пароль
+                </label>
                 <input
+                  id="login-password"
                   type="password"
                   name="password"
                   autoComplete="current-password"
+                  aria-label="Пароль"
                   value={password}
                   onChange={(e) => {
                     e.currentTarget.setCustomValidity('');
@@ -498,11 +506,15 @@ function LoginForm() {
             </>
           ) : (
             <div>
-              <label className="yp-auth-label">Код 2FA</label>
+              <label htmlFor="login-totp" className="yp-auth-label">
+                Код 2FA
+              </label>
               <input
+                id="login-totp"
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
+                aria-label="Код 2FA"
                 value={totpCode}
                 onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 required

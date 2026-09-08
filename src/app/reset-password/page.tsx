@@ -64,12 +64,12 @@ function ResetPasswordForm() {
           {status === 'error' && <p style={{ color: 'var(--destructive)', fontSize: '0.9rem', margin: 0 }}>{message}</p>}
           
           <div>
-            <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.9rem', color: 'var(--muted)' }}>Новый пароль</label>
-            <input name="password" type="password" required minLength={8} className="modern-input" placeholder="••••••••" />
+            <label htmlFor="reset-password" style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.9rem', color: 'var(--muted)' }}>Новый пароль</label>
+            <input id="reset-password" name="password" type="password" required minLength={8} className="modern-input" placeholder="••••••••" aria-label="Новый пароль" />
           </div>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.9rem', color: 'var(--muted)' }}>Повторите пароль</label>
-            <input name="confirm" type="password" required minLength={8} className="modern-input" placeholder="••••••••" />
+            <label htmlFor="reset-confirm" style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.9rem', color: 'var(--muted)' }}>Повторите пароль</label>
+            <input id="reset-confirm" name="confirm" type="password" required minLength={8} className="modern-input" placeholder="••••••••" aria-label="Повторите пароль" />
           </div>
           
           <button type="submit" disabled={status === 'loading'} className="btn btn-primary" style={{ marginTop: '1rem', padding: '0.8rem' }}>

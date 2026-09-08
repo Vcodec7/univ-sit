@@ -45,7 +45,7 @@ export default function HomeHeroMedia({
         <Image
           className="svc-hero__img"
           src={poster}
-          alt=""
+          alt="Сочи: море и набережная"
           fill
           sizes="(max-width: 860px) 100vw, 1600px"
           quality={55}
@@ -57,7 +57,7 @@ export default function HomeHeroMedia({
         <img
           className="svc-hero__img"
           src={poster}
-          alt=""
+          alt="Сочи: море и набережная"
           width={1600}
           height={900}
           decoding="async"
