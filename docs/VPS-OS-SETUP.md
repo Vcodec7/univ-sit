@@ -1,6 +1,8 @@
-# Настройка и эксплуатация VPS — young.idivles.ru (sochi-portal)
+# Настройка и эксплуатация VPS — архив 2026-08
 
-Документ актуален на **2026-08-08**. Описывает ОС, сервисы, безопасность, бэкапы и причины инцидента недоступности.
+**Архив.** Живой эталон: прод **py.idivles.ru**, тест **ty.idivles.ru**, хост **`77.110.125.241:22`**. Не копировать IP `176.124.204.53` и домены young/y1 как defaults. Актуальный цикл: `docs/WORKFLOW.md`.
+
+Документ ниже описывает **старый** VPS young.idivles.ru на **2026-08-08**.
 
 ---
 
@@ -34,7 +36,7 @@
 | `/var/backups/sochi-portal/` | Бэкапы кода + дампы БД |
 
 **Домен:** https://young.idivles.ru  
-**Health:** `GET /api/health` → `{ ok, db, maintenanceMode, siteName, uptimeSec }`
+**Health:** публичный `GET /api/health` → `{ ok, maintenanceMode }` (после hardening). Полный JSON (`db`, `version`) — loopback без `X-Forwarded-Proto: https`.
 
 ---
 

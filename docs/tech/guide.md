@@ -4,7 +4,7 @@
 
 Служебная роль для **включения/выключения любых публичных функций и разделов** сайта без деплоя, плюс режим техработ. Не предназначена для ежедневной контент-модерации.
 
-- Панель: https://young.idivles.ru/ops  
+- Панель: https://ty.idivles.ru/ops (прод: https://py.idivles.ru/ops)  
 - API: `GET/POST /api/ops/flags` (для не-TECH отвечает **404**)  
 - Email учётки по умолчанию: `tech-ops@sochi.local` (задаётся `TECH_EMAIL` в `.env`)  
 - Первый bootstrap: переменные `TECH_BOOTSTRAP_PASSWORD` / опционально `TECH_PASSWORD_HASH` (пароль **не** публикуется в этой документации)

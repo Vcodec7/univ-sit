@@ -73,7 +73,11 @@ bash scripts/manual-promote-to-young.sh
 CONFIRM=PROMOTE_YOUNG APPROVE=YES bash scripts/manual-promote-to-young.sh
 ```
 
-Скрипт: пакет из git → rsync на staging-каталог → `safe-rebuild-web` / staging compose → smoke `https://ty.idivles.ru/api/health`.
+Promote **не** пересобирает Next на VPS: берёт уже одобренный staging-образ (`--no-build`), бэкапит прод, переключает py на этот образ. `safe-rebuild-web` — только если recreate упал.
+
+Публичный `https://ty.idivles.ru/api/health` — liveness (`ok`), не номер версии. Версию после выкладки: `curl -sS http://127.0.0.1:3001/api/health` **без** `X-Forwarded-Proto: https`.
+
+Режимы ty: `bash scripts/apply-staging.sh` (auto) · `prebuilt` · `static` · `sync`.
 
 После promote: `NEXTAUTH_URL` для прода = `https://py.idivles.ru`.
 

@@ -1,5 +1,11 @@
 # Changelog — YoungPortal
 
+## [1.6.154] — 2026-09-07
+
+### Changed
+- Скилы/доки: ty/py, health loopback vs public, ManagePullRequest, кабинет compact как intended UX
+- `pack-dev-deploy-kit.sh` / handoff: устойчивый разбор JSON (без JSONDecodeError на пустом VERSION.json)
+
 ## [1.6.153] — 2026-09-07
 
 ### Fixed

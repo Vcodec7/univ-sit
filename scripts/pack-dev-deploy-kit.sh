@@ -71,7 +71,14 @@ need
 
 APP_VER="$(python3 - "$ROOT/package.json" <<'PY'
 import json, pathlib, sys
-print(json.loads(pathlib.Path(sys.argv[1]).read_text()).get("version", "unknown"))
+p = pathlib.Path(sys.argv[1])
+try:
+    raw = p.read_text(encoding="utf-8").strip()
+    data = json.loads(raw) if raw else {}
+except (json.JSONDecodeError, OSError) as e:
+    print(f"WARN: cannot parse {p}: {e}", file=sys.stderr)
+    data = {}
+print(data.get("version", "unknown"))
 PY
 )"
 GIT_SHA="$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)"
@@ -427,9 +434,16 @@ if [[ "$WITH_LIVE" -eq 1 ]]; then
   python3 - "$STAGE/VERSION.json" <<'PY'
 import json, pathlib, sys
 p = pathlib.Path(sys.argv[1])
-data = json.loads(p.read_text())
+try:
+    raw = p.read_text(encoding="utf-8").strip()
+    data = json.loads(raw) if raw else {}
+except (json.JSONDecodeError, OSError) as e:
+    print(f"WARN: cannot parse {p}: {e}", file=sys.stderr)
+    data = {}
+if not isinstance(data, dict):
+    data = {}
 data["includesLiveSnapshot"] = True
-p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 PY
 fi
 

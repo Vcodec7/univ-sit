@@ -79,3 +79,8 @@ docs/accounts/
 
 artifacts/
 artifacts/*.tgz
+
+# leftover local captures (never commit)
+docs/perf/qa-ty-roles-*.json
+homepage-layout*.webp
+homepage-layout*.png

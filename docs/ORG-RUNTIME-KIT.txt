@@ -1,0 +1,27 @@
+YoungPortal — org runtime kit (без дерева исходников)
+=====================================================
+
+Это НЕ DRM. Образ Docker содержит собранный Next.js standalone; его можно
+разобрать. Защита практическая: в архиве нет src/, нет .git, нет .env с
+живыми секретами. Организация получает runtime (image + compose + дамп).
+
+Состав
+------
+  snapshot/images.tar.gz   docker save: sochi-portal_web + postgres + redis
+  snapshot/db.dump         Postgres custom dump (персональные данные!)
+  snapshot/uploads.tgz     загрузки пользователей
+  snapshot/env-keys.txt    имена переменных (без значений)
+  deploy/                  nginx + docker-compose.runtime.yml
+  INSTALL.sh / START.sh    установка на Debian/Ubuntu
+  .env.example             шаблон секретов (сгенерируйте свои)
+
+Установка (один абзац)
+----------------------
+На чистом Debian 12+/Ubuntu 22.04+ с Docker: распакуйте архив, задайте
+PROD_DOMAIN, выполните `sudo bash START.sh`. Скрипт поставит Docker при
+необходимости, загрузит образы (`docker load`), создаст .env со
+случайными паролями, поднимет compose --no-build, восстановит БД и
+uploads, настроит nginx. TLS: certbot после A-записи. Секреты эталона
+в публичный URL не кладутся — заполните SMTP/ботов в админке.
+
+Не публикуйте этот kit без контроля доступа: внутри живые ПДн из дампа.

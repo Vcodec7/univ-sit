@@ -5,8 +5,8 @@
 ## 1. Общее
 
 1. В кабинете разработчика создать приложения:
-   - [Яндекс OAuth](https://oauth.yandex.ru/) — callback: `https://young.idivles.ru/api/auth/callback/yandex`
-   - [VK ID](https://id.vk.com/) — callback: `https://young.idivles.ru/api/auth/callback/vk`
+   - [Яндекс OAuth](https://oauth.yandex.ru/) — callback: `https://py.idivles.ru/api/auth/callback/yandex` (и зеркало ty)
+   - [VK ID](https://id.vk.com/) — callback: `https://py.idivles.ru/api/auth/callback/vk`
 2. В `.env` на VPS:
    ```
    YANDEX_CLIENT_ID=...
