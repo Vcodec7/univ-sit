@@ -87,7 +87,8 @@ export async function POST(req: Request) {
       select: { featureConsentsJson: true },
     });
     const map = parseFeatureConsents(existing?.featureConsentsJson);
-    map[feature] = new Date().toISOString();
+    const key: FeatureConsentKey = feature;
+    map[key] = new Date().toISOString();
     const user = await prisma.user.update({
       where: { id: session.user.id },
       data: { featureConsentsJson: JSON.stringify(map) },
