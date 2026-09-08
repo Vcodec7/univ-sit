@@ -1,24 +1,33 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import {
   buildOccupancyWeek,
-  buildWeekDayKeys,
   parseOpenClose,
 } from '@/lib/hall-occupancy';
 import { getTzYmd, BOOKING_TZ } from '@/lib/booking-hours';
 import { assertSameOrigin } from '@/lib/csrf-origin';
+import {
+  aclJsonError,
+  canUseScanner,
+  hasPermission,
+  requirePermission,
+  requireUser,
+} from '@/lib/acl';
 
 export const dynamic = 'force-dynamic';
 
-function canManage(role?: string | null) {
-  return role === 'ADMIN' || role === 'MODERATOR' || role === 'SCANNER';
-}
-
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !canManage(session.user.role)) {
+  let session;
+  try {
+    session = await requireUser();
+  } catch (e) {
+    return aclJsonError(e);
+  }
+  const role = session.user.role;
+  const perms = session.user.permissions;
+  const canRead =
+    canUseScanner(role, perms) || hasPermission(role, perms, 'bookings');
+  if (!canRead) {
     return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
   }
 
@@ -108,9 +117,11 @@ export async function POST(req: Request) {
   const originBlock = assertSameOrigin(req);
   if (originBlock) return originBlock;
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !canManage(session.user.role)) {
-    return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
+  let session;
+  try {
+    session = await requirePermission('bookings');
+  } catch (e) {
+    return aclJsonError(e);
   }
 
   const body = await req.json().catch(() => null);
@@ -161,9 +172,10 @@ export async function DELETE(req: Request) {
   const originBlock = assertSameOrigin(req);
   if (originBlock) return originBlock;
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !canManage(session.user.role)) {
-    return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
+  try {
+    await requirePermission('bookings');
+  } catch (e) {
+    return aclJsonError(e);
   }
 
   const body = await req.json().catch(() => null);

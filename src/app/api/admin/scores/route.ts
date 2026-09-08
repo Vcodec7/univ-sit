@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
 import { assertSameOrigin } from '@/lib/csrf-origin';
 import { adjustScore } from '@/lib/score-scales';
 import { prisma } from '@/lib/prisma';
+import { aclJsonError, requirePermission } from '@/lib/acl';
 
 export const dynamic = 'force-dynamic';
 
-function canAdjust(role?: string | null) {
-  return role === 'ADMIN' || role === 'MODERATOR';
-}
-
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !canAdjust(session.user.role)) {
-    return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
+  try {
+    await requirePermission('moderation');
+  } catch (e) {
+    return aclJsonError(e);
   }
   const url = new URL(req.url);
   const userId = url.searchParams.get('userId') || undefined;
@@ -44,9 +40,11 @@ export async function POST(req: Request) {
   const originBlock = assertSameOrigin(req);
   if (originBlock) return originBlock;
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !canAdjust(session.user.role)) {
-    return NextResponse.json({ message: 'Недостаточно прав' }, { status: 403 });
+  let session;
+  try {
+    session = await requirePermission('moderation');
+  } catch (e) {
+    return aclJsonError(e);
   }
 
   const body = await req.json().catch(() => null);

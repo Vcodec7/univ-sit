@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
+import { profanityResponse } from '@/lib/censor';
 import {
   normalizeEventCategory,
   normalizeEventContactMode,
@@ -43,6 +44,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         { status: 400 }
       );
     }
+
+    const dirty = profanityResponse(
+      titleTrim,
+      descTrim,
+      String(body.contactPhone || ''),
+      String(body.contactTelegram || ''),
+      String(body.contactVk || ''),
+      String(body.contactMax || '')
+    );
+    if (dirty) return dirty;
 
     const categoryNorm = normalizeEventCategory(body.category ?? booking.category);
     const contactModeNorm = normalizeEventContactMode(body.contactMode ?? booking.contactMode);

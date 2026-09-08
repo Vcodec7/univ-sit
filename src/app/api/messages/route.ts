@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { ProfanityError, scanUnsafeContent } from '@/lib/censor';
 import { moderateDirectMessage } from '@/lib/content-moderation';
@@ -488,9 +489,8 @@ export async function POST(req: Request) {
   try {
     const csrf = assertSameOrigin(req);
     if (csrf) return csrf;
-    const session = await getServerSession(authOptions);
-    const me = session?.user?.id;
-    if (!me) return unauthorized();
+    const session = await requireEndUser();
+    const me = session.user.id;
 
     const meUser = await prisma.user.findUnique({
       where: { id: me },
@@ -698,6 +698,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ...result, warning }, { status: 201 });
   } catch (error) {
+    if (error instanceof AclError) return aclJsonError(error);
     if (error instanceof ProfanityError) {
       return NextResponse.json({ message: error.message }, { status: 400 });
     }

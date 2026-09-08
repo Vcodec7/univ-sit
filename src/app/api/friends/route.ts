@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
 import { computeTrustScore } from '@/lib/social';
 import { evaluateAchievements } from '@/lib/award-achievements';
 import { friendRequestHourLimiter, rateLimitJson } from '@/lib/rateLimit';
@@ -108,9 +109,8 @@ export async function POST(req: Request) {
   try {
     const csrf = assertSameOrigin(req);
     if (csrf) return csrf;
-    const session = await getServerSession(authOptions);
-    const me = session?.user?.id;
-    if (!me) return unauthorized();
+    const session = await requireEndUser();
+    const me = session.user.id;
 
     const { userFriendRequestLimitMultiplier, boostedMax } = await import('@/lib/activity-limits');
     const frMax = boostedMax(15, await userFriendRequestLimitMultiplier(me));
@@ -224,6 +224,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ friendship }, { status: 201 });
   } catch (error) {
+    if (error instanceof AclError) return aclJsonError(error);
     if ((error as { code?: string })?.code === 'P2002') {
       return NextResponse.json({ message: 'Заявка или дружба уже существует' }, { status: 409 });
     }
