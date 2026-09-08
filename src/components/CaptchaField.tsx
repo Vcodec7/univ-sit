@@ -165,7 +165,6 @@ export default function CaptchaField({ onToken, className }: Props) {
                 onClick={() => toggle(t.id)}
                 disabled={busy || solved}
                 aria-pressed={on}
-                aria-label={t.id}
                 style={{
                   padding: '0.35rem',
                   borderRadius: 10,

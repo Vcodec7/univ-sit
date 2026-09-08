@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { APP_VERSION } from '@/lib/app-version';
-import { isPublicHealthRequest } from '@/lib/health-access';
+import { isDetailedHealthRequest } from '@/lib/health-access';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   const started = Date.now();
-  const publicSurface = isPublicHealthRequest(req);
+  const detailed = isDetailedHealthRequest(req);
   try {
     await prisma.$queryRaw`SELECT 1`;
     const settings = await prisma.siteSettings.findUnique({
@@ -15,15 +15,16 @@ export async function GET(req: Request) {
       select: { siteName: true, maintenanceMode: true },
     });
     const maintenanceMode = Boolean(settings?.maintenanceMode);
-    if (publicSurface) {
+    if (!detailed) {
       return NextResponse.json(
-        { ok: true, maintenanceMode },
+        { status: 'ok' },
         { headers: { 'Cache-Control': 'no-store' } }
       );
     }
     return NextResponse.json(
       {
         ok: true,
+        status: 'ok',
         db: true,
         version: APP_VERSION,
         maintenanceMode,
@@ -34,15 +35,16 @@ export async function GET(req: Request) {
       { headers: { 'Cache-Control': 'no-store' } }
     );
   } catch {
-    if (publicSurface) {
+    if (!detailed) {
       return NextResponse.json(
-        { ok: false, maintenanceMode: false },
+        { status: 'error' },
         { status: 503, headers: { 'Cache-Control': 'no-store' } }
       );
     }
     return NextResponse.json(
       {
         ok: false,
+        status: 'error',
         db: false,
         version: APP_VERSION,
         error: 'db_unavailable',

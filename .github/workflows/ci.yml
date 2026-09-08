@@ -18,6 +18,19 @@ jobs:
       - run: npm ci
       - name: Unit tests
         run: node --test tests/*.test.mjs
+      - name: Dependency audit (critical)
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=critical
+      - name: Block committed secrets
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.local$'; then
+            echo 'Do not commit .env files' >&2
+            exit 1
+          fi
+          if git grep -I -nE 'BEGIN (RSA |OPENSSH )?PRIVATE KEY' -- ':!.github' ':!certs' ':!*.md'; then
+            echo 'Private key material in tree' >&2
+            exit 1
+          fi
       - name: Shell syntax
         run: |
           bash -n scripts/apply-staging.sh

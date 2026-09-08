@@ -661,6 +661,7 @@ proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection "upgrade";
 proxy_set_header X-Request-Id $request_id;
+proxy_hide_header X-Powered-By;
 PX
 
 case "$RATE_PROFILE" in
@@ -669,6 +670,7 @@ case "$RATE_PROFILE" in
 limit_req_zone $binary_remote_addr zone=yp_general:10m rate=20r/s;
 limit_req_zone $binary_remote_addr zone=yp_api:10m rate=15r/s;
 limit_req_zone $binary_remote_addr zone=yp_auth:10m rate=3r/s;
+limit_req_zone $binary_remote_addr zone=yp_login:10m rate=5r/m;
 limit_conn_zone $binary_remote_addr zone=yp_conn:10m;
 LIM
     RATE_AUTH='limit_req zone=yp_auth burst=8 nodelay;'
@@ -713,6 +715,7 @@ C
 limit_req_zone $binary_remote_addr zone=yp_general:10m rate=40r/s;
 limit_req_zone $binary_remote_addr zone=yp_api:10m rate=30r/s;
 limit_req_zone $binary_remote_addr zone=yp_auth:10m rate=5r/s;
+limit_req_zone $binary_remote_addr zone=yp_login:10m rate=5r/m;
 limit_conn_zone $binary_remote_addr zone=yp_conn:10m;
 LIM
     fi

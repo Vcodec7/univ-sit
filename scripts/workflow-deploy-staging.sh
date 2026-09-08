@@ -152,7 +152,7 @@ if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
   for i in 1 2 3 4 5; do
     body="$(curl -fsS --max-time 25 "https://${STAGING_DOMAIN}/api/health" || true)"
     echo "  try $i: $body"
-    if echo "$body" | grep -q '"ok":true'; then
+    if echo "$body" | grep -qE '"status":"ok"|"ok":true'; then
       ok=1
       break
     fi
