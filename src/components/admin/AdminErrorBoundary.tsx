@@ -1,7 +1,6 @@
 'use client';
 
 import { Component, type ReactNode } from 'react';
-import toast from 'react-hot-toast';
 
 type Props = { children: ReactNode };
 type State = { failed: boolean };
@@ -13,16 +12,22 @@ export default class AdminErrorBoundary extends Component<Props, State> {
     return { failed: true };
   }
 
-  componentDidCatch() {
-    toast.error('Раздел не загрузился. Обновите страницу', { duration: 5000, id: 'admin-boundary' });
-  }
+  retry = () => {
+    this.setState({ failed: false });
+  };
 
   render() {
     if (this.state.failed) {
       return (
-        <p className="admin-error-fallback" role="alert">
-          Не удалось показать раздел. Обновите страницу.
-        </p>
+        <div className="admin-error-fallback" role="alert">
+          <h2 className="admin-error-fallback__title">Не удалось показать раздел</h2>
+          <p className="admin-error-fallback__text">
+            Данные не загрузились. Можно попробовать снова — без перезагрузки всей панели.
+          </p>
+          <button type="button" className="btn btn-primary" onClick={this.retry}>
+            Попробовать снова
+          </button>
+        </div>
       );
     }
     return this.props.children;

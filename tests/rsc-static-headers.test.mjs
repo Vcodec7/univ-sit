@@ -30,4 +30,5 @@ test('early PerformanceObserver guard skips entries without startTime', () => {
   const layout = readFileSync(join(root, 'src/app/layout.tsx'), 'utf8');
   assert.match(layout, /yp-po-guard/);
   assert.match(layout, /typeof e\.startTime==='number'/);
+  assert.match(layout, /reading 'startTime'/);
 });

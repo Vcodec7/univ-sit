@@ -6,7 +6,8 @@ import { notifyApplicationStatus } from '@/lib/notifications';
 import { promoteToParticipant } from '@/lib/participant';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 import AdminFocusTarget from '@/components/admin/AdminFocusTarget';
-import ApplicationsBoard, { serializeApp } from '@/components/admin/ApplicationsBoard';
+import ApplicationsBoard from '@/components/admin/ApplicationsBoard';
+import { serializeApp } from '@/lib/serialize-application';
 import type { ApplicationStatus, Prisma } from '@prisma/client';
 
 async function updateStatus(formData: FormData) {
@@ -335,7 +336,7 @@ export default async function AdminApplications({ searchParams }: { searchParams
         }}
       >
         <ApplicationsBoard
-          rows={applications.map(serializeApp)}
+          rows={(applications || []).map(serializeApp)}
           focusId={focus}
           updateStatus={updateStatus}
           bulkApprove={bulkApprove}
