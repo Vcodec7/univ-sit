@@ -1,5 +1,13 @@
 # Changelog — YoungPortal
 
+## [1.6.184] — 2026-09-08
+
+### Консоль / гидрация
+- `html`/`body` с `suppressHydrationWarning` — boot-скрипт не даёт React #418
+- PWA: `preventDefault` на beforeinstallprompt только если баннер не скрыт навсегда
+- Герой без `priority` preload сырого `sochi-sea.jpg` (остаётся eager + fetchPriority)
+- Оценка места: гости идут на логин, без POST 401 в консоли
+
 ## [1.6.183] — 2026-09-08
 
 ### Каталог проектов / TTFB

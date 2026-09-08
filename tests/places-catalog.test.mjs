@@ -15,6 +15,8 @@ test('places catalog shows approximate price disclaimer', () => {
   assert.match(placesLib, /может меняться/);
   assert.match(catalog, /PLACE_PRICE_DISCLAIMER/);
   assert.match(detail, /PLACE_PRICE_DISCLAIMER/);
+  const rating = readFileSync(join(root, 'src/components/places/PlaceRatingWidget.tsx'), 'utf8');
+  assert.match(rating, /status !== 'authenticated'/);
   assert.match(catalog, /places-card__price/);
 });
 

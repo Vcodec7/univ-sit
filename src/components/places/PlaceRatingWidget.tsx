@@ -2,6 +2,7 @@
 
 import { Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
 type Props = {
@@ -18,6 +19,7 @@ export default function PlaceRatingWidget({
   ratingCount = 0,
 }: Props) {
   const router = useRouter();
+  const { status } = useSession();
   const [myScore, setMyScore] = useState<number | null>(initialScore);
   const [avg, setAvg] = useState(ratingAvg);
   const [count, setCount] = useState(ratingCount);
@@ -27,6 +29,10 @@ export default function PlaceRatingWidget({
 
   const rate = async (score: number) => {
     if (busy) return;
+    if (status !== 'authenticated') {
+      router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
     setBusy(true);
     setMsg('');
     try {

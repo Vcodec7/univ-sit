@@ -49,7 +49,7 @@ export default function HomeHeroMedia({
           fill
           sizes="(max-width: 860px) 100vw, 1600px"
           quality={55}
-          priority
+          loading="eager"
           fetchPriority="high"
         />
       ) : (
