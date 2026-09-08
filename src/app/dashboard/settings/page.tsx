@@ -8,7 +8,6 @@ export default function DashboardSettingsPage() {
     <CabinetSubpage
       title="Настройки"
       lead="Публичность, безопасность, уведомления и мессенджеры — каждый блок отдельно."
-      section="settings"
     >
       <DashboardSettingsPageClient />
     </CabinetSubpage>

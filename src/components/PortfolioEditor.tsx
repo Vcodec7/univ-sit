@@ -571,7 +571,6 @@ export default function PortfolioEditor() {
           На проверку
         </button>
       </div>
-      ) : null}
     </div>
   );
 }

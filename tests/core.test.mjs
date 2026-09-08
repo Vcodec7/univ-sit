@@ -69,12 +69,70 @@ test('publishedWhere hides drafts and future schedules', () => {
   assert.ok(Array.isArray(where.OR));
 });
 
+function signTriple(prefix, id, userId, secret) {
+  const sig = createHmac('sha256', secret).update(`${id}:${userId}`).digest('hex').slice(0, 16);
+  return `${prefix}-${id}-${userId}-${sig}`;
+}
+
+function parsePass(raw, secret) {
+  const value = String(raw || '').trim();
+  if (value.startsWith('{')) {
+    const j = JSON.parse(value);
+    const type = String(j.type || '').toLowerCase();
+    if (type === 'coworking' && j.id && !j.sig) return { type: 'coworking', id: j.id, userId: j.userId || null };
+    if ((type === 'ticket' || type === 'space') && j.id && j.userId && j.sig) {
+      const expected = signTriple(type === 'space' ? 'SPACE' : 'TICKET', j.id, j.userId, secret).split('-').pop();
+      if (j.sig !== expected) return null;
+      return { type, id: j.id, userId: j.userId };
+    }
+    return null;
+  }
+  const parts = value.split('-');
+  if (parts.length < 4) {
+    if (/^[cC][a-z0-9]{20,32}$/.test(value)) return { type: 'coworking', id: value, userId: null };
+    return null;
+  }
+  const prefix = parts[0].toUpperCase();
+  const sig = parts[parts.length - 1];
+  const userId = parts[parts.length - 2];
+  const id = parts.slice(1, -2).join('-');
+  const expected = createHmac('sha256', secret).update(`${id}:${userId}`).digest('hex').slice(0, 16);
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  if (prefix === 'TICKET') return { type: 'ticket', id, userId };
+  if (prefix === 'SPACE') return { type: 'space', id, userId };
+  if (prefix === 'COWORK') return { type: 'coworking', id, userId };
+  return null;
+}
+
 test('signed tickets reject unsigned codes', () => {
   const secret = 'test-secret';
   const code = signTicket('book1', 'user1', secret);
   assert.ok(parseTicket(code, secret));
   assert.equal(parseTicket(`TICKET-book1-user1`, secret), null);
   assert.equal(parseTicket(`TICKET-book1-user1-deadbeefdeadbeef`, secret), null);
+});
+
+test('unified pass codes: ticket, coworking, space, JSON, bare id', () => {
+  const secret = 'test-secret';
+  const ticket = signTriple('TICKET', 'book1', 'user1', secret);
+  const space = signTriple('SPACE', 'book2', 'user1', secret);
+  const cowork = signTriple('COWORK', 'cw1', 'user1', secret);
+  assert.deepEqual(parsePass(ticket, secret), { type: 'ticket', id: 'book1', userId: 'user1' });
+  assert.deepEqual(parsePass(space, secret), { type: 'space', id: 'book2', userId: 'user1' });
+  assert.deepEqual(parsePass(cowork, secret), { type: 'coworking', id: 'cw1', userId: 'user1' });
+  assert.equal(parsePass('COWORK-cw1-user1-deadbeefdeadbeef', secret), null);
+  assert.deepEqual(parsePass('{"type":"coworking","id":"cw99"}', secret), {
+    type: 'coworking',
+    id: 'cw99',
+    userId: null,
+  });
+  assert.deepEqual(parsePass('clabcdefghij1234567890abcde', secret), {
+    type: 'coworking',
+    id: 'clabcdefghij1234567890abcde',
+    userId: null,
+  });
 });
 
 test('capacity join race invariant (logical)', () => {
