@@ -1,14 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Check } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
 import { notifyApplicationStatus } from '@/lib/notifications';
 import { promoteToParticipant } from '@/lib/participant';
-import AdminPendingButton from '@/components/admin/AdminPendingButton';
-import RejectWithReasonForm from '@/components/admin/RejectWithReasonForm';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
 import AdminFocusTarget from '@/components/admin/AdminFocusTarget';
+import ApplicationsBoard, { serializeApp } from '@/components/admin/ApplicationsBoard';
 import type { ApplicationStatus, Prisma } from '@prisma/client';
 
 async function updateStatus(formData: FormData) {
@@ -100,6 +98,17 @@ async function updateStatus(formData: FormData) {
     revalidatePath('/dashboard');
   } catch (e) {
     console.error('Ошибка обновления', e);
+  }
+}
+
+async function bulkApprove(formData: FormData) {
+  'use server';
+  const ids = formData.getAll('ids').map(String).filter(Boolean);
+  for (const id of ids) {
+    const fd = new FormData();
+    fd.set('id', id);
+    fd.set('status', 'APPROVED');
+    await updateStatus(fd);
   }
 }
 
@@ -323,109 +332,14 @@ export default async function AdminApplications({ searchParams }: { searchParams
           padding: '1rem',
           borderRadius: 'var(--radius-lg)',
           boxShadow: 'var(--shadow-sm)',
-          overflowX: 'auto',
         }}
       >
-        <div className="admin-table-wrap">
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Тип</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Название</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Пользователь</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Сообщение</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Статус</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)', textAlign: 'right' }}>Решение</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.map((app) => (
-                <tr
-                  key={app.id}
-                  id={`app-${app.id}`}
-                  style={{
-                    borderBottom: '1px solid #f1f5f9',
-                    background: focus === app.id ? 'rgba(59,130,246,0.08)' : undefined,
-                  }}
-                >
-                  <td data-label="Тип" style={{ padding: '1rem', fontWeight: 500 }}>
-                    {app.project
-                      ? 'Проект'
-                      : app.club
-                        ? 'Клуб'
-                        : app.program?.kind === 'GRANT'
-                          ? 'Грант'
-                          : app.program?.kind === 'DOBRO'
-                            ? 'Добро'
-                            : app.program?.kind === 'SELF_GOV'
-                              ? 'Самоупр.'
-                              : 'Программа'}
-                  </td>
-                  <td data-label="Название" style={{ padding: '1rem' }}>
-                    {app.project?.title || app.club?.title || app.program?.title || '—'}
-                  </td>
-                  <td data-label="Пользователь" style={{ padding: '1rem', color: 'var(--muted)' }}>
-                    {app.user?.name || app.user?.email}
-                  </td>
-                  <td data-label="Сообщение" style={{ padding: '1rem', color: 'var(--muted)', fontSize: '0.88rem', maxWidth: 220 }}>
-                    {app.message ? (
-                      <span style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {app.message}
-                      </span>
-                    ) : (
-                      '—'
-                    )}
-                  </td>
-                  <td data-label="Статус" style={{ padding: '1rem' }}>
-                    <span
-                      style={{
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        backgroundColor:
-                          app.status === 'PENDING' ? '#fef3c7' : app.status === 'APPROVED' ? '#dcfce7' : '#fee2e2',
-                        color: app.status === 'PENDING' ? '#d97706' : app.status === 'APPROVED' ? '#166534' : '#991b1b',
-                      }}
-                    >
-                      {app.status === 'PENDING' ? 'Ожидает' : app.status === 'APPROVED' ? 'Одобрено' : 'Отклонено'}
-                    </span>
-                  </td>
-                  <td data-label="Решение" style={{ padding: '1rem', textAlign: 'right' }}>
-                    {app.status === 'PENDING' && (
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                        <form action={updateStatus}>
-                          <input type="hidden" name="id" value={app.id} />
-                          <input type="hidden" name="status" value="APPROVED" />
-                          <AdminPendingButton
-                            className="btn btn-secondary"
-                            style={{ padding: '0.5rem', color: '#166534', backgroundColor: '#dcfce7' }}
-                            title="Одобрить"
-                            pendingLabel="…"
-                          >
-                            <Check size={16} />
-                          </AdminPendingButton>
-                        </form>
-                        <RejectWithReasonForm action={updateStatus} id={app.id} />
-                      </div>
-                    )}
-                    {app.status === 'REJECTED' && app.rejectReason ? (
-                      <p style={{ margin: '0.35rem 0 0', fontSize: '0.8rem', color: '#991b1b', textAlign: 'right', maxWidth: 260, marginLeft: 'auto' }}>
-                        {app.rejectReason}
-                      </p>
-                    ) : null}                  </td>
-                </tr>
-              ))}
-              {applications.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--muted)' }}>
-                    Нет заявок в этом фильтре
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ApplicationsBoard
+          rows={applications.map(serializeApp)}
+          focusId={focus}
+          updateStatus={updateStatus}
+          bulkApprove={bulkApprove}
+        />
       </div>
 
       {totalPages > 1 && (

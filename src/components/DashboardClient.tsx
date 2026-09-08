@@ -13,7 +13,7 @@ import TagPicker from '@/components/TagPicker';
 import { collectDeviceFingerprint } from '@/lib/device-fingerprint';
 import ProfileHeroCard from '@/components/ProfileHeroCard';
 import PersonalQrPanel from '@/components/PersonalQrPanel';
-import CoworkingCabinetList from '@/components/CoworkingCabinetList';
+import CabinetHubTabs from '@/components/CabinetHubTabs';
 import { zodiacFromDate } from '@/lib/profile-meta';
 import {
   QUICK_ACCESS_TUTORIAL_DONE_EVENT,
@@ -611,7 +611,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       revealContacts
                     />
                     <PersonalQrPanel open={passOpen} onClose={() => setPassOpen(false)} />
-                    <CoworkingCabinetList />
+                    <CabinetHubTabs unreadMessages={unreadMessages} />
 
                   </div>
 
