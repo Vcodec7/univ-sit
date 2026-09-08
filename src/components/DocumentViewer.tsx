@@ -25,6 +25,8 @@ type Props = {
   mimeType: string;
   title: string;
   fileName: string;
+  /** Absolute HTTPS URL Google Docs Viewer can fetch */
+  publicFileUrl?: string;
 };
 
 function isDocx(mimeType: string, fileName: string) {
@@ -40,6 +42,18 @@ function isLegacyDoc(mimeType: string, fileName: string) {
   return (
     (mimeType === 'application/msword' || mimeType === 'application/vnd.ms-word' || lower.endsWith('.doc')) &&
     !lower.endsWith('.docx')
+  );
+}
+
+function GoogleDocsFrame({ src, title }: { src: string; title: string }) {
+  const gview = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(src)}`;
+  return (
+    <iframe
+      title={title}
+      src={gview}
+      className="yp-gdocs-frame"
+      allow="fullscreen"
+    />
   );
 }
 
@@ -66,27 +80,20 @@ function TextViewer({ url }: { url: string }) {
   }, [url]);
 
   return (
-    <pre
-      style={{
-        margin: 0,
-        padding: '1.25rem',
-        color: '#0f172a',
-        background: '#fff',
-        borderRadius: 12,
-        border: '1px solid #e2e8f0',
-        fontSize: '0.95rem',
-        lineHeight: 1.55,
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word',
-        minHeight: '40vh',
-      }}
-    >
+    <pre className="yp-doc-text">
       {textError || textBody || 'Загрузка…'}
     </pre>
   );
 }
 
-export default function DocumentViewer({ documentId, fileUrl, mimeType, title, fileName }: Props) {
+export default function DocumentViewer({
+  documentId,
+  fileUrl,
+  mimeType,
+  title,
+  fileName,
+  publicFileUrl,
+}: Props) {
   const inlineUrl = useMemo(
     () => `/api/documents/${documentId}/file?disposition=inline`,
     [documentId]
@@ -95,45 +102,28 @@ export default function DocumentViewer({ documentId, fileUrl, mimeType, title, f
     () => `/api/documents/${documentId}/file?disposition=attachment`,
     [documentId]
   );
-  /** Same-site viewer — avoids Android downloading raw PDF instead of opening. */
   const newTabUrl = useMemo(() => `/documents/${documentId}`, [documentId]);
+  const [localDocx, setLocalDocx] = useState(false);
 
   const isPdf = mimeType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
   const isImage = mimeType.startsWith('image/');
   const isText = mimeType === 'text/plain' || fileName.toLowerCase().endsWith('.txt');
   const docx = isDocx(mimeType, fileName);
   const legacyDoc = isLegacyDoc(mimeType, fileName);
+  const cloudDocx = Boolean(docx && publicFileUrl && /^https:\/\//i.test(publicFileUrl) && !localDocx);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--muted)', fontSize: '0.9rem' }}>
+    <div className="yp-doc-viewer">
+      <div className="yp-doc-viewer__bar">
+        <div className="yp-doc-viewer__file">
           <FileText size={16} />
-          <span style={{ wordBreak: 'break-all' }}>{fileName}</span>
+          <span>{fileName}</span>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <a
-            href={downloadUrl}
-            className="btn btn-secondary"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.55rem 0.9rem' }}
-          >
+        <div className="yp-doc-viewer__actions">
+          <a href={downloadUrl} className="btn btn-secondary">
             <Download size={16} /> Скачать
           </a>
-          <a
-            href={newTabUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.55rem 0.9rem' }}
-          >
+          <a href={newTabUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
             <ExternalLink size={16} /> Открыть в новой вкладке
           </a>
         </div>
@@ -141,55 +131,36 @@ export default function DocumentViewer({ documentId, fileUrl, mimeType, title, f
 
       {isPdf && <PdfViewer url={inlineUrl} title={title} />}
 
-      {docx && <DocxViewer url={inlineUrl} />}
+      {cloudDocx ? (
+        <>
+          <GoogleDocsFrame src={publicFileUrl!} title={title} />
+          <button type="button" className="yp-doc-viewer__fallback" onClick={() => setLocalDocx(true)}>
+            Если предпросмотр не открылся — показать на сайте
+          </button>
+        </>
+      ) : null}
+      {docx && (!cloudDocx || localDocx) ? <DocxViewer url={inlineUrl} /> : null}
 
       {legacyDoc && (
-        <div
-          style={{
-            padding: '2.5rem 1.5rem',
-            textAlign: 'center',
-            background: '#f8fafc',
-            borderRadius: 12,
-            border: '1px solid #e2e8f0',
-            color: '#334155',
-            lineHeight: 1.55,
-          }}
-        >
-          <p style={{ margin: '0 0 0.75rem', fontWeight: 700 }}>Предпросмотр .doc на сайте недоступен</p>
-          <p style={{ margin: 0, color: '#64748b' }}>
-            Старый формат Word (.doc) не открывается без внешних сервисов. Загрузите файл как <strong>.docx</strong> или
-            скачайте и откройте на устройстве.
-          </p>
+        <div className="yp-doc-viewer__note">
+          <p>Предпросмотр .doc на сайте недоступен. Загрузите файл как <strong>.docx</strong> или скачайте.</p>
         </div>
       )}
 
-      {isImage && (
+      {isImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={fileUrl}
-          alt={title}
-          style={{
-            display: 'block',
-            maxWidth: '100%',
-            height: 'auto',
-            margin: '0 auto',
-            borderRadius: 12,
-            background: '#0f172a',
-          }}
-        />
-      )}
+        <img src={fileUrl} alt={title} className="yp-doc-viewer__img" />
+      ) : null}
 
       {isText && <TextViewer url={inlineUrl} />}
 
-      {!isPdf && !docx && !legacyDoc && !isImage && !isText && (
-        <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#64748b' }}>
-          Предпросмотр для этого формата недоступен. Скачайте файл.
-        </div>
-      )}
+      {!isPdf && !docx && !legacyDoc && !isImage && !isText ? (
+        <div className="yp-doc-viewer__note">Предпросмотр для этого формата недоступен. Скачайте файл.</div>
+      ) : null}
 
       {(isPdf || docx || isOfficeDoc(mimeType, fileName)) && (
-        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)' }}>
-          Документы открываются на сайте без внешних сервисов. PDF — чёткий просмотр; DOCX — вёрстка как в Word.
+        <p className="yp-doc-viewer__hint">
+          PDF отдаётся как application/pdf. DOCX открывается в Google Docs Viewer, без обязательного скачивания.
         </p>
       )}
     </div>

@@ -9,6 +9,9 @@ export default function ScannerHub({ initialTab = 'tickets' }: { initialTab?: st
   const [tab, setTab] = useState(initialTab === 'pass' ? 'pass' : 'tickets');
   return (
     <div className="scanner-hub">
+      <p className="scanner-hub__hint">
+        Билет, коворкинг и личный пропуск читаются вместе. Зелёный экран — проход, красный — отказ.
+      </p>
       <div className="scanner-hub__tabs" role="tablist" aria-label="Режим сканера">
         <button
           type="button"
@@ -17,7 +20,7 @@ export default function ScannerHub({ initialTab = 'tickets' }: { initialTab?: st
           className={tab === 'tickets' ? 'is-on' : ''}
           onClick={() => setTab('tickets')}
         >
-          Билеты
+          Билеты и коворкинг
         </button>
         <button
           type="button"

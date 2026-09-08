@@ -7,6 +7,7 @@ import { assertSameOrigin } from '@/lib/csrf-origin';
 import { getSiteIdentity, normalizeOrigin } from '@/lib/site-identity';
 import { maxEnsureWebhook, maxGetConfig, maxListSubscriptions, maxWebhookFailRu } from '@/lib/max';
 import { opsFlagsRateLimiter, rateLimitJson } from '@/lib/rateLimit';
+import { oauthProviderFlags } from '@/lib/oauth-providers';
 import { voidLogUserAction } from '@/lib/user-action-log';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,7 @@ export async function GET() {
       webhookRegisteredUrl: urls[0] || null,
       webhookActive: urls.some((u) => u.replace(/\/$/, '') === expected),
     },
+    oauth: oauthProviderFlags(),
   });
 }
 
