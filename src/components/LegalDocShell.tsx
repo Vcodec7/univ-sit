@@ -39,11 +39,11 @@ export default function LegalDocShell({
   lead: ReactNode;
   meta?: ReactNode;
   toc?: LegalTocItem[];
-  children: ReactNode;
+  children?: ReactNode;
   aside?: ReactNode;
 }) {
   void _brand;
-  const hasToc = toc.length > 1;
+  const hasToc = toc.length >= 4;
 
   return (
     <div className="legal-page">
@@ -73,7 +73,9 @@ export default function LegalDocShell({
           ) : null}
 
           <div className="legal-main">
-            <article className="legal-article">{children}</article>
+            <article className="legal-article">
+              {children}
+            </article>
             {aside ? <aside className="legal-aside">{aside}</aside> : null}
           </div>
         </div>

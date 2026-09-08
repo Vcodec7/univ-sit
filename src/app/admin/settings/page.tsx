@@ -8,7 +8,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import Link from 'next/link';
 import {
-  Mail, Shield, Settings2, Share2, Globe,
+  Mail, Shield, Settings2, Share2, Globe, Phone,
   CheckCircle2, AlertTriangle,
   Database, Calendar, Building2, Zap, Construction, Scale, Landmark, ShieldAlert, Bell,
   Leaf, Server, Activity,
@@ -57,9 +57,29 @@ const SETTINGS_TAB_MODULE: Record<string, ModuleFlagKey | null> = {
   analytics: null,
   demo: null,
   smtp: null,
+  sms: null,
   'vk-api': null,
   notifications: 'bots',
 };
+
+async function testSms(formData: FormData) {
+  'use server';
+  await requireSuperAdmin();
+  const { redirect } = await import('next/navigation');
+  const phone = String(formData.get('testPhone') || '');
+  const { nationalPhoneKey } = await import('@/lib/sms-otp');
+  const { dispatchSms, loadSmsDispatchConfig } = await import('@/lib/sms-dispatch');
+  const key = nationalPhoneKey(phone);
+  if (key.length !== 10) {
+    redirect('/admin/settings?tab=sms&sms=badphone');
+  }
+  const sent = await dispatchSms(
+    `+7${key}`,
+    'Проверка SMS-шлюза портала. Код входа не требуется.',
+    await loadSmsDispatchConfig(),
+  );
+  redirect(`/admin/settings?tab=sms&sms=${sent.ok ? 'ok' : 'fail'}`);
+}
 
 async function testEmail(formData: FormData) {
   'use server';
@@ -181,6 +201,15 @@ async function updateSettings(formData: FormData) {
     data.maintenanceMode = formData.get('maintenanceMode') === 'true';
     data.maintenanceMessage = ((formData.get('maintenanceMessage') as string) || '').trim();
     data.maintenanceEta = ((formData.get('maintenanceEta') as string) || '').trim() || null;
+  } else if (tab === 'sms') {
+    const { parseSmsProvider } = await import('@/lib/sms-dispatch');
+    data.smsLoginEnabled = formData.get('smsLoginEnabled') === 'true';
+    data.smsProvider = parseSmsProvider(formData.get('smsProvider'));
+    data.smsApiUrl = ((formData.get('smsApiUrl') as string) || '').trim() || null;
+    data.smsApiLogin = ((formData.get('smsApiLogin') as string) || '').trim() || null;
+    data.smsFrom = ((formData.get('smsFrom') as string) || '').trim() || null;
+    const smsKey = ((formData.get('smsApiKey') as string) || '').trim();
+    if (smsKey) data.smsApiKey = smsKey;
   } else if (tab === 'smtp') {
     str('smtpHost');
     data.smtpPort = parseInt(formData.get('smtpPort') as string) || 465;
@@ -425,12 +454,13 @@ async function registerTelegramWebhook() {
   redirect(`/admin/settings?tab=notifications&tghook=${r.ok ? 'ok' : 'fail'}`);
 }
 
-export default async function AdminSettings({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string }> }) {
+export default async function AdminSettings({ searchParams }: { searchParams: Promise<{ tab?: string; saved?: string; sms?: string }> }) {
   const session = await requireAdminPage();
   const resolvedParams = await searchParams;
   const rawTab = resolvedParams.tab || 'general';
   const activeTab = rawTab === 'afisha' ? 'general' : rawTab;
   const justSaved  = resolvedParams.saved === '1';
+  const smsTest = resolvedParams.sms || '';
 
   const settings = await prisma.siteSettings.findUnique({ where: { id: '1' } });
   const identity = await getSiteIdentity();
@@ -463,6 +493,7 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
     { id: 'analytics',  label: 'Аналитика',       icon: Zap, group: 'Система' },
     { id: 'demo',       label: 'Демо',      icon: Database, group: 'Система' },
     { id: 'smtp',       label: 'Почта',    icon: Mail, group: 'Интеграции' },
+    { id: 'sms',        label: 'SMS',      icon: Phone, group: 'Интеграции' },
     { id: 'vk-api',     label: 'VK API',          icon: Globe, group: 'Интеграции' },
     { id: 'notifications', label: 'Оповещения',   icon: Bell, group: 'Интеграции' },
   ].map((t) => ({ ...t, moduleOff: tabModuleOff(t.id) }));
@@ -910,7 +941,9 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                   <div>
                     <h3 style={{ margin: '0 0 0.25rem', fontSize: '0.95rem', fontWeight: 700 }}>Вход по телефону + SMS</h3>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', lineHeight: 1.6 }}>
-                      Дополнительно к паролю. Нужен настроенный SMS-провайдер (<code>SMS_API_URL</code>). На странице входа появится кнопка «Код из SMS».
+                      На странице входа появится «Код из SMS». Шлюз настраивается во вкладке{' '}
+                      <Link href="/admin/settings?tab=sms" style={{ fontWeight: 700, color: '#5b21b6' }}>SMS</Link>
+                      {' '}(SMS.ru, SMSC или свой HTTPS). Без шлюза кнопка не отправит код.
                     </p>
                   </div>
                   <label className="toggle-switch">
@@ -1039,6 +1072,90 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
                 Host = <code>resend</code> (США) — только если оформлено основание трансграничной передачи ПДн
                 и домен отправителя верифицирован. From = verified email / <code>onboarding@resend.dev</code> для теста.<br/>
                 Пароль поля = API-ключ провайдера или пароль SMTP.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =================== SMS =================== */}
+        {activeTab === 'sms' && (
+          <div className="tab-content">
+            <div style={cardStyle}>
+              <div className="setting-row">
+                <div>
+                  <h3 style={{ margin: '0 0 0.25rem', fontSize: '0.95rem', fontWeight: 700 }}>Вход по телефону + SMS</h3>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', lineHeight: 1.6 }}>
+                    Код на номер при входе (не путать с письмом на email при регистрации). Подтверждение телефона в очереди регистраций по-прежнему делает администратор.
+                  </p>
+                </div>
+                <label className="toggle-switch">
+                  <input type="checkbox" name="smsLoginEnabled" value="true" defaultChecked={Boolean((settings as any)?.smsLoginEnabled)} />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>Провайдер</label>
+                  <select name="smsProvider" className="settings-input" defaultValue={String((settings as any)?.smsProvider || 'generic')}>
+                    <option value="smsru">SMS.ru (api_id)</option>
+                    <option value="smsc">SMSC.ru (логин и пароль)</option>
+                    <option value="generic">Свой HTTPS (JSON POST)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Логин SMSC</label>
+                  <input
+                    name="smsApiLogin"
+                    type="text"
+                    autoComplete="off"
+                    defaultValue={(settings as any)?.smsApiLogin || ''}
+                    className="settings-input"
+                    placeholder="только для SMSC.ru"
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Ключ / пароль</label>
+                  <input
+                    name="smsApiKey"
+                    type="password"
+                    autoComplete="new-password"
+                    defaultValue=""
+                    className="settings-input"
+                    placeholder={
+                      ((settings as any)?.smsApiKey || '').trim()
+                        ? '••••••••  (пустое — не менять)'
+                        : 'api_id SMS.ru или пароль SMSC'
+                    }
+                  />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>URL своего шлюза</label>
+                  <input
+                    name="smsApiUrl"
+                    type="url"
+                    defaultValue={(settings as any)?.smsApiUrl || ''}
+                    className="settings-input"
+                    placeholder="https://gateway.example.ru/send"
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
+                    Только для «Свой HTTPS». Тело: <code>{'{"to":"+79…","text":"…","from":"…"}'}</code>, ключ — Bearer.
+                  </p>
+                </div>
+                <div>
+                  <label style={labelStyle}>Имя отправителя</label>
+                  <input
+                    name="smsFrom"
+                    type="text"
+                    defaultValue={(settings as any)?.smsFrom || ''}
+                    className="settings-input"
+                    placeholder="как в кабинете провайдера"
+                  />
+                </div>
+              </div>
+              <div style={{ marginTop: '1.25rem', padding: '1rem', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '10px', fontSize: '0.85rem', color: '#0369a1', lineHeight: 1.6 }}>
+                Сохраните настройки, затем отправьте тестовое SMS ниже. Пустой ключ не затирает уже сохранённый.
+                Если поля пустые, портал ещё может взять <code>SMS_API_URL</code> / <code>SMS_API_KEY</code> из окружения сервера.
               </div>
             </div>
           </div>
@@ -1626,6 +1743,31 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
             <input name="testTo" type="email" required placeholder="Введите ваш email для проверки" className="settings-input" style={{ flex: 1, minWidth: '200px' }} />
             <button type="submit" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', borderRadius: '100px', padding: '0.65rem 1.5rem' }}>
               <Mail size={16} style={{ marginRight: '0.4rem' }} /> Отправить тест
+            </button>
+          </form>
+        </div>
+      )}
+      {activeTab === 'sms' && (
+        <div style={{ ...cardStyle, marginTop: '1.5rem', border: '1.5px dashed #e2e8f0' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Phone size={18} style={{ color: '#7c3aed' }} /> Тестовая SMS
+          </h3>
+          <p style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+            Сначала сохраните шлюз. На номер уйдёт служебный текст без кода входа.
+          </p>
+          {smsTest === 'ok' ? (
+            <p style={{ color: '#166534', fontWeight: 700, marginBottom: '0.75rem' }}>Сообщение принято шлюзом.</p>
+          ) : null}
+          {smsTest === 'fail' ? (
+            <p style={{ color: '#991b1b', fontWeight: 700, marginBottom: '0.75rem' }}>Шлюз отклонил отправку. Проверьте ключ и имя отправителя.</p>
+          ) : null}
+          {smsTest === 'badphone' ? (
+            <p style={{ color: '#991b1b', fontWeight: 700, marginBottom: '0.75rem' }}>Укажите российский номер, 10 цифр после +7.</p>
+          ) : null}
+          <form action={testSms} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <input name="testPhone" type="tel" required placeholder="+7 999 123-45-67" className="settings-input" style={{ flex: 1, minWidth: '200px' }} />
+            <button type="submit" className="btn btn-secondary" style={{ whiteSpace: 'nowrap', borderRadius: '100px', padding: '0.65rem 1.5rem' }}>
+              <Phone size={16} style={{ marginRight: '0.4rem' }} /> Отправить тест
             </button>
           </form>
         </div>

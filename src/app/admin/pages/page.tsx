@@ -239,7 +239,7 @@ export default async function AdminPages({
         </Link>
       </div>
 
-      <div className="admin-table-wrap" style={{ padding: '0.5rem 0' }}>
+      <div className="admin-table-wrap admin-table-wrap--sticky" style={{ padding: '0.5rem 0' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #f1f5f9' }}>

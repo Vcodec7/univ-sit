@@ -5,16 +5,12 @@
 ## 1. Общее
 
 1. В кабинете разработчика создать приложения:
-   - [Яндекс OAuth](https://oauth.yandex.ru/) — callback: `https://young.idivles.ru/api/auth/callback/yandex`
-   - [VK ID](https://id.vk.com/) — callback: `https://young.idivles.ru/api/auth/callback/vk`
-2. В `.env` на VPS:
-   ```
-   YANDEX_CLIENT_ID=...
-   YANDEX_CLIENT_SECRET=...
-   VK_CLIENT_ID=...
-   VK_CLIENT_SECRET=...
-   ```
-3. В `authOptions.providers` добавить `YandexProvider` / `VkProvider` (или кастомный OIDC для VK ID).
+   - [Яндекс OAuth](https://oauth.yandex.ru/) — callback: `https://<хост>/api/auth/callback/yandex`
+   - [VK ID](https://id.vk.com/) — callback: `https://<хост>/api/auth/callback/vk`
+   Хост = публичный HTTPS из `/ops` (ty.idivles.ru или py.idivles.ru).
+2. Ключи вставить в **техконсоль** `/ops` → Площадка → SSO. Сохранить. Контейнер web **не** recreate.
+   Запасной путь — те же переменные в `.env` (`YANDEX_CLIENT_*`, `VK_CLIENT_*`).
+3. Провайдеры NextAuth собираются на каждый запрос из кэша ключей (`src/lib/oauth-settings.ts`).
 4. Prisma `Account` уже есть (NextAuth adapter) — связать `provider` + `providerAccountId` с `User`.
 5. При первом входе через соцсеть:
    - создать User, если нет email-матча;

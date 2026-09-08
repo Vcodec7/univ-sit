@@ -37,3 +37,7 @@ ls -1t "$D"/sochi-portal-*.tgz 2>/dev/null | tail -n +5 | xargs -r rm -f || true
 ln -sfn "$D/full-${STAMP}.tar.gz" "$D/full-latest.tar.gz"
 echo "backup done $D/full-${STAMP}.tar.gz"
 
+if [[ -x "$(dirname "$0")/backup-offsite.sh" ]]; then
+  bash "$(dirname "$0")/backup-offsite.sh" || echo "WARN: offsite copy failed (local dump kept)"
+fi
+

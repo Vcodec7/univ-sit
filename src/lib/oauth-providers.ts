@@ -1,20 +1,17 @@
 /**
  * Optional OAuth providers (Yandex / VK / ESIA).
- * Enabled only when client id+secret env vars are set.
+ * Keys: техконсоль /ops (SiteSettings.oauthSsoJson), иначе .env.
  * See docs/OAUTH-YANDEX-VK.md and docs/OAUTH-ESIA.md
  */
 
-function esiaEnv() {
-  const clientId = (process.env.ESIA_CLIENT_ID || '').trim();
-  const clientSecret = (process.env.ESIA_CLIENT_SECRET || '').trim();
-  return { clientId, clientSecret, ready: Boolean(clientId && clientSecret) };
-}
+import { type OAuthCreds, oauthFlagsFromCreds, peekOAuthCreds } from '@/lib/oauth-settings';
 
-export function buildOptionalOAuthProviders(): any[] {
+export function buildOptionalOAuthProviders(creds?: OAuthCreds): any[] {
+  const c = creds || peekOAuthCreds();
   const out: any[] = [];
 
-  const yandexId = (process.env.YANDEX_CLIENT_ID || "").trim();
-  const yandexSecret = (process.env.YANDEX_CLIENT_SECRET || "").trim();
+  const yandexId = c.yandexId;
+  const yandexSecret = c.yandexSecret;
   if (yandexId && yandexSecret) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const YandexProvider = require("next-auth/providers/yandex").default;
@@ -22,12 +19,13 @@ export function buildOptionalOAuthProviders(): any[] {
       YandexProvider({
         clientId: yandexId,
         clientSecret: yandexSecret,
+        allowDangerousEmailAccountLinking: true,
       })
     );
   }
 
-  const vkId = (process.env.VK_CLIENT_ID || "").trim();
-  const vkSecret = (process.env.VK_CLIENT_SECRET || "").trim();
+  const vkId = c.vkId;
+  const vkSecret = c.vkSecret;
   if (vkId && vkSecret) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const VkProvider = require("next-auth/providers/vk").default;
@@ -35,18 +33,35 @@ export function buildOptionalOAuthProviders(): any[] {
       VkProvider({
         clientId: vkId,
         clientSecret: vkSecret,
+        allowDangerousEmailAccountLinking: true,
+        authorization: { params: { scope: 'email' } },
+        profile(profile: Record<string, unknown>) {
+          const first = String(profile.first_name || profile.given_name || '');
+          const last = String(profile.last_name || profile.family_name || '');
+          const name = [first, last].filter(Boolean).join(' ') || String(profile.name || 'VK');
+          const image = String(
+            profile.photo_200 || profile.photo_100 || profile.picture || profile.image || ''
+          );
+          return {
+            id: String(profile.id || profile.sub || ''),
+            name,
+            email: typeof profile.email === 'string' ? profile.email : null,
+            image: image || null,
+            bdate: profile.bdate ? String(profile.bdate) : null,
+          };
+        },
       })
     );
   }
 
-  const esia = esiaEnv();
-  if (esia.ready) {
+  if (c.esiaId && c.esiaSecret) {
     out.push({
       id: 'esia',
       name: 'Госуслуги',
       type: 'oauth',
-      clientId: esia.clientId,
-      clientSecret: esia.clientSecret,
+      clientId: c.esiaId,
+      clientSecret: c.esiaSecret,
+      allowDangerousEmailAccountLinking: true,
       checks: 'pkce',
       authorization: {
         url: (process.env.ESIA_AUTH_URL || 'https://esia.gosuslugi.ru/aas/oauth2/ac').trim(),
@@ -79,9 +94,5 @@ export function buildOptionalOAuthProviders(): any[] {
 }
 
 export function oauthProviderFlags() {
-  return {
-    yandex: Boolean((process.env.YANDEX_CLIENT_ID || "").trim() && (process.env.YANDEX_CLIENT_SECRET || "").trim()),
-    vk: Boolean((process.env.VK_CLIENT_ID || "").trim() && (process.env.VK_CLIENT_SECRET || "").trim()),
-    esia: esiaEnv().ready,
-  };
+  return oauthFlagsFromCreds(peekOAuthCreds());
 }

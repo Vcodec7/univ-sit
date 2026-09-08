@@ -1,18 +1,15 @@
 import { Shield, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 import PrivacyDownloadButton from '@/components/PrivacyDownloadButton';
-import LegalDocShell, { prepareLegalHtml } from '@/components/LegalDocShell';
-import { ensureSystemPages } from '@/lib/system-pages';
-import { getPrivacyCmsContent } from '@/lib/privacy-document';
-import { publishedWhere } from '@/lib/publish';
-import { prisma } from '@/lib/prisma';
-import { applySitePlaceholders, getSiteIdentity } from '@/lib/site-identity';
+import LegalDocShell from '@/components/LegalDocShell';
+import LegalMdxShell from '@/components/LegalMdxShell';
+import { LegalMdxBody, readLegalMdx, tocFromMdx } from '@/lib/legal-mdx';
+import { getSiteIdentity } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
-import { withPrivacyDynamicHtml } from '@/lib/legal-live';
-import { isNextBuildPhase } from '@/lib/build-phase';
+import { PRIVACY_POLICY_VERSION } from '@/lib/consent-versions';
+import { PRIVACY_POLICY_TITLE } from '@/lib/privacy-document';
 
-export const revalidate = 60;
-export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export async function generateMetadata() {
   const { siteName } = await getSiteIdentity();
@@ -23,36 +20,24 @@ export async function generateMetadata() {
 }
 
 export default async function PrivacyPolicy() {
-  await ensureSystemPages();
   const identity = await getSiteIdentity();
-  const cms = await getPrivacyCmsContent();
-  const page = isNextBuildPhase()
-    ? null
-    : await prisma.pageContent.findFirst({
-        where: { slug: 'privacy', ...publishedWhere() },
-      }).catch(() => null);
-
-  const title = page?.title || cms.title;
-  const rawHtml = applySitePlaceholders(page?.content || '', identity);
-  const liveHtml = await withPrivacyDynamicHtml(rawHtml);
-  const { html, toc } = prepareLegalHtml(liveHtml);
-  const versionLabel = cms.version;
+  const source = readLegalMdx('privacy');
+  const toc = tocFromMdx(source);
 
   return (
     <LegalDocShell
       brand={identity.siteName}
       icon={<Shield size={26} strokeWidth={2.2} />}
-      title={title}
+      title={PRIVACY_POLICY_TITLE}
       lead={
         <>
-          Как оператор обрабатывает персональные данные на портале.
-          Коротко, по делу и с возможностью скачать подписанный документ.
+          Как оператор обрабатывает персональные данные. Переключатель «человеческий язык» показывает короткую суть.
         </>
       }
       meta={
         <>
           <span className="legal-pill">
-            <CalendarDays size={13} /> Версия от {versionLabel}
+            <CalendarDays size={13} /> Версия {PRIVACY_POLICY_VERSION}
           </span>
           <span className="legal-pill">Подпись портала</span>
         </>
@@ -62,8 +47,7 @@ export default async function PrivacyPolicy() {
         <>
           <h2 className="legal-aside-title">Скачать и проверить</h2>
           <p className="legal-aside-text">
-            HTML открывается корректно на телефоне. В файле — электронная подпись: если текст подменят, проверка на
-            сайте это покажет.
+            HTML открывается на телефоне. В файле — электронная подпись: если текст подменят, проверка на сайте это покажет.
           </p>
           <PrivacyDownloadButton dark />
           <Link
@@ -76,13 +60,9 @@ export default async function PrivacyPolicy() {
         </>
       }
     >
-      {html ? (
-        <div className="legal-prose" dangerouslySetInnerHTML={{ __html: html }} />
-      ) : (
-        <div className="legal-prose" style={{ whiteSpace: 'pre-wrap' }}>
-          {applySitePlaceholders(cms.body, identity)}
-        </div>
-      )}
+      <LegalMdxShell>
+        <LegalMdxBody source={source} />
+      </LegalMdxShell>
     </LegalDocShell>
   );
 }

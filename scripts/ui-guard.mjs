@@ -89,8 +89,17 @@ if (!/\.nav-dropdown-portal\.dropdown[\s\S]{0,180}left:\s*auto/.test(unify)) {
 if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1fr\s*!important/.test(unify)) {
   fails.push('home feed card actions must stack at equal width');
 }
-if (!/home-section-title::after[\s\S]{0,500}#afca03[\s\S]{0,120}#8562d8/.test(unify)) {
-  fails.push('home section titles must keep lime + purple dashes');
+if (!/\.home-page\.home-page--lift[\s\S]{0,80}background-color:\s*#f9fafb\s*!important/.test(unify)) {
+  fails.push('home page canvas must be light gray #f9fafb (60%)');
+}
+if (!/html, body \{[\s\S]{0,80}background-color: #f9fafb !important/.test(unify)) {
+  fails.push('global html/body canvas must be #f9fafb');
+}
+if (!/\.home-page\.home-page--lift \.home-section-title::after[\s\S]{0,200}display:\s*none\s*!important/.test(unify)) {
+  fails.push('home section titles must not use dual-color dashes');
+}
+if (!/\.home-page--lift \.free-now-slot[\s\S]{0,200}color:\s*#4b5563\s*!important/.test(unify)) {
+  fails.push('card captions must be neutral gray, not lime');
 }
 if (/html::-webkit-scrollbar\s*\{[^}]*width\s*:/.test(unify) || /html\s*\{[^}]*scrollbar-color:\s*#8562d8/.test(unify)) {
   fails.push('do not force a classic html scrollbar (header jumps on refresh)');

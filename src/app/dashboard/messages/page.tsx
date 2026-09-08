@@ -38,6 +38,7 @@ import {
 import { splitMessageBodyMedia } from '@/lib/message-body-media';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
+import EmptyStateCta from '@/components/EmptyStateCta';
 import MessageBodyText from '@/components/MessageBodyText';
 import { fetchPublicStatusCached } from '@/lib/public-status-client';
 import {
@@ -199,6 +200,7 @@ function MessagesInner() {
   const [loading, setLoading] = useState(true);
   const [threadLoading, setThreadLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const swipeStart = useRef(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState(false);
   const [pickerMode, setPickerMode] = useState<'event' | 'club' | 'project'>('event');
@@ -662,6 +664,18 @@ function MessagesInner() {
     event?.preventDefault();
     const text = body.trim();
     if (!text || sending) return;
+    const tempId = `tmp-${Date.now()}`;
+    const optimistic: Message = {
+      id: tempId,
+      senderId: session?.user?.id || 'me',
+      senderName: session?.user?.name || undefined,
+      body: text,
+      kind: 'TEXT',
+      readAt: null,
+      createdAt: new Date().toISOString(),
+    };
+    setBody('');
+    setMessages((current) => [...current, optimistic]);
     setSending(true);
     try {
       if (activeGroup) {
@@ -672,23 +686,8 @@ function MessagesInner() {
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.message || 'Не удалось отправить');
-        setBody('');
+        setMessages((current) => current.map((m) => (m.id === tempId && result.message ? { ...result.message, kind: 'TEXT' } : m)));
         if (result.conversationId) setSelectedId(result.conversationId);
-        if (result.message) {
-          setMessages((current) => [
-            ...current,
-            {
-              id: result.message.id,
-              senderId: result.message.senderId,
-              senderName: result.message.senderName,
-              body: result.message.body,
-              kind: 'TEXT',
-              flagged: result.message.flagged,
-              readAt: null,
-              createdAt: result.message.createdAt,
-            },
-          ]);
-        }
         if (result.warning) toast.error(result.warning, { duration: 6000 });
         await loadList();
       } else if (activeUser) {
@@ -699,14 +698,15 @@ function MessagesInner() {
         });
         const result = await response.json();
         if (!response.ok) throw new Error(result.message || 'Не удалось отправить сообщение');
-        setBody('');
         setSelectedId(result.conversationId);
-        setMessages((current) => [...current, result.message]);
+        setMessages((current) => current.map((m) => (m.id === tempId && result.message ? result.message : m)));
         if (result.warning) toast.error(result.warning, { duration: 6000 });
         await loadList();
         if (!selectedId) setQuery({ tab: 'personal', with: activeUser.id });
       }
     } catch (error) {
+      setMessages((current) => current.filter((m) => m.id !== tempId));
+      setBody(text);
       toast.error(error instanceof Error ? error.message : 'Ошибка');
     } finally {
       setSending(false);
@@ -1029,14 +1029,16 @@ function MessagesInner() {
               ))
             )
           ) : dmList.length === 0 ? (
-            <div className="messages-list__empty">
-              <span className="messages-list__empty-ico" aria-hidden>
-                <MessageCircle size={28} />
-              </span>
-              <strong>{showArchived ? 'Архив пуст' : 'Диалогов пока нет'}</strong>
-              <p>{showArchived ? 'Архивные личные чаты появятся здесь.' : 'Напишите другу — переписка откроется в этом списке.'}</p>
-              {!showArchived && friendsOn ? <Link href="/dashboard/friends">Перейти к друзьям</Link> : null}
-            </div>
+            <EmptyStateCta
+              title={showArchived ? 'Архив пуст' : 'Диалогов пока нет'}
+              text={
+                showArchived
+                  ? 'Архивные личные чаты появятся здесь.'
+                  : 'Напишите участнику — переписка откроется в этом списке.'
+              }
+              href="/dashboard/friends"
+              cta="Найти единомышленников"
+            />
           ) : (
             dmList.map((conversation) => {
               const selected = conversation.id === selectedId;
@@ -1105,7 +1107,17 @@ function MessagesInner() {
           )}
         </aside>
 
-        <section className="messages-thread" aria-label="Диалог">
+        <section
+          className="messages-thread"
+          aria-label="Диалог"
+          onTouchStart={(e) => {
+            swipeStart.current = e.touches[0]?.clientX || 0;
+          }}
+          onTouchEnd={(e) => {
+            const dx = (e.changedTouches[0]?.clientX || 0) - swipeStart.current;
+            if (dx > 72 && window.matchMedia('(max-width: 768px)').matches) closeThread();
+          }}
+        >
           {tab === 'invites' && !inThread ? (
             <div className="messages-thread__empty"><Users size={34} style={{ marginBottom: 8 }} /><div>Выберите приглашение слева или примите прямо из списка</div></div>
           ) : !activeUser && !activeGroup ? (

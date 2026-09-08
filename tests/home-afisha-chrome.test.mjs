@@ -17,9 +17,9 @@ test('home and events show live afisha, not the weekly bulletin', () => {
   assert.match(page, /UpcomingEvents/);
 });
 
-test('home titles keep lime and purple dashes', () => {
-  assert.match(unify, /home-section-title::after[\s\S]{0,500}#afca03[\s\S]{0,120}#8562d8/);
-  assert.doesNotMatch(unify, /home-section-title::after,\s*\n\.home-section-title::after \{\s*display: none/);
+test('home titles skip dual-color dashes', () => {
+  assert.match(unify, /home-page\.home-page--lift \.home-section-title::after[\s\S]{0,200}display:\s*none\s*!important/);
+  assert.match(unify, /background-color:\s*#f9fafb\s*!important/);
 });
 
 test('html scrollbar is not forced into a layout column', () => {
@@ -29,6 +29,7 @@ test('html scrollbar is not forced into a layout column', () => {
 
 test('home sections do not leave tall empty wells', () => {
   assert.match(unify, /home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*0\.85rem\s*!important/);
+  assert.doesNotMatch(unify, /contain-intrinsic-size:\s*1px 420px/);
   assert.match(unify, /home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/);
   assert.match(unify, /home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/);
 });

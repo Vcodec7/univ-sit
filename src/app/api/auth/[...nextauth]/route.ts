@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { loadOAuthCreds } from "@/lib/oauth-settings";
 import { loginIpRateLimiter } from "@/lib/rateLimit";
 
 const handler = NextAuth(authOptions);
@@ -13,6 +14,7 @@ export async function GET(
   req: Request,
   context: { params: Promise<{ nextauth: string[] }> }
 ) {
+  await loadOAuthCreds();
   return (handler as (req: Request, ctx: unknown) => Promise<Response>)(req, context);
 }
 
@@ -37,5 +39,6 @@ export async function POST(
       );
     }
   }
+  await loadOAuthCreds();
   return (handler as (req: Request, ctx: unknown) => Promise<Response>)(req, context);
 }

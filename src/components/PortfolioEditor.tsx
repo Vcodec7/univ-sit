@@ -11,6 +11,7 @@ import {
   TIER_META,
 } from '@/lib/achievements';
 import { PORTFOLIO_STATUS_RU, statusRu } from '@/lib/status-labels-ru';
+import FeatureConsentModal from '@/components/FeatureConsentModal';
 
 type Section = { title: string; body: string; type: string };
 type Cert = {
@@ -52,6 +53,7 @@ export default function PortfolioEditor() {
   const [cooldownDays, setCooldownDays] = useState(7);
   const [nextSubmitAt, setNextSubmitAt] = useState<string | null>(null);
   const [canSubmitNow, setCanSubmitNow] = useState(true);
+  const [needPortfolioRules, setNeedPortfolioRules] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch('/api/user/portfolio');
@@ -122,6 +124,10 @@ export default function PortfolioEditor() {
         }),
       });
       const data = await res.json();
+      if (res.status === 412 && data.code === 'NEED_FEATURE_CONSENT') {
+        setNeedPortfolioRules(true);
+        return;
+      }
       if (!res.ok) throw new Error(data.message || 'Не удалось сохранить');
       setPortfolio(data.portfolio);
       if (typeof data.cooldownDays === 'number') setCooldownDays(data.cooldownDays);
@@ -192,7 +198,7 @@ export default function PortfolioEditor() {
               </Link>
               <a
                 href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-                className="btn btn-primary btn-sm"
+                className="btn btn-secondary btn-sm"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -200,24 +206,6 @@ export default function PortfolioEditor() {
               </a>
             </>
           ) : null}
-          <button type="button" className="btn btn-secondary btn-sm" disabled={saving} onClick={() => void save(false)}>
-            Сохранить
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            disabled={saving || submitBlocked}
-            onClick={() => void save(true)}
-            title={
-              portfolio?.status === 'PENDING'
-                ? 'Уже на проверке'
-                : submitBlocked && nextSubmitAt
-                  ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
-                  : undefined
-            }
-          >
-            На проверку
-          </button>
         </div>
         <ul className="pf-studio__stats">
           <li>
@@ -552,7 +540,7 @@ export default function PortfolioEditor() {
           </Link>
           <a
             href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-            className="btn btn-primary btn-sm"
+            className="btn btn-secondary btn-sm"
             target="_blank"
             rel="noreferrer"
           >
@@ -567,6 +555,50 @@ export default function PortfolioEditor() {
             Печать
           </a>
         </div>
+      ) : null}
+
+      <div className="yp-form-z">
+        <button type="button" className="btn btn-secondary" disabled={saving} onClick={() => void save(false)}>
+          Сохранить
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={saving || submitBlocked}
+          onClick={() => void save(true)}
+          title={
+            portfolio?.status === 'PENDING'
+              ? 'Уже на проверке'
+              : submitBlocked && nextSubmitAt
+                ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
+                : undefined
+          }
+        >
+          На проверку
+        </button>
+      </div>
+      {needPortfolioRules ? (
+        <FeatureConsentModal
+          feature="portfolio"
+          busy={saving}
+          onAccept={() => {
+            void (async () => {
+              const r = await fetch('/api/user/consent', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feature: 'portfolio' }),
+              });
+              if (!r.ok) {
+                toast.error('Не удалось сохранить согласие');
+                return;
+              }
+              setNeedPortfolioRules(false);
+              await save(true);
+            })();
+          }}
+          onClose={() => setNeedPortfolioRules(false)}
+        />
       ) : null}
     </div>
   );

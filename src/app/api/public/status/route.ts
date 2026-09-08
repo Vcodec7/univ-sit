@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getMaintenanceState } from '@/lib/maintenance';
 import { getAccessSettings } from '@/lib/access-settings';
 import { getModuleFlagsBundle } from '@/lib/module-flags';
-import { oauthProviderFlags } from '@/lib/oauth-providers';
+import { oauthFlagsFromCreds, loadOAuthCreds } from '@/lib/oauth-settings';
 import { smsProviderConfigured } from '@/lib/sms-otp';
 import { prisma } from '@/lib/prisma';
 
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 /** Public lightweight status for middleware / PWA / uptime checks */
 export async function GET() {
-  const [state, access, bundle, visibility] = await Promise.all([
+  const [state, access, bundle, visibility, smsReady, oauthCreds] = await Promise.all([
     getMaintenanceState(),
     getAccessSettings(),
     getModuleFlagsBundle(),
@@ -24,7 +24,10 @@ export async function GET() {
         },
       })
       .catch(() => null),
+    smsProviderConfigured(),
+    loadOAuthCreds(),
   ]);
+  const oauth = oauthFlagsFromCreds(oauthCreds);
   return NextResponse.json(
     {
       ok: true,
@@ -36,8 +39,9 @@ export async function GET() {
       messagingEnabled: access.messagingEnabled,
       smsLoginEnabled: access.smsLoginEnabled,
       esiaLoginEnabled: access.esiaLoginEnabled,
-      smsLoginReady: access.smsLoginEnabled && smsProviderConfigured(),
-      esiaLoginReady: access.esiaLoginEnabled && oauthProviderFlags().esia,
+      smsLoginReady: access.smsLoginEnabled && smsReady,
+      esiaLoginReady: access.esiaLoginEnabled && oauth.esia,
+      oauth,
       modules: bundle.flags,
       offModes: bundle.offModes,
       publicEventsVisibility: Boolean(visibility?.publicEventsVisibility),

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ExternalLink, Navigation, Map as MapIcon } from 'lucide-react';
 import {
   yandexMapsDirectionsUrl,
@@ -30,6 +31,41 @@ function resolveQuery(address?: string | null, placeName?: string | null) {
   if (!a && !n) return '';
   // Prefer plain address for geocoding — place titles often confuse Nominatim
   return a || n;
+}
+
+/** Map JS must not block first paint — iframe only after idle, intersection, or tap. */
+function LazyMapEmbed({
+  src,
+  title,
+  large,
+}: {
+  src: string;
+  title: string;
+  large?: boolean;
+}) {
+  const [load, setLoad] = useState(false);
+
+  return (
+    <div className={`yp-map-embed${large ? ' yp-map-embed--lg' : ''}`}>
+      {load ? (
+        <iframe
+          title={title}
+          src={src}
+          width="100%"
+          height="100%"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+      ) : (
+        <button type="button" className="yp-map-embed__wake" onClick={() => setLoad(true)}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="yp-map-embed__poster" src="/brand/templates/section-contacts.svg" alt="" />
+          <span>Открыть интерактивную карту</span>
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function YandexDirections({
@@ -154,23 +190,11 @@ export default function YandexDirections({
   );
 
   const map = widget ? (
-    <div className={`yp-map-embed${splitLayout ? ' yp-map-embed--lg' : ''}`}>
-      <iframe
-        title={`Карта: ${query || address || 'место'}`}
-        src={widget}
-        width="100%"
-        height="100%"
-        frameBorder={0}
-        allowFullScreen
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          border: 0,
-        }}
-      />
-    </div>
+    <LazyMapEmbed
+      src={widget}
+      title={`Карта: ${query || address || 'место'}`}
+      large={splitLayout}
+    />
   ) : null;
 
   if (splitLayout && map) {

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import CabinetMenu from '@/components/CabinetMenu';
 
 /**
@@ -15,6 +15,7 @@ export default function CabinetShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() || '/dashboard';
   const role = (session?.user as { role?: string } | undefined)?.role;
   const isOverview = pathname.replace(/\/+$/, '') === '/dashboard';
+  const [wide, setWide] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -25,15 +26,23 @@ export default function CabinetShell({ children }: { children: ReactNode }) {
     if (status === 'authenticated' && role === 'TECH') router.replace('/ops');
   }, [status, router, pathname, role]);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 900px)');
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
   if (status === 'unauthenticated') return null;
 
   return (
     <main className="container dashboard-page cabinet-subpage">
-      <CabinetMenu variant="strip" role={role} />
+      {wide ? null : <CabinetMenu variant="strip" role={role} />}
       <div
         className={`dashboard-layout dashboard-shell hide-aside-mobile${isOverview ? ' is-overview' : ''}`}
       >
-        <CabinetMenu role={role} />
+        {wide ? <CabinetMenu role={role} /> : null}
         <div className="dashboard-main">
           {status === 'loading' ? (
             <div className="svc-skel" aria-busy="true" aria-label="Загрузка кабинета">

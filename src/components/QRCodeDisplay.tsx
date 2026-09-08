@@ -15,6 +15,10 @@ export default function QRCodeDisplay({ value, size = 120 }: { value: string; si
   const ticketFx = lite ? '' : loadout.ticket || '';
 
   useEffect(() => {
+    if (!value) {
+      setSrc('');
+      return;
+    }
     QRCode.toDataURL(value, {
       margin: 3,
       width: size,
@@ -33,14 +37,16 @@ export default function QRCodeDisplay({ value, size = 120 }: { value: string; si
 
   return (
     <div
-      className={`yp-ticket-qr${ticketFx ? ` is-${ticketFx}` : ''}`}
+      className={`yp-ticket-qr yp-qr-live${ticketFx ? ` is-${ticketFx}` : ''}`}
       data-eco-ticket={ticketFx || undefined}
-      style={{ display: 'inline-block', lineHeight: 0 }}
     >
+      <span className="yp-qr-live__ring" aria-hidden />
+      <span className="yp-qr-live__hole" aria-hidden />
       <img
         src={src}
-        alt="Билет QR"
-        style={{ width: size, height: size, borderRadius: 8, border: '1px solid #e2e8f0' }}
+        alt="QR-пропуск"
+        width={size}
+        height={size}
       />
     </div>
   );

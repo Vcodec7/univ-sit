@@ -64,3 +64,27 @@ yp_retry() {
 
 yp_ssh() { yp_retry "${SSH[@]}" "$@"; }
 yp_scp() { yp_retry "${SCP[@]}" "$@"; }
+
+yp_drop_dir() {
+  yp_ssh 'mkdir -p "$HOME/.yp-drop" && echo "$HOME/.yp-drop"'
+}
+
+yp_put_root() {
+  local src="$1" dest="$2"
+  local drop base tmp
+  drop="$(yp_drop_dir)"
+  base="$(basename "$dest")"
+  tmp="${drop}/${base}.$$"
+  yp_scp "$src" "$HOST:$tmp"
+  yp_ssh "sudo mkdir -p '$(dirname "$dest")' && sudo mv '$tmp' '$dest' && sudo chmod a+r '$dest'"
+}
+
+yp_get_root() {
+  local src="$1" dest="$2"
+  local drop tmp
+  drop="$(yp_drop_dir)"
+  tmp="${drop}/get.$$.$(basename "$src")"
+  yp_ssh "sudo cp -a '$src' '$tmp' && sudo chown \$(id -un):\$(id -gn) '$tmp'"
+  yp_scp "$HOST:$tmp" "$dest"
+  yp_ssh "rm -f '$tmp'"
+}

@@ -118,7 +118,7 @@ export const getCachedPublicProjects = unstable_cache(
     const rows = await prisma.project.findMany({
       where: publicCatalogWhere(),
       orderBy: { title: 'asc' },
-      take: CATALOG_TAKE,
+      take: 12,
       select: {
         id: true,
         title: true,
@@ -140,24 +140,25 @@ export const getCachedPublicProjects = unstable_cache(
         goal: p.goal,
         description: p.description,
       });
+      const plain = String(p.description || '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
       return {
         id: p.id,
         title: p.title,
-        description: p.description,
+        description: plain.slice(0, 360),
         image: p.image,
         status: p.status,
         viewCount: p.viewCount,
         createdAt: p.createdAt.toISOString(),
         applicationsCount: p._count.applications,
-        mission: p.mission,
-        goal: p.goal,
-        studioJson: p.studioJson,
         pitch: pitch.text,
         who: pitch.who,
       };
     });
   },
-  ['public-projects-catalog-v3'],
+  ['public-projects-catalog-v5'],
   { revalidate: PUBLIC_REVALIDATE, tags: ['yp-home-catalog'] }
 );
 

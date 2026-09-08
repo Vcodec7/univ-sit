@@ -115,6 +115,23 @@ export default function CatalogFilterPopover({
 
   return (
     <div className="catalog-filter-pop" ref={rootRef}>
+          {categoryOptions?.length ? (
+            <div className="catalog-sticky-tags" role="tablist" aria-label="Категории">
+              <button type="button" className={cat === 'ALL' ? 'is-on' : ''} onClick={() => setCat('ALL')}>
+                Все
+              </button>
+              {categoryOptions.map((o) => (
+                <button
+                  key={o.key}
+                  type="button"
+                  className={cat === o.key ? 'is-on' : ''}
+                  onClick={() => setCat(o.key)}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
       <div className="catalog-filter-pop__row">
         <div className="catalog-filter-pop__search">
           <Search size={16} aria-hidden />

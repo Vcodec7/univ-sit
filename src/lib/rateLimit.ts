@@ -116,9 +116,9 @@ function getRedis(): Redis | null {
 export const registerRateLimiter = new RateLimiter(60 * 1000, 5, 'reg');
 export const resetPasswordRateLimiter = new RateLimiter(5 * 60 * 1000, 3, 'reset');
 export const recoveryPhraseRateLimiter = new RateLimiter(15 * 60 * 1000, 5, 'phrase');
-export const loginRateLimiter = new RateLimiter(5 * 60 * 1000, 5, 'login');
-/** Shared IP bucket for credential login storms (paired with per-login key). */
-export const loginIpRateLimiter = new RateLimiter(5 * 60 * 1000, 20, 'login-ip');
+export const loginRateLimiter = new RateLimiter(60 * 1000, 5, 'login');
+/** Shared IP bucket: 5 credential attempts per minute. */
+export const loginIpRateLimiter = new RateLimiter(60 * 1000, 5, 'login-ip');
 /** Public places catalog / search — light anti-scrape */
 export const placesReadRateLimiter = new RateLimiter(60 * 1000, 60, 'places-r');
 export const messagePerMinuteLimiter = new RateLimiter(60 * 1000, 20, 'msg-m');

@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Trash2, Eye } from 'lucide-react';
-import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin, requireAdminPage } from '@/lib/acl';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
-import { roleLabelRu } from '@/lib/role-labels';
+import UsersBoard, { type UserRow } from '@/components/admin/UsersBoard';
+import { formatBanReasons } from '@/lib/ban-reasons';
+import { logAdminAction } from '@/lib/admin-audit';
 
 async function deleteUser(formData: FormData) {
   'use server';
@@ -31,6 +31,63 @@ async function deleteUser(formData: FormData) {
   } catch (e) {
     console.error('Ошибка удаления', e);
   }
+}
+
+
+async function bulkDeleteUsers(formData: FormData) {
+  'use server';
+  const ids = formData.getAll('ids').map(String).filter(Boolean);
+  for (const id of ids) {
+    const fd = new FormData();
+    fd.set('id', id);
+    await deleteUser(fd);
+  }
+}
+
+async function bulkBlockUsers(formData: FormData) {
+  'use server';
+  const session = await requireAdmin();
+  const ids = formData.getAll('ids').map(String).filter(Boolean);
+  const reasonCodes = ['RULES'];
+  const reasonText = formatBanReasons(reasonCodes, 'Массовая блокировка из списка');
+  for (const id of ids) {
+    const target = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, name: true, role: true },
+    });
+    if (!target || target.role === 'TECH' || target.role === 'ADMIN') continue;
+    if (id === session.user.id) continue;
+    await prisma.user.update({
+      where: { id },
+      data: {
+        blockedAt: new Date(),
+        blockedReason: reasonText,
+        tokenVersion: { increment: 1 },
+        suspiciousFlag: true,
+      },
+    });
+    await prisma.userBlockEvent.create({
+      data: {
+        userId: id,
+        action: 'BLOCK',
+        reasonsJson: JSON.stringify(reasonCodes),
+        comment: 'Массовая блокировка из списка',
+        actorId: session.user.id,
+        actorName: session.user.name || session.user.email || 'Админ',
+      },
+    });
+    await logAdminAction({
+      actorId: session.user.id,
+      actorEmail: session.user.email,
+      actorRole: session.user.role,
+      action: 'USER_BLOCK',
+      targetType: 'User',
+      targetId: target.id,
+      targetEmail: target.email,
+      detail: { reasonCodes, bulk: true },
+    });
+  }
+  revalidatePath('/admin/users');
 }
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; role?: string }> }) {
@@ -62,7 +119,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
     total = await prisma.user.count({ where });
     users = await prisma.user.findMany({
       where,
-      select: { id: true, name: true, email: true, phone: true, image: true, role: true, reliabilityScore: true, attendedCount: true, noShowCount: true, createdAt: true },
+      select: { id: true, name: true, email: true, phone: true, image: true, role: true, permissions: true, reliabilityScore: true, attendedCount: true, noShowCount: true, createdAt: true, blockedAt: true, blockedReason: true, suspiciousFlag: true },
       orderBy: { createdAt: 'desc' },
       take,
       skip
@@ -142,63 +199,27 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
         )}
       </form>
 
-      <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflowX: 'auto' }}>
-        <div className="admin-table-wrap"><table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-              <th style={{ padding: '1rem', color: 'var(--muted)' }}>Имя</th>
-              <th style={{ padding: '1rem', color: 'var(--muted)' }}>Контакты</th>
-              <th style={{ padding: '1rem', color: 'var(--muted)' }}>Рейтинг</th>
-              <th style={{ padding: '1rem', color: 'var(--muted)' }}>Роль</th>
-              <th style={{ padding: '1rem', color: 'var(--muted)', textAlign: 'right' }}>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td data-label="Имя" style={{ padding: '1rem', fontWeight: 500 }}>
-                  <Link href={`/admin/users/${user.id}`} style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
-                    {user.name || 'Без имени'}
-                  </Link>
-                </td>
-                <td data-label="Контакты" style={{ padding: '1rem', color: 'var(--muted)' }}>
-                  <div>{user.email || 'Нет email'}</div>
-                  <div style={{ fontSize: '0.8rem' }}>{user.phone || 'Нет телефона'}</div>
-                </td>
-                <td data-label="Рейтинг" style={{ padding: '1rem' }}>
-                  <div style={{ fontWeight: 700 }}>{user.reliabilityScore ?? 100}%</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>
-                    ✓{user.attendedCount ?? 0} · ✗{user.noShowCount ?? 0}
-                  </div>
-                </td>
-                <td data-label="Роль" style={{ padding: '1rem' }}>
-                  <span style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', backgroundColor: user.role === 'ADMIN' ? 'rgba(244,63,94,0.1)' : '#f1f5f9', color: user.role === 'ADMIN' ? 'var(--accent)' : 'inherit' }}>
-                    {roleLabelRu(user.role)}
-                  </span>
-                </td>
-                <td data-label="Действия" className="actions-cell" style={{ padding: '1rem', textAlign: 'right' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                    <Link href={`/admin/users/${user.id}`} className="btn btn-secondary" style={{ padding: '0.5rem' }}>
-                      <Eye size={16} />
-                    </Link>
-                    <form action={deleteUser}>
-                      <input type="hidden" name="id" value={user.id} />
-                      <ConfirmSubmitButton message="Удалить пользователя? Это необратимо." className="btn btn-secondary" style={{ padding: '0.5rem', color: 'var(--accent)' }} title="Удалить">
-                        <Trash2 size={16} />
-                      </ConfirmSubmitButton>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {users.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: 'var(--muted)' }}>Ничего не найдено</td>
-              </tr>
-            )}
-          </tbody>
-        </table></div>
-      </div>
+      <UsersBoard
+        rows={users.map(
+          (user): UserRow => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            permissions: user.permissions,
+            reliabilityScore: user.reliabilityScore,
+            attendedCount: user.attendedCount,
+            noShowCount: user.noShowCount,
+            blockedAt: user.blockedAt ? user.blockedAt.toISOString() : null,
+            blockedReason: user.blockedReason,
+            suspiciousFlag: Boolean(user.suspiciousFlag),
+          })
+        )}
+        deleteUser={deleteUser}
+        bulkDelete={bulkDeleteUsers}
+        bulkBlock={bulkBlockUsers}
+      />
 
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { cabinetGet } from '@/lib/cabinet-fetch';
+import QRCodeDisplay from '@/components/QRCodeDisplay';
 
 type CwSignup = {
   id: string;
@@ -12,11 +13,13 @@ type CwSignup = {
   startTime: string;
   endTime: string;
   inviteToken?: string | null;
+  passCode?: string;
   space: { id: string; title: string };
 };
 
 type EventPart = {
   id: string;
+  ticketCode?: string;
   booking: {
     id: string;
     title?: string | null;
@@ -33,6 +36,7 @@ type HallBooking = {
   status: string;
   startTime: string;
   endTime: string;
+  passCode?: string;
   space?: { title?: string | null } | null;
 };
 
@@ -47,10 +51,22 @@ type Row = {
   canCancel: boolean;
   cancelLabel: string;
   groupHref?: string | null;
+  passCode?: string;
 };
 
 function isPast(end: string) {
   return new Date(end).getTime() < Date.now();
+}
+
+function statusMark(_kind: Row['kind'], status: string, end: string) {
+  const u = String(status || '').toUpperCase();
+  if (isPast(end) || u === 'ATTENDED' || u === 'NO_SHOW' || u === 'CANCELLED' || u === 'REJECTED') {
+    return { emoji: '⚪', label: 'Прошло' };
+  }
+  if (u === 'PENDING' || u === 'WAITLIST' || u === 'REVIEW') {
+    return { emoji: '🟡', label: 'На модерации' };
+  }
+  return { emoji: '🟢', label: 'Предстоит' };
 }
 
 function fmtDay(iso: string) {
@@ -115,6 +131,7 @@ export default function CoworkingCabinetList() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'now' | 'history'>('now');
+  const [mode, setMode] = useState<'list' | 'cal'>('list');
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async (opts?: { soft?: boolean }) => {
@@ -160,6 +177,7 @@ export default function CoworkingCabinetList() {
         cancelLabel: 'Отменить',
         groupHref:
           row.kind === 'GROUP' && row.inviteToken ? `/coworking/group/${row.inviteToken}` : null,
+        passCode: row.passCode,
       });
     }
     for (const part of events) {
@@ -176,6 +194,7 @@ export default function CoworkingCabinetList() {
         status: live ? 'CONFIRMED' : 'ATTENDED',
         canCancel: live,
         cancelLabel: 'Отменить участие',
+        passCode: part.ticketCode,
       });
     }
     for (const booking of halls) {
@@ -191,6 +210,7 @@ export default function CoworkingCabinetList() {
         status: booking.status,
         canCancel: live,
         cancelLabel: 'Отменить бронь',
+        passCode: booking.passCode,
       });
     }
     out.sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime());
@@ -200,6 +220,16 @@ export default function CoworkingCabinetList() {
   const nowRows = rows.filter((r) => r.canCancel || (!isPast(r.end) && !['CANCELLED', 'REJECTED'].includes(r.status)));
   const historyRows = rows.filter((r) => !nowRows.includes(r));
   const visible = tab === 'now' ? nowRows : historyRows;
+  const byDay = useMemo(() => {
+    const map = new Map<string, Row[]>();
+    for (const row of visible) {
+      const key = new Date(row.start).toLocaleDateString('ru-RU', { timeZone: 'Europe/Moscow' });
+      const list = map.get(key) || [];
+      list.push(row);
+      map.set(key, list);
+    }
+    return [...map.entries()];
+  }, [visible]);
 
   async function cancelRow(row: Row) {
     if (busy) return;
@@ -275,6 +305,14 @@ export default function CoworkingCabinetList() {
           История <span>{historyRows.length}</span>
         </button>
       </div>
+      <div className="cw-cabinet-mode" role="group" aria-label="Вид записей">
+        <button type="button" className={mode === 'list' ? 'is-on' : ''} onClick={() => setMode('list')}>
+          Список
+        </button>
+        <button type="button" className={mode === 'cal' ? 'is-on' : ''} onClick={() => setMode('cal')}>
+          Календарь
+        </button>
+      </div>
       {error ? <p className="cw-error">{error}</p> : null}
       {loading && rows.length === 0 ? (
         <div className="svc-skel" aria-hidden>
@@ -300,7 +338,33 @@ export default function CoworkingCabinetList() {
           ) : null}
         </p>
       ) : null}
-      {visible.length > 0 ? (
+      {visible.length > 0 && mode === 'cal' ? (
+        <div className="cw-cal">
+          {byDay.map(([day, list]) => (
+            <div key={day}>
+              <div className="cw-cal__day">{day}</div>
+              <ul className="cw-cabinet-pills">
+                {list.map((row) => {
+                  const mark = statusMark(row.kind, row.status, row.end);
+                  return (
+                    <li key={row.key} className={`cw-cabinet-pill${row.kind === 'cowork' ? '' : ` is-${row.kind}`}`}>
+                      <span className="cw-cabinet-pill__slot">{fmtSlot(row.start, row.end)}</span>
+                      <span className="cw-cabinet-pill__place">{row.title}</span>
+                      <span className="cw-cabinet-pill__status">
+                        <span className="cw-status-dot" title={mark.label}>
+                          {mark.emoji}
+                        </span>
+                        {mark.label}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {visible.length > 0 && mode === 'list' ? (
         <ul className="cw-cabinet-pills">
           {visible.map((row) => (
             <li key={row.key} className={`cw-cabinet-pill${row.kind === 'cowork' ? '' : ` is-${row.kind}`}`}>
@@ -311,8 +375,16 @@ export default function CoworkingCabinetList() {
                 {row.place && row.place !== row.title ? ` · ${row.place}` : ''}
               </span>
               <span className={`cw-cabinet-pill__status status-${row.status.toLowerCase()}`}>
+                <span className="cw-status-dot" title={statusMark(row.kind, row.status, row.end).label}>
+                  {statusMark(row.kind, row.status, row.end).emoji}
+                </span>
                 {statusRu(row.kind, row.status)}
               </span>
+              {row.passCode && tab === 'now' && !['CANCELLED', 'REJECTED', 'WAITLIST'].includes(row.status) ? (
+                <div className="cw-cabinet-pill__qr">
+                  <QRCodeDisplay value={row.passCode} size={112} />
+                </div>
+              ) : null}
               {row.groupHref || row.canCancel || row.kind === 'event' ? (
                 <div className="cw-cabinet-pill__actions">
                   {row.groupHref ? (

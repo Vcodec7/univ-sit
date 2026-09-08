@@ -3,7 +3,6 @@ import { MapPin, Phone, Mail, Clock, ExternalLink, MessageCircle, FileText, Navi
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import YandexDirections from '@/components/YandexDirections';
-import { geocodeAddress } from '@/lib/geocode';
 import { ensureSystemPages } from '@/lib/system-pages';
 import { SocialIconLink } from '@/components/SocialIcons';
 import { isNextBuildPhase } from '@/lib/build-phase';
@@ -20,8 +19,6 @@ export default async function ContactsPage() {
   const settings = isNextBuildPhase()
     ? null
     : await prisma.siteSettings.findUnique({ where: { id: '1' } }).catch(() => null);
-  const mapPoint = settings?.address ? await geocodeAddress(settings.address) : null;
-
   const siteName = settings?.siteName || 'Молодёжь Сочи';
   const supportEmail =
     ((settings as { supportEmail?: string | null } | null)?.supportEmail || '').trim() ||
@@ -133,7 +130,7 @@ export default async function ContactsPage() {
             body: address ? (
               <>
                 <div style={{ marginBottom: '0.55rem', fontWeight: 600 }}>{address}</div>
-                <YandexDirections address={address} placeName={siteName} point={mapPoint} compact />
+                <YandexDirections address={address} placeName={siteName} compact />
               </>
             ) : (
               <span style={{ color: 'var(--muted)' }}>Адрес уточняется</span>
@@ -225,7 +222,6 @@ export default async function ContactsPage() {
             <YandexDirections
               address={address}
               placeName={siteName}
-              point={mapPoint}
               showMap
               splitLayout
             />

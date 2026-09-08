@@ -4,6 +4,7 @@ import { getToken } from 'next-auth/jwt';
 import { canBypassMaintenance, isMaintenanceBypassPath } from '@/lib/maintenance';
 import { canAccessAdminPath, canUseScanner, isTechRole } from '@/lib/acl-shared';
 import { moduleKeyForPath } from '@/lib/module-flags-edge';
+import { clientIp, edgeRateAllow } from '@/lib/edge-rate-limit';
 
 // Public pages are ISR (root layout revalidate=60). A per-request script nonce
 // cannot match cached HTML, and 'strict-dynamic' disables host allowlists —
@@ -12,13 +13,13 @@ import { moduleKeyForPath } from '@/lib/module-flags-edge';
 function buildCsp(): string {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://*.yandex.ru https://yastatic.net",
+    "script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://*.yandex.ru https://yastatic.net https://telegram.org https://*.telegram.org",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https: http:",
     "font-src 'self' data:",
     "connect-src 'self' https://mc.yandex.ru https://*.yandex.ru wss: https:",
     "media-src 'self' blob: https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru",
-    "frame-src 'self' https://yandex.ru https://*.yandex.ru https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://gosuslugi.ru https://*.gosuslugi.ru https://pos.gosuslugi.ru",
+    "frame-src 'self' https://docs.google.com https://*.google.com https://view.officeapps.live.com https://yandex.ru https://*.yandex.ru https://vk.com https://*.vk.com https://vk.ru https://*.vk.ru https://gosuslugi.ru https://*.gosuslugi.ru https://pos.gosuslugi.ru https://oauth.telegram.org https://telegram.org",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -112,6 +113,8 @@ export default async function proxy(req: NextRequest) {
   requestHeaders.set('Content-Security-Policy', csp);
   const withCsp = (res: NextResponse) => {
     res.headers.set('Content-Security-Policy', csp);
+    res.headers.delete('x-powered-by');
+    res.headers.delete('X-Powered-By');
     const ref = (req.nextUrl.searchParams.get('ref') || '')
       .trim()
       .toUpperCase()
@@ -131,6 +134,28 @@ export default async function proxy(req: NextRequest) {
     return res;
   };
 
+  const method = req.method.toUpperCase();
+  const ip = clientIp(req);
+  const authPost =
+    method === 'POST' &&
+    (pathname.startsWith('/api/auth/callback') ||
+      pathname.startsWith('/api/auth/signin') ||
+      pathname.startsWith('/api/auth/sms'));
+  if (authPost && !edgeRateAllow(`auth-post:${ip}`, 5, 60_000)) {
+    return NextResponse.json(
+      { message: 'Слишком много попыток входа. Подождите минуту.' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    );
+  }
+  if ((pathname === '/login' || pathname === '/register') && method === 'GET') {
+    if (!edgeRateAllow(`auth-page:${ip}`, 30, 60_000)) {
+      return new NextResponse('Too Many Requests', {
+        status: 429,
+        headers: { 'Retry-After': '60', 'Content-Type': 'text/plain; charset=utf-8' },
+      });
+    }
+  }
+
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
@@ -140,7 +165,6 @@ export default async function proxy(req: NextRequest) {
   const mustChangePassword = Boolean((token as { mustChangePassword?: boolean } | null)?.mustChangePassword);
 
   // CSRF defense-in-depth for cookie-auth mutating APIs (skip webhooks / NextAuth / public / cron).
-  const method = req.method.toUpperCase();
   if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
     const skipCsrf =
       pathname.startsWith('/api/auth') ||
@@ -265,13 +289,28 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
+  // Staff JSON APIs: cookie JWT required. Public catalogs (/api/events, /api/places, …),
+  // captcha, health and NextAuth stay open — locking them would break the afisha.
+  if (
+    !token &&
+    (pathname.startsWith('/api/admin') || pathname.startsWith('/api/ops'))
+  ) {
+    return NextResponse.json({ message: 'Нужна авторизация' }, { status: 401 });
+  }
+
   if (pathname.startsWith('/ops')) {
     if (!token || !isTechRole(role)) {
       return NextResponse.redirect(new URL('/', req.url));
     }
   }
 
-  if (pathname.startsWith('/scanner') || pathname.startsWith('/scan')) {
+  if (pathname === '/scan' || pathname.startsWith('/scan/')) {
+    const u = new URL('/scanner', req.url);
+    u.searchParams.set('tab', 'pass');
+    return NextResponse.redirect(u, 308);
+  }
+
+  if (pathname.startsWith('/scanner')) {
     if (!token) {
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}&staff=1`, req.url)

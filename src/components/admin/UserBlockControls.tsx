@@ -3,7 +3,9 @@
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Ban, Unlock } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { BAN_REASONS, type BanSeverity } from '@/lib/ban-reasons';
+import { adminFetch } from '@/lib/admin-fetch';
 
 type BlockEvent = {
   id: string;
@@ -50,12 +52,12 @@ export default function UserBlockControls({
 
   const run = async (action: 'block' | 'unblock') => {
     if (action === 'block' && codes.length === 0) {
-      alert('Выберите хотя бы одну причину блокировки');
+      toast.error('Выберите хотя бы одну причину блокировки', { duration: 5000 });
       return;
     }
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/block`, {
+      const res = await adminFetch(`/api/admin/users/${userId}/block`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,11 +66,7 @@ export default function UserBlockControls({
           comment: comment.trim(),
         }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        alert(data.message || 'Ошибка');
-        return;
-      }
+      if (!res.ok) return;
       setComment('');
       setCodes([]);
       startTransition(() => router.refresh());

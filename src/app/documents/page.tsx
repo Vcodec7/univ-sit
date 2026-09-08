@@ -8,7 +8,7 @@ export const dynamic = 'force-static';
 export async function generateMetadata(): Promise<Metadata> {
   const { brandedMetadata } = await import('@/lib/branded-metadata');
   return brandedMetadata('Документы', {
-    description: 'Положения, формы и нормативные документы портала',
+    description: 'Политика, правила, соглашение, проверка подлинности и файлы портала',
     canonicalPath: '/documents',
   });
 }

@@ -16,6 +16,7 @@ import SvcDateField from '@/components/SvcDateField';
 import ServiceSplitModal from '@/components/ServiceSplitModal';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import CoworkingInviteScreen, { type CoworkingGroupPayload } from '@/components/CoworkingInviteScreen';
+import FeatureConsentModal from '@/components/FeatureConsentModal';
 
 type SpaceInfo = CoworkingSpaceAvailability;
 
@@ -76,6 +77,8 @@ export default function CoworkingSignupFlow({
   } | null>(null);
   const [qrUrl, setQrUrl] = useState('');
   const [inviteGroup, setInviteGroup] = useState<CoworkingGroupPayload | null>(null);
+  const [needCoworkingRules, setNeedCoworkingRules] = useState(false);
+  const [consentBusy, setConsentBusy] = useState(false);
   const spaceIdRef = useRef(spaceId);
   spaceIdRef.current = spaceId;
   const lastFetchedDay = useRef<string | null>(
@@ -162,6 +165,10 @@ export default function CoworkingSignupFlow({
         }),
       });
       const data = await r.json();
+      if (r.status === 412 && data.code === 'NEED_FEATURE_CONSENT') {
+        setNeedCoworkingRules(true);
+        return;
+      }
       if (!r.ok) {
         if (data.canWaitlist) {
           setError('Мест нет — можно встать в лист ожидания');
@@ -179,12 +186,17 @@ export default function CoworkingSignupFlow({
         end: periodDef.end || '',
         waitlist: wait,
       });
-      try {
-        const qrRes = await fetch('/api/presence-qr', { credentials: 'same-origin' });
-        const qrData = await qrRes.json();
-        if (qrRes.ok) setQrUrl(qrData.qr?.url || '');
-      } catch {
-        /* optional */
+      const pass = typeof data.signup?.passCode === 'string' ? data.signup.passCode : '';
+      if (pass) {
+        setQrUrl(pass);
+      } else {
+        try {
+          const qrRes = await fetch('/api/presence-qr', { credentials: 'same-origin' });
+          const qrData = await qrRes.json();
+          if (qrRes.ok) setQrUrl(qrData.qr?.url || '');
+        } catch {
+          /* optional */
+        }
       }
       if (mode === 'GROUP' && data.signup?.kind === 'GROUP' && !wait) {
         const signup = data.signup;
@@ -231,6 +243,26 @@ export default function CoworkingSignupFlow({
       </div>
     );
   }
+
+  const acceptCoworkingRules = async () => {
+    setConsentBusy(true);
+    try {
+      const r = await fetch('/api/user/consent', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature: 'coworking' }),
+      });
+      if (!r.ok) {
+        setError('Не удалось сохранить согласие');
+        return;
+      }
+      setNeedCoworkingRules(false);
+      await submit(false);
+    } finally {
+      setConsentBusy(false);
+    }
+  };
 
   return (
     <div className={`cw-layout${refreshing ? ' is-refreshing' : ''}`}>
@@ -295,7 +327,7 @@ export default function CoworkingSignupFlow({
             </select>
           </label>
 
-          <SvcDateField value={dayKey} min={todayYmd()} onChange={setDayKey} />
+          <SvcDateField value={dayKey} min={todayYmd()} onChange={setDayKey} variant="rail" />
 
           <div className="cw-field" role="group" aria-labelledby="cw-interval-label">
             <span id="cw-interval-label">Час</span>
@@ -305,11 +337,12 @@ export default function CoworkingSignupFlow({
                 const info = space?.periods.find((x) => x.id === p.id);
                 const slotLeft = info?.left;
                 const full = typeof slotLeft === 'number' && slotLeft <= 0;
+                const low = typeof slotLeft === 'number' && slotLeft > 0 && slotLeft <= 5;
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}`}
+                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}${low ? ' is-low' : ''}`}
                     aria-pressed={period === p.id}
                     onClick={() => setPeriod(p.id)}
                   >
@@ -319,8 +352,10 @@ export default function CoworkingSignupFlow({
                     <em>
                       {typeof slotLeft === 'number'
                         ? slotLeft > 0
-                          ? `Свободно мест: ${slotLeft}`
-                          : 'нет мест'
+                          ? low
+                            ? `Осталось ${slotLeft}`
+                            : `Свободно: ${slotLeft}`
+                          : 'мест нет'
                         : busy
                           ? '…'
                           : '—'}
@@ -475,6 +510,14 @@ export default function CoworkingSignupFlow({
           </p>
         ) : null}
       </ServiceSplitModal>
+      {needCoworkingRules ? (
+        <FeatureConsentModal
+          feature="coworking"
+          busy={consentBusy}
+          onAccept={() => void acceptCoworkingRules()}
+          onClose={() => setNeedCoworkingRules(false)}
+        />
+      ) : null}
     </div>
   );
 }

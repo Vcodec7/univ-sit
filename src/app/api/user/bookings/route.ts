@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { buildSpaceCode } from '@/lib/tickets';
 
 export async function GET(req: Request) {
   try {
@@ -27,7 +28,13 @@ export async function GET(req: Request) {
       take: 80,
     });
 
-    return NextResponse.json(bookings, { status: 200 });
+    return NextResponse.json(
+      bookings.map((b) => ({
+        ...b,
+        passCode: buildSpaceCode(b.id, session.user.id),
+      })),
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Ошибка при получении бронирований:', error);
     return NextResponse.json({ message: 'Внутренняя ошибка сервера' }, { status: 500 });

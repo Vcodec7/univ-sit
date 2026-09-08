@@ -188,7 +188,7 @@ export default function ProfileHeroCard({
   onPreview,
   onSettings,
   onAvatarPick,
-  editSectionHref = '#profile-edit',
+  editSectionHref = '/dashboard/edit',
   onShowcaseSaved,
   onStatClick,
   onPassClick,
@@ -208,6 +208,7 @@ export default function ProfileHeroCard({
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [achLoading, setAchLoading] = useState(true);
+  const [gearOpen, setGearOpen] = useState(false);
   const saveLock = useRef(false);
 
   const loadAchievements = useCallback(() => {
@@ -227,8 +228,9 @@ export default function ProfileHeroCard({
           setCodes([]);
           return;
         }
-        const unlocked = (data.items as AchItem[]).filter((i) => i.unlocked);
-        setItems(unlocked);
+        const all = data.items as AchItem[];
+        setItems(all);
+        const unlocked = all.filter((i) => i.unlocked);
         const unlockedMeta: UnlockedShowcase[] = unlocked.map((i) => ({
           code: i.code,
           unlockedAt: i.unlockedAt || null,
@@ -262,9 +264,11 @@ export default function ProfileHeroCard({
     return () => window.clearTimeout(t);
   }, [loadAchievements, instructionsVersion, instructionsCompletedAt]);
 
+  const unlockedItems = useMemo(() => items.filter((i) => i.unlocked), [items]);
+  const lockedItems = useMemo(() => items.filter((i) => !i.unlocked).slice(0, 12), [items]);
   const unlockedMeta = useMemo<UnlockedShowcase[]>(
-    () => items.map((i) => ({ code: i.code, unlockedAt: i.unlockedAt || null })),
-    [items]
+    () => unlockedItems.map((i) => ({ code: i.code, unlockedAt: i.unlockedAt || null })),
+    [unlockedItems]
   );
 
   const activeCodes = editing ? draft : codes;
@@ -272,9 +276,9 @@ export default function ProfileHeroCard({
   const defs = useMemo(
     () =>
       activeCodes
-        .map((c) => items.find((i) => i.code === c) || ACHIEVEMENTS.find((a) => a.code === c))
+        .map((c) => unlockedItems.find((i) => i.code === c) || ACHIEVEMENTS.find((a) => a.code === c))
         .filter(Boolean) as AchievementDef[],
-    [activeCodes, items]
+    [activeCodes, unlockedItems]
   );
 
   const startEdit = () => {
@@ -361,232 +365,257 @@ export default function ProfileHeroCard({
   };
 
   const showHud = showRatings || showEco;
+  const contactsBlock = email || phone || publicCode ? (
+    <ul className="profile-hero__contacts">
+      {email ? (
+        <li>
+          <Mail size={14} aria-hidden />
+          {revealContacts ? <a href={`mailto:${email}`}>{email}</a> : <span>{email}</span>}
+        </li>
+      ) : null}
+      {phone ? (
+        <li>
+          <Phone size={14} aria-hidden />
+          {revealContacts ? <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a> : <span>{phone}</span>}
+        </li>
+      ) : null}
+      {publicCode ? (
+        <li>
+          <button
+            type="button"
+            className="profile-hero__id"
+            title="Скопировать публичный ID"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(publicCode);
+                toast.success('ID скопирован');
+              } catch {
+                toast.error('Не удалось скопировать');
+              }
+            }}
+          >
+            ID {publicCode} <Copy size={11} />
+          </button>
+        </li>
+      ) : null}
+    </ul>
+  ) : null;
 
   return (
-    <section className={`profile-hero profile-hero--cabinet${legend ? ' is-legend' : ''}`}>
-      <div className="profile-hero__main">
-        <div className="profile-hero__avatar-col">
-          <div
-            className={`profile-hero__avatar${onAvatarPick ? ' is-editable' : ''}${stableImage ? ' has-photo' : ' is-fallback'}`}
-            title={frameLook ? 'Рамка из магазина' : undefined}
-          >
-            <div className="profile-hero__avatar-inner">
-              {stableImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={stableImage} alt="" style={avatarStyle} />
-              ) : (
-                <span className="profile-hero__avatar-fallback">
-                  {displayName.charAt(0).toUpperCase() || <User size={22} />}
-                </span>
-              )}
-              {onAvatarPick && !stableImage ? (
-                <span className="profile-hero__avatar-add">
-                  <Camera size={16} aria-hidden />
-                  Фото
-                </span>
+    <section className={`profile-hero profile-hero--cabinet profile-hero--bento${legend ? ' is-legend' : ''}`}>
+      <div className="profile-hero__zone-a">
+        <div className="profile-hero__main">
+          <div className="profile-hero__avatar-col">
+            <div
+              className={`profile-hero__avatar${onAvatarPick ? ' is-editable' : ''}${stableImage ? ' has-photo' : ' is-fallback'}`}
+              title={frameLook ? 'Рамка из магазина' : undefined}
+            >
+              <div className="profile-hero__avatar-inner">
+                {stableImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={stableImage} alt="" style={avatarStyle} />
+                ) : (
+                  <span className="profile-hero__avatar-fallback">
+                    {displayName.charAt(0).toUpperCase() || <User size={22} />}
+                  </span>
+                )}
+                {onAvatarPick && !stableImage ? (
+                  <span className="profile-hero__avatar-add">
+                    <Camera size={16} aria-hidden />
+                    Фото
+                  </span>
+                ) : null}
+              </div>
+              {onAvatarPick ? (
+                <label className="profile-hero__avatar-edit" title="Добавить фото" aria-label="Добавить фото">
+                  <Camera size={11} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) onAvatarPick(file);
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                </label>
               ) : null}
             </div>
-            {onAvatarPick ? (
-              <label className="profile-hero__avatar-edit" title="Добавить фото" aria-label="Добавить фото">
-                <Camera size={11} />
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) onAvatarPick(file);
-                    e.currentTarget.value = '';
-                  }}
-                />
-              </label>
+          </div>
+          <div className="profile-hero__meta">
+            <div className="profile-hero__name-row">
+              <h1 className="profile-hero__name">{displayName}</h1>
+              {roleLabel ? <span className="profile-hero__role">{roleLabel}</span> : null}
+            </div>
+            {showLegal ? <p className="profile-hero__sub">{name}</p> : null}
+            {bio ? <p className="profile-hero__bio">{bio}</p> : null}
+            {!bio && openEdit ? (
+              <button type="button" className="profile-hero__bio-cta" onClick={openEdit}>
+                Добавьте пару слов о себе →
+              </button>
+            ) : null}
+            {!bio && !openEdit ? (
+              <a href={editSectionHref} className="profile-hero__bio-cta">
+                Добавьте пару слов о себе →
+              </a>
             ) : null}
           </div>
         </div>
-
-        <div className="profile-hero__meta">
-          <div className="profile-hero__name-row">
-            <h1 className="profile-hero__name">{displayName}</h1>
-            {roleLabel ? <span className="profile-hero__role">{roleLabel}</span> : null}
-          </div>
-          {showLegal ? <p className="profile-hero__sub">{name}</p> : null}
-          {bio ? <p className="profile-hero__bio">{bio}</p> : null}
-          {email || phone || publicCode ? (
-            <details className="profile-hero__more">
-              <summary>Контакты и ID</summary>
-              <ul className="profile-hero__contacts">
-                {email ? (
-                  <li>
-                    <Mail size={14} aria-hidden />
-                    {revealContacts ? <a href={`mailto:${email}`}>{email}</a> : <span>{email}</span>}
-                  </li>
-                ) : null}
-                {phone ? (
-                  <li>
-                    <Phone size={14} aria-hidden />
-                    {revealContacts ? (
-                      <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>
-                    ) : (
-                      <span>{phone}</span>
-                    )}
-                  </li>
-                ) : null}
-                {publicCode ? (
-                  <li>
-                    <button
-                      type="button"
-                      className="profile-hero__id"
-                      title="Скопировать публичный ID"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(publicCode);
-                          toast.success('ID скопирован');
-                        } catch {
-                          toast.error('Не удалось скопировать');
-                        }
-                      }}
-                    >
-                      ID {publicCode} <Copy size={11} />
-                    </button>
-                  </li>
-                ) : null}
-              </ul>
-            </details>
+        <div className="profile-hero__gear">
+          <button
+            type="button"
+            className="profile-hero__tool is-icon"
+            aria-label="Настройки"
+            aria-expanded={gearOpen}
+            onClick={() => setGearOpen((v) => !v)}
+          >
+            <Settings size={18} aria-hidden />
+          </button>
+          {gearOpen ? (
+            <div className="profile-hero__gear-menu" role="menu">
+              {openEdit ? (
+                <button type="button" role="menuitem" onClick={() => { setGearOpen(false); openEdit(); }}>
+                  <Pencil size={14} /> Правка
+                </button>
+              ) : (
+                <a href={editSectionHref} role="menuitem">
+                  <Pencil size={14} /> Правка
+                </a>
+              )}
+              {contactsBlock ? (
+                <details>
+                  <summary>Контакты и ID</summary>
+                  {contactsBlock}
+                </details>
+              ) : null}
+              {onPreview ? (
+                <button type="button" role="menuitem" onClick={() => { setGearOpen(false); onPreview(); }}>
+                  <UserCircle size={14} /> Как видят
+                </button>
+              ) : publicHref ? (
+                <Link href={publicHref} role="menuitem" onClick={() => setGearOpen(false)}>
+                  <UserCircle size={14} /> Как видят
+                </Link>
+              ) : null}
+              {onSettings ? (
+                <button type="button" role="menuitem" onClick={() => { setGearOpen(false); onSettings(); }}>
+                  <Settings size={14} /> Настройки
+                </button>
+              ) : settingsHref ? (
+                <Link href={settingsHref} role="menuitem">
+                  <Settings size={14} /> Настройки
+                </Link>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
 
-      {!bio && openEdit ? (
-        <button type="button" className="profile-hero__bio-cta" onClick={openEdit}>
-          Добавьте пару слов о себе →
-        </button>
-      ) : null}
-      {!bio && !openEdit ? (
-        <a href={editSectionHref} className="profile-hero__bio-cta">
-          Добавьте пару слов о себе →
-        </a>
-      ) : null}
-
-      <div className="profile-hero__toolbar" role="group" aria-label="Действия профиля">
-        {openEdit ? (
-          <button type="button" className="profile-hero__tool is-primary" onClick={openEdit}>
-            <Pencil size={14} aria-hidden /> Правка
-          </button>
-        ) : (
-          <a href={editSectionHref} className="profile-hero__tool is-primary">
-            <Pencil size={14} aria-hidden /> Правка
-          </a>
-        )}
-        {onPreview ? (
-          <button type="button" className="profile-hero__tool" onClick={onPreview}>
-            <UserCircle size={14} aria-hidden /> Как видят
-          </button>
-        ) : publicHref ? (
-          <Link href={publicHref} className="profile-hero__tool">
-            <UserCircle size={14} aria-hidden /> Как видят
-          </Link>
-        ) : null}
-        {onSettings ? (
-          <button type="button" className="profile-hero__tool is-icon" onClick={onSettings} aria-label="Настройки">
-            <Settings size={16} aria-hidden />
-          </button>
-        ) : settingsHref ? (
-          <Link href={settingsHref} className="profile-hero__tool is-icon" aria-label="Настройки">
-            <Settings size={16} aria-hidden />
-          </Link>
-        ) : null}
-      </div>
-
       {showHud ? (
-        <div className="profile-hero__meters" aria-label="Пропуск, репутация и М-баллы">
+        <div className="profile-hero__bento-b" aria-label="Пропуск, репутация и М-баллы">
           {onPassClick ? (
-            <button type="button" className="profile-hero__meter" onClick={onPassClick}>
-              <QrCode size={14} aria-hidden />
+            <button type="button" className="profile-hero__meter is-qr" onClick={onPassClick}>
+              <QrCode size={22} aria-hidden />
               <span>
-                <small>Пропуск</small>
+                <small>QR-пропуск</small>
                 <strong>Открыть</strong>
               </span>
             </button>
           ) : (
-            <a className="profile-hero__meter" href="#pass">
-              <QrCode size={14} aria-hidden />
+            <a className="profile-hero__meter is-qr" href="#pass">
+              <QrCode size={22} aria-hidden />
               <span>
-                <small>Пропуск</small>
+                <small>QR-пропуск</small>
                 <strong>QR</strong>
               </span>
             </a>
           )}
-          <button
-            type="button"
-            className="profile-hero__meter"
-            onClick={() => onStatClick?.('AUTHORITY')}
-          >
-            <Shield size={14} aria-hidden />
-            <span>
-              <small>Репутация</small>
-              <strong title={authorityLabel || undefined}>
-                {authority == null ? '—' : `${authority}%`}
-              </strong>
-            </span>
-          </button>
-          {showEco ? (
-            <button type="button" className="profile-hero__meter" onClick={() => onStatClick?.('ECO')}>
-              <Leaf size={14} aria-hidden />
+          <div className="profile-hero__bento-side">
+            <button type="button" className="profile-hero__meter" onClick={() => onStatClick?.('AUTHORITY')}>
+              <Shield size={14} aria-hidden />
               <span>
-                <small>М-баллы</small>
-                <strong>{Number(ecoPoints || 0).toLocaleString('ru-RU')}</strong>
+                <small>Репутация</small>
+                <strong title={authorityLabel || undefined}>{authority == null ? '—' : `${authority}%`}</strong>
               </span>
             </button>
-          ) : null}
+            {showEco ? (
+              <button type="button" className="profile-hero__meter" onClick={() => onStatClick?.('ECO')}>
+                <Leaf size={14} aria-hidden />
+                <span>
+                  <small>М-баллы</small>
+                  <strong>{Number(ecoPoints || 0).toLocaleString('ru-RU')}</strong>
+                </span>
+              </button>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
       {showShowcase ? (
-      <div className="profile-hero__showcase profile-hero__showcase--shelf">
-        <div className="profile-hero__showcase-head">
-          <div className="profile-hero__showcase-label">
-            Значки
-            <span>
-              {achLoading ? '…' : `${activeCodes.length}/${SHOWCASE_MAX}`}
-              {equipped.length ? ` · стиль ${equipped.length}` : ''}
-            </span>
-          </div>
-          <div className="profile-hero__showcase-actions">
-            <Link href="/dashboard/shop" className="profile-hero__edit-btn">
-              Магазин
-            </Link>
-            <Link href={showcaseHref} className="profile-hero__edit-btn">
-              Собрать
-            </Link>
-          </div>
-        </div>
-        <div className="profile-hero__showcase-body" aria-busy={achLoading}>
-          {achLoading ? (
-            <div className="profile-hero__showcase-skel" aria-hidden />
-          ) : !defs.length ? (
-            <p className="profile-hero__hint">
-              {items.length
-                ? 'Соберите значки и карты на странице витрины.'
-                : 'Откройте достижения — затем оформите витрину профиля.'}
-            </p>
-          ) : (
-            <div className="profile-hero__selected" aria-label="Витрина значков">
-              {defs.map((def) => (
-                <span
-                  key={def.code}
-                  className="profile-hero__chip"
-                  style={{ '--chip-accent': def.accent } as CSSProperties}
-                >
-                  <BadgeIcon def={def} size={13} />
-                  {def.title}
-                </span>
-              ))}
+        <div className="profile-hero__showcase profile-hero__showcase--shelf profile-hero__zone-c">
+          {levelMeta ? (
+            <div className="profile-hero__progress" aria-label="Прогресс уровня">
+              <div className="profile-hero__progress-label">
+                Прогресс · ур. {levelMeta.level}
+                {levelMeta.title ? ` · ${levelMeta.title}` : ''}
+              </div>
+              <div className="profile-hero__progress-bar">
+                <span style={{ width: `${Math.max(4, Math.min(100, levelMeta.pct || 0))}%` }} />
+              </div>
             </div>
-          )}
+          ) : null}
+          <div className="profile-hero__showcase-head">
+            <div className="profile-hero__showcase-label">
+              Значки
+              <span>
+                {achLoading ? '…' : `${unlockedItems.length}`}
+                {equipped.length ? ` · стиль ${equipped.length}` : ''}
+              </span>
+            </div>
+            <div className="profile-hero__showcase-actions">
+              <Link href="/dashboard/shop" className="profile-hero__edit-btn">
+                Магазин
+              </Link>
+              <Link href={showcaseHref} className="profile-hero__edit-btn">
+                Собрать
+              </Link>
+            </div>
+          </div>
+          <div className="profile-hero__showcase-body" aria-busy={achLoading}>
+            {achLoading ? (
+              <div className="profile-hero__showcase-skel" aria-hidden />
+            ) : (
+              <div className="profile-hero__selected" aria-label="Значки">
+                {defs.map((def) => (
+                  <span
+                    key={def.code}
+                    className="profile-hero__chip"
+                    style={{ '--chip-accent': def.accent } as CSSProperties}
+                    title={def.description}
+                  >
+                    <BadgeIcon def={def} size={13} />
+                    {def.title}
+                  </span>
+                ))}
+                {lockedItems.map((def) => (
+                  <span
+                    key={def.code}
+                    className="profile-hero__chip is-locked"
+                    title={def.description || 'Сходи ещё на мероприятия, чтобы разблокировать'}
+                  >
+                    <BadgeIcon def={def} size={13} />
+                    {def.title}
+                  </span>
+                ))}
+                {!defs.length && !lockedItems.length ? (
+                  <p className="profile-hero__hint">{emptyAch}</p>
+                ) : null}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       ) : null}
-
     </section>
   );
 }

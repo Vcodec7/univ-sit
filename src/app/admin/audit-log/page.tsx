@@ -70,7 +70,7 @@ export default async function AdminAuditLogPage({
         </button>
       </form>
 
-      <div style={{ overflowX: 'auto', background: 'white', borderRadius: 12, boxShadow: 'var(--shadow-sm)' }}>
+      <div className="admin-table-wrap admin-table-wrap--sticky">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>

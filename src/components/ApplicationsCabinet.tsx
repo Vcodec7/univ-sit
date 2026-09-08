@@ -73,17 +73,15 @@ function rejectNote(reason?: string | null) {
 
 function emptyBox(text: string, href?: string, linkLabel?: string) {
   return (
-    <div
-      style={{
-        padding: '1.25rem',
-        borderRadius: 'var(--radius-md)',
-        backgroundColor: 'rgba(0,0,0,0.02)',
-        textAlign: 'center',
-      }}
-    >
-      <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: href ? '0 0 0.85rem' : 0 }}>{text}</p>
+    <div className="yp-empty-cta">
+      <svg className="yp-empty-cta__art" viewBox="0 0 120 80" aria-hidden>
+        <rect x="8" y="18" width="104" height="50" rx="12" fill="none" stroke="currentColor" strokeWidth="2" />
+        <circle cx="40" cy="42" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="M58 36 h36 M58 46 h24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <p>{text}</p>
       {href && linkLabel ? (
-        <a href={href} className="btn btn-primary" style={{ display: 'inline-block' }}>
+        <a href={href} className="btn btn-primary">
           {linkLabel}
         </a>
       ) : null}
@@ -281,7 +279,7 @@ export default function ApplicationsCabinet() {
 
       {appsSubTab === 'projects' &&
         (projectApplications.length === 0
-          ? emptyBox('Пока нет заявок в проекты', '/projects', 'Смотреть проекты')
+          ? emptyBox('Пока нет заявок в проекты', '/projects', 'Посмотреть актуальные проекты')
           : (
             <div className="dashboard-apps-grid">
               {projectApplications.map((app) => (

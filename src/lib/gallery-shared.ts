@@ -90,5 +90,7 @@ export function serializeGalleryUrls(urls: string[], max = 24): string | null {
 }
 
 export function galleryUrls(items: GalleryItem[]): string[] {
-  return items.map((i) => i.url);
+  return items
+    .map((i) => String(i.url || '').trim())
+    .filter((u) => (u.startsWith('/') || /^https?:\/\//i.test(u)) && u !== '/' && u !== '#');
 }

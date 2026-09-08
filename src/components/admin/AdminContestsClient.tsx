@@ -1,9 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { usePathname } from 'next/navigation';
 import { CONTEST_KIND_RU, CONTEST_STATUS_RU } from '@/lib/contest-eligibility-shared';
 import { vacancyHtmlToPlain, vacancyPlainToHtml } from '@/lib/vacancy-content';
+import { adminFetch } from '@/lib/admin-fetch';
+import { useAdminDraft } from '@/lib/use-admin-draft';
+import AdminDraftBanner from '@/components/admin/AdminDraftBanner';
 
 type Contest = {
   id: string;
@@ -41,14 +45,27 @@ export default function AdminContestsClient() {
   const [awardAmount, setAwardAmount] = useState(25);
   const [awardReason, setAwardReason] = useState('');
   const [rejectById, setRejectById] = useState<Record<string, string>>({});
+  const path = usePathname() || '/admin/contests';
+  const contestDraft = useMemo(
+    () => ({ title, kind, status, summary, rulesHtml, prizeText, bookingId, editId }),
+    [title, kind, status, summary, rulesHtml, prizeText, bookingId, editId]
+  );
+  const applyContestDraft = useCallback((d: typeof contestDraft) => {
+    if (d.title) setTitle(d.title);
+    if (d.kind) setKind(d.kind);
+    if (d.status) setStatus(d.status);
+    if (d.summary) setSummary(d.summary);
+    if (d.rulesHtml) setRulesHtml(d.rulesHtml);
+    if (d.prizeText) setPrizeText(d.prizeText);
+    if (d.bookingId) setBookingId(d.bookingId);
+    if (d.editId) setEditId(d.editId);
+  }, []);
+  const { restored, discard, clear } = useAdminDraft(path, editId || 'new', contestDraft, applyContestDraft);
 
   const load = useCallback(async () => {
-    const res = await fetch('/api/admin/contests');
-    const data = await res.json();
-    if (!res.ok) {
-      toast.error(data.message || 'Нет доступа');
-      return;
-    }
+    const res = await adminFetch('/api/admin/contests');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return;
     setContests(data.contests || []);
     setPending(data.pendingSubs || []);
     setAwardContestId((prev) => prev || data.contests?.[0]?.id || '');
@@ -59,13 +76,13 @@ export default function AdminContestsClient() {
   }, [load]);
 
   const post = async (body: Record<string, unknown>) => {
-    const res = await fetch('/api/admin/contests', {
+    const res = await adminFetch('/api/admin/contests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Ошибка');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error('fail');
     return data;
   };
 
@@ -103,6 +120,7 @@ export default function AdminContestsClient() {
 
       <section className="card-surface admin-vac-card">
         <h2>{editId ? 'Редактировать' : 'Создать'}</h2>
+        {restored ? <AdminDraftBanner onDiscard={discard} /> : null}
         <div className="admin-vac-form">
           <div className="admin-vac-form__row">
             <select value={kind} onChange={(e) => setKind(e.target.value)} disabled={Boolean(editId)} aria-label="Тип">
@@ -160,10 +178,11 @@ export default function AdminContestsClient() {
                 })
                   .then(() => {
                     toast.success(editId ? 'Сохранено' : 'Создано');
+                    clear();
                     resetForm();
                     void load();
                   })
-                  .catch((e) => toast.error(e.message))
+                  .catch(() => undefined)
               }
             >
               {editId ? 'Сохранить' : 'Опубликовать'}
@@ -225,7 +244,7 @@ export default function AdminContestsClient() {
                   toast.success(`Начислено. Баланс: ${r.ecoPoints}`);
                   setAwardCode('');
                 })
-                .catch((e) => toast.error(e.message))
+                .catch(() => undefined)
             }
           >
             Выдать М-баллы
@@ -263,7 +282,7 @@ export default function AdminContestsClient() {
                             toast.success(`Синхронизировано: ${r.synced}`);
                             void load();
                           })
-                          .catch((e) => toast.error(e.message))
+                          .catch(() => undefined)
                       }
                     >
                       Синхр. отметки
@@ -277,7 +296,7 @@ export default function AdminContestsClient() {
                             toast.success(`Розыгрыш: seed ${String(r.seed).slice(0, 12)}…`);
                             void load();
                           })
-                          .catch((e) => toast.error(e.message))
+                          .catch(() => undefined)
                       }
                     >
                       Розыгрыш
@@ -294,7 +313,7 @@ export default function AdminContestsClient() {
                           toast.success('Победители по голосам');
                           void load();
                         })
-                        .catch((e) => toast.error(e.message))
+                        .catch(() => undefined)
                     }
                   >
                     Топ-3

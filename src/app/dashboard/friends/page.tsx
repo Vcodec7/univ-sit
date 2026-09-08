@@ -8,6 +8,7 @@ import { Check, MessageCircle, Search, UserPlus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserAvatar from '@/components/UserAvatar';
 import CabinetSubpage from '@/components/CabinetSubpage';
+import EmptyStateCta from '@/components/EmptyStateCta';
 import '@/app/friends/friends.css';
 
 type Trust = {
@@ -244,6 +245,7 @@ export default function FriendsPage() {
         <label className="friends-field">
           <Search size={15} aria-hidden />
           <input
+            id="friends-find"
             value={siteQuery}
             onChange={(event) => setSiteQuery(event.target.value)}
             placeholder="Имя (от 2 символов)"
@@ -381,8 +383,19 @@ export default function FriendsPage() {
 
         {friends.length === 0 ? (
           <div className="friends-empty">
-            <UserPlus size={22} />
-            <div>{query ? 'Никого не найдено' : 'Список друзей пока пуст'}</div>
+            {query ? (
+              <>
+                <UserPlus size={22} />
+                <div>Никого не найдено</div>
+              </>
+            ) : (
+              <EmptyStateCta
+                title="Список друзей пока пуст"
+                text="Найдите участников портала и отправьте заявку в друзья."
+                href="#friends-find"
+                cta="Найти единомышленников"
+              />
+            )}
           </div>
         ) : (
           <div className="friends-rows is-flush">

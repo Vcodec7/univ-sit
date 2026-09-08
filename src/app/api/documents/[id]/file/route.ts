@@ -4,18 +4,7 @@ import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { publishedNonDemoWhere } from '@/lib/publish';
 import { rejectIfModuleDisabled } from '@/lib/require-module';
-
-const EXT_MIME: Record<string, string> = {
-  '.pdf': 'application/pdf',
-  '.txt': 'text/plain; charset=utf-8',
-  '.doc': 'application/msword',
-  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-  '.gif': 'image/gif',
-};
+import { contentTypeHeader, sniffDocumentMime } from '@/lib/document-mime';
 
 /**
  * Stream a published document with correct MIME and Content-Disposition.
@@ -55,17 +44,17 @@ export async function GET(
       return NextResponse.json({ message: 'Файл не найден' }, { status: 404 });
     }
     const buf = await readFile(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    const mime = EXT_MIME[ext] || doc.mimeType || 'application/octet-stream';
+    const mime = sniffDocumentMime(buf, doc.fileName || filePath, doc.mimeType);
 
     const { searchParams } = new URL(req.url);
     const disposition =
       searchParams.get('disposition') === 'attachment' ? 'attachment' : 'inline';
+    const ext = path.extname(filePath).toLowerCase();
     const safeName = doc.fileName.replace(/["\r\n]/g, '_') || `document${ext}`;
 
     return new NextResponse(buf, {
       headers: {
-        'Content-Type': mime,
+        'Content-Type': contentTypeHeader(mime),
         'Content-Length': String(info.size),
         'Content-Disposition': `${disposition}; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
         'Cache-Control': 'public, max-age=3600',

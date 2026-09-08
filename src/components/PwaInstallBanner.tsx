@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Download, Smartphone } from 'lucide-react';
 import OnboardingSheet from '@/components/OnboardingSheet';
@@ -70,6 +71,9 @@ function emitPwaVisibility(visible: boolean) {
 
 export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи' }: { siteName?: string }) {
   const { data: session, status } = useSession();
+  const pathname = usePathname() || '';
+  const hideOnForms =
+    pathname.startsWith('/dashboard/edit') || pathname.startsWith('/dashboard/settings');
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIos, setIsIos] = useState(false);
   const [standalone, setStandalone] = useState(false);
@@ -200,7 +204,7 @@ export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи
     };
   }, [userId]);
 
-  if (!ready || standalone || !visible || status === 'loading') return null;
+  if (!ready || standalone || !visible || status === 'loading' || hideOnForms) return null;
 
   const dismissLater = () => {
     sessionStorage.setItem(DISMISS_SESSION, '1');

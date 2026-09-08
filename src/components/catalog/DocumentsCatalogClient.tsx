@@ -40,8 +40,29 @@ export default function DocumentsCatalogClient({ items }: { items: PublicDocumen
   return (
     <div className="container docs-page-shell catalog-page" style={{ padding: '2rem 1rem', minHeight: '60vh' }}>
       <h1 className="page-hero-title">Документы</h1>
+      <p style={{ color: 'var(--muted)', marginBottom: '1rem', fontSize: '1.05rem' }}>
+        Хаб официальных текстов портала и файловой библиотеки.
+      </p>
+      <nav className="docs-legal-hub" aria-label="Правовые страницы">
+        <Link href="/privacy" className="docs-legal-hub__card">
+          <strong>Политика конфиденциальности</strong>
+          <span>152-ФЗ, cookie, обработка ПДн</span>
+        </Link>
+        <Link href="/rules" className="docs-legal-hub__card">
+          <strong>Правила сайта</strong>
+          <span>Поведение на портале и в пространствах</span>
+        </Link>
+        <Link href="/terms" className="docs-legal-hub__card">
+          <strong>Пользовательское соглашение</strong>
+          <span>Условия использования сервиса</span>
+        </Link>
+        <Link href="/documents/verify" className="docs-legal-hub__card">
+          <strong>Проверить документ</strong>
+          <span>Подлинность выданной справки или грамоты</span>
+        </Link>
+      </nav>
       <p style={{ color: 'var(--muted)', marginBottom: '1.75rem', fontSize: '1.05rem' }}>
-        Официальные положения и правила — в PDF. Типовые заявления — отдельная категория в формате Word (.docx).
+        Ниже — положения и формы в PDF. Типовые заявления — отдельная категория в формате Word (.docx).
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>

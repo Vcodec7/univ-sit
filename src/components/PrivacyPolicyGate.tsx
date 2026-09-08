@@ -8,6 +8,8 @@ import { usePathname } from 'next/navigation';
 import { ShieldAlert } from 'lucide-react';
 import { PRIVACY_POLICY_VERSION } from '@/lib/consent-versions';
 import { signOutLogged } from '@/lib/sign-out-logged';
+import LegalDiffBlock from '@/components/LegalDiffBlock';
+import type { DiffLine } from '@/lib/legal-diff';
 
 /** Paths still available while privacy re-consent is required. */
 const ALLOWED_WHEN_BLOCKED = [
@@ -35,6 +37,7 @@ export default function PrivacyPolicyGate() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [diffLines, setDiffLines] = useState<DiffLine[]>([]);
 
   useEffect(() => setMounted(true), []);
 
@@ -51,6 +54,14 @@ export default function PrivacyPolicyGate() {
         setNeeded(need);
         setRefused(Boolean(data?.privacyRefusedAt));
         if (data?.currentPrivacyVersion) setVersion(data.currentPrivacyVersion);
+        if (need) {
+          fetch('/api/legal/diff')
+            .then((r) => r.json())
+            .then((d) => {
+              if (Array.isArray(d?.lines)) setDiffLines(d.lines);
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => {
         /* ignore network — don't lock out on fetch fail */
@@ -127,8 +138,9 @@ export default function PrivacyPolicyGate() {
         <p id="privacy-gate-desc" className="privacy-gate__text">
           {refused
             ? 'Без согласия с актуальной политикой пользоваться порталом нельзя. Примите политику или выйдите из аккаунта.'
-            : 'Мы обновили документы. Примите политику и правила сайта — иначе доступ будет ограничен.'}
+            : 'Мы обновили документы. Ниже — что изменилось относительно прошлой редакции.'}
         </p>
+        {!refused && diffLines.length ? <LegalDiffBlock lines={diffLines} /> : null}
         <p className="privacy-gate__meta">
           <Link href="/privacy" className="privacy-gate__link">
             Политика конфиденциальности

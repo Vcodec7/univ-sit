@@ -13,7 +13,9 @@ import TagPicker from '@/components/TagPicker';
 import { collectDeviceFingerprint } from '@/lib/device-fingerprint';
 import ProfileHeroCard from '@/components/ProfileHeroCard';
 import PersonalQrPanel from '@/components/PersonalQrPanel';
-import CoworkingCabinetList from '@/components/CoworkingCabinetList';
+import MobileSheet from '@/components/ui/MobileSheet';
+import DashboardSettingsPageClient from '@/components/DashboardSettingsPageClient';
+import CabinetHubTabs from '@/components/CabinetHubTabs';
 import { zodiacFromDate } from '@/lib/profile-meta';
 import {
   QUICK_ACCESS_TUTORIAL_DONE_EVENT,
@@ -105,6 +107,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
   const [repModalOpen, setRepModalOpen] = useState(false);
   const [repModalTab, setRepModalTab] = useState<'LEVEL' | 'AUTHORITY' | 'SOCIAL' | 'ECO'>('AUTHORITY');
   const [passOpen, setPassOpen] = useState(false);
+  const [settingsSheet, setSettingsSheet] = useState(false);
   const [moduleFlags, setModuleFlags] = useState<Record<string, boolean> | null>(null);
   const [levelMeta, setLevelMeta] = useState<{
     level: number;
@@ -135,7 +138,6 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
     [moduleFlags]
   );
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [editOpen, setEditOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const setEcoBalance = useCallback((ecoPoints: number) => {
     setProfile((prev) => {
@@ -220,8 +222,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
       return;
     }
     if (tab === 'profile' && section === 'edit') {
-      setEditOpen(true);
-      router.replace('/dashboard#profile-edit');
+      router.replace('/dashboard/edit');
       return;
     }
     if (tab === 'profile' && section === 'settings') {
@@ -420,12 +421,10 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
     const applyHash = () => {
       const hash = window.location.hash;
       if (hash === '#profile-edit') {
-        setPreviewOpen(false);
-        setEditOpen(true);
+        router.replace('/dashboard/edit');
         return;
       }
       if (hash === '#messengers' || hash === '#settings') {
-        setEditOpen(false);
         setPreviewOpen(false);
         router.push(hash === '#messengers' ? '/dashboard/settings?section=messengers' : '/dashboard/settings');
         return;
@@ -440,11 +439,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
   }, [view, status, session, router]);
 
   useEffect(() => {
-    if (view === 'edit') setEditOpen(true);
-  }, [view]);
-
-  useEffect(() => {
-    if (!editOpen && !previewOpen) {
+    if (!previewOpen) {
       document.body.classList.remove('yp-sheet-open');
       return;
     }
@@ -453,7 +448,6 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
     document.body.classList.add('yp-sheet-open');
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      setEditOpen(false);
       setPreviewOpen(false);
     };
     window.addEventListener('keydown', onKey);
@@ -462,7 +456,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
       document.body.classList.remove('yp-sheet-open');
       window.removeEventListener('keydown', onKey);
     };
-  }, [editOpen, previewOpen]);
+  }, [previewOpen]);
 
   if (status === 'loading') {
     if (embedded) {
@@ -565,6 +559,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                     <div className={embedded ? undefined : 'dashboard-main'}>
             {(view === 'overview' || view === 'edit') && (
               <div className="dashboard-stack" style={{ maxWidth: "100%", width: "100%", display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+                {view === 'overview' ? (
                 <div className="profile-overview-top" id="profile-hub">
                   <div className="profile-view profile-view--unified profile-view--modern profile-view--hub">
                     <ProfileHeroCard
@@ -589,7 +584,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       social={profile?.socialScore ?? 50}
                       ecoPoints={profile?.ecoPoints ?? 0}
                       levelMeta={levelMeta}
-                      editSectionHref="#profile-edit"
+                      editSectionHref="/dashboard/edit"
                       settingsHref="/dashboard/settings"
                       publicHref={
                         profile?.publicCode || session.user?.id
@@ -597,19 +592,15 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                           : undefined
                       }
                       onEdit={() => {
-                        setEditOpen(true);
+                        router.push('/dashboard/edit');
                       }}
                       onPreview={() => setPreviewOpen(true)}
                       onSettings={() => {
-                        setEditOpen(false);
-                        router.push('/dashboard/settings');
+                        setSettingsSheet(true);
                       }}
-                      onAvatarPick={(file) => {
-                        setAvatarFile(file);
-                        setAvatarPreview(URL.createObjectURL(file));
-                        setAvatarName(file.name);
-                        toast('Фото выбрано — сохраните в окне редактирования');
-                        setEditOpen(true);
+                      onAvatarPick={() => {
+                        toast('Добавьте фото в форме редактирования профиля');
+                        router.push('/dashboard/edit');
                       }}
                       onShowcaseSaved={(codes) =>
                         setProfile((prev) =>
@@ -623,22 +614,20 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       revealContacts
                     />
                     <PersonalQrPanel open={passOpen} onClose={() => setPassOpen(false)} />
-                    <CoworkingCabinetList />
+                    <MobileSheet open={settingsSheet} onOpenChange={setSettingsSheet} title="Настройки">
+                      <DashboardSettingsPageClient />
+                    </MobileSheet>
+                    <CabinetHubTabs unreadMessages={unreadMessages} />
 
                   </div>
 
                   </div>
-                {editOpen ? (
-                <div className="yp-sheet yp-sheet--profile" role="dialog" aria-modal="true" aria-labelledby="profile-edit-title">
-                  <button type="button" className="yp-sheet__backdrop" aria-label="Закрыть" onClick={() => setEditOpen(false)} />
-                  <div className="yp-sheet__panel">
-                    <header className="yp-sheet__head">
-                      <h2 id="profile-edit-title">Редактировать профиль</h2>
-                      <button type="button" className="yp-sheet__close" onClick={() => setEditOpen(false)} aria-label="Закрыть">
-                        ×
-                      </button>
+                ) : null}
+                {view === 'edit' ? (
+                <div className="profile-edit-page">
+                    <header className="profile-subhead">
+                      <h1 className="profile-view__title" id="profile-edit-title">Редактировать профиль</h1>
                     </header>
-                <div className="yp-sheet__body">
                 <form
                   id="profile-edit"
                   className="profile-unified-edit profile-edit-form"
@@ -705,7 +694,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       const json = (await readCabinetJson(res)) || {};
                       if (res.ok) {
                         toast.success(json.message || 'Профиль успешно сохранен!');
-                        setEditOpen(false);
+                        router.push('/dashboard');
                         const saved = json.user || {};
                         setProfile((prev) => ({ ...prev, ...saved }));
                         setProfileHobbies(Array.isArray(saved.hobbies) ? saved.hobbies : profileHobbies);
@@ -1313,7 +1302,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                     <button
                       type="button"
                       className="profile-edit-sticky__btn profile-edit-sticky__btn--ghost"
-                      onClick={() => setEditOpen(false)}
+                      onClick={() => router.push('/dashboard')}
                     >
                       Закрыть
                     </button>
@@ -1326,8 +1315,6 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                     </button>
                   </div>
                 </form>
-                </div>
-                  </div>
                 </div>
                 ) : null}
 

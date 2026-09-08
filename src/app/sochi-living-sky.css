@@ -6,6 +6,8 @@
   z-index: 3;
   overflow: hidden;
   pointer-events: none;
+  contain: layout style paint;
+  will-change: auto;
   /* Keep sun/moon in the sky band — do not paint over the sea in the photo. */
   -webkit-mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.45) 52%, transparent 64%);
   mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.45) 52%, transparent 64%);
@@ -171,6 +173,10 @@
   }
   .sochi-sky__stars span {
     animation: none;
+  }
+  .sochi-sky__sun,
+  .sochi-sky__moon {
+    box-shadow: none;
   }
 }
 

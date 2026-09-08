@@ -22,6 +22,18 @@ export async function getSettingsHealth() {
   const more: SettingsHealthItem[] = [
     { id: 'social', label: 'Соцсети', ok: Boolean(s?.vkLink || s?.tgLink || s?.maxLink), href: '/admin/settings?tab=social', group: 'more' },
     { id: 'smtp', label: 'Почта', ok: Boolean(s?.smtpHost), href: '/admin/settings?tab=smtp', group: 'more' },
+    {
+      id: 'sms',
+      label: 'SMS',
+      ok:
+        String(s?.smsProvider || '') === 'smsru'
+          ? Boolean(s?.smsApiKey)
+          : String(s?.smsProvider || '') === 'smsc'
+            ? Boolean(s?.smsApiLogin && s?.smsApiKey)
+            : Boolean(s?.smsApiUrl || s?.smsApiKey),
+      href: '/admin/settings?tab=sms',
+      group: 'more',
+    },
     { id: 'legal', label: '152-ФЗ / cookie', ok: true, href: '/admin/settings?tab=legal', group: 'more' },
   ];
   const [projects, clubs, pending] = await Promise.all([

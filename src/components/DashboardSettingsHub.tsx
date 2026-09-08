@@ -220,7 +220,7 @@ export default function DashboardSettingsHub({
               данных профиля
             </button>
           ) : (
-            <Link href="/dashboard#profile-edit">данных профиля</Link>
+            <Link href="/dashboard/edit">данных профиля</Link>
           )}
           .
         </p>
@@ -363,9 +363,11 @@ export default function DashboardSettingsHub({
               <span>Новый пароль</span>
               <input name="password" type="password" autoComplete="new-password" minLength={10} required />
             </label>
-            <button type="submit" className="btn btn-primary" disabled={profileSaving}>
-              Обновить пароль
-            </button>
+            <div className="yp-form-z">
+              <button type="submit" className="btn btn-primary" disabled={profileSaving}>
+                Обновить пароль
+              </button>
+            </div>
           </form>
         </section>
       ) : null}
@@ -532,7 +534,7 @@ export default function DashboardSettingsHub({
       {section === 'messengers' ? (
         <p className="settings-hub-foot" style={{ marginTop: '1rem' }}>
           <Link2 size={14} aria-hidden /> Ссылки на соцсети также можно указать в{' '}
-          <Link href="/dashboard#profile-edit">данных профиля</Link>.
+          <Link href="/dashboard/edit">данных профиля</Link>.
         </p>
       ) : null}
     </div>

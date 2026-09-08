@@ -154,7 +154,7 @@ export default async function RootLayout({
                 boxShadow: '0 10px 28px rgba(15,23,42,0.14)',
               },
               success: { duration: 2800 },
-              error: { duration: 4500 },
+              error: { duration: 5000 },
             }}
           />
           <HideOnPaths>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requirePermission, aclJsonError } from '@/lib/acl';
+import { excludeTechWhere } from '@/lib/tech-visibility';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,7 @@ export async function GET(req: Request) {
   const users = await prisma.user.findMany({
     where: {
       deletedAt: null,
+      ...excludeTechWhere(),
       OR: [
         { email: { contains: q, mode: 'insensitive' } },
         { name: { contains: q, mode: 'insensitive' } },

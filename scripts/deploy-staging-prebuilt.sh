@@ -98,6 +98,18 @@ sudo -n chown -R 1000:1000 /opt/sochi-portal/public/uploads 2>/dev/null || sudo 
 sudo -n docker build -f "$EXTRACT/Dockerfile.prebuilt" -t sochi-staging_web:latest "$EXTRACT"
 sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml up -d --no-build web
 
+# Additive column: prisma db push is blocked by leftover User.featureConsentsJson
+# (do not --accept-data-loss). Nullable TEXT is safe on the shared DB.
+DB_CTR="$(sudo -n docker ps --format '{{.Names}}' | grep -E 'sochi-portal.*db|_db_' | head -1 || true)"
+if [[ -n "$DB_CTR" ]]; then
+  echo "==> ensure SiteSettings.oauthSsoJson exists ($DB_CTR)"
+  sudo -n docker exec "$DB_CTR" psql -U sochi -d sochi_portal -v ON_ERROR_STOP=1 \
+    -c 'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "oauthSsoJson" TEXT;' \
+    || echo "WARN: ALTER oauthSsoJson failed"
+else
+  echo "WARN: postgres container not found for oauthSsoJson" >&2
+fi
+
 if [[ "$NEW_SHA" == "$OLD_SHA" ]]; then
   echo "==> prisma schema unchanged, skip db push"
 else
@@ -115,7 +127,7 @@ else
         -v "$APP/scripts/prisma-push.config.mjs:/work/prisma.config.mjs:ro" \
         -w /work \
         node:22-bookworm-slim \
-        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs --accept-data-loss'; then
+        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs'; then
       pushed=1
     fi
   fi
@@ -158,19 +170,19 @@ yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-stg-pre-remote.sh"
 rm -f "$REMOTE_SCRIPT"
 yp_ssh "bash /var/tmp/yp-stg-pre-remote.sh; ec=\$?; rm -f /var/tmp/yp-stg-pre-remote.sh; exit \$ec"
 
-echo "==> verify https://${STAGING_DOMAIN}/api/health == ${EXPECTED_VER}"
+echo "==> verify https://${STAGING_DOMAIN}/api/health (public: ok only; version on :3001)"
 ok=0
 for i in 1 2 3 4 5 6; do
   body="$(curl -fsS --max-time 12 "https://${STAGING_DOMAIN}/api/health" || true)"
   echo "  try $i: $body"
-  if echo "$body" | grep -q "\"version\":\"${EXPECTED_VER}\""; then
+  if echo "$body" | grep -qE '"status":"ok"|"ok":true'; then
     ok=1
     break
   fi
   sleep 3
 done
 if [[ "$ok" != "1" ]]; then
-  echo "ERROR: staging version mismatch (expected $EXPECTED_VER)" >&2
+  echo "ERROR: staging public health not ok" >&2
   exit 1
 fi
 echo "==> ty ready https://${STAGING_DOMAIN}/"

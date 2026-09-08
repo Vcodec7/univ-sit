@@ -10,14 +10,13 @@ import Link from 'next/link';
 import { RU_EMAIL_HINT, isRussianEmail } from '@/lib/ru-email';
 import { safeCallbackUrl } from '@/lib/safe-callback-url';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
-import { formatPhoneMaskInput, normalizePhone } from '@/lib/phone';
 import PasswordMeter from '@/components/PasswordMeter';
+import SocialAuthButtons, { type SocialAuthFlags } from '@/components/SocialAuthButtons';
 
 function RegisterForm() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
@@ -27,6 +26,8 @@ function RegisterForm() {
   const [error, setError] = useState('');
   const [fieldErr, setFieldErr] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [emailConflict, setEmailConflict] = useState(false);
+  const [oauth, setOauth] = useState<SocialAuthFlags>({});
   const [registrationEnabled, setRegistrationEnabled] = useState(true);
   const router = useRouter();
   const searchParams = useSafeSearchParams();
@@ -47,7 +48,28 @@ function RegisterForm() {
       .then((r) => r.json())
       .then((d) => {
         if (d && d.registrationEnabled === false) setRegistrationEnabled(false);
+        if (d?.oauth) {
+          setOauth({
+            vk: Boolean(d.oauth.vk),
+            yandex: Boolean(d.oauth.yandex),
+            telegram: Boolean(d.oauth.telegram),
+            telegramBot: d.oauth.telegramBot || '',
+            esia: Boolean(d.oauth.esia),
+          });
+        }
       })
+      .catch(() => undefined);
+    fetch('/api/auth/providers')
+      .then((r) => r.json())
+      .then((p) =>
+        setOauth((prev) => ({
+          ...prev,
+          yandex: Boolean(p?.yandex) || prev.yandex,
+          vk: Boolean(p?.vk) || prev.vk,
+          telegram: Boolean(p?.telegram) || prev.telegram,
+          esia: Boolean(p?.esia) || prev.esia,
+        }))
+      )
       .catch(() => undefined);
   }, []);
 
@@ -74,11 +96,9 @@ function RegisterForm() {
     } else if (!/[A-Za-zА-Яа-яЁё]/.test(password) || !/\d/.test(password)) {
       nextErr.password = 'Пароль должен содержать буквы и цифры';
     }
+    setEmailConflict(false);
     if (password !== password2) {
       nextErr.password2 = 'Пароли не совпадают';
-    }
-    if (normalizePhone(phone).length < 11) {
-      nextErr.phone = 'Укажите телефон в формате +7 (XXX) XXX-XX-XX';
     }
     if (!privacyAccepted) {
       nextErr.privacy = 'Примите политику и правила';
@@ -113,10 +133,6 @@ function RegisterForm() {
         return;
       }
     }
-    if (phone.replace(/\D/g, '').length < 11) {
-      setError('Укажите корректный российский телефон');
-      return;
-    }
     if (!captchaToken) {
       setError('Пройдите проверку «я не робот»');
       return;
@@ -139,7 +155,6 @@ function RegisterForm() {
         body: JSON.stringify({
           name,
           email,
-          phone,
           password,
           birthDate,
           privacyAccepted: true,
@@ -180,6 +195,11 @@ function RegisterForm() {
         }
       } else {
         const data = await res.json().catch(() => ({}));
+        if (res.status === 409 || data.code === 'EMAIL_EXISTS') {
+          setEmailConflict(true);
+          setError('');
+          return;
+        }
         setError(data.message || 'Ошибка при регистрации');
       }
     } catch {
@@ -196,14 +216,33 @@ function RegisterForm() {
         <p className="yp-auth-brand">Молодёжь Сочи</p>
         <h1 className="yp-auth-title">Регистрация</h1>
         <p className="yp-auth-lead">
-          Простая форма, жёсткая проверка: email-код, возраст 14+, согласия и пароль с буквами и цифрами.
+          Имя, фамилия, email и пароль — или вход через VK, Telegram и Яндекс без пароля.
         </p>
+
+        {registrationEnabled ? (
+          <SocialAuthButtons oauth={oauth} callbackUrl={safeCallbackUrl(callbackUrl, '/dashboard')} />
+        ) : null}
 
         {!registrationEnabled ? (
           <div className="yp-auth-alert yp-auth-alert--warn">
             Регистрация временно закрыта администрацией. Если у вас уже есть аккаунт —{' '}
             <Link href={withCallback('/login')}>войдите</Link>
             . Вопросы — через <Link href="/contacts">контакты</Link>.
+          </div>
+        ) : null}
+
+        {emailConflict ? (
+          <div className="yp-auth-alert yp-auth-alert--warn">
+            Аккаунт с такой почтой уже существует.
+            <div className="yp-auth-conflict-actions">
+              <Link
+                className="btn btn-primary"
+                href={`/login?email=${encodeURIComponent(email.trim())}`}
+              >
+                Войти по этому Email
+              </Link>
+              <Link href="/forgot-password">Восстановить пароль</Link>
+            </div>
           </div>
         ) : null}
 
@@ -269,25 +308,6 @@ function RegisterForm() {
             {fieldErr.email ? <p className="yp-auth-hint" style={{ color: '#b91c1c' }}>{fieldErr.email}</p> : (
             <p className="yp-auth-hint">{RU_EMAIL_HINT}</p>
             )}
-          </div>
-
-          <div>
-            <label className="yp-auth-label">Телефон</label>
-            <input
-              type="tel"
-              autoComplete="tel"
-              name="phone"
-              value={phone}
-              onChange={(e) => {
-                setPhone(formatPhoneMaskInput(e.target.value));
-                setFieldErr((p) => ({ ...p, phone: '' }));
-              }}
-              required
-              disabled={loading}
-              className="yp-auth-input"
-              placeholder="+7 (999) 000-00-00"
-            />
-            {fieldErr.phone ? <p className="yp-auth-hint" style={{ color: '#b91c1c' }}>{fieldErr.phone}</p> : null}
           </div>
 
           <div>
@@ -368,15 +388,7 @@ function RegisterForm() {
               <Link href="/privacy" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
                 Политику конфиденциальности
               </Link>
-              {', '}
-              <Link href="/rules" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
-                Правила сайта
-              </Link>
-              {' и '}
-              <Link href="/terms" target="_blank" rel="noreferrer" style={{ fontWeight: 800, textDecoration: 'underline' }}>
-                Пользовательское соглашение
-              </Link>
-              .
+              . Правила отдельных сервисов (коворкинг, портфолио) показываем в момент использования.
             </span>
           </label>
           {fieldErr.privacy ? <p className="yp-auth-hint" style={{ color: '#b91c1c' }}>{fieldErr.privacy}</p> : null}

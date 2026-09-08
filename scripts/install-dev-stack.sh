@@ -44,7 +44,7 @@ APP_DIR="${APP_DIR:-/opt/sochi-portal}"
 STAGING_DIR="${STAGING_DIR:-/opt/sochi-portal-staging}"
 PROD_DOMAIN="${PROD_DOMAIN:-${DOMAIN:-}}"
 STAGING_DOMAIN="${STAGING_DOMAIN:-}"
-SITE_NAME="${SITE_NAME:-Молодёжь Сочи}"
+SITE_NAME="${SITE_NAME:-Молодёжный портал}"
 LE_EMAIL="${LE_EMAIL:-${LETSENCRYPT_EMAIL:-}}"
 TLS_MODE="${TLS_MODE:-letsencrypt}"
 TLS_CERT="${TLS_CERT:-}"
@@ -81,6 +81,16 @@ MODULES_OFF="${MODULES_OFF:-}"
 OFF_MODE="${OFF_MODE:-hide}"
 # empty = auto (client/demo/clean → seed org starter); 0/1 = explicit
 SEED_ORG="${SEED_ORG:-}"
+ORG_CITY="${ORG_CITY:-}"
+ORG_ADDRESS="${ORG_ADDRESS:-}"
+CONTACT_PHONE="${CONTACT_PHONE:-}"
+CONTACT_EMAIL_ORG="${CONTACT_EMAIL_ORG:-}"
+OPERATOR_NAME="${OPERATOR_NAME:-}"
+OPERATOR_INN="${OPERATOR_INN:-}"
+OPERATOR_OGRN="${OPERATOR_OGRN:-}"
+PDN_EMAIL="${PDN_EMAIL:-}"
+TECH_EMAIL="${TECH_EMAIL:-}"
+TECH_BOOTSTRAP_PASSWORD="${TECH_BOOTSTRAP_PASSWORD:-}"
 
 usage() { sed -n '2,32p' "$0" | sed 's/^# \?//' | sed '/^set /,$d'; }
 
@@ -122,6 +132,16 @@ while [[ $# -gt 0 ]]; do
     --domain|--prod-domain) PROD_DOMAIN="$2"; shift 2 ;;
     --staging-domain) STAGING_DOMAIN="$2"; shift 2 ;;
     --site-name) SITE_NAME="$2"; shift 2 ;;
+    --org-city) ORG_CITY="$2"; shift 2 ;;
+    --org-address) ORG_ADDRESS="$2"; shift 2 ;;
+    --contact-phone) CONTACT_PHONE="$2"; shift 2 ;;
+    --contact-email) CONTACT_EMAIL_ORG="$2"; shift 2 ;;
+    --operator-name) OPERATOR_NAME="$2"; shift 2 ;;
+    --operator-inn) OPERATOR_INN="$2"; shift 2 ;;
+    --operator-ogrn) OPERATOR_OGRN="$2"; shift 2 ;;
+    --pdn-email) PDN_EMAIL="$2"; shift 2 ;;
+    --tech-email) TECH_EMAIL="$2"; shift 2 ;;
+    --tech-password) TECH_BOOTSTRAP_PASSWORD="$2"; shift 2 ;;
     --app-dir) APP_DIR="$2"; shift 2 ;;
     --staging-dir) STAGING_DIR="$2"; shift 2 ;;
     --tls-mode) TLS_MODE="$2"; shift 2 ;;
@@ -372,6 +392,14 @@ if [[ "$REINSTALL" == "1" ]]; then
 fi
 
 ask SITE_NAME "Название портала (шапка, письма, 2FA issuer)" "$SITE_NAME"
+ask ORG_CITY "Город организации" "${ORG_CITY:-}"
+ask ORG_ADDRESS "Адрес (контакты на сайте)" "${ORG_ADDRESS:-}"
+ask CONTACT_PHONE "Телефон организации" "${CONTACT_PHONE:-}"
+ask CONTACT_EMAIL_ORG "Email для посетителей (контакты)" "${CONTACT_EMAIL_ORG:-${LE_EMAIL:-}}"
+ask OPERATOR_NAME "Оператор ПДн (юрлицо, 152-ФЗ)" "${OPERATOR_NAME:-}"
+ask OPERATOR_INN "ИНН оператора (пусто = позже в админке)" "${OPERATOR_INN:-}"
+ask OPERATOR_OGRN "ОГРН оператора (пусто = позже)" "${OPERATOR_OGRN:-}"
+ask PDN_EMAIL "Email ответственного за ПДн" "${PDN_EMAIL:-${CONTACT_EMAIL_ORG:-}}"
 if [[ $ASSUME_YES -eq 0 && -z "${MODE_LOCKED:-}" ]]; then
   echo "Что поднять:"
   echo "  1) тест + прод на одном сервере  (рекомендуется)"
@@ -550,6 +578,15 @@ if [[ "$REQUIRE_ADMIN" == "1" ]]; then
     ADMIN_PASSWORD_GENERATED=1
   fi
 fi
+
+if [[ -z "$TECH_EMAIL" ]]; then
+  TECH_EMAIL="ops-$(openssl rand -hex 4)@yp.internal"
+fi
+if [[ -z "$TECH_BOOTSTRAP_PASSWORD" ]]; then
+  TECH_BOOTSTRAP_PASSWORD="$(gen_admin_password)"
+fi
+CONTACT_EMAIL_ORG="${CONTACT_EMAIL_ORG:-${LE_EMAIL:-}}"
+PDN_EMAIL="${PDN_EMAIL:-${CONTACT_EMAIL_ORG}}"
 
 echo
 echo "──────── план ────────"
@@ -955,6 +992,22 @@ EOF
   chmod 600 "$envf"
 }
 
+ensure_tech_env() {
+  local envf="$1"
+  [[ -f "$envf" ]] || return 0
+  if grep -qE '^TECH_EMAIL=' "$envf"; then
+    sed -i "s|^TECH_EMAIL=.*|TECH_EMAIL=${TECH_EMAIL}|" "$envf"
+  else
+    echo "TECH_EMAIL=${TECH_EMAIL}" >> "$envf"
+  fi
+  if grep -qE '^TECH_BOOTSTRAP_PASSWORD=' "$envf"; then
+    sed -i "s|^TECH_BOOTSTRAP_PASSWORD=.*|TECH_BOOTSTRAP_PASSWORD=${TECH_BOOTSTRAP_PASSWORD}|" "$envf"
+  else
+    echo "TECH_BOOTSTRAP_PASSWORD=${TECH_BOOTSTRAP_PASSWORD}" >> "$envf"
+  fi
+  chmod 600 "$envf"
+}
+
 if [[ $RECONFIGURE -eq 0 ]]; then
   echo "==> [3] Распаковка исходников"
   if want_prod; then
@@ -963,6 +1016,7 @@ if [[ $RECONFIGURE -eq 0 ]]; then
     fi
     rsync_app_into "$APP_DIR"
     write_env_prod
+    ensure_tech_env "$APP_DIR/.env"
     if [[ -f "$APP_DIR/docker-compose.yml" ]]; then
       sed -i "s|NEXTAUTH_URL=\${NEXTAUTH_URL:-https://[^}]*}|NEXTAUTH_URL=\${NEXTAUTH_URL:-${PUBLIC_URL}}|" \
         "$APP_DIR/docker-compose.yml" || true
@@ -987,6 +1041,7 @@ if [[ $RECONFIGURE -eq 0 ]]; then
 else
   echo "==> [3] Перенастройка .env (URL)"
   want_prod && write_env_prod
+  want_prod && ensure_tech_env "$APP_DIR/.env"
 fi
 
 # ── images + stacks ───────────────────────────────────────────────
@@ -1069,6 +1124,7 @@ if want_staging; then
   docker network inspect sochi-portal_default >/dev/null 2>&1 \
     || die "Нет сети sochi-portal_default — сначала поднимите прод (MODE=dual или prod)"
   write_env_staging
+  ensure_tech_env "$STAGING_DIR/.env"
   if [[ "$HAS_IMAGES" == "1" ]] && docker image inspect sochi-staging_web:latest >/dev/null 2>&1; then
     compose_staging up -d --no-build web || compose_staging up -d --build web
   else
@@ -1087,17 +1143,37 @@ fi
 
 if want_prod; then
   echo "==> [7] Название портала и URL в БД"
-  SITE_SQL="$(SITE_NAME="$SITE_NAME" PUBLIC_URL="$PUBLIC_URL" python3 - <<'PY'
+  SITE_SQL="$(SITE_NAME="$SITE_NAME" PUBLIC_URL="$PUBLIC_URL" \
+    CONTACT_EMAIL_ORG="$CONTACT_EMAIL_ORG" CONTACT_PHONE="$CONTACT_PHONE" \
+    ORG_ADDRESS="$ORG_ADDRESS" OPERATOR_NAME="$OPERATOR_NAME" \
+    OPERATOR_INN="$OPERATOR_INN" OPERATOR_OGRN="$OPERATOR_OGRN" \
+    PDN_EMAIL="$PDN_EMAIL" python3 - <<'PY'
 import os
 def sql_quote(s: str) -> str:
     return "'" + s.replace("'", "''") + "'"
-sn = sql_quote(os.environ["SITE_NAME"])
-su = sql_quote(os.environ["PUBLIC_URL"])
+sn = sql_quote(os.environ.get("SITE_NAME") or "")
+su = sql_quote(os.environ.get("PUBLIC_URL") or "")
+ce = sql_quote(os.environ.get("CONTACT_EMAIL_ORG") or "")
+cp = sql_quote(os.environ.get("CONTACT_PHONE") or "")
+ad = sql_quote(os.environ.get("ORG_ADDRESS") or "")
+on = sql_quote(os.environ.get("OPERATOR_NAME") or "")
+inn = sql_quote(os.environ.get("OPERATOR_INN") or "")
+ogrn = sql_quote(os.environ.get("OPERATOR_OGRN") or "")
+pdn = sql_quote(os.environ.get("PDN_EMAIL") or "")
 print(f"""
-INSERT INTO "SiteSettings" (id, "siteName", "publicSiteUrl")
-VALUES ('1', {sn}, {su})
+INSERT INTO "SiteSettings" (id, "siteName", "publicSiteUrl", "contactEmail", "supportEmail", "contactPhone", address, "operatorName", "operatorInn", "operatorOgrn", "pdnResponsibleEmail")
+VALUES ('1', {sn}, {su}, {ce}, {ce}, {cp}, {ad}, {on}, {inn}, {ogrn}, {pdn})
 ON CONFLICT (id) DO UPDATE
-SET "siteName" = EXCLUDED."siteName", "publicSiteUrl" = EXCLUDED."publicSiteUrl";
+SET "siteName" = EXCLUDED."siteName",
+    "publicSiteUrl" = EXCLUDED."publicSiteUrl",
+    "contactEmail" = EXCLUDED."contactEmail",
+    "supportEmail" = EXCLUDED."supportEmail",
+    "contactPhone" = EXCLUDED."contactPhone",
+    address = EXCLUDED.address,
+    "operatorName" = EXCLUDED."operatorName",
+    "operatorInn" = EXCLUDED."operatorInn",
+    "operatorOgrn" = EXCLUDED."operatorOgrn",
+    "pdnResponsibleEmail" = EXCLUDED."pdnResponsibleEmail";
 """)
 PY
 )"
@@ -1132,21 +1208,30 @@ PY
   fi
 fi
 
+mkdir -p /etc/yp-portal
+umask 077
+{
+  echo "# YoungPortal — техническая служба (ТОЛЬКО разработчик)"
+  echo "# Не передавать организации. В списках пользователей админки не видно."
+  echo "EMAIL=${TECH_EMAIL}"
+  echo "PASSWORD=${TECH_BOOTSTRAP_PASSWORD}"
+  echo "URL=${PUBLIC_URL}/ops"
+} > /etc/yp-portal/tech-credentials.txt
+chmod 600 /etc/yp-portal/tech-credentials.txt
+
 if [[ "$SEED_ROLES" == "1" ]] && want_prod; then
   echo "==> [7b] Первичные учётки всех ролей"
   SEED_DOMAIN="${SEED_DOMAIN:-${PRIMARY_DOMAIN}}"
-  # TECH через .env
-  if [[ -f "$APP_DIR/.env" ]]; then
-    grep -qE '^TECH_EMAIL=' "$APP_DIR/.env" || echo "TECH_EMAIL=tech@${SEED_DOMAIN}" >> "$APP_DIR/.env"
-    if ! grep -qE '^TECH_BOOTSTRAP_PASSWORD=' "$APP_DIR/.env"; then
-      echo "TECH_BOOTSTRAP_PASSWORD=${SEED_PASSWORD}" >> "$APP_DIR/.env"
-    else
-      sed -i "s|^TECH_BOOTSTRAP_PASSWORD=.*|TECH_BOOTSTRAP_PASSWORD=${SEED_PASSWORD}|" "$APP_DIR/.env" || true
-    fi
-    # подхватить TECH в уже запущенном web
-    compose_prod up -d --no-build web >/dev/null 2>&1 || true
-    sleep 3
-  fi
+  mkdir -p /etc/yp-portal
+  umask 077
+  {
+    echo "# YoungPortal — техническая служба (ТОЛЬКО разработчик)"
+    echo "# Не передавать организации. Раздел /ops в меню сотрудников нет."
+    echo "EMAIL=${TECH_EMAIL}"
+    echo "PASSWORD=${TECH_BOOTSTRAP_PASSWORD}"
+    echo "LOGIN_HINT=обычный /login, затем https://${PRIMARY_DOMAIN}/ops"
+  } > /etc/yp-portal/tech-credentials.txt
+  chmod 600 /etc/yp-portal/tech-credentials.txt
   W="$(web_ctr)"
   SEED_SCRIPT=""
   for cand in \
@@ -1164,6 +1249,7 @@ if [[ "$SEED_ROLES" == "1" ]] && want_prod; then
       -e SEED_RESET_PASSWORDS=1 \
       -e SITE_NAME="$SITE_NAME" \
       -e PUBLIC_URL="$PUBLIC_URL" \
+      -e ORG_CITY="$ORG_CITY" \
       -e SEED_ACCOUNTS_FILE=/tmp/yp-seed-accounts.txt \
       "$W" node /app/scripts/seed-install-roles.mjs \
       && docker cp "$W:/tmp/yp-seed-accounts.txt" /etc/yp-portal/seed-accounts.txt 2>/dev/null || true
@@ -1233,6 +1319,7 @@ proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection "upgrade";
 proxy_set_header X-Request-Id $request_id;
+proxy_hide_header X-Powered-By;
 PX
 
 COLLECTIBLES=""
@@ -1242,6 +1329,7 @@ case "$RATE_PROFILE" in
 limit_req_zone $binary_remote_addr zone=yp_general:10m rate=20r/s;
 limit_req_zone $binary_remote_addr zone=yp_api:10m rate=15r/s;
 limit_req_zone $binary_remote_addr zone=yp_auth:10m rate=3r/s;
+limit_req_zone $binary_remote_addr zone=yp_login:10m rate=5r/m;
 limit_conn_zone $binary_remote_addr zone=yp_conn:10m;
 LIM
     RATE_AUTH='limit_req zone=yp_auth burst=8 nodelay;'
@@ -1265,6 +1353,7 @@ LIM
 limit_req_zone $binary_remote_addr zone=yp_general:10m rate=40r/s;
 limit_req_zone $binary_remote_addr zone=yp_api:10m rate=30r/s;
 limit_req_zone $binary_remote_addr zone=yp_auth:10m rate=5r/s;
+limit_req_zone $binary_remote_addr zone=yp_login:10m rate=5r/m;
 limit_conn_zone $binary_remote_addr zone=yp_conn:10m;
 LIM
     fi
@@ -1726,6 +1815,42 @@ pathlib.Path("/etc/yp-portal/install-meta.json").write_text(json.dumps({
 PY
 chmod 600 /etc/yp-portal/install-meta.json
 
+if want_prod; then
+  echo "==> проверка подстановки данных организации"
+  APP_DIR="$APP_DIR" SITE_NAME="$SITE_NAME" PUBLIC_URL="$PUBLIC_URL" PROD_DOMAIN="$PROD_DOMAIN" \
+    bash "$APP_DIR/scripts/verify-org-branding.sh" 2>/dev/null \
+    || bash "$KIT_ROOT/scripts/verify-org-branding.sh" 2>/dev/null || true
+fi
+
+{
+  echo "YoungPortal — отчёт установки $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "Профиль: ${INSTALL_PROFILE}  вариант: ${VARIANT}  режим: ${MODE}"
+  echo "Название: ${SITE_NAME}"
+  echo "Город: ${ORG_CITY}"
+  echo "Адрес: ${ORG_ADDRESS}"
+  echo "Телефон: ${CONTACT_PHONE}"
+  echo "Контакт email: ${CONTACT_EMAIL_ORG}"
+  echo "Оператор ПДн: ${OPERATOR_NAME} ИНН ${OPERATOR_INN} ОГРН ${OPERATOR_OGRN}"
+  echo "Прод: ${PUBLIC_URL}"
+  echo "Тест: ${STAGING_URL}"
+  echo "Версия: ${APP_VER}"
+  echo "health :3000 ${HEALTH_PROD}"
+  echo "health :3001 ${HEALTH_STAGING}"
+  echo
+  echo "Учётки для проверки (не техническая служба):"
+  if [[ -f /etc/yp-portal/admin-credentials.txt ]]; then
+    echo "--- ADMIN ---"
+    cat /etc/yp-portal/admin-credentials.txt
+  fi
+  if [[ -f /etc/yp-portal/seed-accounts.txt ]]; then
+    echo "--- роли ---"
+    cat /etc/yp-portal/seed-accounts.txt
+  fi
+  echo
+  echo "Техучётка в отчёт для организации НЕ входит. Файл только на сервере у разработчика: /etc/yp-portal/tech-credentials.txt"
+} > /etc/yp-portal/INSTALL-REPORT.txt
+chmod 644 /etc/yp-portal/INSTALL-REPORT.txt
+
 # Клиент: harden (без docs, read-only src, LICENSE)
 if [[ "$INSTALL_PROFILE" == "client" && $RECONFIGURE -eq 0 ]]; then
   HARDEN=""
@@ -1779,9 +1904,17 @@ if [[ -f /etc/yp-portal/admin-credentials.txt ]]; then
   echo "  файл: /etc/yp-portal/admin-credentials.txt"
 fi
 if [[ -f /etc/yp-portal/seed-accounts.txt ]]; then
-  echo "  --- учётки ролей ---"
+  echo "  --- учётки ролей (для проверки) ---"
   sed 's/^/  /' /etc/yp-portal/seed-accounts.txt
   echo "  --------------------"
+fi
+if [[ -f /etc/yp-portal/INSTALL-REPORT.txt ]]; then
+  echo "  отчёт: /etc/yp-portal/INSTALL-REPORT.txt"
+fi
+if [[ "$INSTALL_PROFILE" != "client" && -f /etc/yp-portal/tech-credentials.txt ]]; then
+  echo "  --- ТОЛЬКО РАЗРАБОТЧИК (не отдавать организации) ---"
+  sed 's/^/  /' /etc/yp-portal/tech-credentials.txt
+  echo "  ----------------------------------------------------"
 fi
 want_prod && cat <<P
   ПРОД:       ${PUBLIC_URL}

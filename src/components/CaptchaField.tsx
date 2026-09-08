@@ -1,9 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 
-type Tile = { id: string; emoji: string; label: string };
+type Tile = { id: string; src: string };
+
+function CaptchaTileCanvas({ src }: { src: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    let dead = false;
+    const run = async () => {
+      const res = await fetch(src, { cache: 'no-store' });
+      if (!res.ok || dead) return;
+      const blob = await res.blob();
+      const bmp = await createImageBitmap(blob);
+      if (dead) return;
+      const c = ref.current;
+      if (!c) return;
+      c.width = 96;
+      c.height = 96;
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 96, 96);
+      ctx.drawImage(bmp, 0, 0, 96, 96);
+    };
+    void run();
+    return () => {
+      dead = true;
+    };
+  }, [src]);
+  return <canvas ref={ref} width={96} height={96} aria-hidden style={{ width: '100%', height: 'auto', display: 'block' }} />;
+}
 
 type Props = {
   /** Called whenever a fresh solved token is ready (or cleared) */
@@ -138,18 +165,15 @@ export default function CaptchaField({ onToken, className }: Props) {
                 onClick={() => toggle(t.id)}
                 disabled={busy || solved}
                 aria-pressed={on}
-                aria-label={t.label}
                 style={{
-                  fontSize: '1.65rem',
-                  lineHeight: 1.2,
-                  padding: '0.55rem 0.2rem',
+                  padding: '0.35rem',
                   borderRadius: 10,
                   border: on ? '2px solid var(--primary, #0d9488)' : '1px solid rgba(0,0,0,0.12)',
                   background: on ? 'color-mix(in srgb, var(--primary, #0d9488) 12%, #fff)' : '#fff',
                   cursor: busy || solved ? 'default' : 'pointer',
                 }}
               >
-                <span aria-hidden>{t.emoji}</span>
+                <CaptchaTileCanvas src={t.src} />
               </button>
             );
           })}

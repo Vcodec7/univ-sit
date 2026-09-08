@@ -22,6 +22,8 @@ import { SLOT_LABELS, COSMETIC_PREVIEW, type CosmeticSlot, type EcoLoadout } fro
 import EcoPoolHint from '@/components/EcoPoolHint';
 import { fetchEcoCached, invalidateEcoCache } from '@/lib/user-data-client';
 import { POINTS } from '@/lib/points-labels';
+import { useSession } from 'next-auth/react';
+import UserAvatar from '@/components/UserAvatar';
 
 const SLOT_ICONS: Record<CosmeticSlot, LucideIcon> = {
   frame: Circle,
@@ -72,6 +74,8 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
   const [busyId, setBusyId] = useState<string | null>(null);
   const [shopOpen, setShopOpen] = useState(resolvedMode === 'shop' || resolvedMode === 'full');
   const [openSlot, setOpenSlot] = useState<CosmeticSlot | null>('frame');
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const { data: session } = useSession();
   const { setLoadoutLocal } = useVoiceActions();
   const postLock = useRef(false);
   const onBalanceRef = useRef(onBalanceChange);
@@ -279,6 +283,17 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
     [catalog]
   );
 
+  const previewItem = useMemo(() => {
+    const id =
+      previewId ||
+      catalog.find((c) => c.slot === 'frame' && c.equipped)?.id ||
+      catalog.find((c) => c.slot === 'frame')?.id;
+    return catalog.find((c) => c.id === id) || null;
+  }, [catalog, previewId]);
+  const previewMeta = previewItem
+    ? COSMETIC_PREVIEW[previewItem.id] || { glyph: '▣', tint: '#8562d8' }
+    : null;
+
   if (resolvedMode === 'card') {
     return (
       <section className="eco-card" aria-label={POINTS.shop.wallet}>
@@ -371,6 +386,27 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
 
       <EcoPoolHint variant="shop" />
 
+      {resolvedMode === 'shop' || resolvedMode === 'full' ? (
+        <div className="eco-live-preview" aria-label="Примерка на аватаре">
+          <div
+            className="eco-live-preview__ring"
+            data-slot={previewItem?.slot || 'frame'}
+            style={{ ['--preview' as string]: previewMeta?.tint || '#8562d8' }}
+          >
+            <UserAvatar name={session?.user?.name} image={session?.user?.image || null} size={88} />
+          </div>
+          <div className="eco-live-preview__meta">
+            <span className="eco-live-preview__kicker">Как будет выглядеть</span>
+            <strong>{previewItem?.label || 'Выберите рамку'}</strong>
+            <p>
+              {previewItem?.slot === 'frame' || previewItem?.slot === 'aura'
+                ? 'Примерка на вашем текущем аватаре. Купите или наденьте, чтобы закрепить в профиле.'
+                : 'Наведите на карточку товара, чтобы примерить цвет и акцент.'}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       {equippedLook.length > 0 ? (
         <div className="eco-look" aria-label="Текущий образ">
           <span className="eco-look__label">Ваш образ</span>
@@ -439,7 +475,7 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
                 <span className="eco-panel__slot-count">{items.length}</span>
               </summary>
               {openSlot === slot ? (
-              <ul className="eco-panel__catalog eco-panel__catalog--rich">
+              <ul className="eco-panel__catalog eco-panel__catalog--rich eco-panel__catalog--grid">
                 {items.map((item) => {
                   const preview = COSMETIC_PREVIEW[item.id] || {
                     glyph:
@@ -449,9 +485,11 @@ export default function EcoPointsPanel({ compact, mode, onBalanceChange }: Props
                   return (
                   <li
                     key={item.id}
-                    className={`eco-shop-card${item.owned ? ' is-owned' : ''}${item.equipped ? ' is-equipped' : ''}`}
+                    className={`eco-shop-card${item.owned ? ' is-owned' : ''}${item.equipped ? ' is-equipped' : ''}${previewId === item.id ? ' is-preview' : ''}`}
                     data-slot={slot}
                     data-preview={item.id}
+                    onMouseEnter={() => setPreviewId(item.id)}
+                    onFocus={() => setPreviewId(item.id)}
                   >
                     <div
                       className="eco-shop-card__visual"
