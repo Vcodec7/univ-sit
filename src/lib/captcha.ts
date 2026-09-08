@@ -140,38 +140,38 @@ export async function renderCaptchaTilePng(challengeId: string, tileId: string):
 }
 
 function captchaTileSvg(tag: TileTag): string {
-  const bg = '#eef3f8';
+  const bg = '#f4f6f8';
+  const ink = '#334155';
   if (tag === 'tree') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
-      <rect width="128" height="128" rx="18" fill="${bg}"/>
-      <polygon points="64,18 108,78 20,78" fill="#2f7d32"/>
-      <rect x="56" y="76" width="16" height="28" rx="3" fill="#6d4c41"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none">
+      <rect width="128" height="128" rx="16" fill="${bg}"/>
+      <polygon points="64,22 104,78 24,78" fill="#3d6b40" stroke="${ink}" stroke-width="2"/>
+      <rect x="58" y="76" width="12" height="26" fill="#475569" stroke="${ink}" stroke-width="2"/>
     </svg>`;
   }
   if (tag === 'car') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
-      <rect width="128" height="128" rx="18" fill="${bg}"/>
-      <rect x="22" y="52" width="84" height="28" rx="10" fill="#1565c0"/>
-      <rect x="38" y="40" width="42" height="18" rx="6" fill="#42a5f5"/>
-      <circle cx="42" cy="86" r="10" fill="#263238"/>
-      <circle cx="88" cy="86" r="10" fill="#263238"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none">
+      <rect width="128" height="128" rx="16" fill="${bg}"/>
+      <rect x="24" y="54" width="80" height="26" rx="6" fill="#1e4e8c" stroke="${ink}" stroke-width="2"/>
+      <path d="M40 54 L50 40 H78 L88 54" fill="#1e4e8c" stroke="${ink}" stroke-width="2"/>
+      <circle cx="44" cy="86" r="8" fill="${ink}"/>
+      <circle cx="86" cy="86" r="8" fill="${ink}"/>
     </svg>`;
   }
   if (tag === 'house') {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
-      <rect width="128" height="128" rx="18" fill="${bg}"/>
-      <polygon points="64,20 112,62 16,62" fill="#c62828"/>
-      <rect x="34" y="60" width="60" height="46" fill="#ef9a9a"/>
-      <rect x="56" y="78" width="16" height="28" fill="#6d4c41"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none">
+      <rect width="128" height="128" rx="16" fill="${bg}"/>
+      <polygon points="64,22 108,60 20,60" fill="#9b2c2c" stroke="${ink}" stroke-width="2"/>
+      <rect x="36" y="58" width="56" height="44" fill="#b91c1c" stroke="${ink}" stroke-width="2"/>
+      <rect x="58" y="78" width="12" height="24" fill="${ink}"/>
     </svg>`;
   }
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
-    <rect width="128" height="128" rx="18" fill="${bg}"/>
-    <circle cx="64" cy="70" r="28" fill="#ef6c00"/>
-    <polygon points="42,48 52,28 64,48" fill="#ef6c00"/>
-    <polygon points="86,48 76,28 64,48" fill="#ef6c00"/>
-    <circle cx="54" cy="66" r="4" fill="#3e2723"/>
-    <circle cx="74" cy="66" r="4" fill="#3e2723"/>
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none">
+    <rect width="128" height="128" rx="16" fill="${bg}"/>
+    <circle cx="64" cy="72" r="26" fill="#c05621" stroke="${ink}" stroke-width="2"/>
+    <circle cx="54" cy="68" r="3" fill="${ink}"/>
+    <circle cx="74" cy="68" r="3" fill="${ink}"/>
+    <path d="M48 48 L56 30 L64 48 M80 48 L72 30 L64 48" stroke="${ink}" stroke-width="2" fill="#c05621"/>
   </svg>`;
 }
 

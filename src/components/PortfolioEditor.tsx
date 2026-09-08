@@ -192,7 +192,7 @@ export default function PortfolioEditor() {
               </Link>
               <a
                 href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-                className="btn btn-primary btn-sm"
+                className="btn btn-secondary btn-sm"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -200,24 +200,6 @@ export default function PortfolioEditor() {
               </a>
             </>
           ) : null}
-          <button type="button" className="btn btn-secondary btn-sm" disabled={saving} onClick={() => void save(false)}>
-            Сохранить
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            disabled={saving || submitBlocked}
-            onClick={() => void save(true)}
-            title={
-              portfolio?.status === 'PENDING'
-                ? 'Уже на проверке'
-                : submitBlocked && nextSubmitAt
-                  ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
-                  : undefined
-            }
-          >
-            На проверку
-          </button>
         </div>
         <ul className="pf-studio__stats">
           <li>
@@ -552,7 +534,7 @@ export default function PortfolioEditor() {
           </Link>
           <a
             href={`/api/portfolio/${portfolio.userId}/download?mode=download`}
-            className="btn btn-primary btn-sm"
+            className="btn btn-secondary btn-sm"
             target="_blank"
             rel="noreferrer"
           >
@@ -567,6 +549,28 @@ export default function PortfolioEditor() {
             Печать
           </a>
         </div>
+      ) : null}
+
+      <div className="yp-form-z">
+        <button type="button" className="btn btn-secondary" disabled={saving} onClick={() => void save(false)}>
+          Сохранить
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={saving || submitBlocked}
+          onClick={() => void save(true)}
+          title={
+            portfolio?.status === 'PENDING'
+              ? 'Уже на проверке'
+              : submitBlocked && nextSubmitAt
+                ? `Доступно с ${new Date(nextSubmitAt).toLocaleString('ru-RU')}`
+                : undefined
+          }
+        >
+          На проверку
+        </button>
+      </div>
       ) : null}
     </div>
   );

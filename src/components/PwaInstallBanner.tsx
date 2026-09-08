@@ -72,7 +72,8 @@ function emitPwaVisibility(visible: boolean) {
 export default function PwaInstallBanner({ siteName = 'Молодёжь Сочи' }: { siteName?: string }) {
   const { data: session, status } = useSession();
   const pathname = usePathname() || '';
-  const hideOnForms = pathname.startsWith('/dashboard/edit');
+  const hideOnForms =
+    pathname.startsWith('/dashboard/edit') || pathname.startsWith('/dashboard/settings');
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIos, setIsIos] = useState(false);
   const [standalone, setStandalone] = useState(false);

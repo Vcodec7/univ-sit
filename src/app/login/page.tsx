@@ -87,6 +87,7 @@ function LoginForm() {
         setRegistrationOn(reg);
         setSmsOn(Boolean(d?.smsLoginEnabled));
         setSmsReady(Boolean(d?.smsLoginReady));
+        if (!d?.smsLoginReady) setLoginMode('password');
         setEsiaOn(Boolean(d?.esiaLoginEnabled));
       })
       .catch(() => undefined);
@@ -553,7 +554,7 @@ function LoginForm() {
               )}
 
               <CaptchaField onToken={setCaptchaToken} />
-              {smsOn ? (
+              {smsOn && smsReady ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -572,11 +573,7 @@ function LoginForm() {
                     textAlign: 'left',
                   }}
                 >
-                  {loginMode === 'sms'
-                    ? 'Войти с паролем'
-                    : smsReady
-                      ? 'Войти по телефону и SMS'
-                      : 'Войти по SMS (провайдер не настроен)'}
+                  {loginMode === 'sms' ? 'Войти с паролем' : 'Войти по телефону и SMS'}
                 </button>
               ) : null}
             </>
