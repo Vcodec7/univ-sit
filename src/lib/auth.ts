@@ -13,6 +13,7 @@ import {
   RULES_POLICY_VERSION,
 } from "@/lib/consent-versions";
 import { ageFromVkBdate, verifyTelegramWidget } from "@/lib/telegram-login";
+import { shouldForcePasswordChange } from "@/lib/force-password-change";
 
 async function findUserByLogin(loginRaw: string) {
   const raw = loginRaw.trim();
@@ -355,6 +356,7 @@ export const authOptions: NextAuthOptions = {
           return "/login?error=" + encodeURIComponent("Регистрация доступна с 14 лет");
         }
       }
+      const isOAuth = Boolean(account?.provider) && account.provider !== "credentials";
       if (account?.provider && account.provider !== "credentials" && account.provider !== "telegram") {
         if (user?.id) {
           const row = await prisma.user.findUnique({
@@ -363,6 +365,15 @@ export const authOptions: NextAuthOptions = {
           });
           if (row?.blockedAt || row?.deletedAt) return false;
         }
+      }
+      // OAuth / Telegram: no local password — drop leftover staff "must change password".
+      if (isOAuth && user?.id) {
+        await prisma.user
+          .updateMany({
+            where: { id: user.id, password: null, mustChangePassword: true },
+            data: { mustChangePassword: false },
+          })
+          .catch(() => null);
       }
       return true;
     },
@@ -378,6 +389,7 @@ export const authOptions: NextAuthOptions = {
           typeof (user as any).ecoPoints === "number" ? (user as any).ecoPoints : undefined;
         token.tv = (user as any).tokenVersion ?? 0;
         token.mustChangePassword = Boolean((user as any).mustChangePassword);
+        token.hasPassword = Boolean((user as any).password);
         delete token.error;
       }
       if (token.id) {
@@ -398,6 +410,7 @@ export const authOptions: NextAuthOptions = {
               tokenVersion: true,
               tokenKeepAlive: true,
               mustChangePassword: true,
+              password: true,
               moderationApprovedAt: true,
               createdAt: true,
               lastActiveAt: true,
@@ -444,7 +457,11 @@ export const authOptions: NextAuthOptions = {
             return token;
           }
           token.role = dbUser.role;
-          token.mustChangePassword = Boolean(dbUser.mustChangePassword);
+          token.hasPassword = Boolean(dbUser.password);
+          token.mustChangePassword = shouldForcePasswordChange(
+            Boolean(dbUser.mustChangePassword),
+            Boolean(dbUser.password)
+          );
           token.permissions = dbUser.permissions;
           token.image = dbUser.image;
           token.phone = dbUser.phone;
@@ -488,7 +505,11 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        (session.user as any).mustChangePassword = Boolean(token.mustChangePassword);
+        (session.user as any).mustChangePassword = shouldForcePasswordChange(
+          Boolean(token.mustChangePassword),
+          token.hasPassword as boolean | undefined
+        );
+        (session.user as any).hasPassword = token.hasPassword !== false;
         session.user.permissions = token.permissions as string;
         session.user.isSuperAdmin = (await import('./acl-shared')).isSuperAdmin(
           token.role as string,

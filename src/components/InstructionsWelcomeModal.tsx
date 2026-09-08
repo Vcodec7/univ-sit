@@ -1,8 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { BookOpen } from 'lucide-react';
 import ServiceSplitModal from '@/components/ServiceSplitModal';
@@ -39,6 +38,7 @@ function writeLocal(v: 'skipped' | 'dismissed') {
  */
 export default function InstructionsWelcomeModal() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const pathname = usePathname() || '';
   const [state, setState] = useState<PromptState>('unknown');
   const [busy, setBusy] = useState(false);
@@ -51,7 +51,14 @@ export default function InstructionsWelcomeModal() {
       setState('hide');
       return;
     }
-    if (pathname.startsWith('/admin') || pathname.startsWith('/ops')) {
+    if (
+      pathname.startsWith('/admin') ||
+      pathname.startsWith('/ops') ||
+      pathname.startsWith('/change-password') ||
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/register') ||
+      pathname.startsWith('/dashboard/guides')
+    ) {
       setEligible(false);
       setState('hide');
       return;
@@ -131,7 +138,7 @@ export default function InstructionsWelcomeModal() {
           if (pathname === '/' || pathname === '') return;
           setState('show');
         }
-      }, 6_000);
+      }, 800);
     };
 
     const onCookieVis = (e: Event) => {
@@ -205,9 +212,10 @@ export default function InstructionsWelcomeModal() {
       }
       footer={
         <>
-          <Link
-            href="/dashboard/guides"
+          <button
+            type="button"
             className="btn btn-primary"
+            disabled={busy}
             onClick={() => {
               writeLocal('skipped');
               try {
@@ -216,10 +224,11 @@ export default function InstructionsWelcomeModal() {
                 /* ignore */
               }
               setState('hide');
+              router.push('/dashboard/guides');
             }}
           >
             Пройти инструктаж
-          </Link>
+          </button>
           <button
             type="button"
             className="btn btn-secondary"

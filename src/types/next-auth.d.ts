@@ -11,6 +11,8 @@ declare module "next-auth" {
       nickname?: string | null
       ecoPoints?: number
       moderationPending?: boolean
+      mustChangePassword?: boolean
+      hasPassword?: boolean
     } & DefaultSession["user"]
     error?: string
   }
@@ -29,5 +31,6 @@ declare module "next-auth/jwt" {
     error?: string
     moderationPending?: boolean
     mustChangePassword?: boolean
+    hasPassword?: boolean
   }
 }

@@ -14,6 +14,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { safeCallbackUrl } from '@/lib/safe-callback-url';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
+import { shouldForcePasswordChange } from '@/lib/force-password-change';
 import SocialAuthButtons, { type SocialAuthFlags } from '@/components/SocialAuthButtons';
 
 async function offerSavePassword(login: string, password: string, form?: HTMLFormElement | null) {
@@ -54,6 +55,7 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [maintenanceOn, setMaintenanceOn] = useState(false);
+  const [publicReady, setPublicReady] = useState(false);
   const [registrationOn, setRegistrationOn] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
   const [needs2fa, setNeeds2fa] = useState(false);
@@ -85,12 +87,25 @@ function LoginForm() {
           d?.modules?.registration !== false;
         setRegistrationOn(reg);
         setEsiaOn(Boolean(d?.esiaLoginEnabled));
+        setPublicReady(true);
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!cancelled) setPublicReady(true);
+      });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  // After Yandex/VK: do not leave the user on the email+password form.
+  useEffect(() => {
+    if (!publicReady) return;
+    if (sessionStatus !== 'authenticated' || !session?.user?.id) return;
+    if (maintenanceOn && !isStaffSession) return;
+    const mustChange = shouldForcePasswordChange(session.user.mustChangePassword, session.user.hasPassword);
+    const dest = mustChange ? '/change-password' : callbackUrl;
+    window.location.replace(dest);
+  }, [publicReady, sessionStatus, session?.user?.id, session?.user?.mustChangePassword, session?.user?.hasPassword, maintenanceOn, isStaffSession, callbackUrl]);
 
   const finishLogin = async (loginValue: string, pwd: string) => {
     setError('');
@@ -109,7 +124,10 @@ function LoginForm() {
       const sessionRes = await fetch('/api/auth/session');
       const nextSession = await sessionRes.json();
       nextRole = nextSession?.user?.role;
-      const mustChange = Boolean(nextSession?.user?.mustChangePassword);
+      const mustChange = shouldForcePasswordChange(
+        nextSession?.user?.mustChangePassword,
+        nextSession?.user?.hasPassword
+      );
       if (mustChange) {
         dest = '/change-password';
       } else if (nextRole === 'TECH') {
