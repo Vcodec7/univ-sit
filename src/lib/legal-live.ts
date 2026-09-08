@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getAccessSettings } from '@/lib/access-settings';
 import { getModerationConfig } from '@/lib/moderation-settings';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentityStatic } from '@/lib/site-identity';
 import { getModuleFlags } from '@/lib/module-flags';
 import { isNextBuildPhase } from '@/lib/build-phase';
 import {
@@ -15,7 +15,7 @@ import {
 
 async function loadLegalDynamicInputUncached(): Promise<LegalDynamicInput> {
   if (isNextBuildPhase()) {
-    const identity = await getSiteIdentity();
+    const identity = await getSiteIdentityStatic();
     return {
       siteName: identity.siteName,
       operatorName: null,
@@ -33,7 +33,7 @@ async function loadLegalDynamicInputUncached(): Promise<LegalDynamicInput> {
     };
   }
   const [identity, access, moderation, settings, modules] = await Promise.all([
-    getSiteIdentity(),
+    getSiteIdentityStatic(),
     getAccessSettings(),
     getModerationConfig(),
     prisma.siteSettings.findUnique({

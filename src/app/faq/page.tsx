@@ -10,8 +10,8 @@ export const revalidate = 60;
 export const dynamic = 'force-static';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName, publicOrigin } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName, publicOrigin } = await getSiteIdentityStatic();
   return {
     title: withSiteBrand('Вопросы и ответы', siteName),
     description: 'Ответы на частые вопросы о портале, записи и личном кабинете.',

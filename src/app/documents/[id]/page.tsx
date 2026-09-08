@@ -6,7 +6,7 @@ import DocumentViewer from '@/components/DocumentViewer';
 import { ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 import { staticDocumentParams } from '@/lib/generate-public-static-params';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentityStatic } from '@/lib/site-identity';
 
 export const revalidate = 60;
 export const dynamic = 'force-static';
@@ -44,7 +44,7 @@ export default async function DocumentViewPage({
   });
   if (!doc) notFound();
 
-  const identity = await getSiteIdentity();
+  const identity = await getSiteIdentityStatic();
   const publicFileUrl = `${identity.publicOrigin.replace(/\/$/, '')}/api/documents/${doc.id}/file?disposition=inline`;
 
   return (

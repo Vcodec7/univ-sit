@@ -4,15 +4,16 @@ import PrivacyDownloadButton from '@/components/PrivacyDownloadButton';
 import LegalDocShell from '@/components/LegalDocShell';
 import LegalMdxShell from '@/components/LegalMdxShell';
 import { LegalMdxBody, readLegalMdx, tocFromMdx } from '@/lib/legal-mdx';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentityStatic } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
 import { PRIVACY_POLICY_VERSION } from '@/lib/consent-versions';
 import { PRIVACY_POLICY_TITLE } from '@/lib/privacy-document';
 
 export const revalidate = 3600;
+export const dynamic = 'force-static';
 
 export async function generateMetadata() {
-  const { siteName } = await getSiteIdentity();
+  const { siteName } = await getSiteIdentityStatic();
   return brandedMetadata('Политика конфиденциальности', {
     description: `Как портал «${siteName}» собирает, использует и защищает персональные данные.`,
     canonicalPath: '/privacy',
@@ -20,7 +21,7 @@ export async function generateMetadata() {
 }
 
 export default async function PrivacyPolicy() {
-  const identity = await getSiteIdentity();
+  const identity = await getSiteIdentityStatic();
   const source = readLegalMdx('privacy');
   const toc = tocFromMdx(source);
 

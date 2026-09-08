@@ -127,6 +127,13 @@ export default async function RootLayout({
           }}
         />
         <Script
+          id="yp-po-guard"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var P=window.PerformanceObserver;if(!P||P.__ypSafe)return;function wrap(cb){if(typeof cb!=='function')return cb;return function(list,obs){try{var raw=list&&typeof list.getEntries==='function'?list.getEntries():[];var ok=[];for(var i=0;i<raw.length;i++){var e=raw[i];if(e&&typeof e.startTime==='number')ok.push(e)}cb({getEntries:function(){return ok},getEntriesByName:function(n,t){return ok.filter(function(e){return e.name===n&&(!t||e.entryType===t)})},getEntriesByType:function(t){return ok.filter(function(e){return e.entryType===t})}},obs)}catch(x){}}}var W=function(cb){return new P(wrap(cb))};W.prototype=P.prototype;W.supportedEntryTypes=P.supportedEntryTypes;W.__ypSafe=1;window.PerformanceObserver=W}catch(e){}})();`,
+          }}
+        />
+        <Script
           id="yp-pwa-early"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{

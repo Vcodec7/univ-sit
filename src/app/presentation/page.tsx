@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getSiteIdentity } from '@/lib/site-identity';
+import { getSiteIdentityStatic } from '@/lib/site-identity';
+
+export const revalidate = 60;
+export const dynamic = 'force-static';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { siteName } = await getSiteIdentity();
+  const { siteName } = await getSiteIdentityStatic();
   return {
     title: 'Презентация портала',
     description: `Две версии презентации ${siteName}: полный функционал и необходимый набор.`,
@@ -11,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PresentationPage() {
-  const { siteName } = await getSiteIdentity();
+  const { siteName } = await getSiteIdentityStatic();
 
   return (
     <main className="container" style={{ paddingTop: '2.5rem', paddingBottom: '4rem', maxWidth: 960 }}>

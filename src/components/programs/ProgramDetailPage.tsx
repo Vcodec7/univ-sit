@@ -19,8 +19,8 @@ export async function makeProgramDetailMetadata(
     select: { title: true, summary: true, description: true, image: true },
   });
   if (!program) return { title: 'Не найдено' };
-  const { withSiteBrand, getSiteIdentity } = await import('@/lib/site-identity');
-  const { siteName } = await getSiteIdentity();
+  const { withSiteBrand, getSiteIdentityStatic } = await import('@/lib/site-identity');
+  const { siteName } = await getSiteIdentityStatic();
   const description = (program.summary || program.description.replace(/<[^>]+>/g, '')).slice(0, 160);
   return {
     title: withSiteBrand(program.title, siteName),
