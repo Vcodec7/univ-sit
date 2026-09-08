@@ -367,6 +367,17 @@ export async function runScannerCheck(opts: {
     });
   }
 
+  if (parsed.type !== 'presence') {
+    return {
+      http: 400,
+      body: {
+        ok: false,
+        status: 'INVALID',
+        message: 'Неверный формат QR. Нужен билет, бронь коворкинга или пространства.',
+      },
+    };
+  }
+
   const resolved = await resolvePresenceToken(parsed.token);
   if (!resolved.ok) {
     return {
