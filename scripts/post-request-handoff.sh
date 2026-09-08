@@ -33,7 +33,7 @@ python3 - "$OUT_DIR" <<'PY'
 import os, re, sys
 from pathlib import Path
 root = Path(sys.argv[1])
-pat = re.compile(r"^(youngportal-(?:org-kit|sale-source|portable-dev|client-kit|reference-kit|dev-kit|source-full))-(\d{8}-\d{6})\.tgz$")
+pat = re.compile(r"^(youngportal-(?:org-kit|org-runtime-kit|sale-source|portable-dev|client-kit|reference-kit|dev-kit|source-full|full-backup))-(\d{8}-\d{6})\.tgz$")
 groups = {}
 for p in root.iterdir():
     if not p.is_file() or not p.name.endswith(".tgz"):
@@ -95,6 +95,16 @@ fi
 ORG_ARC="$OUT_DIR/youngportal-org-kit-${STAMP}.tgz"
 ORG_SHA="$(read_sha "$ORG_ARC")"
 
+echo "==> [4b/5] Org RUNTIME kit (no source tree)"
+RUNTIME_ARC=""
+RUNTIME_SHA=""
+if [[ "$SKIP_ORG_LIVE" != "1" ]]; then
+  RUNTIME_ARGS=("${PACK_PUBLISH_ARGS[@]}")
+  bash "$ROOT/scripts/pack-org-runtime-kit.sh" --out-dir "$OUT_DIR" --stamp "$STAMP" "${RUNTIME_ARGS[@]}"
+  RUNTIME_ARC="$OUT_DIR/youngportal-org-runtime-kit-${STAMP}.tgz"
+  RUNTIME_SHA="$(read_sha "$RUNTIME_ARC")"
+fi
+
 # Best-effort: pull published URLs from latest publish markers if present on VPS
 if [[ "$SKIP_PUBLISH" != "1" ]]; then
   yp_init_ssh || true
@@ -119,10 +129,12 @@ Artifacts (local):
                  sha256=${PORTABLE_SHA}
   Org kit:       ${ORG_ARC}
                  sha256=${ORG_SHA}
+  Org runtime:   ${RUNTIME_ARC}
+                 sha256=${RUNTIME_SHA}
 
 Deploy (new VPS):
   See docs/ORG-HANDOFF.md and docs/REMOTE-DEPLOY.md
-  KIT_PROFILE=org|sale|portable bash scripts/download-kit.sh
+  KIT_PROFILE=org|runtime|sale|portable bash scripts/download-kit.sh
 
 Also run on VPS after promote (live DB+uploads):
   bash /opt/sochi-portal/scripts/full-backup.sh
