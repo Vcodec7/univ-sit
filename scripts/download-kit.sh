@@ -11,8 +11,11 @@
 # Исходник для модернизации:
 #   KIT_PROFILE=source bash scripts/download-kit.sh
 #
-# Разработчик (полный эталон):
+# Разработчик (полный эталон исходников, без node_modules):
 #   KIT_PROFILE=developer bash scripts/download-kit.sh
+#
+# Живой VPS (Docker-образы + /app с node_modules + БД + uploads):
+#   KIT_PROFILE=server bash scripts/download-kit.sh
 #
 # Свой token/path:
 #   KIT_URL='https://77.110.125.241/backups/<token>/file.tgz' bash scripts/download-kit.sh
@@ -39,6 +42,10 @@ case "$KIT_PROFILE" in
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/f897e77da076d7363a67ba67035ad4a3/youngportal-org-runtime-kit-20260908-134736.tgz}"
     KIT_SHA256="${KIT_SHA256:-36d16b4947720362a2b212157c47e2a0360747b31f992f50c577cc6b9aa82fcc}"
     ;;
+  server|server-full|live-full)
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/e8557e9d7dcbb9b7d968d28af3e43c8d/youngportal-server-full-20260908-200732.tgz}"
+    KIT_SHA256="${KIT_SHA256:-ce243c87814d3970ed92e9582667f7945e548a5cb4e8f0373f6ab4d84ab64d62}"
+    ;;
   source|modernize|sale)
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/2d09f831b5ea8c19103c336fda9741ff/youngportal-sale-source-20260908-134736.tgz}"
     KIT_SHA256="${KIT_SHA256:-88823cf1891b080572324ed90b090b8c5134915b9ce3aae1bfd80da82e1b5dbc}"
@@ -52,7 +59,7 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-0d794fc5609eccf2d340e75865795871419671778b9d7321abf7c50ae14a1e1a}"
     ;;
   *)
-    echo "KIT_PROFILE=client|org|runtime|sale|portable|source|developer" >&2
+    echo "KIT_PROFILE=client|org|runtime|server|sale|portable|source|developer" >&2
     exit 1
     ;;
 esac
