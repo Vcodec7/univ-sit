@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
 import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
-import Link from 'next/link';
+import { AdminFooter, AdminTopBar } from '@/components/admin/AdminChrome';
 import { pingSecurity } from '@/lib/device-fingerprint';
 import { canAccessAdminPath } from '@/lib/acl-shared';
 
@@ -129,15 +129,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       <AdminSidebar userRole={userRole} userPermissions={userPermissions} />
       <AdminCommandPalette userRole={userRole} userPermissions={userPermissions} />
       <main className="admin-main" id="admin-main">
-        {pathname !== '/admin' ? (
-          <nav className="admin-escape-bar" aria-label="Выход из раздела">
-            <Link href="/" className="admin-escape-bar__home">
-              На сайт
-            </Link>
-            <Link href="/dashboard">Кабинет</Link>
-            <Link href="/admin">Обзор</Link>
-          </nav>
-        ) : null}
+        <AdminTopBar userName={session.user?.name || session.user?.email} />
         {deniedBanner ? (
           <div
             role="status"
@@ -147,6 +139,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         ) : null}
         <AdminErrorBoundary>{children}</AdminErrorBoundary>
+        <AdminFooter />
       </main>
     </div>
   );

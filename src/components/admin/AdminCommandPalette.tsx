@@ -28,8 +28,13 @@ export default function AdminCommandPalette({ userRole, userPermissions }: Props
       }
       if (e.key === 'Escape') setOpen(false);
     };
+    const onOpen = () => setOpen(true);
     window.addEventListener('keydown', onKey, true);
-    return () => window.removeEventListener('keydown', onKey, true);
+    window.addEventListener('yp-admin-cmdk', onOpen);
+    return () => {
+      window.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('yp-admin-cmdk', onOpen);
+    };
   }, []);
 
   const items = useMemo(

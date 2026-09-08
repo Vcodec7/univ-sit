@@ -82,6 +82,13 @@ const ICONS: Record<string, ComponentType<{ size?: number; className?: string }>
 
 const COLLAPSE_KEY = 'yp-admin-sidebar-collapsed';
 const RECENT_KEY = 'yp-admin-nav-recent';
+const GROUPS_KEY = 'yp-admin-nav-groups';
+const DEFAULT_GROUPS: Record<AdminNavGroup, boolean> = {
+  main: true,
+  content: true,
+  ops: true,
+  system: true,
+};
 
 function canSee(item: AdminNavDef, userRole: string, userPermissions: string[]): boolean {
   if (userRole === 'ADMIN') return true;
@@ -142,6 +149,7 @@ export default function AdminSidebar({
   const [portalReady, setPortalReady] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [openGroups, setOpenGroups] = useState<Record<AdminNavGroup, boolean>>(DEFAULT_GROUPS);
 
   useEffect(() => setPortalReady(true), []);
 
@@ -149,6 +157,11 @@ export default function AdminSidebar({
     try {
       setCollapsed(localStorage.getItem(COLLAPSE_KEY) === '1');
       setRecent(readRecent());
+      const raw = localStorage.getItem(GROUPS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Record<AdminNavGroup, boolean>>;
+        setOpenGroups({ ...DEFAULT_GROUPS, ...parsed });
+      }
     } catch {
       /* ignore */
     }
@@ -289,12 +302,34 @@ export default function AdminSidebar({
           groups.map((group) => {
             const groupItems = filtered.filter((i) => i.group === group);
             if (!groupItems.length) return null;
+            const expanded = openGroups[group] !== false;
             return (
               <div key={group} className="admin-nav-board__group">
-                {opts.iconOnly ? null : <p className="admin-nav-board__label">{ADMIN_NAV_GROUP_LABELS[group]}</p>}
-                <div className="admin-nav-board__grid">
-                  {groupItems.map((item) => renderCard(item, opts.idPrefix, filtered.indexOf(item), opts.iconOnly))}
-                </div>
+                {opts.iconOnly ? null : (
+                  <button
+                    type="button"
+                    className="admin-nav-board__label"
+                    aria-expanded={expanded}
+                    onClick={() => {
+                      setOpenGroups((prev) => {
+                        const next = { ...prev, [group]: !expanded };
+                        try {
+                          localStorage.setItem(GROUPS_KEY, JSON.stringify(next));
+                        } catch {
+                          /* ignore */
+                        }
+                        return next;
+                      });
+                    }}
+                  >
+                    {ADMIN_NAV_GROUP_LABELS[group]}
+                  </button>
+                )}
+                {expanded || opts.iconOnly ? (
+                  <div className="admin-nav-board__grid">
+                    {groupItems.map((item) => renderCard(item, opts.idPrefix, filtered.indexOf(item), opts.iconOnly))}
+                  </div>
+                ) : null}
               </div>
             );
           })

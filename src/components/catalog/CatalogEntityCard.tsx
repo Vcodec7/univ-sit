@@ -55,7 +55,7 @@ export default function CatalogEntityCard({
         {who && who !== excerpt ? <p className="catalog-card__who">Кому: {who}</p> : null}
         {children}
         {metaLeft ? (
-          <div className="catalog-card-meta">
+          <div className="catalog-card-meta catalog-card__cta">
             <span>{metaLeft}</span>
             <span>
               Подробнее <ArrowRight size={16} />

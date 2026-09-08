@@ -48,8 +48,8 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-bd1bf4e404e519a9dec6d2c5c1decfc6022fd4dbcc1c1146f9cfa41b406c94ce}"
     ;;
   developer|reference|full)
-    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/54c90cd0f47c31c632148223e235fe53/youngportal-full-backup-20260908-134736.tgz}"
-    KIT_SHA256="${KIT_SHA256:-1131ef548d9efe7429344add2017d108222008f00eeaa5c57549f833a71819b5}"
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/72f8718f99f60c9366bae549d7f6486d/youngportal-full-backup-20260908-194634.tgz}"
+    KIT_SHA256="${KIT_SHA256:-0d794fc5609eccf2d340e75865795871419671778b9d7321abf7c50ae14a1e1a}"
     ;;
   *)
     echo "KIT_PROFILE=client|org|runtime|sale|portable|source|developer" >&2

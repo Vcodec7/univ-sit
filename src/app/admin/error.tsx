@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
+import Button from '@/components/ui/Button';
 
 export default function AdminError({
   error,
@@ -14,14 +16,15 @@ export default function AdminError({
   }, [error]);
 
   return (
-    <div className="admin-error-fallback" role="alert">
-      <h1 className="admin-error-fallback__title">Не удалось показать раздел</h1>
+    <div className="admin-error-fallback yp-empty" role="alert">
+      <AlertTriangle className="yp-empty__icon" size={44} aria-hidden />
+      <h1 className="admin-error-fallback__title">Ошибка загрузки данных раздела</h1>
       <p className="admin-error-fallback__text">
-        Ошибка на сервере. Нажмите «Попробовать снова» или откройте другой пункт меню.
+        Нажмите «Повторить попытку» или откройте другой пункт меню.
       </p>
-      <button type="button" className="btn btn-primary" onClick={() => reset()}>
+      <Button variant="outline" onClick={() => reset()}>
         Попробовать снова
-      </button>
+      </Button>
     </div>
   );
 }

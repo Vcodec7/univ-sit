@@ -28,7 +28,7 @@ VPS эталона: `root@77.110.125.241`. Прод после promote: **1.6.15
 | Org **runtime** без src (~595 МБ) | `youngportal-org-runtime-kit-20260908-134736.tgz` | `36d16b4947720362a2b212157c47e2a0360747b31f992f50c577cc6b9aa82fcc` | https://py.idivles.ru/backups/f897e77da076d7363a67ba67035ad4a3/youngportal-org-runtime-kit-20260908-134736.tgz |
 | Org kit + исходники (~639 МБ) | `youngportal-org-kit-20260908-134736.tgz` | `707d8c530172fdfc301ff5f08d300b79195f277d5095150b72656657464f3060` | https://py.idivles.ru/backups/5583708ce4551ad7f13f10ae484a5130/youngportal-org-kit-20260908-134736.tgz |
 | Sale source (~44 МБ) | `youngportal-sale-source-20260908-134736.tgz` | `88823cf1891b080572324ed90b090b8c5134915b9ce3aae1bfd80da82e1b5dbc` | https://py.idivles.ru/backups/2d09f831b5ea8c19103c336fda9741ff/youngportal-sale-source-20260908-134736.tgz |
-| Full source backup (~44 МБ) | `youngportal-full-backup-20260908-134736.tgz` | `1131ef548d9efe7429344add2017d108222008f00eeaa5c57549f833a71819b5` | https://py.idivles.ru/backups/54c90cd0f47c31c632148223e235fe53/youngportal-full-backup-20260908-134736.tgz |
+| Full source backup (~44 МБ) | `youngportal-full-backup-20260908-194634.tgz` | `0d794fc5609eccf2d340e75865795871419671778b9d7321abf7c50ae14a1e1a` | https://py.idivles.ru/backups/72f8718f99f60c9366bae549d7f6486d/youngportal-full-backup-20260908-194634.tgz |
 
 Стабильные алиасы (тоже публичные):
 

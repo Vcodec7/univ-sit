@@ -207,9 +207,9 @@ export default async function SpaceDetail({ params }: { params: Promise<{ id: st
                 <GuestAuthPrompt
                   href={`/spaces/${encodeURIComponent(space.id)}/book`}
                   className="btn btn-primary"
-                  title="Забронировать зал"
+                  title="Забронировать место"
                 >
-                  <CalendarPlus size={18} /> Бронь зала
+                  <CalendarPlus size={18} /> Забронировать место
                 </GuestAuthPrompt>
               ) : null}
             </div>

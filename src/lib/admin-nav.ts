@@ -15,9 +15,9 @@ export type AdminNavDef = {
 
 export const ADMIN_NAV_GROUP_LABELS: Record<AdminNavGroup, string> = {
   main: 'Обзор',
-  content: 'Контент',
-  ops: 'Операции',
-  system: 'Система',
+  content: 'Контент и афиша',
+  ops: 'Операции и бронирования',
+  system: 'Администрирование',
 };
 
 export const ADMIN_NAV_ITEMS: AdminNavDef[] = [
@@ -131,12 +131,12 @@ export const ADMIN_NAV_ITEMS: AdminNavDef[] = [
   },
   {
     href: '/admin/occupancy',
-    label: 'Занятость залов',
+    label: 'Расписание по часам',
     icon: 'CalendarRange',
     requiredPermission: 'bookings',
     group: 'ops',
-    hint: 'Сетка занятости',
-    keywords: 'занятость слот зал календарь occupancy',
+    hint: 'Расписание по часам',
+    keywords: 'занятость слот зал календарь occupancy сетка расписание',
   },
   {
     href: '/admin/applications',
