@@ -21,5 +21,6 @@ test('public URL and MAX webhook belong to the tech console, not youth admin for
   assert.doesNotMatch(bots, /ensureMaxWebhook/);
   assert.match(ops, /OpsSitePanel/);
   assert.match(api, /action === 'ensureMaxWebhook'/);
+  assert.match(api, /action === 'saveSso'/);
   assert.match(api, /isTechRole/);
 });

@@ -936,6 +936,9 @@ model SiteSettings {
   maintenanceMessage  String?
   maintenanceEta      String?
 
+  /** JSON SSO keys for /ops (VK / Yandex / Telegram login). Env vars still work as fallback. */
+  oauthSsoJson        String?
+
   updatedAt DateTime @updatedAt
   // --- Notifications: Telegram bot + MAX bot (added by integration) ---
   telegramBotToken      String?

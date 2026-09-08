@@ -7,7 +7,7 @@ import { assertSameOrigin } from '@/lib/csrf-origin';
 import { getSiteIdentity, normalizeOrigin } from '@/lib/site-identity';
 import { maxEnsureWebhook, maxGetConfig, maxListSubscriptions, maxWebhookFailRu } from '@/lib/max';
 import { opsFlagsRateLimiter, rateLimitJson } from '@/lib/rateLimit';
-import { oauthProviderFlags } from '@/lib/oauth-providers';
+import { loadOAuthCreds, oauthFlagsFromCreds, saveOAuthSso } from '@/lib/oauth-settings';
 import { voidLogUserAction } from '@/lib/user-action-log';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +40,8 @@ export async function GET() {
   const subs = max.token ? await maxListSubscriptions(max.token) : { ok: false, json: null };
   const urls = subs.ok ? parseSubs(subs.json).map((s) => s.url || '').filter(Boolean) : [];
   const expected = `${identity.publicOrigin.replace(/\/$/, '')}/api/integrations/max/webhook`;
+  const creds = await loadOAuthCreds();
+  const oauth = oauthFlagsFromCreds(creds);
   return NextResponse.json({
     publicSiteUrl: settings?.publicSiteUrl || '',
     effectiveOrigin: identity.publicOrigin,
@@ -50,7 +52,15 @@ export async function GET() {
       webhookRegisteredUrl: urls[0] || null,
       webhookActive: urls.some((u) => u.replace(/\/$/, '') === expected),
     },
-    oauth: oauthProviderFlags(),
+    oauth,
+    sso: {
+      yandexClientId: creds.yandexId,
+      vkClientId: creds.vkId,
+      telegramBotUsername: creds.telegramUsername,
+      hasYandexSecret: Boolean(creds.yandexSecret),
+      hasVkSecret: Boolean(creds.vkSecret),
+      hasTelegramToken: Boolean(creds.telegramToken),
+    },
   });
 }
 
@@ -107,6 +117,33 @@ export async function POST(req: Request) {
       success: true,
     });
     return GET();
+  }
+
+  if (action === 'saveSso') {
+    const creds = await saveOAuthSso({
+      yandexClientId: String(body.yandexClientId || ''),
+      yandexClientSecret: String(body.yandexClientSecret || ''),
+      vkClientId: String(body.vkClientId || ''),
+      vkClientSecret: String(body.vkClientSecret || ''),
+      telegramBotToken: String(body.telegramBotToken || ''),
+      telegramBotUsername: String(body.telegramBotUsername || ''),
+    });
+    voidLogUserAction({
+      userId: session.user.id,
+      userEmail: session.user.email,
+      action: 'OPS_SSO_KEYS',
+      category: 'admin',
+      summary: 'Обновлены ключи SSO',
+      success: true,
+      detail: oauthFlagsFromCreds(creds),
+    });
+    const fresh = await GET();
+    const payload = await fresh.json();
+    return NextResponse.json({
+      ok: true,
+      message: 'Ключи сохранены. Контейнер пересоздавать не нужно — откройте /login.',
+      ...payload,
+    });
   }
 
   if (action === 'ensureMaxWebhook') {
