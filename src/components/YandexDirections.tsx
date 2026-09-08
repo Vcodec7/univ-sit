@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Navigation, Map as MapIcon } from 'lucide-react';
 import {
   yandexMapsDirectionsUrl,
@@ -30,6 +31,71 @@ function resolveQuery(address?: string | null, placeName?: string | null) {
   if (!a && !n) return '';
   // Prefer plain address for geocoding — place titles often confuse Nominatim
   return a || n;
+}
+
+/** Map JS must not block first paint — iframe only after idle, intersection, or tap. */
+function LazyMapEmbed({
+  src,
+  title,
+  large,
+}: {
+  src: string;
+  title: string;
+  large?: boolean;
+}) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [load, setLoad] = useState(false);
+
+  useEffect(() => {
+    if (load) return;
+    const el = hostRef.current;
+    if (!el) return;
+
+    const arm = () => setLoad(true);
+    const idle = (fn: () => void) => {
+      const ric = window.requestIdleCallback;
+      if (typeof ric === 'function') ric.call(window, fn, { timeout: 2200 });
+      else window.setTimeout(fn, 600);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        idle(arm);
+      },
+      { rootMargin: '120px', threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [load]);
+
+  return (
+    <div
+      ref={hostRef}
+      className={`yp-map-embed${large ? ' yp-map-embed--lg' : ''}`}
+    >
+      {load ? (
+        <iframe
+          title={title}
+          src={src}
+          width="100%"
+          height="100%"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          className="yp-map-embed__wake"
+          onClick={() => setLoad(true)}
+        >
+          Показать карту
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function YandexDirections({
@@ -154,23 +220,11 @@ export default function YandexDirections({
   );
 
   const map = widget ? (
-    <div className={`yp-map-embed${splitLayout ? ' yp-map-embed--lg' : ''}`}>
-      <iframe
-        title={`Карта: ${query || address || 'место'}`}
-        src={widget}
-        width="100%"
-        height="100%"
-        frameBorder={0}
-        allowFullScreen
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          border: 0,
-        }}
-      />
-    </div>
+    <LazyMapEmbed
+      src={widget}
+      title={`Карта: ${query || address || 'место'}`}
+      large={splitLayout}
+    />
   ) : null;
 
   if (splitLayout && map) {

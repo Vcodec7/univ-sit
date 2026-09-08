@@ -404,26 +404,26 @@ if [[ "$WITH_LIVE" -eq 1 ]]; then
   # /tmp на многих VPS — tmpfs (~1G); docker save нужен диск
   LIVE_SNAP_REMOTE=/var/backups/sochi-portal/yp-devkit-live-snap
   pack_live_on_vps "$PACK_LOCAL"
-  yp_ssh "mkdir -p '$LIVE_SNAP_REMOTE' /var/tmp && rm -rf '${LIVE_SNAP_REMOTE:?}'/*"
-  yp_scp "$PACK_LOCAL" "$HOST:/var/tmp/yp-devkit-live.sh"
+  yp_ssh "sudo mkdir -p '$LIVE_SNAP_REMOTE' /var/tmp && sudo rm -rf '${LIVE_SNAP_REMOTE:?}'/*"
+  yp_put_root "$PACK_LOCAL" "/var/tmp/yp-devkit-live.sh"
   if [[ "$CLIENT_KIT" == "1" ]]; then
-    yp_ssh "chmod +x /var/tmp/yp-devkit-live.sh && CLIENT_SLIM=1 bash /var/tmp/yp-devkit-live.sh '$LIVE_SNAP_REMOTE'"
+    yp_ssh "sudo chmod +x /var/tmp/yp-devkit-live.sh && sudo CLIENT_SLIM=1 bash /var/tmp/yp-devkit-live.sh '$LIVE_SNAP_REMOTE'"
   else
-    yp_ssh "chmod +x /var/tmp/yp-devkit-live.sh && bash /var/tmp/yp-devkit-live.sh '$LIVE_SNAP_REMOTE'"
+    yp_ssh "sudo chmod +x /var/tmp/yp-devkit-live.sh && sudo bash /var/tmp/yp-devkit-live.sh '$LIVE_SNAP_REMOTE'"
   fi
   mkdir -p "$STAGE/snapshot"
   if [[ "$CLIENT_KIT" == "1" ]]; then
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
     echo "client: images only (no db.dump / uploads)" >> "$STAGE/snapshot/MANIFEST.txt"
   else
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/db.dump" "$STAGE/snapshot/db.dump" || true
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/uploads.tgz" "$STAGE/snapshot/uploads.tgz" || true
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
-    yp_scp "$HOST:${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/db.dump" "$STAGE/snapshot/db.dump" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/uploads.tgz" "$STAGE/snapshot/uploads.tgz" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/images.tar.gz" "$STAGE/snapshot/images.tar.gz" || true
+    yp_get_root "${LIVE_SNAP_REMOTE}/env-keys.txt" "$STAGE/snapshot/env-keys.txt" || true
   fi
-  yp_ssh "cat '${LIVE_SNAP_REMOTE}/MANIFEST.txt'" >> "$STAGE/snapshot/MANIFEST.txt" || true
-  yp_ssh "rm -rf '${LIVE_SNAP_REMOTE}' /var/tmp/yp-devkit-live.sh" || true
+  yp_ssh "sudo cat '${LIVE_SNAP_REMOTE}/MANIFEST.txt'" >> "$STAGE/snapshot/MANIFEST.txt" || true
+  yp_ssh "sudo rm -rf '${LIVE_SNAP_REMOTE}' /var/tmp/yp-devkit-live.sh" || true
   python3 - "$STAGE/VERSION.json" <<'PY'
 import json, pathlib, sys
 p = pathlib.Path(sys.argv[1])
@@ -456,29 +456,28 @@ if [[ "$SKIP_PUBLISH" != "1" ]]; then
   fi
   HOST_IP="$(echo "$HOST" | sed -E 's/^[^@]+@//')"
   echo "==> Copy kit to VPS backups + public-dl (${PUBLIC_ORIGIN})"
-  yp_scp "$ARCHIVE" "$HOST:/var/backups/sochi-portal/${NAME}.tgz"
-  yp_scp "${ARCHIVE}.sha256" "$HOST:/var/backups/sochi-portal/${NAME}.tgz.sha256" || true
-  yp_ssh "ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/${KIT_PREFIX}-latest.tgz
-ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-dev-kit-latest.tgz 2>/dev/null || true"
+  yp_put_root "$ARCHIVE" "/var/backups/sochi-portal/${NAME}.tgz"
+  yp_put_root "${ARCHIVE}.sha256" "/var/backups/sochi-portal/${NAME}.tgz.sha256" || true
+  yp_ssh "sudo ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/${KIT_PREFIX}-latest.tgz
+sudo ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-dev-kit-latest.tgz 2>/dev/null || true"
   if [[ "$CLIENT_KIT" == "1" ]]; then
-    yp_ssh "ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-client-kit-latest.tgz" || true
+    yp_ssh "sudo ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-client-kit-latest.tgz" || true
   else
-    yp_ssh "ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-reference-kit-latest.tgz 2>/dev/null || true" || true
+    yp_ssh "sudo ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/youngportal-reference-kit-latest.tgz 2>/dev/null || true" || true
   fi
-  # Bootstrap со свежих скриптов репо (не только /opt)
-  yp_ssh "mkdir -p /var/backups/sochi-portal/public-dl/bootstrap"
+  yp_ssh "sudo mkdir -p /var/backups/sochi-portal/public-dl/bootstrap"
   for boot in run-install.sh yp-install.sh yp-install.env.example; do
     if [[ -f "$ROOT/scripts/$boot" ]]; then
-      yp_scp "$ROOT/scripts/$boot" "$HOST:/var/backups/sochi-portal/public-dl/bootstrap/$boot"
+      yp_put_root "$ROOT/scripts/$boot" "/var/backups/sochi-portal/public-dl/bootstrap/$boot"
     fi
   done
-  yp_ssh "real=\$(readlink -f /var/backups/sochi-portal/${NAME}.tgz)
-ln -f \"\$real\" /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz 2>/dev/null || cp -f \"\$real\" /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz
-sha256sum /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz | awk '{print \$1}' > /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz.sha256
-chmod a+r /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz.sha256 /var/backups/sochi-portal/public-dl/bootstrap/* 2>/dev/null || true
+  yp_ssh "real=\$(sudo readlink -f /var/backups/sochi-portal/${NAME}.tgz)
+sudo ln -f \"\$real\" /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz 2>/dev/null || sudo cp -f \"\$real\" /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz
+sudo sha256sum /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz | awk '{print \$1}' | sudo tee /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz.sha256 >/dev/null
+sudo chmod a+r /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz /var/backups/sochi-portal/public-dl/${KIT_PREFIX}-latest.tgz.sha256 /var/backups/sochi-portal/public-dl/bootstrap/* 2>/dev/null || true
 echo ORIGIN_LATEST=${PUBLIC_ORIGIN}/backups/${KIT_PREFIX}-latest.tgz
 echo IP_LATEST=https://${HOST_IP}/backups/${KIT_PREFIX}-latest.tgz"
-  PUB_OUT="$(yp_ssh "PUBLIC_ORIGIN=${PUBLIC_ORIGIN} bash /opt/sochi-portal/scripts/publish-public-backup.sh /var/backups/sochi-portal/${NAME}.tgz" || true)"
+  PUB_OUT="$(yp_ssh "sudo PUBLIC_ORIGIN=${PUBLIC_ORIGIN} bash /opt/sochi-portal/scripts/publish-public-backup.sh /var/backups/sochi-portal/${NAME}.tgz" || true)"
   echo "$PUB_OUT"
   PUBLISHED_URL="$(echo "$PUB_OUT" | grep -E '^URL=' | tail -1 | cut -d= -f2- || true)"
   [[ -z "$PUBLISHED_URL" ]] && PUBLISHED_URL="${PUBLIC_ORIGIN}/backups/${KIT_PREFIX}-latest.tgz"

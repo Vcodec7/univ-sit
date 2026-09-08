@@ -32,24 +32,27 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-fc3711f8a3f7f4e806e67349413a2a49ac908b7a2908e1ecfde018b42e026a1d}"
     ;;
   org|organization|with-live)
-    # Полный орг-кит: код + снимок БД/uploads/образов (персональные данные!)
-    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/8694c332fe0530d051329de0ca2322ce/youngportal-org-kit-20260817-222141.tgz}"
-    KIT_SHA256="${KIT_SHA256:-f28a741ba3814f4f81e41b520b958af38e848eabc4a9f95d9e2017cf5153a366}"
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/a5b5dc55c4d507fd31578e96f79aa537/youngportal-org-kit-20260908-001446.tgz}"
+    KIT_SHA256="${KIT_SHA256:-b820a9bb9b934b6ea4959bb2c2e05710b71d1784922a0d60611cd09a6d83a780}"
+    ;;
+  runtime|org-runtime|nosource)
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/79726a08bc6e2cb8824d968721e2f148/youngportal-org-runtime-kit-20260908-001446.tgz}"
+    KIT_SHA256="${KIT_SHA256:-f1e830faf05eb7f9b8f026b1fac08cebfd2191ac01429dde7694e817a0d9d242}"
     ;;
   source|modernize|sale)
-    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/879d87b363d76416fd5c295abe26e152/youngportal-sale-source-20260817-222141.tgz}"
-    KIT_SHA256="${KIT_SHA256:-8e16efcfcd0c257a5e20f9776c9de4b9d439cccd32e8782487f26a7315da47e7}"
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/a17e0c717cfcfc372933fb0f8c89636a/youngportal-sale-source-20260908-001446.tgz}"
+    KIT_SHA256="${KIT_SHA256:-e5115d9d974059b4df9055589eff5b93d2ad578ed4a9990646842e9948db8463}"
     ;;
   portable|dev-portable)
-    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/947feea2b4f93b2d1c244e26ea41160c/youngportal-portable-dev-20260817-222141.tgz}"
-    KIT_SHA256="${KIT_SHA256:-2f3a13353536ee1fcd1a7a34cdf5b6253218f58da3331661b6252f96695b747a}"
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/90d0c734e518435ae14d7d25d8b6c45d/youngportal-portable-dev-20260908-001446.tgz}"
+    KIT_SHA256="${KIT_SHA256:-2cf5bd0d45ab63647037b1ffe2bba1e0cae1583ed172417ac679707d672c4c4a}"
     ;;
   developer|reference|full)
-    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/879d87b363d76416fd5c295abe26e152/youngportal-sale-source-20260817-222141.tgz}"
-    KIT_SHA256="${KIT_SHA256:-8e16efcfcd0c257a5e20f9776c9de4b9d439cccd32e8782487f26a7315da47e7}"
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/a17e0c717cfcfc372933fb0f8c89636a/youngportal-sale-source-20260908-001446.tgz}"
+    KIT_SHA256="${KIT_SHA256:-e5115d9d974059b4df9055589eff5b93d2ad578ed4a9990646842e9948db8463}"
     ;;
   *)
-    echo "KIT_PROFILE=client|org|sale|portable|source|developer" >&2
+    echo "KIT_PROFILE=client|org|runtime|sale|portable|source|developer" >&2
     exit 1
     ;;
 esac

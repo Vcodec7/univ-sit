@@ -16,3 +16,13 @@ test('dashboard layout keeps cabinet chrome across leaf routes', () => {
   assert.match(nav, /href: '\/dashboard\/messages'/);
   assert.match(nav, /href: '\/dashboard\/tickets'/);
 });
+
+test('mobile dashboard kills HUD spin and dock blur', () => {
+  const css = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/app/layout-unify.css'), 'utf8');
+  assert.match(css, /player-hud__badge-glow/);
+  assert.match(css, /player-hud__xp-shine/);
+  const menu = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/CabinetMenu.tsx'), 'utf8');
+  assert.match(menu, /prefetch=\{false\}/);
+  const shell = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/components/CabinetShell.tsx'), 'utf8');
+  assert.match(shell, /min-width: 900px/);
+});

@@ -1,7 +1,7 @@
 # YoungPortal — развёртывание для организации и модернизация
 
-Актуально на **2026-08-17**. Домены эталона: **py.idivles.ru** (прод), **ty.idivles.ru** (тест).  
-VPS эталона: `root@77.110.125.241`.
+Актуально на **2026-09-08**. Домены эталона: **py.idivles.ru** (прод), **ty.idivles.ru** (тест).  
+VPS эталона: `root@77.110.125.241`. Прод после promote: **1.6.158**.
 
 Этот документ — единая инструкция: что лежит в архивах, как поставить на VPS,
 как защитить сервер, как работать с сайтом и как пересобрать под другую организацию.
@@ -12,58 +12,51 @@ VPS эталона: `root@77.110.125.241`.
 
 | Архив | Для кого | Содержимое |
 |-------|----------|------------|
-| `youngportal-source-full-*.tgz` | Разработчик / модернизация | Полное дерево кода (без `.env`, `node_modules`, uploads) |
-| `youngportal-org-kit-*.tgz` | Установка организации | Код + скрипты установки + снимок БД/uploads/образов (контент) |
-| `youngportal-*-kit-*-source.tgz` / `pack-dev-deploy-kit.sh` без `--with-live` | Чистая установка | Только код и установщик, пустая БД + роли по флагу |
+| `youngportal-portable-dev-*.tgz` | Разработчик | Исходники + установщик, без live БД |
+| `youngportal-org-runtime-kit-*.tgz` | Организация **без исходников** | Docker image tar + dump + uploads + compose, нет `src/` |
+| `youngportal-org-kit-*.tgz` | Организация с исходниками | Код + снимок БД/uploads/образов |
+| `youngportal-sale-source-*.tgz` | Продажа / модернизация | Чистый исходник, без uploads/БД/секретов |
+| `youngportal-full-backup-*.tgz` / `full-*.tar.gz` | DR | Полный архив кода (локальный) / хоста VPS |
 
-### Скачать актуальные (2026-08-17, после static ISR / promote)
+### Скачать актуальные (2026-09-08, после promote 1.6.158)
 
 После каждого завершённого запроса агент обновляет киты через `bash scripts/post-request-handoff.sh`.
 
 | Назначение | Файл | SHA-256 | URL |
 |------------|------|---------|-----|
-| Org kit + контент (~864 МБ) | `youngportal-org-kit-20260817-211320.tgz` | `203f0e7944f1e5626375bf5e035595c5446baef1a8be3ac4c68e5cf5baf35358` | https://py.idivles.ru/backups/c8ec5dd215bc938a287a7ae05246d249/youngportal-org-kit-20260817-211320.tgz |
-| Sale source (~39 МБ) | `youngportal-sale-source-20260817-211320.tgz` | `73816894af6007355bccdeb46e875638e71d3ab80773010247674ce869d510f8` | https://py.idivles.ru/backups/aca20aaaaa0fd596b15ea52626a6ebab/youngportal-sale-source-20260817-211320.tgz |
-| Portable dev (~39 МБ) | `youngportal-portable-dev-20260817-211320.tgz` | `748d7b6ac1f6b8bf9b476c1845c7db2fe934b848a2556d9e4a7186b669dcaa5a` | https://py.idivles.ru/backups/9d15d24e9260ed7d2833a94a6392b010/youngportal-portable-dev-20260817-211320.tgz |
-| Full host backup (~65 МБ) | `full-2026-08-17_211908.tar.gz` | `aa7fb3cf457ebe6c00658a564a432db8688e07fa527b3eab197248aac3236395` | https://py.idivles.ru/backups/798aed53c527308941d69fcd11356051/full-2026-08-17_211908.tar.gz |
-| Live snapshot DR (~810 МБ) | `live-2026-08-17_211125.tar.gz` | `52a2b06776d97e82263574c0d5cf9ec4ab9e4cc6e691a731f887e6830be4ba69` | https://py.idivles.ru/backups/75326331317fcd51e7099fa099b84c86/live-2026-08-17_211125.tar.gz |
+| Portable / dev (~44 МБ) | `youngportal-portable-dev-20260908-001446.tgz` | `2cf5bd0d45ab63647037b1ffe2bba1e0cae1583ed172417ac679707d672c4c4a` | https://py.idivles.ru/backups/90d0c734e518435ae14d7d25d8b6c45d/youngportal-portable-dev-20260908-001446.tgz |
+| Org **runtime** без src (~593 МБ) | `youngportal-org-runtime-kit-20260908-001446.tgz` | `f1e830faf05eb7f9b8f026b1fac08cebfd2191ac01429dde7694e817a0d9d242` | https://py.idivles.ru/backups/79726a08bc6e2cb8824d968721e2f148/youngportal-org-runtime-kit-20260908-001446.tgz |
+| Org kit + исходники (~636 МБ) | `youngportal-org-kit-20260908-001446.tgz` | `b820a9bb9b934b6ea4959bb2c2e05710b71d1784922a0d60611cd09a6d83a780` | https://py.idivles.ru/backups/a5b5dc55c4d507fd31578e96f79aa537/youngportal-org-kit-20260908-001446.tgz |
+| Sale source (~44 МБ) | `youngportal-sale-source-20260908-001446.tgz` | `e5115d9d974059b4df9055589eff5b93d2ad578ed4a9990646842e9948db8463` | https://py.idivles.ru/backups/a17e0c717cfcfc372933fb0f8c89636a/youngportal-sale-source-20260908-001446.tgz |
+| Full source backup (~44 МБ) | `youngportal-full-backup-20260908-001446.tgz` | `1388b5caf5ec3e55befb55ec61f545b3bccdbb9c0168da822b640d98b3f606a0` | https://py.idivles.ru/backups/f3c8bbc4c37e6359d362bdfd1bc2e587/youngportal-full-backup-20260908-001446.tgz |
+| VPS host full | `full-2026-09-08_001151.tar.gz` | `18411ecc7d84c6ffda717120b696457b644b074aa75a7d1a26705c8a05282682` | https://py.idivles.ru/backups/9e987bf763a1d529cdead7059d535317/full-2026-09-08_001151.tar.gz |
+| Live snapshot DR (~732 МБ) | `live-2026-09-08_001003.tar.gz` | `6542d0dfbdd9e17fea5b32b150521c4e1766dd6a17716a7e023906b51e95f187` | https://py.idivles.ru/backups/79693c545db598dabecb43f1a5d5537e/live-2026-09-08_001003.tar.gz |
 
 Стабильные алиасы (тоже публичные):
 
 - Full latest: https://py.idivles.ru/backups/full-latest.tar.gz
 - Live latest: https://py.idivles.ru/backups/live-latest.tar.gz
 
-```bash
-# Org kit
-curl -fL -o youngportal-org-kit.tgz \
-  'https://py.idivles.ru/backups/c8ec5dd215bc938a287a7ae05246d249/youngportal-org-kit-20260817-211320.tgz'
-echo '203f0e7944f1e5626375bf5e035595c5446baef1a8be3ac4c68e5cf5baf35358  youngportal-org-kit.tgz' | sha256sum -c
+**Защита org-runtime:** в архиве нет дерева TypeScript/`src/`, нет `.git`, нет значений `.env`. Есть собранный Docker-образ — его можно разобрать; это не DRM. Персональные данные в `db.dump`/`uploads` — не раздавайте URL без контроля.
 
-# Sale / portable
+```bash
+# Org runtime (без исходников)
+curl -fL -o youngportal-org-runtime.tgz \
+  'https://py.idivles.ru/backups/79726a08bc6e2cb8824d968721e2f148/youngportal-org-runtime-kit-20260908-001446.tgz'
+echo 'f1e830faf05eb7f9b8f026b1fac08cebfd2191ac01429dde7694e817a0d9d242  youngportal-org-runtime.tgz' | sha256sum -c
+
+KIT_PROFILE=runtime bash scripts/download-kit.sh
 KIT_PROFILE=sale bash scripts/download-kit.sh
 KIT_PROFILE=portable bash scripts/download-kit.sh
-
-# VPS host full + live snapshot
-curl -fL -o full-latest.tar.gz 'https://py.idivles.ru/backups/798aed53c527308941d69fcd11356051/full-2026-08-17_211908.tar.gz'
-curl -fL -o live-latest.tar.gz 'https://py.idivles.ru/backups/75326331317fcd51e7099fa099b84c86/live-2026-08-17_211125.tar.gz'
-echo 'aa7fb3cf457ebe6c00658a564a432db8688e07fa527b3eab197248aac3236395  full-latest.tar.gz' | sha256sum -c
-echo '52a2b06776d97e82263574c0d5cf9ec4ab9e4cc6e691a731f887e6830be4ba69  live-latest.tar.gz' | sha256sum -c
+KIT_PROFILE=org bash scripts/download-kit.sh
 ```
 
-Секреты (`.env`, TLS-ключи, токены ботов) **никогда** не входят в архив.  
-Полный kit с БД содержит персональные данные — не публикуйте без токена/доступа.
-
-Собрать заново с машины, у которой есть SSH на эталон:
+Собрать заново:
 
 ```bash
-# 1) Полный исходник (модернизация)
 bash scripts/pack-dev-deploy-kit.sh --out-dir /opt/cursor/artifacts
-
-# 2) Организационный kit с живым контентом
 KIT_PREFIX=youngportal-org-kit bash scripts/pack-dev-deploy-kit.sh --with-live --out-dir /opt/cursor/artifacts
-
-# 3) Клиентский slim (без чужой БД, только образы) — опционально
-bash scripts/pack-dev-deploy-kit.sh --client --with-live --out-dir /opt/cursor/artifacts
+bash scripts/pack-org-runtime-kit.sh --out-dir /opt/cursor/artifacts
 ```
 
 Перед упаковкой с контентом: дедуп заявок
@@ -79,9 +72,14 @@ docker exec sochi-portal-web-1 node /app/scripts/dedupe-applications.mjs
 Требования: **Debian 12+ / Ubuntu 22.04+**, root, **≥ 2 GB RAM** (лучше 4), **≥ 20 GB** диска, A-запись домена на IP.
 
 ```bash
-# На целевом сервере
+# Runtime kit (без исходников)
+tar -xzf youngportal-org-runtime-kit-*.tgz
+cd youngportal-org-runtime-kit-*
+sudo PROD_DOMAIN=portal.example.ru bash START.sh
+
+# Kit с исходниками
 tar -xzf youngportal-org-kit-*.tgz
-cd youngportal-org-kit-*   # или youngportal-*-kit-*
+cd youngportal-org-kit-*
 sudo bash START.sh
 ```
 

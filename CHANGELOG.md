@@ -1,5 +1,24 @@
 # Changelog — YoungPortal
 
+## [1.6.160] — 2026-09-08
+
+### Performance
+- Кабинет `/dashboard` на телефоне: без бесконечного spin/shine HUD, без blur нижней панели, без prefetch всех пунктов меню при скролле
+
+## [1.6.159] — 2026-09-08
+
+### Fixed
+- SiteSettings в Prisma снова содержит SMS-поля (`smsProvider`, `smsApiUrl`, `smsApiKey`, `smsApiLogin`, `smsFrom`) — `db push` больше не сносит колонки
+- Staging: `prisma db push` без `--accept-data-loss`
+- Админка: вкладка SMS рядом с почтой (шлюз + тест)
+
+## [1.6.158] — 2026-09-07
+
+### Performance
+- Главная: легче LCP (`next/image` quality 55), без CSS-filter и blur на первом экране; небо Сочи остаётся смонтированным на coarse
+- Контакты: карта Яндекса только после idle/пересечения/«Показать карту», без блокирующего geocode
+- Проекты: `next/image` для загрузок, priority только у первых двух карточек, урезанный payload каталога
+
 ## [1.6.153] — 2026-09-07
 
 ### Fixed

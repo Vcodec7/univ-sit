@@ -1,16 +1,14 @@
 import { Suspense } from 'react';
+import nextDynamic from 'next/dynamic';
 import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
-import HomeSlideRail from '@/components/HomeSlideRail';
 import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
 import { formatRuDate } from '@/lib/format-date';
 import { getModuleFlags } from '@/lib/module-flags';
-import HomeGalleryAuth from '@/components/HomeGalleryAuth';
-import AuthAfishaSection from '@/components/AuthAfishaSection';
 import FreeNowSpaces from '@/components/FreeNowSpaces';
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GovWidgetsSection from '@/components/GovWidgetsSection';
@@ -21,6 +19,12 @@ import NewsMediaBadge from '@/components/NewsMediaBadge';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { encodeRouteParam } from '@/lib/route-id';
+
+const HomeSlideRail = nextDynamic(() => import('@/components/HomeSlideRail'), {
+  loading: () => <div className="home-deferred-skel" aria-hidden />,
+});
+const HomeGalleryAuth = nextDynamic(() => import('@/components/HomeGalleryAuth'));
+const AuthAfishaSection = nextDynamic(() => import('@/components/AuthAfishaSection'));
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteName, publicOrigin } = await getSiteIdentity();

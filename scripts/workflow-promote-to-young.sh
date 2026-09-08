@@ -51,15 +51,16 @@ tar -czf "$ARCHIVE" \
   --exclude='qa-screenshots-*' \
   -C "$ROOT_DIR" .
 
-REMOTE_TGZ="/var/tmp/yp-promote-deploy.tgz"
+REMOTE_DROP="/home/cursor-site/yp-promote-drop"
+yp_ssh "mkdir -p '$REMOTE_DROP' && chmod 700 '$REMOTE_DROP'"
+REMOTE_TGZ="${REMOTE_DROP}/yp-promote-deploy.tgz"
 yp_scp "$ARCHIVE" "$HOST:$REMOTE_TGZ"
-# also ensure dual nginx + staging compose + fixed snapshot helper are on the server
 yp_scp \
   "$ROOT_DIR/deploy/nginx-py-ty-dual.conf" \
   "$ROOT_DIR/docker-compose.staging.yml" \
   "$ROOT_DIR/scripts/snapshot-live-site.sh" \
   "$ROOT_DIR/scripts/full-backup.sh" \
-  "$HOST:/var/tmp/"
+  "$HOST:$REMOTE_DROP/"
 
 # Write remote steps to a file first — never pipe a heredoc into yp_ssh/yp_retry
 # (retries would re-run with empty stdin and falsely exit 0).
@@ -71,18 +72,18 @@ STAGING=/opt/sochi-portal-staging
 PROD_DOMAIN="${PROD_DOMAIN}"
 STAGING_DOMAIN="${STAGING_DOMAIN}"
 BACKUP_DIR=/var/backups/sochi-portal
-REMOTE_TGZ="/var/tmp/yp-promote-deploy.tgz"
-EXTRACT=/var/tmp/yp-promote-extract
+REMOTE_DROP="${REMOTE_DROP}"
+REMOTE_TGZ="${REMOTE_DROP}/yp-promote-deploy.tgz"
+EXTRACT="${REMOTE_DROP}/extract"
 
 echo "==> [1/6] Extract approved code (before live backup so helpers are current)"
 mkdir -p "\$EXTRACT"
 rm -rf "\$EXTRACT"/*
 tar -xzf "\$REMOTE_TGZ" -C "\$EXTRACT"
-rm -f "\$REMOTE_TGZ"
-install -m 0755 /var/tmp/snapshot-live-site.sh "\$PROD/scripts/snapshot-live-site.sh"
-install -m 0755 /var/tmp/full-backup.sh "\$PROD/scripts/full-backup.sh"
-cp -f /var/tmp/nginx-py-ty-dual.conf "\$PROD/deploy/nginx-py-ty-dual.conf"
-cp -f /var/tmp/docker-compose.staging.yml "\$PROD/docker-compose.staging.yml"
+install -m 0755 "\$REMOTE_DROP/snapshot-live-site.sh" "\$PROD/scripts/snapshot-live-site.sh"
+install -m 0755 "\$REMOTE_DROP/full-backup.sh" "\$PROD/scripts/full-backup.sh"
+cp -f "\$REMOTE_DROP/nginx-py-ty-dual.conf" "\$PROD/deploy/nginx-py-ty-dual.conf"
+cp -f "\$REMOTE_DROP/docker-compose.staging.yml" "\$PROD/docker-compose.staging.yml"
 
 echo "==> [2/6] LIVE backup before cutting over"
 cd "\$PROD"
@@ -202,7 +203,7 @@ echo "Rollback: DOMAIN=\${PROD_DOMAIN} bash \$PROD/scripts/restore-live-snapshot
 REMOTE
 
 # Upload remote script as a file so SSH retries do not consume an empty heredoc stdin.
-yp_scp "$REMOTE_SCRIPT" "$HOST:/var/tmp/yp-promote-remote.sh"
-yp_ssh "bash /var/tmp/yp-promote-remote.sh; rc=\$?; rm -f /var/tmp/yp-promote-remote.sh; exit \$rc"
+yp_scp "$REMOTE_SCRIPT" "$HOST:${REMOTE_DROP}/yp-promote-remote.sh"
+yp_ssh "sudo bash '${REMOTE_DROP}/yp-promote-remote.sh'; rc=\$?; rm -rf '${REMOTE_DROP}'; exit \$rc"
 rm -f "$ARCHIVE" "$REMOTE_SCRIPT"
 echo "==> promote finished."
