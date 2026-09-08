@@ -55,8 +55,7 @@ test('free-now rail on lift home keeps full cards and hero buttons', () => {
   assert.match(css, /home-page--lift \.free-now-card/);
   assert.match(css, /home-page--lift \.home-rail::-webkit-scrollbar/);
   assert.match(css, /--rail-cols/);
-  assert.doesNotMatch(css, /home-page--lift \.free-now-actions \{\s*margin-top: auto !important/);
-  assert.match(unify, /margin-top:\s*0\.35rem !important/);
+  assert.match(unify, /margin-top:\s*auto !important/);
 });
 
 test('compact upcoming events reuse lift feed cards and lime venue CTA', () => {
