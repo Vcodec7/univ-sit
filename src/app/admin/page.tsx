@@ -7,6 +7,7 @@ import { authOptions } from '@/lib/auth';
 import { hasPermission, parsePermissions } from '@/lib/acl';
 import { redirect } from 'next/navigation';
 import { formatMskTimeRange } from '@/lib/booking-hours';
+import { staffUserLabel } from '@/lib/staff-label';
 import { updateBookingStatus } from '@/app/admin/bookings/actions';
 import EmptyState from '@/components/ui/EmptyState';
 
