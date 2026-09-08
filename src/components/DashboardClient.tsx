@@ -13,6 +13,8 @@ import TagPicker from '@/components/TagPicker';
 import { collectDeviceFingerprint } from '@/lib/device-fingerprint';
 import ProfileHeroCard from '@/components/ProfileHeroCard';
 import PersonalQrPanel from '@/components/PersonalQrPanel';
+import MobileSheet from '@/components/ui/MobileSheet';
+import DashboardSettingsPageClient from '@/components/DashboardSettingsPageClient';
 import CabinetHubTabs from '@/components/CabinetHubTabs';
 import { zodiacFromDate } from '@/lib/profile-meta';
 import {
@@ -105,6 +107,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
   const [repModalOpen, setRepModalOpen] = useState(false);
   const [repModalTab, setRepModalTab] = useState<'LEVEL' | 'AUTHORITY' | 'SOCIAL' | 'ECO'>('AUTHORITY');
   const [passOpen, setPassOpen] = useState(false);
+  const [settingsSheet, setSettingsSheet] = useState(false);
   const [moduleFlags, setModuleFlags] = useState<Record<string, boolean> | null>(null);
   const [levelMeta, setLevelMeta] = useState<{
     level: number;
@@ -593,7 +596,7 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       }}
                       onPreview={() => setPreviewOpen(true)}
                       onSettings={() => {
-                        router.push('/dashboard/settings');
+                        setSettingsSheet(true);
                       }}
                       onAvatarPick={() => {
                         toast('Добавьте фото в форме редактирования профиля');
@@ -611,6 +614,9 @@ function DashboardInner({ view = 'overview', embedded = false }: DashboardClient
                       revealContacts
                     />
                     <PersonalQrPanel open={passOpen} onClose={() => setPassOpen(false)} />
+                    <MobileSheet open={settingsSheet} onOpenChange={setSettingsSheet} title="Настройки">
+                      <DashboardSettingsPageClient />
+                    </MobileSheet>
                     <CabinetHubTabs unreadMessages={unreadMessages} />
 
                   </div>

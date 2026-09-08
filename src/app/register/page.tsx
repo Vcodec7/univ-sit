@@ -233,10 +233,16 @@ function RegisterForm() {
 
         {emailConflict ? (
           <div className="yp-auth-alert yp-auth-alert--warn">
-            Аккаунт с такой почтой уже существует. Вы можете{' '}
-            <Link href={`/login?email=${encodeURIComponent(email.trim())}`}>войти по этой почте</Link>
-            {' или '}
-            <Link href="/forgot-password">восстановить пароль</Link>.
+            Аккаунт с такой почтой уже существует.
+            <div className="yp-auth-conflict-actions">
+              <Link
+                className="btn btn-primary"
+                href={`/login?email=${encodeURIComponent(email.trim())}`}
+              >
+                Войти по этому Email
+              </Link>
+              <Link href="/forgot-password">Восстановить пароль</Link>
+            </div>
           </div>
         ) : null}
 

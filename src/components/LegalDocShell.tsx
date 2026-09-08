@@ -43,7 +43,7 @@ export default function LegalDocShell({
   aside?: ReactNode;
 }) {
   void _brand;
-  const hasToc = toc.length > 1;
+  const hasToc = toc.length >= 4;
 
   return (
     <div className="legal-page">

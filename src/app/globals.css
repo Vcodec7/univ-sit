@@ -1,6 +1,6 @@
 :root {
   /* Youth Spaces Sochi: lime #AFCA03 + lavender #8562D8 + navy #0A0C2A */
-  --background: #fafbf4;
+  --background: #f9fafb;
   --foreground: #0a0c2a;
   --primary: #8562d8;
   --primary-hover: #6e4bc4;
@@ -9,7 +9,7 @@
   --accent-hover: #8fa502;
   --muted: #5a5670;
   --card-bg: #ffffff;
-  --card-border: #e6e2f2;
+  --card-border: #e5e7eb;
   --surface: #ffffff;
   --surface-elevated: #eee9fb;
   --ink-soft: #0a0c2a;
@@ -18,10 +18,10 @@
   --success: #2f9e8c;
   --warn: #c9842a;
   --danger: #c44536;
-  --line: #e6e2f2;
-  --shadow-sm: 0 4px 16px rgba(133, 98, 216, 0.08);
-  --shadow-md: 0 8px 28px rgba(133, 98, 216, 0.1);
-  --shadow-lg: 0 16px 40px rgba(133, 98, 216, 0.12);
+  --line: #e5e7eb;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 4px 12px rgba(15, 23, 42, 0.08);
 
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
@@ -42,7 +42,7 @@ html {
   overflow-x: clip;
   overflow-y: scroll;
   max-width: 100%;
-  background-color: #f4f0fb;
+  background-color: #f9fafb;
   /* Overlay/classic scrollbar must not reserve a second column beside the header. */
   scrollbar-gutter: auto;
 }
@@ -55,13 +55,9 @@ html.yp-booting * {
 }
 
 body {
-  background-color: #f4f0fb;
-  background-image:
-    radial-gradient(70rem 36rem at 100% -8%, rgba(175, 202, 3, 0.22), transparent 58%),
-    radial-gradient(54rem 32rem at -8% 12%, rgba(133, 98, 216, 0.2), transparent 54%),
-    radial-gradient(40rem 24rem at 70% 110%, rgba(175, 202, 3, 0.12), transparent 60%),
-    linear-gradient(180deg, #fbfaff 0%, #f3eefc 42%, #f7f8e8 100%);
-  background-attachment: fixed;
+  background-color: #f9fafb;
+  background-image: none;
+  background-attachment: scroll;
   color: var(--foreground);
   font-family: var(--font-manrope), 'Manrope', sans-serif;
   line-height: 1.5;
@@ -829,7 +825,7 @@ html.mobile-nav-open {
 }
 
 .main-content {
-  flex-grow: 1;
+  flex: 1 0 auto;
 }
 .main-content:has(> .yp-auth-shell) {
   display: block;
@@ -23934,7 +23930,7 @@ body.yp-scroll-locked {
   padding: 0.75rem 0.85rem; border-radius: 0.95rem; background: #f7fbfa;
 }
 .cw-cabinet-list span { display: block; color: var(--muted); font-size: 0.86rem; }
-.cw-today { display: block; color: var(--accent); font-weight: 700; font-size: 0.85rem; margin-top: 0.2rem; }
+.cw-today { display: block; color: #4b5563; font-weight: 700; font-size: 0.85rem; margin-top: 0.2rem; }
 
 .presence-scan { max-width: 560px; margin: 0 auto; padding: 1.25rem; }
 .presence-scan-cam { border-radius: 1rem; overflow: hidden; margin: 0.75rem 0; background: #0f172a; min-height: 240px; }
