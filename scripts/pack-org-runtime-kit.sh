@@ -166,10 +166,10 @@ rm -rf "$STAGE"
 PUBLISHED_URL=""
 if [[ "$SKIP_PUBLISH" != "1" ]]; then
   PUBLIC_ORIGIN="${PUBLIC_ORIGIN:-https://py.idivles.ru}"
-  yp_scp "$ARCHIVE" "$HOST:/var/backups/sochi-portal/${NAME}.tgz"
-  yp_scp "${ARCHIVE}.sha256" "$HOST:/var/backups/sochi-portal/${NAME}.tgz.sha256" || true
-  yp_ssh "ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/${KIT_PREFIX}-latest.tgz"
-  PUB_OUT="$(yp_ssh "PUBLIC_ORIGIN=${PUBLIC_ORIGIN} bash /opt/sochi-portal/scripts/publish-public-backup.sh /var/backups/sochi-portal/${NAME}.tgz" || true)"
+  yp_put_root "$ARCHIVE" "/var/backups/sochi-portal/${NAME}.tgz"
+  yp_put_root "${ARCHIVE}.sha256" "/var/backups/sochi-portal/${NAME}.tgz.sha256" || true
+  yp_ssh "sudo ln -sfn /var/backups/sochi-portal/${NAME}.tgz /var/backups/sochi-portal/${KIT_PREFIX}-latest.tgz"
+  PUB_OUT="$(yp_ssh "sudo PUBLIC_ORIGIN=${PUBLIC_ORIGIN} bash /opt/sochi-portal/scripts/publish-public-backup.sh /var/backups/sochi-portal/${NAME}.tgz" || true)"
   echo "$PUB_OUT"
   PUBLISHED_URL="$(echo "$PUB_OUT" | grep -E '^URL=' | tail -1 | cut -d= -f2- || true)"
 fi
