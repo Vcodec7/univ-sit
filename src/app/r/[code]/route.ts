@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { normalizeReferralCode, REF } from '@/lib/referrals';
+import { originFromEnv } from '@/lib/site-identity-shared';
 
 export const dynamic = 'force-dynamic';
 
-function publicOrigin(req: NextRequest) {
-  const env = (process.env.NEXTAUTH_URL || '').replace(/\/$/, '');
-  if (env && !/0\.0\.0\.0|127\.0\.0\.1|localhost/i.test(env)) return env;
-  const xfProto = req.headers.get('x-forwarded-proto') || 'https';
-  const xfHost = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'py.idivles.ru';
-  return `${xfProto}://${xfHost}`.replace(/\/$/, '');
+function publicOrigin() {
+  const env = originFromEnv({ allowLocal: false });
+  if (env) return env;
+  return 'https://py.idivles.ru';
 }
 
 /** /r/CODE → /register?ref=CODE + cookie for attribution */
@@ -18,7 +17,7 @@ export async function GET(
 ) {
   const { code: raw } = await params;
   const code = normalizeReferralCode(decodeURIComponent(raw || ''));
-  const url = new URL('/register', publicOrigin(req));
+  const url = new URL('/register', publicOrigin());
   if (code) url.searchParams.set('ref', code);
 
   const res = NextResponse.redirect(url);

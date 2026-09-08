@@ -59,6 +59,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const payload = bookings.map((b) => {
+      const hidePendingDetails = !userId && !isStaff && b.status === 'PENDING';
       const identity = resolvePublicIdentity({
         target: b.user,
         viewerId: userId,
@@ -67,13 +68,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       });
       return {
         id: b.id,
-        title: b.title,
-        description: b.description,
+        title: hidePendingDetails ? 'Интервал занят' : b.title,
+        description: hidePendingDetails ? null : b.description,
         startTime: b.startTime,
         endTime: b.endTime,
-        status: b.status,
-        user: { name: identity.name },
-        participantsCount: b._count?.participants ?? 0,
+        status: hidePendingDetails ? 'PENDING' : b.status,
+        user: { name: hidePendingDetails ? null : identity.name },
+        participantsCount: hidePendingDetails ? 0 : (b._count?.participants ?? 0),
         joinedByMe: Boolean(userId && Array.isArray(b.participants) && b.participants.length > 0),
       };
     });

@@ -250,7 +250,7 @@ if [[ -z "\$SECRET" && -f .env ]]; then
   SECRET=\$(grep -E '^CRON_SECRET=' .env | head -1 | cut -d= -f2- | tr -d '\r' || true)
 fi
 if [[ -n "\$SECRET" ]]; then
-  curl -fsS --max-time 90 "http://127.0.0.1:3000/api/vk-sync?secret=\${SECRET}" || true
+  curl -fsS --max-time 90 -H "Authorization: Bearer \${SECRET}" "http://127.0.0.1:3000/api/vk-sync" || true
   echo
 else
   echo 'CRON_SECRET missing — skip vk-sync heal'

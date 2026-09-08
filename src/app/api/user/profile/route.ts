@@ -86,8 +86,6 @@ const profileSchema = z.object({
   steamUrl: z.string().max(500).optional().or(z.literal('')).nullable(),
   vkUrl: z.string().max(500).optional().or(z.literal('')).nullable(),
   telegramUrl: z.string().max(500).optional().or(z.literal('')).nullable(),
-  telegramChatId: z.string().max(32).optional().or(z.literal('')).nullable(),
-  maxUserId: z.string().max(32).optional().or(z.literal('')).nullable(),
   maxUrl: z.string().max(500).optional().or(z.literal('')).nullable(),
   showcaseBadges: z.union([z.array(z.string()), z.string()]).optional().nullable(),
 });
@@ -411,16 +409,6 @@ export async function PUT(req: Request) {
       if (data.steamUrl !== undefined) updateData.steamUrl = normalizeSteamUrl(data.steamUrl);
       if (data.vkUrl !== undefined) updateData.vkUrl = normalizeVkUrl(data.vkUrl);
       if (data.telegramUrl !== undefined) updateData.telegramUrl = normalizeTelegramUrl(data.telegramUrl);
-      if (data.telegramChatId !== undefined) {
-        const tg = String(data.telegramChatId || '').replace(/[^0-9]/g, '');
-        updateData.telegramChatId = tg || null;
-        (updateData as Record<string, unknown>).telegramLinkedAt = tg ? new Date() : null;
-      }
-      if (data.maxUserId !== undefined) {
-        const mx = String(data.maxUserId || '').replace(/[^0-9]/g, '');
-        updateData.maxUserId = mx || null;
-        (updateData as Record<string, unknown>).maxLinkedAt = mx ? new Date() : null;
-      }
       if (data.maxUrl !== undefined) updateData.maxUrl = normalizeMaxUrl(data.maxUrl);
     } catch (e) {
       return NextResponse.json(

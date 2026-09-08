@@ -67,7 +67,8 @@ test('register form has no phone field and 409 conflict copy', () => {
 test('register API returns 409 for existing email', () => {
   const src = readFileSync(join(root, 'src/app/api/register/route.ts'), 'utf8');
   assert.match(src, /status: 409/);
-  assert.match(src, /EMAIL_EXISTS/);
+  assert.match(src, /EXISTING_ACCOUNT_MSG/);
+  assert.doesNotMatch(src, /EMAIL_EXISTS/);
 });
 
 test('login email query is applied and SMS login is gone', () => {

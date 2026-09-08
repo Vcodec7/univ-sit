@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
 import { notifyBookingStatus, notifyBookingCancelledToGuests } from '@/lib/notifications';
+import { assertSameOrigin } from '@/lib/csrf-origin';
 
 /**
  * User cancels own space booking (organizer request).
@@ -9,6 +10,8 @@ import { notifyBookingStatus, notifyBookingCancelledToGuests } from '@/lib/notif
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const csrf = assertSameOrigin(_req);
+    if (csrf) return csrf;
     const session = await requireEndUser();
     const { id } = await params;
     const userId = session.user.id;

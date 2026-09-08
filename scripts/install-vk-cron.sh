@@ -29,8 +29,8 @@ cat > "$CRON_FILE" <<EOF
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 CRON_TZ=Europe/Moscow
-5 * * * * root curl -fsS "https://${DOMAIN}/api/vk-sync?secret=${SECRET}" >/var/log/youngportal-vk-sync.log 2>&1 || true
+5 * * * * root curl -fsS -H "Authorization: Bearer ${SECRET}" "https://${DOMAIN}/api/vk-sync" >/var/log/youngportal-vk-sync.log 2>&1 || true
 EOF
 chmod 644 "$CRON_FILE"
 echo "Installed $CRON_FILE (hourly :05 MSK; window set in Admin → VK API)"
-echo "Manual test: curl -fsS \"https://${DOMAIN}/api/vk-sync?secret=***&force=1\""
+echo "Manual test: curl -fsS -H 'Authorization: Bearer ***' \"https://${DOMAIN}/api/vk-sync?force=1\""

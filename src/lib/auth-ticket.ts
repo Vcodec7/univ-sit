@@ -9,10 +9,8 @@ const TTL_MS = 2 * 60_000;
 function secret() {
   const value = process.env.NEXTAUTH_SECRET?.trim();
   if (value) return value;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('NEXTAUTH_SECRET is required for auth tickets');
-  }
-  return 'dev-auth-ticket';
+  if (process.env.NODE_ENV === 'development') return 'dev-auth-ticket';
+  throw new Error('NEXTAUTH_SECRET is required for auth tickets');
 }
 
 export type AuthTicketPayload = {

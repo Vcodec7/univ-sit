@@ -2,21 +2,17 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { parseReplicaJson } from '@/lib/replica-config';
 import { runReplicaSync } from '@/lib/replica-sync';
+import { cronAuthorized } from '@/lib/cron-auth';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 /**
  * Cron endpoint for automatic replica sync.
- * Header: Authorization: Bearer $CRON_SECRET  (or ?secret=)
+ * Header: Authorization: Bearer $CRON_SECRET  (or x-cron-secret)
  */
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const auth = req.headers.get('authorization') || '';
-  const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  const secret = bearer || url.searchParams.get('secret') || '';
-  const expected = process.env.CRON_SECRET || '';
-  if (!expected || secret !== expected) {
+  if (!cronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

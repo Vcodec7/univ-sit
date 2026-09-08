@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { assertSameOrigin } from '@/lib/csrf-origin';
 import { consumeMaxClaimToken } from '@/lib/messenger-link';
 import { bindMaxUserIdToAccount } from '@/lib/messenger-bind-max';
 import { getSharedRedis } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-function sameOriginOk(req: NextRequest) {
-  const origin = req.headers.get('origin');
-  if (!origin) return true; // same-origin navigational form POST often omits Origin
-  try {
-    return new URL(origin).host === req.nextUrl.host;
-  } catch {
-    return false;
-  }
-}
 
 async function rateLimit(key: string, max = 8, windowSec = 600) {
   const redis = getSharedRedis();
@@ -29,9 +20,8 @@ async function rateLimit(key: string, max = 8, windowSec = 600) {
 
 /** Confirm one-time MAX claim bind (authenticated POST from /bind/max). */
 export async function POST(req: NextRequest) {
-  if (!sameOriginOk(req)) {
-    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-  }
+  const csrf = assertSameOrigin(req);
+  if (csrf) return csrf;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {

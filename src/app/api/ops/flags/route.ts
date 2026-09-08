@@ -12,6 +12,7 @@ import {
   type ModuleOffModes,
 } from '@/lib/module-flags';
 import { opsFlagsRateLimiter, rateLimitJson } from '@/lib/rateLimit';
+import { assertSameOrigin } from '@/lib/csrf-origin';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const csrf = assertSameOrigin(req);
+  if (csrf) return csrf;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || !isTechRole(session.user.role)) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });

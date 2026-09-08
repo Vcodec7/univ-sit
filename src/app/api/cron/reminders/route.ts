@@ -2,23 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { notifyEventReminder } from '@/lib/notifications';
 import { settleNoShows } from '@/lib/reliability';
-
-function authorizeCron(req: Request) {
-  const secret = process.env.CRON_SECRET || '';
-  const url = new URL(req.url);
-  const q = url.searchParams.get('secret') || '';
-  const header = req.headers.get('authorization') || '';
-  const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
-  const cronHeader = req.headers.get('x-cron-secret') || '';
-  return Boolean(secret && (q === secret || bearer === secret || cronHeader === secret));
-}
+import { cronAuthorized } from '@/lib/cron-auth';
 
 /**
- * Cron: event email reminders + settle no-shows for reliability rating.
- * Auth: Authorization: Bearer $CRON_SECRET or ?secret=
+ * Cron: event email reminders + settle no-shows.
+ * Auth: Authorization: Bearer $CRON_SECRET or header x-cron-secret.
  */
 export async function GET(req: Request) {
-  if (!authorizeCron(req)) {
+  if (!cronAuthorized(req)) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
