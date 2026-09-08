@@ -35,7 +35,7 @@ test('admin command palette finds create news', () => {
 test('applications board has bulk and slide-over', () => {
   const src = readFileSync(join(root, 'src/components/admin/ApplicationsBoard.tsx'), 'utf8');
   assert.match(src, /Одобрить выбранных/);
-  assert.match(src, /admin-slideover/);
+  assert.match(src, /AdminSlideover|admin-slideover/);
 });
 
 test('news form stepper and vaul sheet exist', () => {

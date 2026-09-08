@@ -25,6 +25,7 @@ import {
   slugifyPlace,
   type PlaceFeature,
 } from '@/lib/places';
+import AdminDraftForm from '@/components/admin/AdminDraftForm';
 
 async function processImage(formData: FormData) {
   const file = formData.get('imageFile') as File | null;
@@ -411,7 +412,7 @@ export default async function AdminPlaces({
         </section>
       ) : null}
 
-      <div className="admin-table-wrap" style={{ padding: '0.5rem 0' }}>
+      <div className="admin-table-wrap admin-table-wrap--sticky" style={{ padding: '0.5rem 0' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
@@ -493,13 +494,17 @@ export default async function AdminPlaces({
                 <X size={18} />
               </Link>
             </div>
-            <form action={editItem ? updateItem : createItem} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <AdminDraftForm
+              action={editItem ? updateItem : createItem}
+              entity={editItem?.id || 'new'}
+              style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            >
               {editItem ? <input type="hidden" name="id" value={editItem.id} /> : null}
               {formFields(editItem || null)}
               <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.75rem', fontWeight: 600 }}>
                 {editItem ? 'Сохранить' : 'Создать'}
               </button>
-            </form>
+            </AdminDraftForm>
           </div>
         </div>
       ) : null}

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import CoverImageField from '@/components/admin/CoverImageField';
 import GalleryPickerField from '@/components/admin/GalleryPickerField';
 import RichTextInput from '@/components/RichTextInput';
@@ -22,6 +23,8 @@ import {
 } from '@/lib/youth-studio';
 import StudioCopyField from '@/components/admin/StudioCopyField';
 import { SPACE_CATEGORIES } from '@/lib/spaces';
+import { useAdminDraft } from '@/lib/use-admin-draft';
+import AdminDraftBanner from '@/components/admin/AdminDraftBanner';
 
 export type StudioKind = 'project' | 'club' | 'space' | 'page';
 
@@ -150,36 +153,27 @@ export default function AdminYouthStudioForm({
   const [joinMode, setJoinMode] = useState<JoinMode>(studio0.joinMode || defaultJoin(kind));
   const [format, setFormat] = useState(studio0.format || defaultFormat(kind));
   const [slug, setSlug] = useState(item?.slug || '');
+  const path = usePathname() || `/admin/${kind}`;
   const bodyHtml = item?.content || item?.description || '';
   const cover = item?.image || (item?.images && item.images !== '[]' ? item.images : null);
-  const draftKey = `yp-studio-${kind}-${item?.id || 'new'}`;
   const stepId = steps[step]?.id || 'main';
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(draftKey);
-      if (!raw || item?.id) return;
-      const d = JSON.parse(raw) as { title?: string; mission?: string; goal?: string; audience?: string; whatHappens?: string };
-      if (d.title) setTitle(d.title);
-      if (d.mission) setMission(d.mission);
-      if (d.goal) setGoal(d.goal);
-      if (d.audience) setAudience(d.audience);
-      if (d.whatHappens) setWhatHappens(d.whatHappens);
-    } catch {
-      /* ignore */
-    }
-  }, [draftKey, item?.id]);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => {
-      try {
-        localStorage.setItem(draftKey, JSON.stringify({ title, mission, goal, audience, whatHappens, howToJoin, format, status }));
-      } catch {
-        /* ignore */
-      }
-    }, 1000);
-    return () => window.clearTimeout(t);
-  }, [draftKey, title, mission, goal, audience, whatHappens, howToJoin, format, status]);
+  const studioDraft = useMemo(
+    () => ({ title, mission, goal, audience, whatHappens, howToJoin, format, status, slug, step }),
+    [title, mission, goal, audience, whatHappens, howToJoin, format, status, slug, step]
+  );
+  const applyStudioDraft = useCallback((d: Record<string, unknown>) => {
+    if (typeof d.title === 'string') setTitle(d.title);
+    if (typeof d.mission === 'string') setMission(d.mission);
+    if (typeof d.goal === 'string') setGoal(d.goal);
+    if (typeof d.audience === 'string') setAudience(d.audience);
+    if (typeof d.whatHappens === 'string') setWhatHappens(d.whatHappens);
+    if (typeof d.howToJoin === 'string') setHowToJoin(d.howToJoin);
+    if (typeof d.format === 'string') setFormat(d.format);
+    if (typeof d.status === 'string') setStatus(d.status);
+    if (typeof d.slug === 'string') setSlug(d.slug);
+    if (typeof d.step === 'number') setStep(d.step);
+  }, []);
+  const { restored, discard } = useAdminDraft(path, `${kind}-${item?.id || 'new'}`, studioDraft, applyStudioDraft);
 
   const applyTemplate = (key: string) => {
     const t = YOUTH_TEMPLATES[key];
@@ -221,6 +215,7 @@ export default function AdminYouthStudioForm({
 
   return (
     <div className="admin-studio">
+      {restored ? <AdminDraftBanner onDiscard={discard} /> : null}
       <nav className="admin-studio__steps" aria-label="Шаги">
         {steps.map((s, i) => (
           <button

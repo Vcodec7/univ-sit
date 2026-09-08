@@ -1,14 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Check, X, Users, X as XIcon } from 'lucide-react';
+import { X as XIcon } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
 import { notifyBookingStatus, notifyBookingCancelledToGuests } from '@/lib/notifications';
 import { promoteToParticipant } from '@/lib/participant';
 import { formatMskDate, formatMskTimeRange } from '@/lib/booking-hours';
-import AdminPendingButton from '@/components/admin/AdminPendingButton';
-import RejectWithReasonForm from '@/components/admin/RejectWithReasonForm';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
+import BookingsBoard, { type BookingRow } from '@/components/admin/BookingsBoard';
 import type { Prisma } from '@prisma/client';
 
 async function updateStatus(formData: FormData) {
@@ -109,7 +108,18 @@ async function updateStatus(formData: FormData) {
     revalidatePath('/events');
     revalidatePath('/');
   } catch (e: any) {
-    console.error('Ошибка обновления', e.message);
+    console.error('Ошибка обновления', e);
+  }
+}
+
+async function bulkApprove(formData: FormData) {
+  'use server';
+  const ids = formData.getAll('ids').map(String).filter(Boolean);
+  for (const id of ids) {
+    const fd = new FormData();
+    fd.set('id', id);
+    fd.set('status', 'APPROVED');
+    await updateStatus(fd);
   }
 }
 
@@ -264,147 +274,25 @@ export default async function AdminBookings({
         ]}
       />
 
-      <div
-        style={{
-          backgroundColor: 'white',
-          padding: '1rem',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-sm)',
-          overflowX: 'auto',
-        }}
-      >
-        <div className="admin-table-wrap">
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>В афише</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Организатор</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Время и место</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Участники</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)' }}>Статус</th>
-                <th style={{ padding: '1rem', color: 'var(--muted)', textAlign: 'right' }}>Решение</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td data-label="В афише" style={{ padding: '1rem', fontWeight: 500 }}>
-                    {booking.title}
-                    {(booking as { category?: string }).category ? (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          marginLeft: 8,
-                          fontSize: '0.7rem',
-                          fontWeight: 700,
-                          color: '#0369a1',
-                          background: 'rgba(14,165,233,0.12)',
-                          padding: '0.12rem 0.4rem',
-                          borderRadius: 999,
-                        }}
-                      >
-                        {(booking as { category?: string }).category}
-                      </span>
-                    ) : null}
-                    <div style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
-                      {booking.description}
-                    </div>
-                  </td>
-                  <td data-label="Организатор" style={{ padding: '1rem', color: 'var(--muted)' }}>
-                    {booking.user?.name || booking.user?.email}
-                  </td>
-                  <td data-label="Время и место" style={{ padding: '1rem', color: 'var(--muted)' }}>
-                    <div style={{ fontWeight: 500, color: 'var(--foreground)' }}>{booking.space?.title}</div>
-                    <div style={{ fontSize: '0.85rem' }}>
-                      {formatMskDate(booking.startTime, { day: 'numeric', month: 'short', year: 'numeric' })}{' '}
-                      {formatMskTimeRange(booking.startTime, booking.endTime)} (МСК)
-                    </div>
-                  </td>
-                  <td data-label="Участники" style={{ padding: '1rem' }}>
-                    {booking.participants?.length > 0 ? (
-                      <Link
-                        href={hrefFor({ tab: activeTab, status: statusFilter, view: booking.id })}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.25rem',
-                          color: 'var(--primary)',
-                          fontWeight: 500,
-                          padding: '0.25rem 0.5rem',
-                          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                          borderRadius: 'var(--radius-sm)',
-                        }}
-                      >
-                        <Users size={16} /> {booking.participants.length}
-                      </Link>
-                    ) : (
-                      <span style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Нет</span>
-                    )}
-                  </td>
-                  <td data-label="Статус" style={{ padding: '1rem' }}>
-                    <span
-                      style={{
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '1rem',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        backgroundColor:
-                          booking.status === 'PENDING'
-                            ? '#fef3c7'
-                            : booking.status === 'APPROVED'
-                              ? '#dcfce7'
-                              : '#fee2e2',
-                        color:
-                          booking.status === 'PENDING'
-                            ? '#d97706'
-                            : booking.status === 'APPROVED'
-                              ? '#166534'
-                              : '#991b1b',
-                      }}
-                    >
-                      {booking.status === 'PENDING'
-                        ? 'Ожидает'
-                        : booking.status === 'APPROVED'
-                          ? 'Одобрено'
-                          : 'Отклонено'}
-                    </span>
-                  </td>
-                  <td data-label="Решение" style={{ padding: '1rem', textAlign: 'right' }}>
-                    {booking.status === 'PENDING' && (
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                        <form action={updateStatus}>
-                          <input type="hidden" name="id" value={booking.id} />
-                          <input type="hidden" name="status" value="APPROVED" />
-                          <AdminPendingButton
-                            className="btn btn-secondary"
-                            style={{ padding: '0.5rem', color: '#166534', backgroundColor: '#dcfce7' }}
-                            title="Одобрить"
-                            pendingLabel="…"
-                          >
-                            <Check size={16} />
-                          </AdminPendingButton>
-                        </form>
-                        <RejectWithReasonForm action={updateStatus} id={booking.id} />
-                      </div>
-                    )}
-                    {booking.status === 'REJECTED' && booking.rejectReason ? (
-                      <p style={{ margin: '0.35rem 0 0', fontSize: '0.8rem', color: '#991b1b', textAlign: 'right', maxWidth: 260, marginLeft: 'auto' }}>
-                        {booking.rejectReason}
-                      </p>
-                    ) : null}                  </td>
-                </tr>
-              ))}
-              {bookings.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--muted)' }}>
-                    Нет заявок в этом фильтре
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <BookingsBoard
+        rows={bookings.map(
+          (booking): BookingRow => ({
+            id: booking.id,
+            title: booking.title,
+            description: booking.description,
+            category: (booking as { category?: string }).category || null,
+            status: booking.status,
+            rejectReason: booking.rejectReason || null,
+            startLabel: `${formatMskDate(booking.startTime, { day: 'numeric', month: 'short', year: 'numeric' })} ${formatMskTimeRange(booking.startTime, booking.endTime)} (МСК)`,
+            spaceTitle: booking.space?.title || '—',
+            organizer: booking.user?.name || booking.user?.email || '—',
+            participantCount: booking.participants?.length || 0,
+          })
+        )}
+        hrefFor={(opts) => hrefFor({ tab: activeTab, status: statusFilter, view: opts.view })}
+        updateStatus={updateStatus}
+        bulkApprove={bulkApprove}
+      />
 
       {viewedBooking && (
         <div className="admin-modal-backdrop">

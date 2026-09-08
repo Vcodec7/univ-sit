@@ -38,6 +38,27 @@ export const ADMIN_CREATE_COMMANDS: AdminCommand[] = [
     keywords: 'создать событие мероприятие афиша',
     requiredPermission: 'bookings',
   },
+  {
+    href: '/admin/pages/new',
+    label: 'Создать страницу',
+    hint: 'CMS',
+    keywords: 'создать страницу cms page add',
+    requiredPermission: 'pages',
+  },
+  {
+    href: '/admin/contests',
+    label: 'Создать конкурс',
+    hint: 'Конкурсы',
+    keywords: 'создать конкурс contest add',
+    requiredPermission: 'contests',
+  },
+  {
+    href: '/admin/programs?add=true',
+    label: 'Создать программу',
+    hint: 'Гранты и добро',
+    keywords: 'создать программу грант добро',
+    requiredPermission: ['programs', 'pages'],
+  },
 ];
 
 export function canSeeAdminItem(

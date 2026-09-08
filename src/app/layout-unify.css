@@ -2998,9 +2998,36 @@ body:has(.home-page--lift) {
 .yp-center-modal { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; }
 .yp-center-modal__backdrop { position: absolute; inset: 0; border: 0; background: rgba(15,23,42,.45); }
 .yp-center-modal__panel { position: relative; z-index: 1; width: min(52rem, calc(100% - 1.5rem)); max-height: 88vh; overflow: auto; background: #fff; border-radius: 1.1rem; padding: 0.75rem; }
-.admin-table-wrap--sticky { max-height: min(70vh, 640px); overflow: auto; }
-.admin-table-wrap--sticky thead th { position: sticky; top: 0; z-index: 2; background: #fff; }
+.admin-table-wrap--sticky {
+  max-height: min(70vh, calc(100vh - var(--nav-h, 64px) - 7rem));
+  overflow: auto;
+}
+.admin-table-wrap--sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  color: #0a0c2a;
+  box-shadow: 0 1px 0 #e5e7eb;
+}
 .admin-bulk-bar { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin: 0 0 0.75rem; }
+.admin-bulk-bar--float {
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 20;
+  background: #0a0c2a;
+  color: #fff;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(10,12,42,.28);
+}
+.admin-bulk-bar--float .btn { color: #0a0c2a; background: #fff; }
+.admin-draft-banner {
+  display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+  padding: 0.65rem 0.85rem; margin: 0 0 0.85rem;
+  background: #fefce8; color: #854d0e; border: 1px solid #facc15; border-radius: 10px; font-weight: 650;
+}
+.admin-error-fallback { padding: 1.25rem; color: #991b1b; font-weight: 650; }
 .admin-slideover { position: fixed; inset: 0; z-index: 70; }
 .admin-slideover__backdrop { position: absolute; inset: 0; border: 0; background: rgba(15,23,42,.35); }
 .admin-slideover__panel {
@@ -3011,8 +3038,15 @@ body:has(.home-page--lift) {
 .admin-slideover__kicker { font-size: 0.75rem; color: #6b7280; margin: 0; }
 .admin-slideover__body { padding: 1rem 1.1rem; overflow: auto; flex: 1; }
 .admin-slideover__foot { padding: 0.85rem 1.1rem; border-top: 1px solid #e5e7eb; display: flex; gap: 0.5rem; flex-wrap: wrap; }
-@media (max-width: 640px) {
-  .profile-hero__bento-b { grid-template-columns: 1fr; }
+@media (max-width: 1024px) {
+  .admin-table-wrap,
+  .admin-table-wrap--sticky {
+    overflow: visible;
+    max-height: none;
+  }
+  .admin-table-wrap table {
+    min-width: 0;
+  }
 }
 
 .scanner-hub__tabs {

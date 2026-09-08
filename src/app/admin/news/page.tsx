@@ -1,15 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Trash2, Plus } from 'lucide-react';
-import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton';
+import { Plus } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
-import { parsePublishFields, publishLabel } from '@/lib/publish';
+import { parsePublishFields } from '@/lib/publish';
 import { normalizeVkVideoEmbed } from '@/lib/vk-media';
 import NewsDraftForm from '@/components/admin/NewsDraftForm';
+import NewsListBoard from '@/components/admin/NewsListBoard';
 
 function resolveVideoEmbed(formData: FormData): string | null {
   const raw = String(formData.get('videoEmbedUrl') || '').trim();
@@ -114,6 +114,18 @@ async function updateItem(formData: FormData) {
   redirect('/admin/news');
 }
 
+
+async function bulkDeleteNews(formData: FormData) {
+  'use server';
+  await requirePermission(['news', 'pages']);
+  const ids = formData.getAll('ids').map(String).filter(Boolean);
+  for (const id of ids) {
+    const fd = new FormData();
+    fd.set('id', id);
+    await deleteItem(fd);
+  }
+}
+
 export default async function AdminNews({
   searchParams,
 }: {
@@ -161,32 +173,19 @@ export default async function AdminNews({
         />
       )}
 
-      <div className="admin-entity-list">
-        {items.length === 0 && <p style={{ color: 'var(--muted)' }}>Новостей пока нет</p>}
-        {items.map((n) => (
-          <div key={n.id} className="glass admin-entity-row">
-            <div className="admin-entity-row__body">
-              <div className="admin-entity-row__title">{n.title || 'Без названия'}</div>
-              <div className="admin-entity-row__text">
-                {(n.text || '').slice(0, 160)}{(n.text || '').length > 160 ? '...' : ''}
-              </div>
-              <small className="admin-entity-row__meta">
-                {publishLabel(n.status, n.publishedAt || n.createdAt)} · {new Date(n.createdAt).toLocaleString('ru-RU')}
-                {n.videoEmbedUrl ? ' · видео' : ''}
-              </small>
-            </div>
-            <div className="admin-entity-row__actions">
-              <Link href={'/admin/news?edit=' + n.id} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem' }}>Изменить</Link>
-              <form action={deleteItem}>
-                <input type="hidden" name="id" value={n.id} />
-                <ConfirmSubmitButton message="Удалить новость?" className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', color: '#e11d48' }} aria-label="Удалить">
-                  <Trash2 size={16} />
-                </ConfirmSubmitButton>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
+      <NewsListBoard
+        rows={items.map((n) => ({
+          id: n.id,
+          title: n.title,
+          text: n.text,
+          status: n.status,
+          publishedAt: n.publishedAt ? new Date(n.publishedAt).toISOString() : null,
+          createdAt: new Date(n.createdAt).toISOString(),
+          videoEmbedUrl: n.videoEmbedUrl,
+        }))}
+        deleteItem={deleteItem}
+        bulkDelete={bulkDeleteNews}
+      />
     </div>
   );
 }

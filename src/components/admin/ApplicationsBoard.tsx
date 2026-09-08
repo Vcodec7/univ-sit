@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
+import AdminSlideover from '@/components/admin/AdminSlideover';
 import AdminPendingButton from '@/components/admin/AdminPendingButton';
 import RejectWithReasonForm from '@/components/admin/RejectWithReasonForm';
 
@@ -68,7 +69,7 @@ export default function ApplicationsBoard({
   return (
     <>
       {pendingIds.length > 0 ? (
-        <form action={bulkApprove} className="admin-bulk-bar">
+        <form action={bulkApprove} className="admin-bulk-bar admin-bulk-bar--float">
           {selected.map((id) => (
             <input key={id} type="hidden" name="ids" value={id} />
           ))}
@@ -148,28 +149,15 @@ export default function ApplicationsBoard({
       </div>
 
       {open ? (
-        <div className="admin-slideover" role="dialog" aria-modal="true" aria-labelledby="app-slide-title">
-          <button type="button" className="admin-slideover__backdrop" aria-label="Закрыть" onClick={() => setOpenId(null)} />
-          <aside className="admin-slideover__panel">
-            <header className="admin-slideover__head">
-              <div>
-                <p className="admin-slideover__kicker">{open.typeLabel}</p>
-                <h2 id="app-slide-title">{open.title}</h2>
-                <p>{open.userName}</p>
-              </div>
-              <button type="button" className="yp-modal-close" onClick={() => setOpenId(null)} aria-label="Закрыть">
-                <X size={18} />
-              </button>
-            </header>
-            <div className="admin-slideover__body">
-              <p>
-                <strong>Статус:</strong> {statusRu(open.status)}
-              </p>
-              {open.message ? <p style={{ whiteSpace: 'pre-wrap' }}>{open.message}</p> : <p>Без сопроводительного текста</p>}
-              {open.rejectReason ? <p style={{ color: '#991b1b' }}>{open.rejectReason}</p> : null}
-            </div>
-            {open.status === 'PENDING' ? (
-              <footer className="admin-slideover__foot">
+        <AdminSlideover
+          titleId="app-slide-title"
+          title={open.title}
+          kicker={open.typeLabel}
+          subtitle={open.userName}
+          onClose={() => setOpenId(null)}
+          footer={
+            open.status === 'PENDING' ? (
+              <>
                 <form action={updateStatus}>
                   <input type="hidden" name="id" value={open.id} />
                   <input type="hidden" name="status" value="APPROVED" />
@@ -178,10 +166,16 @@ export default function ApplicationsBoard({
                   </AdminPendingButton>
                 </form>
                 <RejectWithReasonForm action={updateStatus} id={open.id} />
-              </footer>
-            ) : null}
-          </aside>
-        </div>
+              </>
+            ) : null
+          }
+        >
+          <p>
+            <strong>Статус:</strong> {statusRu(open.status)}
+          </p>
+          {open.message ? <p style={{ whiteSpace: 'pre-wrap' }}>{open.message}</p> : <p>Без сопроводительного текста</p>}
+          {open.rejectReason ? <p style={{ color: '#991b1b' }}>{open.rejectReason}</p> : null}
+        </AdminSlideover>
       ) : null}
     </>
   );

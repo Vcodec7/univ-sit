@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import CoverImageField from '@/components/admin/CoverImageField';
-import { clearDraft, readDraft, useDraftAutosave } from '@/lib/use-draft-autosave';
+import { useAdminDraft } from '@/lib/use-admin-draft';
+import AdminDraftBanner from '@/components/admin/AdminDraftBanner';
 
 type Draft = {
   title: string;
@@ -32,7 +34,7 @@ export default function NewsDraftForm({
     publishedAt?: string | null;
   };
 }) {
-  const key = `yp-news-draft-${editingId || 'new'}`;
+  const path = usePathname() || '/admin/news';
   const [step, setStep] = useState(0);
   const [title, setTitle] = useState(initial.title ?? '');
   const [text, setText] = useState(initial.text ?? '');
@@ -40,27 +42,24 @@ export default function NewsDraftForm({
   const [status, setStatus] = useState(initial.status ?? 'PUBLISHED');
   const [publishedAt, setPublishedAt] = useState(initial.publishedAt ?? '');
 
-  useEffect(() => {
-    const d = readDraft<Draft>(key);
-    if (!d) return;
+  const payload = useMemo(
+    () => ({ title, text, videoEmbedUrl, status, publishedAt, step }),
+    [title, text, videoEmbedUrl, status, publishedAt, step]
+  );
+  const applyDraft = useCallback((d: Draft) => {
     if (d.title) setTitle(d.title);
     if (d.text) setText(d.text);
     if (d.videoEmbedUrl) setVideo(d.videoEmbedUrl);
     if (d.status) setStatus(d.status);
     if (d.publishedAt) setPublishedAt(d.publishedAt);
     if (typeof d.step === 'number') setStep(d.step);
-  }, [key]);
-
-  const payload = useMemo(
-    () => ({ title, text, videoEmbedUrl, status, publishedAt, step }),
-    [title, text, videoEmbedUrl, status, publishedAt, step]
-  );
-  useDraftAutosave(key, payload);
+  }, []);
+  const { restored, discard, clear } = useAdminDraft(path, editingId || 'new', payload, applyDraft);
 
   return (
     <form
       action={async (fd) => {
-        clearDraft(key);
+        clear();
         await action(fd);
       }}
       className="glass news-draft-form"
@@ -79,8 +78,9 @@ export default function NewsDraftForm({
           </button>
         ))}
       </nav>
+      {restored ? <AdminDraftBanner onDiscard={discard} /> : null}
       <p className="admin-studio-hint" style={{ margin: 0, fontSize: '0.82rem' }}>
-        Черновик сохраняется автоматически каждую секунду
+        Черновик сохраняется автоматически
       </p>
       <div hidden={step !== 0}>
         <div>

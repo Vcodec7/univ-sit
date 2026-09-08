@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import RichTextInput from '@/components/RichTextInput';
 import CoverImageField from '@/components/admin/CoverImageField';
 import AdminFilterTabs from '@/components/admin/AdminFilterTabs';
+import AdminDraftForm from '@/components/admin/AdminDraftForm';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { saveUploadedImage } from '@/lib/uploads';
 import { requirePermission, requirePermissionPage } from '@/lib/acl';
@@ -368,7 +369,7 @@ export default async function AdminPrograms({
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div className="admin-table-wrap" style={{ padding: '0.5rem 0' }}>
+        <div className="admin-table-wrap admin-table-wrap--sticky" style={{ padding: '0.5rem 0' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #f1f5f9' }}>
@@ -459,8 +460,9 @@ export default async function AdminPrograms({
                   <X size={18} />
                 </Link>
               </div>
-              <form
+              <AdminDraftForm
                 action={editItem ? updateItem : createItem}
+                entity={editItem?.id || 'new'}
                 style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
               >
                 {editItem && <input type="hidden" name="id" value={editItem.id} />}
@@ -472,7 +474,7 @@ export default async function AdminPrograms({
                 >
                   {editItem ? 'Сохранить изменения' : 'Создать'}
                 </button>
-              </form>
+              </AdminDraftForm>
             </div>
           </div>
         )}

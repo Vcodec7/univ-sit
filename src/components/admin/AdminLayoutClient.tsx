@@ -9,6 +9,7 @@ import { ShieldAlert } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
+import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
 import Link from 'next/link';
 import { pingSecurity } from '@/lib/device-fingerprint';
 import { canAccessAdminPath } from '@/lib/acl-shared';
@@ -145,7 +146,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             Недостаточно прав для запрошенного раздела.
           </div>
         ) : null}
-        {children}
+        <AdminErrorBoundary>{children}</AdminErrorBoundary>
       </main>
     </div>
   );
