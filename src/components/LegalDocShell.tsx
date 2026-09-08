@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { sanitizeCmsHtml } from '@/lib/sanitize-html';
-import LegalInteractive from '@/components/LegalInteractive';
 
 export type LegalTocItem = { id: string; title: string };
 
@@ -33,7 +32,6 @@ export default function LegalDocShell({
   toc = [],
   children,
   aside,
-  interactiveHtml,
 }: {
   brand?: string;
   icon: ReactNode;
@@ -43,7 +41,6 @@ export default function LegalDocShell({
   toc?: LegalTocItem[];
   children?: ReactNode;
   aside?: ReactNode;
-  interactiveHtml?: string;
 }) {
   void _brand;
   const hasToc = toc.length > 1;
@@ -77,7 +74,7 @@ export default function LegalDocShell({
 
           <div className="legal-main">
             <article className="legal-article">
-              {interactiveHtml ? <LegalInteractive html={interactiveHtml} /> : children}
+              {children}
             </article>
             {aside ? <aside className="legal-aside">{aside}</aside> : null}
           </div>

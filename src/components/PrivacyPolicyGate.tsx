@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { ShieldAlert } from 'lucide-react';
 import { PRIVACY_POLICY_VERSION } from '@/lib/consent-versions';
 import { signOutLogged } from '@/lib/sign-out-logged';
-import LegalDiffBlock from '@/components/LegalClause';
+import LegalDiffBlock from '@/components/LegalDiffBlock';
 import type { DiffLine } from '@/lib/legal-diff';
 
 /** Paths still available while privacy re-consent is required. */

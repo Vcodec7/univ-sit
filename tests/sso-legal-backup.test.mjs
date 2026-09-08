@@ -14,11 +14,9 @@ test('login and register are force-dynamic', () => {
 });
 
 test('legal interactive and search', () => {
-  const shell = readFileSync(join(root, 'src/components/LegalDocShell.tsx'), 'utf8');
-  const interactive = readFileSync(join(root, 'src/components/LegalInteractive.tsx'), 'utf8');
-  assert.match(shell, /interactiveHtml/);
-  assert.match(interactive, /fuse\.js/i);
-  assert.match(interactive, /Человеческий язык/);
+  const shell = readFileSync(join(root, 'src/components/LegalMdxShell.tsx'), 'utf8');
+  assert.match(shell, /fuse\.js/i);
+  assert.match(shell, /Человеческий язык/);
 });
 
 test('feature consents and coworking 412', () => {

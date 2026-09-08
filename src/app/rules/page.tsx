@@ -1,15 +1,12 @@
 import { ScrollText } from 'lucide-react';
-import LegalDocShell, { prepareLegalHtml } from '@/components/LegalDocShell';
-import { ensureSystemPages } from '@/lib/system-pages';
-import { prisma } from '@/lib/prisma';
-import { publishedWhere } from '@/lib/publish';
-import { applySitePlaceholders, getSiteIdentity } from '@/lib/site-identity';
+import LegalDocShell from '@/components/LegalDocShell';
+import LegalMdxShell from '@/components/LegalMdxShell';
+import { LegalMdxBody, readLegalMdx, tocFromMdx } from '@/lib/legal-mdx';
+import { getSiteIdentity } from '@/lib/site-identity';
 import { brandedMetadata } from '@/lib/branded-metadata';
-import { withRulesDynamicHtml } from '@/lib/legal-live';
-import { isNextBuildPhase } from '@/lib/build-phase';
+import { RULES_POLICY_VERSION } from '@/lib/consent-versions';
 
-export const revalidate = 60;
-export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 export async function generateMetadata() {
   const { siteName } = await getSiteIdentity();
@@ -20,31 +17,20 @@ export async function generateMetadata() {
 }
 
 export default async function RulesPage() {
-  await ensureSystemPages();
   const identity = await getSiteIdentity();
-  const page = isNextBuildPhase()
-    ? null
-    : await prisma.pageContent.findFirst({
-        where: { slug: 'rules', ...publishedWhere() },
-      }).catch(() => null);
-
-  const title = page?.title || 'Правила сайта';
-  const raw = applySitePlaceholders(page?.content || '<p>Правила скоро появятся.</p>', identity);
-  const live = await withRulesDynamicHtml(raw);
-  const { html, toc } = prepareLegalHtml(live);
-
+  const source = readLegalMdx('rules');
   return (
     <LegalDocShell
       brand={identity.siteName}
       icon={<ScrollText size={26} strokeWidth={2.2} />}
-      title={title}
-      lead={
-        <>
-          Обязательные правила пользования порталом. Нарушение может привести к ограничению доступа.
-        </>
-      }
-      toc={toc}
-      interactiveHtml={html}
-    />
+      title="Правила сайта"
+      lead={<>Коротко и по делу: кто может пользоваться порталом и что нельзя делать.</>}
+      meta={<span className="legal-pill">Версия {RULES_POLICY_VERSION}</span>}
+      toc={tocFromMdx(source)}
+    >
+      <LegalMdxShell>
+        <LegalMdxBody source={source} />
+      </LegalMdxShell>
+    </LegalDocShell>
   );
 }
