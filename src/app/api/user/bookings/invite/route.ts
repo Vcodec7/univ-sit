@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { AclError, aclJsonError, requireEndUser } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { conversationPairKey } from '@/lib/social';
@@ -13,11 +12,8 @@ import {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json({ message: 'Необходимо авторизоваться' }, { status: 401 });
-    }
+    const session = await requireEndUser();
+    const userId = session.user.id;
 
     const { getUserCapabilities, AUTHORITY } = await import('@/lib/reputation');
     const caps = await getUserCapabilities(userId);
@@ -215,6 +211,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
     console.error('POST /api/user/bookings/invite', e);
     return NextResponse.json({ message: 'Не удалось отправить приглашение' }, { status: 500 });
   }

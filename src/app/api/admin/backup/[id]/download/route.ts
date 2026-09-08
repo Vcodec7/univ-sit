@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import path from 'path';
-import { requireAdmin, aclJsonError, AclError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError, AclError } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { resolvePrivateStoragePath } from '@/lib/private-storage';
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const { id } = await ctx.params;
     const row = await prisma.projectBackup.findUnique({ where: { id } });
     if (!row) {

@@ -91,11 +91,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Нельзя бронировать интервал в прошлом" }, { status: 400 });
     }
 
+    const space = await prisma.space.findUnique({ where: { id: spaceId } });
+    if (!space || space.status === "INACTIVE" || space.status === "COMPLETED") {
+      return NextResponse.json({ message: "Площадка недоступна" }, { status: 400 });
+    }
+    const { isHallBookable, occupiedSeatStatuses, spaceBookingMode } = await import('@/lib/coworking');
+    if (!isHallBookable(space)) {
+      return NextResponse.json(
+        { message: "Эта площадка только для коворкинга — зал нельзя забронировать" },
+        { status: 400 }
+      );
+    }
+
     const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } });
     const minBookingHours = settings?.minBookingHours ?? 3;
     const autoApprove = settings?.autoApproveBookings ?? false;
-    const openTime = (settings as { bookingOpenTime?: string | null })?.bookingOpenTime || "09:00";
-    const closeTime = (settings as { bookingCloseTime?: string | null })?.bookingCloseTime || "21:00";
+    const openTime =
+      (space.openTime && String(space.openTime).trim()) ||
+      (settings as { bookingOpenTime?: string | null })?.bookingOpenTime ||
+      "09:00";
+    const closeTime =
+      (space.closeTime && String(space.closeTime).trim()) ||
+      (settings as { bookingCloseTime?: string | null })?.bookingCloseTime ||
+      "21:00";
 
     const { isWithinWorkingHours, bookingsConflictWithTurnover, BOOKING_TURNOVER_MS } = await import(
       '@/lib/booking-hours'
@@ -110,12 +128,34 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: `Бронирование возможно минимум за ${minBookingHours} ч. до начала.` }, { status: 400 });
     }
 
-    const space = await prisma.space.findUnique({ where: { id: spaceId } });
-    if (!space || space.status === "INACTIVE" || space.status === "COMPLETED") {
-      return NextResponse.json({ message: "Площадка недоступна" }, { status: 400 });
-    }
-
     const booking = await prisma.$transaction(async (tx) => {
+      const closure = await tx.spaceClosure.findFirst({
+        where: {
+          spaceId,
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+        select: { id: true },
+      });
+      if (closure) {
+        throw new Error("CLOSED");
+      }
+
+      if (spaceBookingMode(space) === 'BOTH') {
+        const cwBusy = await tx.coworkingSignup.findFirst({
+          where: {
+            spaceId,
+            status: { in: [...occupiedSeatStatuses()] },
+            startTime: { lt: end },
+            endTime: { gt: start },
+          },
+          select: { id: true },
+        });
+        if (cwBusy) {
+          throw new Error("COWORKING");
+        }
+      }
+
       const candidates = await tx.booking.findMany({
         where: {
           spaceId,
@@ -228,6 +268,18 @@ export async function POST(req: Request) {
           message:
             'Интервал занят или слишком близко к другой брони (нужен зазор 10 мин., например после 10:00–11:00 — следующее с 11:10).',
         },
+        { status: 409 }
+      );
+    }
+    if (error?.message === "CLOSED") {
+      return NextResponse.json(
+        { message: "Площадка закрыта или на служебном интервале в это время" },
+        { status: 409 }
+      );
+    }
+    if (error?.message === "COWORKING") {
+      return NextResponse.json(
+        { message: "Интервал занят записью в коворкинг" },
         { status: 409 }
       );
     }

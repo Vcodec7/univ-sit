@@ -35,6 +35,19 @@ test('mobile home hides the four-icon deck between hero and free-now', () => {
   assert.match(unify, /@media \(max-width: 860px\)[\s\S]*?\.lift-deck \{\s*display: none !important;/);
 });
 
+test('home defers heavy client rails without unmounting the sky', () => {
+  assert.match(page, /nextDynamic\(\(\) => import\('@\/components\/HomeSlideRail'\)/);
+  assert.doesNotMatch(page, /nextDynamic\(\(\) => import\('@\/components\/SochiLivingSky'\)/);
+  assert.doesNotMatch(page, /WeeklyAfisha/);
+});
+
+test('hero photo uses next/image srcset for phones', () => {
+  assert.match(media, /from 'next\/image'/);
+  assert.match(media, /sizes="\(max-width: 860px\) 100vw, 1600px"/);
+  assert.match(media, /priority/);
+  assert.match(media, /quality=\{55\}/);
+});
+
 test('home deck does not prefetch four routes on first paint', () => {
   assert.match(hero, /prefetch=\{false\}/);
 });
@@ -44,4 +57,11 @@ test('catalog titles wrap on words, search input keeps icon padding, moon is a s
   assert.match(unify, /space-filter-bar__input[\s\S]{0,80}2\.5rem/);
   assert.doesNotMatch(skyCss, /inset -14px -5px 0 0/);
   assert.match(skyCss, /\.sochi-sky__moon[\s\S]{0,520}inset -7px -5px 12px/);
+});
+
+test('home first screen skips GPU blur while living sky stays mounted', () => {
+  const globals = readFileSync(join(root, '../src/app/globals.css'), 'utf8');
+  assert.match(globals, /\.lift-hero__btn--ghost[\s\S]{0,220}backdrop-filter:\s*none/);
+  assert.match(unify, /body:has\(\.home-page--lift\) \.glass-nav[\s\S]{0,180}backdrop-filter:\s*none/);
+  assert.doesNotMatch(sky, /if \(!enabled\) return null/);
 });

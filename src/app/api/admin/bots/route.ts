@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { requireAdmin, aclJsonError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError } from '@/lib/acl';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -197,7 +197,7 @@ async function buildStatus() {
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     return NextResponse.json(await buildStatus());
   } catch (e) {
     return aclJsonError(e);
@@ -206,7 +206,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const action = String(body.action || '');
     const actor = await actorMeta();

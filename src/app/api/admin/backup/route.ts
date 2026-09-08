@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { requireAdmin, aclJsonError, AclError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError, AclError } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { createEncryptedProjectBackup } from '@/lib/project-backup';
 
@@ -17,7 +17,7 @@ function asJsonError(e: unknown, fallback: string) {
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const rows = await prisma.projectBackup.findMany({
       orderBy: { createdAt: 'desc' },
       take: 40,
@@ -43,7 +43,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Нужна авторизация' }, { status: 401 });

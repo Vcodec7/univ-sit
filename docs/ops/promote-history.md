@@ -13,3 +13,4 @@
 | 2026-08-15T03:41:07Z | ubuntu | ok (exit 0) | одобряю после аудита: 1.5.2 портфолио/рамка/окна/гости |
 | 2026-08-17T21:00:12Z | ubuntu | failed (exit 1) | static ISR public routes (cursor/static-routes-16b2) |
 | 2026-08-17T21:07:00Z | ubuntu | ok (exit 0) | static ISR public routes (cursor/static-routes-16b2) |
+| 2026-09-08T00:09:59Z | ubuntu | ok (exit 0) | manual promote |

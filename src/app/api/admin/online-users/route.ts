@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin, aclJsonError } from '@/lib/acl';
+import { requireSuperAdmin, aclJsonError } from '@/lib/acl';
 import { queryOnlineUsers } from '@/lib/admin-online-users';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const url = new URL(req.url);
     const data = await queryOnlineUsers({
       q: url.searchParams.get('q') || undefined,

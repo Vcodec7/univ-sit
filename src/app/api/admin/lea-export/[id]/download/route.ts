@@ -1,21 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { AclError, aclJsonError, requireSuperAdmin } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { readFile } from 'fs/promises';
 import { resolvePrivateStoragePath } from '@/lib/private-storage';
-
-function unauthorized() {
-  return NextResponse.json({ message: 'Нет доступа' }, { status: 403 });
-}
 
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id || session.user.role !== 'ADMIN') return unauthorized();
+    await requireSuperAdmin();
     const { id } = await ctx.params;
     const row = await prisma.leaDataExport.findUnique({ where: { id } });
     if (!row) return NextResponse.json({ message: 'Не найдено' }, { status: 404 });
@@ -32,6 +26,7 @@ export async function GET(
       },
     });
   } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
     console.error('GET lea download', e);
     return NextResponse.json({ message: 'Файл недоступен' }, { status: 500 });
   }

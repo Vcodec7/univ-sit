@@ -126,6 +126,7 @@ export default function ProjectsCatalogClient({ items }: { items: PublicProjectC
                       fallback={projectCover(project, skip + projectIdx + 5)}
                       className="catalog-img"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      priority={skip === 0 && projectIdx < 2}
                     />
                   </div>
                   <div className="catalog-card__body">

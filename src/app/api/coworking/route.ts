@@ -11,6 +11,7 @@ import {
   isCoworkingSpace,
   occupiedSeatStatuses,
   periodBounds,
+  spaceBookingMode,
   todayKey,
 } from '@/lib/coworking';
 import { getCoworkingAvailability } from '@/lib/coworking-availability';
@@ -94,74 +95,106 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Этот интервал уже прошёл' }, { status: 400 });
   }
 
-  const overlap = await prisma.coworkingSignup.findFirst({
-    where: {
-      userId: session.user.id,
-      status: { in: [...activeSignupStatuses()] },
-      startTime: { lt: end },
-      endTime: { gt: start },
-    },
-  });
-  if (overlap) {
-    return NextResponse.json({ message: 'У вас уже есть запись на это время' }, { status: 409 });
-  }
+  try {
+    const row = await prisma.$transaction(async (tx) => {
+      const overlap = await tx.coworkingSignup.findFirst({
+        where: {
+          userId: session.user.id,
+          status: { in: [...activeSignupStatuses()] },
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+      });
+      if (overlap) {
+        throw new Error('OVERLAP');
+      }
 
-  const usedAgg = await prisma.coworkingSignup.findMany({
-    where: {
-      spaceId,
-      dayKey,
-      status: { in: [...occupiedSeatStatuses()] },
-      startTime: { lt: end },
-      endTime: { gt: start },
-    },
-    select: { seats: true },
-  });
-  const used = usedAgg.reduce((a, s) => a + s.seats, 0);
-  const left = space.capacity - used;
+      if (spaceBookingMode(space) === 'BOTH') {
+        const hallBusy = await tx.booking.findFirst({
+          where: {
+            spaceId,
+            status: { in: ['PENDING', 'APPROVED'] },
+            startTime: { lt: end },
+            endTime: { gt: start },
+          },
+          select: { id: true },
+        });
+        if (hallBusy) {
+          throw new Error('HALL');
+        }
+      }
 
-  if (left < seatsToBook) {
-    if (!waitlist && left <= 0) {
-      return NextResponse.json(
-        { message: 'Мест нет', left: 0, canWaitlist: true },
-        { status: 409 }
-      );
+      const usedAgg = await tx.coworkingSignup.findMany({
+        where: {
+          spaceId,
+          dayKey,
+          status: { in: [...occupiedSeatStatuses()] },
+          startTime: { lt: end },
+          endTime: { gt: start },
+        },
+        select: { seats: true },
+      });
+      const used = usedAgg.reduce((a, s) => a + s.seats, 0);
+      const left = space.capacity - used;
+
+      if (left < seatsToBook) {
+        if (!waitlist && left <= 0) {
+          throw new Error('FULL');
+        }
+        if (!waitlist) {
+          throw Object.assign(new Error('LEFT'), { left });
+        }
+      }
+
+      const status = left < seatsToBook ? 'WAITLIST' : 'CONFIRMED';
+      const inviteToken = kind === 'GROUP' && status === 'CONFIRMED' ? newCoworkingInviteToken() : null;
+      return tx.coworkingSignup.create({
+        data: {
+          spaceId,
+          userId: session.user.id,
+          dayKey,
+          period,
+          startTime: start,
+          endTime: end,
+          seats: seatsToBook,
+          purpose,
+          status,
+          kind,
+          inviteToken,
+          joinOpen: kind === 'GROUP',
+          members:
+            kind === 'GROUP' && status === 'CONFIRMED'
+              ? {
+                  create: {
+                    userId: session.user.id,
+                    role: 'HOST',
+                    status: 'APPROVED',
+                  },
+                }
+              : undefined,
+        },
+        include: groupInclude(),
+      });
+    });
+
+    return NextResponse.json({ ok: true, signup: row }, { status: 201 });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : '';
+    if (msg === 'OVERLAP') {
+      return NextResponse.json({ message: 'У вас уже есть запись на это время' }, { status: 409 });
     }
-    if (!waitlist) {
+    if (msg === 'HALL') {
+      return NextResponse.json({ message: 'Зал занят бронью в это время' }, { status: 409 });
+    }
+    if (msg === 'FULL') {
+      return NextResponse.json({ message: 'Мест нет', left: 0, canWaitlist: true }, { status: 409 });
+    }
+    if (msg === 'LEFT') {
+      const left = Number((e as { left?: number }).left || 0);
       return NextResponse.json({ message: `Осталось мест: ${Math.max(0, left)}`, left }, { status: 409 });
     }
+    throw e;
   }
-
-  const status = left < seatsToBook ? 'WAITLIST' : 'CONFIRMED';
-  const inviteToken = kind === 'GROUP' && status === 'CONFIRMED' ? newCoworkingInviteToken() : null;
-  const row = await prisma.coworkingSignup.create({
-    data: {
-      spaceId,
-      userId: session.user.id,
-      dayKey,
-      period,
-      startTime: start,
-      endTime: end,
-      seats: seatsToBook,
-      purpose,
-      status,
-      kind,
-      inviteToken,
-      joinOpen: kind === 'GROUP',
-      members:
-        kind === 'GROUP' && status === 'CONFIRMED'
-          ? {
-              create: {
-                userId: session.user.id,
-                role: 'HOST',
-                status: 'APPROVED',
-              },
-            }
-          : undefined,
-    },
-    include: groupInclude(),
-  });
-
-  return NextResponse.json({ ok: true, signup: row }, { status: 201 });
 }
 
 export async function DELETE(req: Request) {

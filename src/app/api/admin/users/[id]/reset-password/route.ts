@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { AclError, aclJsonError, isSuperAdmin, requireAdmin } from '@/lib/acl';
 import { prisma } from '@/lib/prisma';
 import { generateTempPassword, logAdminAction } from '@/lib/admin-audit';
 import { z } from 'zod';
@@ -15,11 +14,8 @@ const bodySchema = z.object({
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
     const params = await props.params;
-    const session = await getServerSession(authOptions);
-    const role = session?.user?.role;
-    if (!session?.user?.id || (role !== 'ADMIN' && role !== 'TECH')) {
-      return NextResponse.json({ message: 'Нет доступа' }, { status: 403 });
-    }
+    const session = await requireAdmin();
+    const role = session.user.role;
 
     const parsed = bodySchema.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) {
@@ -36,8 +32,20 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     if (!target) {
       return NextResponse.json({ message: 'Пользователь не найден' }, { status: 404 });
     }
-    if (target.role === 'TECH' && role !== 'TECH') {
-      return NextResponse.json({ message: 'Нельзя сбросить пароль TECH-учётки' }, { status: 403 });
+    if (target.role === 'TECH') {
+      return NextResponse.json(
+        { message: 'Пароль TECH сбрасывается только в /ops' },
+        { status: 403 }
+      );
+    }
+    if (
+      target.role === 'ADMIN' &&
+      !isSuperAdmin(session.user.role, session.user.permissions)
+    ) {
+      return NextResponse.json(
+        { message: 'Сброс пароля администратора — только для суперадмина' },
+        { status: 403 }
+      );
     }
 
     const plain = parsed.data.password?.trim() || generateTempPassword(14);
@@ -79,6 +87,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       email: target.email,
     });
   } catch (e) {
+    if (e instanceof AclError) return aclJsonError(e);
     console.error('admin reset-password', e);
     return NextResponse.json({ message: 'Ошибка сервера' }, { status: 500 });
   }
