@@ -4,6 +4,7 @@ import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 
 import Link from "next/link";
 import { useVoiceCopy } from "@/components/VoiceProvider";
+import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BarChart3, Crown, Gamepad2, Trophy } from "lucide-react";
 import { GAMES, GAME_IDS, isGameId, type GameId } from "@/lib/games";
@@ -78,6 +79,7 @@ function parseTab(raw: string | null): HubTab {
 type TopMap = Partial<Record<GameId, number>>;
 
 function GamesHubInner() {
+  const { status } = useSession();
   const gamesTitle = useVoiceCopy("game.hub.title", "Офлайн-игры");
   const gamesIntro = useVoiceCopy("game.hub.intro");
   const searchParams = useSafeSearchParams();
@@ -114,21 +116,25 @@ function GamesHubInner() {
     setTimes(localTimes);
     setPlays(getAllLocalPlayCounts());
 
+    if (status === "loading") return;
+
     void (async () => {
-      await flushGameScoreQueue();
-      try {
-        const res = await fetch("/api/user/games", { credentials: "include" });
-        if (res.ok) {
-          const data = (await res.json()) as { scores?: { game: string; score: number }[] };
-          const next = { ...local };
-          for (const row of data.scores ?? []) {
-            const id = row.game as GameId;
-            if (id in GAMES) next[id] = Math.max(next[id] ?? 0, row.score);
+      if (status === "authenticated") {
+        await flushGameScoreQueue();
+        try {
+          const res = await fetch("/api/user/games", { credentials: "include" });
+          if (res.ok) {
+            const data = (await res.json()) as { scores?: { game: string; score: number }[] };
+            const next = { ...local };
+            for (const row of data.scores ?? []) {
+              const id = row.game as GameId;
+              if (id in GAMES) next[id] = Math.max(next[id] ?? 0, row.score);
+            }
+            setScores(next);
           }
-          setScores(next);
+        } catch {
+          /* offline */
         }
-      } catch {
-        /* offline */
       }
 
       const nextTops: TopMap = {};
@@ -148,7 +154,7 @@ function GamesHubInner() {
       );
       setTops(nextTops);
     })();
-  }, []);
+  }, [status]);
 
   const playedCount = useMemo(
     () => GAME_IDS.filter((id) => (scores[id] ?? 0) > 0 || (times[id] ?? 0) > 0).length,

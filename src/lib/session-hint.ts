@@ -17,3 +17,21 @@ export function readSessionHint(): boolean {
   if (typeof document === 'undefined') return false;
   return document.documentElement.classList.contains('has-session');
 }
+
+/** Cookie present — skip guest POSTs that would 401 in DevTools. */
+export function hasAuthSessionCookie(): boolean {
+  if (typeof document === 'undefined') return false;
+  try {
+    return document.cookie.split(';').some((part) => {
+      const name = part.trim().split('=')[0];
+      return (
+        name === 'next-auth.session-token' ||
+        name === '__Secure-next-auth.session-token' ||
+        name === 'authjs.session-token' ||
+        name === '__Secure-authjs.session-token'
+      );
+    });
+  } catch {
+    return false;
+  }
+}

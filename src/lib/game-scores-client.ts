@@ -1,5 +1,7 @@
 /** Client helpers: persist scores offline and sync when online. */
 
+import { hasAuthSessionCookie } from '@/lib/session-hint';
+
 const QUEUE_KEY = 'yp-game-score-queue';
 const LOCAL_BEST_KEY = 'yp-game-best';
 const LOCAL_PLAYS_KEY = 'yp-game-plays';
@@ -121,6 +123,7 @@ export async function waitForPlaySession(
 /** Start a server-validated play session before the match begins. */
 export async function beginGameSession(game: string): Promise<GameSessionCreds | null> {
   bumpLocalPlayCount(game);
+  if (!hasAuthSessionCookie()) return null;
   try {
     const res = await fetch('/api/user/games/start', {
       method: 'POST',
@@ -153,6 +156,7 @@ export async function reportGameScore(opts: {
     bumpLocalPlayCount(opts.game);
   }
   setLocalBest(opts.game, opts.score);
+  if (!hasAuthSessionCookie()) return true;
   const payload = {
     game: opts.game,
     score: opts.score,
@@ -181,6 +185,7 @@ export async function reportGameScore(opts: {
 }
 
 export async function reportSecretMenuFound() {
+  if (!hasAuthSessionCookie()) return;
   try {
     await fetch('/api/user/games', {
       method: 'POST',
@@ -194,6 +199,7 @@ export async function reportSecretMenuFound() {
 
 export async function flushGameScoreQueue() {
   if (typeof window === 'undefined' || !navigator.onLine) return;
+  if (!hasAuthSessionCookie()) return;
   try {
     const raw = localStorage.getItem(QUEUE_KEY);
     const list: QueuedScore[] = raw ? JSON.parse(raw) : [];

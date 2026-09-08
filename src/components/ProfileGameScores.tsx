@@ -30,6 +30,8 @@ export default function ProfileGameScores() {
     setScores(local);
     setTimes(localTimes);
 
+    if (!userId) return;
+
     void (async () => {
       await flushGameScoreQueue();
       try {
