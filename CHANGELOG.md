@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.161] — 2026-09-08
+
+### Fixed
+- Капча: PNG-плитки без emoji/`aria-label` с названием объекта в DOM
+- `/dashboard/edit` — отдельная страница, не модалка поверх профиля; PWA-баннер на ней скрыт
+- Алиасы `/dashboard/briefings` → инструктажи, `/dashboard/rewards` → награды
+
 ## [1.6.160] — 2026-09-08
 
 ### Performance

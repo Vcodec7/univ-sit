@@ -188,7 +188,7 @@ export default function ProfileHeroCard({
   onPreview,
   onSettings,
   onAvatarPick,
-  editSectionHref = '#profile-edit',
+  editSectionHref = '/dashboard/edit',
   onShowcaseSaved,
   onStatClick,
   onPassClick,

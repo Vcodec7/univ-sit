@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 
-type Tile = { id: string; emoji: string; label: string };
+type Tile = { id: string; src: string };
 
 type Props = {
   /** Called whenever a fresh solved token is ready (or cleared) */
@@ -129,7 +129,7 @@ export default function CaptchaField({ onToken, className }: Props) {
             gap: '0.4rem',
           }}
         >
-          {tiles.map((t) => {
+          {tiles.map((t, idx) => {
             const on = selected.includes(t.id);
             return (
               <button
@@ -138,18 +138,17 @@ export default function CaptchaField({ onToken, className }: Props) {
                 onClick={() => toggle(t.id)}
                 disabled={busy || solved}
                 aria-pressed={on}
-                aria-label={t.label}
+                aria-label={`Вариант ${idx + 1}`}
                 style={{
-                  fontSize: '1.65rem',
-                  lineHeight: 1.2,
-                  padding: '0.55rem 0.2rem',
+                  padding: '0.35rem',
                   borderRadius: 10,
                   border: on ? '2px solid var(--primary, #0d9488)' : '1px solid rgba(0,0,0,0.12)',
                   background: on ? 'color-mix(in srgb, var(--primary, #0d9488) 12%, #fff)' : '#fff',
                   cursor: busy || solved ? 'default' : 'pointer',
                 }}
               >
-                <span aria-hidden>{t.emoji}</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={t.src} alt="" width={96} height={96} draggable={false} style={{ width: '100%', height: 'auto', display: 'block' }} />
               </button>
             );
           })}

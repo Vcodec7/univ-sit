@@ -2839,6 +2839,9 @@ body:has(.home-page--lift) .glass-nav {
     -webkit-backdrop-filter: none !important;
     background: #fff !important;
   }
+  .profile-edit-page {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 

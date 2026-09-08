@@ -2,7 +2,7 @@
  * Captcha-aware role audit against ty staging.
  * Usage: node scripts/qa-ty-roles.mjs [baseUrl]
  */
-import { writeFileSync, mkdirSync } from 'fs';
+import sharp from 'sharp';
 import { join } from 'path';
 
 const BASE = (process.argv[2] || 'https://ty.idivles.ru').replace(/\/$/, '');
@@ -64,11 +64,28 @@ function row(role, name, ok, severity, detail = '') {
   return { role, name, ok: Boolean(ok), severity, detail: String(detail || '').slice(0, 240) };
 }
 
+async function classifyTileTag(src, jar) {
+  const url = src.startsWith('http') ? src : `${BASE}${src}`;
+  const res = await fetchRetry(url, { headers: { cookie: cookieHeader(jar) } });
+  if (!res.ok) throw new Error(`captcha tile HTTP ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  const { data } = await sharp(buf).resize(1, 1).raw().toBuffer({ resolveWithObject: true });
+  const [r, g, b] = data;
+  if (g > r + 20 && g > b + 10) return 'tree';
+  if (b > r + 20 && b > g) return 'car';
+  if (r > g + 20 && r > b) return 'house';
+  if (r > 160 && g > 70 && g < 160) return 'cat';
+  return 'unknown';
+}
+
 async function solveCaptcha(jar) {
   const chRes = await fetchRetry(`${BASE}/api/captcha/challenge`, { headers: { cookie: cookieHeader(jar) } });
   jarStore(jar, chRes);
   if (!chRes.ok) throw new Error(`captcha challenge HTTP ${chRes.status}`);
   const ch = await chRes.json();
+  if (JSON.stringify(ch).includes('emoji') || /дерево|такси|здание/.test(JSON.stringify(ch.tiles || []))) {
+    throw new Error('captcha challenge leaked tile labels');
+  }
   let selected = [];
   if (ch.kind === 'pick' && Array.isArray(ch.tiles)) {
     const q = String(ch.question || '');
@@ -77,7 +94,10 @@ async function solveCaptcha(jar) {
       if (q.includes(title)) tag = t;
     }
     if (!tag) throw new Error(`unknown captcha question: ${q}`);
-    selected = ch.tiles.filter((t) => String(t.id).startsWith(`${tag}-`)).map((t) => t.id);
+    for (const tile of ch.tiles) {
+      const got = await classifyTileTag(tile.src, jar);
+      if (got === tag) selected.push(tile.id);
+    }
   } else {
     throw new Error(`unsupported captcha kind ${ch.kind}`);
   }

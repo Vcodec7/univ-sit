@@ -1,11 +1,13 @@
 /**
- * Self-hosted anti-bot: arithmetic challenge + honeypot + single-use Redis/memory token.
+ * Self-hosted anti-bot: picture pick (PNG tiles) + honeypot + single-use token.
+ * Challenge JSON never includes emoji, labels, or tag prefixes in tile ids.
  */
 import crypto from 'crypto';
+import sharp from 'sharp';
 import { getSharedRedis } from '@/lib/rateLimit';
 
 const TTL_SEC = 300;
-const MEM = new Map<string, { answer: string; exp: number }>();
+const MEM = new Map<string, { payload: string; exp: number }>();
 
 function requireHmacSecret(fallbackDevOnly: string): string {
   const s =
@@ -31,29 +33,14 @@ function cleanupMem() {
   }
 }
 
-export type CaptchaTile = { id: string; emoji: string; label: string };
+export type CaptchaTilePublic = { id: string; src: string };
 
 export type CaptchaChallenge = {
   challengeId: string;
   question: string;
   kind: 'pick' | 'math';
-  tiles?: CaptchaTile[];
+  tiles?: CaptchaTilePublic[];
 };
-
-const PICK_POOL: Array<{ id: string; emoji: string; tag: string; label: string }> = [
-  { id: 'tree-a', emoji: '🌳', tag: 'tree', label: 'дерево' },
-  { id: 'tree-b', emoji: '🌲', tag: 'tree', label: 'ёлка' },
-  { id: 'tree-c', emoji: '🌴', tag: 'tree', label: 'пальма' },
-  { id: 'car-a', emoji: '🚗', tag: 'car', label: 'машина' },
-  { id: 'car-b', emoji: '🚕', tag: 'car', label: 'такси' },
-  { id: 'house-a', emoji: '🏠', tag: 'house', label: 'дом' },
-  { id: 'house-b', emoji: '🏢', tag: 'house', label: 'здание' },
-  { id: 'cat-a', emoji: '🐱', tag: 'cat', label: 'кот' },
-  { id: 'cat-b', emoji: '🦁', tag: 'cat', label: 'лев' },
-  { id: 'sun-a', emoji: '☀️', tag: 'sun', label: 'солнце' },
-  { id: 'star-a', emoji: '⭐', tag: 'star', label: 'звезда' },
-  { id: 'fish-a', emoji: '🐟', tag: 'fish', label: 'рыба' },
-];
 
 const PICK_TARGETS = [
   { tag: 'tree', title: 'деревья' },
@@ -61,6 +48,11 @@ const PICK_TARGETS = [
   { tag: 'house', title: 'дома' },
   { tag: 'cat', title: 'животные' },
 ] as const;
+
+type TileTag = (typeof PICK_TARGETS)[number]['tag'];
+
+type StoredTile = { id: string; tag: TileTag };
+type StoredChallenge = { answer: string; tiles: StoredTile[] };
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -71,42 +63,122 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-async function storeAnswer(challengeId: string, answer: string) {
+async function storeRaw(key: string, value: string) {
   const redis = getSharedRedis();
   if (redis) {
-    await redis.set(`captcha:${challengeId}`, answer, 'EX', TTL_SEC);
+    await redis.set(key, value, 'EX', TTL_SEC);
   } else {
-    MEM.set(challengeId, { answer, exp: Date.now() + TTL_SEC * 1000 });
+    MEM.set(key, { payload: value, exp: Date.now() + TTL_SEC * 1000 });
   }
+}
+
+async function loadRaw(key: string): Promise<string | null> {
+  const redis = getSharedRedis();
+  if (redis) {
+    const stored = await redis.get(key);
+    return stored != null ? String(stored) : null;
+  }
+  cleanupMem();
+  const row = MEM.get(key);
+  if (!row || row.exp < Date.now()) {
+    MEM.delete(key);
+    return null;
+  }
+  return row.payload;
+}
+
+async function delRaw(key: string) {
+  const redis = getSharedRedis();
+  if (redis) await redis.del(key);
+  else MEM.delete(key);
+}
+
+function parseStored(raw: string | null): StoredChallenge | null {
+  if (!raw) return null;
+  if (raw.startsWith('pick:')) return { answer: raw, tiles: [] };
+  try {
+    const parsed = JSON.parse(raw) as StoredChallenge;
+    if (parsed?.answer && Array.isArray(parsed.tiles)) return parsed;
+  } catch {
+    /* ignore */
+  }
+  return null;
 }
 
 export async function createCaptchaChallenge(): Promise<CaptchaChallenge> {
   cleanupMem();
   const challengeId = crypto.randomBytes(16).toString('hex');
   const target = PICK_TARGETS[Math.floor(Math.random() * PICK_TARGETS.length)];
-  const hits = shuffle(PICK_POOL.filter((t) => t.tag === target.tag)).slice(0, 2);
-  const decoys = shuffle(PICK_POOL.filter((t) => t.tag !== target.tag)).slice(0, 4);
-  const tiles = shuffle([...hits, ...decoys]).map((t) => ({
-    id: `${t.id}-${crypto.randomBytes(2).toString('hex')}`,
-    emoji: t.emoji,
-    label: t.label,
-    tag: t.tag,
-  }));
+  const hits: StoredTile[] = [
+    { id: crypto.randomBytes(8).toString('hex'), tag: target.tag },
+    { id: crypto.randomBytes(8).toString('hex'), tag: target.tag },
+  ];
+  const others = PICK_TARGETS.filter((t) => t.tag !== target.tag).map((t) => t.tag);
+  const decoys: StoredTile[] = shuffle(others)
+    .slice(0, 4)
+    .map((tag) => ({ id: crypto.randomBytes(8).toString('hex'), tag }));
+  const tiles = shuffle([...hits, ...decoys]);
   const correct = tiles.filter((t) => t.tag === target.tag).map((t) => t.id).sort().join(',');
-  await storeAnswer(challengeId, `pick:${correct}`);
+  await storeRaw(`captcha:${challengeId}`, JSON.stringify({ answer: `pick:${correct}`, tiles }));
   return {
     challengeId,
     question: `Выберите все картинки: ${target.title}`,
     kind: 'pick',
-    tiles: tiles.map(({ id, emoji, label }) => ({ id, emoji, label })),
+    tiles: tiles.map((t) => ({
+      id: t.id,
+      src: `/api/captcha/tile/${challengeId}/${t.id}`,
+    })),
   };
+}
+
+export async function renderCaptchaTilePng(challengeId: string, tileId: string): Promise<Buffer | null> {
+  const stored = parseStored(await loadRaw(`captcha:${challengeId}`));
+  const tile = stored?.tiles.find((t) => t.id === tileId);
+  if (!tile) return null;
+  const svg = captchaTileSvg(tile.tag);
+  return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+function captchaTileSvg(tag: TileTag): string {
+  const bg = '#eef3f8';
+  if (tag === 'tree') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+      <rect width="128" height="128" rx="18" fill="${bg}"/>
+      <polygon points="64,18 108,78 20,78" fill="#2f7d32"/>
+      <rect x="56" y="76" width="16" height="28" rx="3" fill="#6d4c41"/>
+    </svg>`;
+  }
+  if (tag === 'car') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+      <rect width="128" height="128" rx="18" fill="${bg}"/>
+      <rect x="22" y="52" width="84" height="28" rx="10" fill="#1565c0"/>
+      <rect x="38" y="40" width="42" height="18" rx="6" fill="#42a5f5"/>
+      <circle cx="42" cy="86" r="10" fill="#263238"/>
+      <circle cx="88" cy="86" r="10" fill="#263238"/>
+    </svg>`;
+  }
+  if (tag === 'house') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+      <rect width="128" height="128" rx="18" fill="${bg}"/>
+      <polygon points="64,20 112,62 16,62" fill="#c62828"/>
+      <rect x="34" y="60" width="60" height="46" fill="#ef9a9a"/>
+      <rect x="56" y="78" width="16" height="28" fill="#6d4c41"/>
+    </svg>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+    <rect width="128" height="128" rx="18" fill="${bg}"/>
+    <circle cx="64" cy="70" r="28" fill="#ef6c00"/>
+    <polygon points="42,48 52,28 64,48" fill="#ef6c00"/>
+    <polygon points="86,48 76,28 64,48" fill="#ef6c00"/>
+    <circle cx="54" cy="66" r="4" fill="#3e2723"/>
+    <circle cx="74" cy="66" r="4" fill="#3e2723"/>
+  </svg>`;
 }
 
 export type CaptchaVerifyInput = {
   challengeId?: string | null;
   answer?: string | number | null;
   selected?: string[] | null;
-  /** Honeypot — must be empty */
   website?: string | null;
 };
 
@@ -114,7 +186,6 @@ export type CaptchaVerifyResult =
   | { ok: true; token: string }
   | { ok: false; message: string };
 
-/** Step 1: verify answer and issue single-use token */
 export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVerifyResult> {
   if (input.website && String(input.website).trim() !== '') {
     return { ok: false, message: 'Проверка не пройдена' };
@@ -124,24 +195,10 @@ export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVe
     return { ok: false, message: 'Обновите проверку и попробуйте снова' };
   }
 
-  let expected: string | null = null;
-  const redis = getSharedRedis();
-  if (redis) {
-    const key = `captcha:${id}`;
-    const stored = await redis.get(key);
-    if (stored != null) {
-      await redis.del(key);
-      expected = String(stored);
-    }
-  } else {
-    const row = MEM.get(id);
-    if (row && row.exp >= Date.now()) {
-      MEM.delete(id);
-      expected = row.answer;
-    } else {
-      MEM.delete(id);
-    }
-  }
+  const key = `captcha:${id}`;
+  const stored = parseStored(await loadRaw(key));
+  await delRaw(key);
+  const expected = stored?.answer ?? null;
 
   if (expected == null) {
     return { ok: false, message: 'Неверный ответ на проверку' };
@@ -170,11 +227,7 @@ export async function solveCaptcha(input: CaptchaVerifyInput): Promise<CaptchaVe
   }
 
   const token = signToken(id);
-  if (redis) {
-    await redis.set(`captcha:tok:${token}`, '1', 'EX', TTL_SEC);
-  } else {
-    MEM.set(`tok:${token}`, { answer: '1', exp: Date.now() + TTL_SEC * 1000 });
-  }
+  await storeRaw(`captcha:tok:${token}`, '1');
   return { ok: true, token };
 }
 
@@ -185,7 +238,6 @@ function signToken(challengeId: string) {
   return `${payload}.${sig}`;
 }
 
-/** Consume one-time token (register / apply / contest). */
 export async function consumeCaptchaToken(
   token: string | null | undefined,
   honeypot?: string | null
@@ -208,14 +260,13 @@ export async function consumeCaptchaToken(
     return { ok: false, message: 'Пройдите проверку заново' };
   }
 
+  const key = `captcha:tok:${t}`;
   const redis = getSharedRedis();
   if (redis) {
-    const key = `captcha:tok:${t}`;
     const n = await redis.del(key);
     if (!n) return { ok: false, message: 'Проверка устарела — решите пример снова' };
   } else {
     cleanupMem();
-    const key = `tok:${t}`;
     if (!MEM.has(key)) return { ok: false, message: 'Проверка устарела — решите пример снова' };
     MEM.delete(key);
   }
