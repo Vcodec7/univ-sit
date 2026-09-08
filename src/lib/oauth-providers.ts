@@ -24,6 +24,7 @@ export function buildOptionalOAuthProviders(): any[] {
       YandexProvider({
         clientId: yandexId,
         clientSecret: yandexSecret,
+        allowDangerousEmailAccountLinking: true,
       })
     );
   }
@@ -37,6 +38,7 @@ export function buildOptionalOAuthProviders(): any[] {
       VkProvider({
         clientId: vkId,
         clientSecret: vkSecret,
+        allowDangerousEmailAccountLinking: true,
         authorization: { params: { scope: 'email' } },
         profile(profile: Record<string, unknown>) {
           const first = String(profile.first_name || profile.given_name || '');
@@ -65,6 +67,7 @@ export function buildOptionalOAuthProviders(): any[] {
       type: 'oauth',
       clientId: esia.clientId,
       clientSecret: esia.clientSecret,
+      allowDangerousEmailAccountLinking: true,
       checks: 'pkce',
       authorization: {
         url: (process.env.ESIA_AUTH_URL || 'https://esia.gosuslugi.ru/aas/oauth2/ac').trim(),

@@ -524,7 +524,6 @@ export const authOptions: NextAuthOptions = {
       }).catch(() => null);
     },
   },
-  allowDangerousEmailAccountLinking: true,
   pages: {
     signIn: "/login",
   },
