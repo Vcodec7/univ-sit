@@ -4,9 +4,12 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isSuperAdmin, LIMITED_ADMIN_TOKEN, sanitizePermissions } from '@/lib/acl';
 import { logAdminAction } from '@/lib/admin-audit';
+import { assertSameOrigin } from '@/lib/csrf-origin';
 
 export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
+    const csrf = assertSameOrigin(req);
+    if (csrf) return csrf;
     const params = await props.params;
     const session = await getServerSession(authOptions);
 

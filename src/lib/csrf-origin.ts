@@ -1,8 +1,11 @@
 /**
  * Same-origin guard for mutating API routes (CSRF defense-in-depth).
- * Allows missing Origin on same-site navigations that send only Referer.
+ * Allowlist is env/public hosts only — never the request Host /
+ * X-Forwarded-Host (those are attacker-controlled behind a mis-set proxy).
  */
 import { NextResponse } from 'next/server';
+
+const PINNED_HOSTS = ['ty.idivles.ru', 'py.idivles.ru'];
 
 function hostOf(url: string | null): string | null {
   if (!url) return null;
@@ -13,37 +16,49 @@ function hostOf(url: string | null): string | null {
   }
 }
 
+export function csrfAllowedHosts(): Set<string> {
+  const allowed = new Set<string>();
+  const add = (h: string | null | undefined) => {
+    const v = String(h || '')
+      .trim()
+      .toLowerCase()
+      .replace(/\/$/, '');
+    if (v) allowed.add(v);
+  };
+  add(hostOf(process.env.NEXTAUTH_URL || null));
+  add(hostOf(process.env.NEXT_PUBLIC_SITE_URL || null));
+  for (const part of String(process.env.CSRF_ALLOWED_HOSTS || '').split(',')) add(part);
+  for (const h of PINNED_HOSTS) add(h);
+  if (process.env.NODE_ENV !== 'production') {
+    add('localhost:3000');
+    add('localhost:3001');
+    add('127.0.0.1:3000');
+    add('127.0.0.1:3001');
+  }
+  return allowed;
+}
+
 export function assertSameOrigin(req: Request): NextResponse | null {
+  const allowed = csrfAllowedHosts();
   const origin = req.headers.get('origin');
   const referer = req.headers.get('referer');
-  const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '')
-    .split(',')[0]
-    .trim()
-    .toLowerCase();
-  if (!host) return null;
 
-  const allowed = new Set(
-    [host, process.env.NEXTAUTH_URL ? hostOf(process.env.NEXTAUTH_URL) : null].filter(Boolean) as string[]
-  );
-
-  const check = (raw: string | null) => {
+  const hostAllowed = (raw: string | null) => {
     const h = hostOf(raw);
-    return !h || allowed.has(h);
+    if (raw && !h) return false;
+    if (!h) return false;
+    return allowed.has(h);
   };
 
   if (!origin && !referer) {
-    /* Some WebViews omit Origin/Referer but still send Sec-Fetch-Site. */
     const site = (req.headers.get('sec-fetch-site') || '').toLowerCase();
-    if (site === 'same-origin' || site === 'same-site' || site === 'none') return null;
-    return NextResponse.json(
-      { message: 'Origin required', code: 'CSRF_ORIGIN' },
-      { status: 403 }
-    );
+    if (site === 'same-origin' || site === 'same-site') return null;
+    return NextResponse.json({ message: 'Origin required', code: 'CSRF_ORIGIN' }, { status: 403 });
   }
-  if (origin && !check(origin)) {
+  if (origin && !hostAllowed(origin)) {
     return NextResponse.json({ message: 'Origin denied', code: 'CSRF_ORIGIN' }, { status: 403 });
   }
-  if (!origin && referer && !check(referer)) {
+  if (!origin && referer && !hostAllowed(referer)) {
     return NextResponse.json({ message: 'Referer denied', code: 'CSRF_REFERER' }, { status: 403 });
   }
   return null;

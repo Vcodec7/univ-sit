@@ -1,5 +1,16 @@
 # Changelog — YoungPortal
 
+## [1.6.195] — 2026-09-08
+
+### Безопасность
+- CSRF: allowlist публичных хостов (не `X-Forwarded-Host`); проверка на мутациях `/api` в `proxy.ts`
+- Профиль больше не принимает `telegramChatId` / `maxUserId` из тела запроса
+- Cron только `Authorization: Bearer` / `x-cron-secret` (без `?secret=` в URL)
+- Редиректы `/r/` и инвайтов только на `NEXTAUTH_URL`, не на Host заголовка
+- Гостю календарь площадки не показывает названия заявок «на рассмотрении»
+- HMAC-билеты требуют `NEXTAUTH_SECRET` вне development; health-монитор не шарит `CRON_SECRET`
+
+
 ## [1.6.194] — 2026-09-08
 
 ### Надёжность

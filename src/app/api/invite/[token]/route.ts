@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getSiteIdentity, isLocalOrigin, normalizeOrigin } from '@/lib/site-identity';
+import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
+import { originFromEnv } from '@/lib/site-identity-shared';
 
-async function resolvePublicOrigin(req: Request) {
+async function resolvePublicOrigin() {
   const identity = await getSiteIdentity();
   if (identity.publicOrigin && !isLocalOrigin(identity.publicOrigin)) return identity.publicOrigin;
-  const proto = req.headers.get('x-forwarded-proto') || 'https';
-  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
-  if (host && !/0\.0\.0\.0|127\.0\.0\.1/i.test(host)) {
-    return normalizeOrigin(`${proto}://${host}`) || identity.publicOrigin;
-  }
-  return identity.publicOrigin;
+  const env = originFromEnv({ allowLocal: false });
+  if (env) return env;
+  return 'https://py.idivles.ru';
 }
 
 /** Resolve friend-invite token → redirect to public profile with invite query. */
@@ -21,7 +19,7 @@ export async function GET(
   try {
     const { token } = await params;
     const clean = (token || '').trim();
-    const origin = await resolvePublicOrigin(req);
+    const origin = await resolvePublicOrigin();
     if (!clean || clean.length > 64) {
       return NextResponse.redirect(`${origin}/friends`);
     }
@@ -44,7 +42,7 @@ export async function GET(
     );
   } catch (error) {
     console.error('GET /api/invite/[token]', error);
-    const origin = await resolvePublicOrigin(req).catch(() => 'https://py.idivles.ru');
+    const origin = await resolvePublicOrigin().catch(() => 'https://py.idivles.ru');
     return NextResponse.redirect(`${origin}/friends`);
   }
 }

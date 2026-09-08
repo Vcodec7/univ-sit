@@ -16,8 +16,7 @@ import {
   parseVkSyncSchedule,
   shouldRunVkSyncNow,
 } from '@/lib/vk-sync-schedule';
-
-const CRON_SECRET = process.env.CRON_SECRET || '';
+import { cronAuthorized } from '@/lib/cron-auth';
 
 function postTitle(text: string, videoTitle: string | null) {
   const first = (text.split('\n')[0] || '').trim();
@@ -205,10 +204,9 @@ async function runSync(opts: SyncOpts = {}) {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const secret = searchParams.get('secret') || request.headers.get('x-cron-secret') || '';
   const force = searchParams.get('force') === '1';
 
-  if (!CRON_SECRET || secret !== CRON_SECRET) {
+  if (!cronAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -222,9 +220,8 @@ export async function GET(request: Request) {
     }
     return NextResponse.json(result);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
     console.error('Ошибка синхронизации VK (cron):', error);
-    return NextResponse.json({ error: 'Внутренняя ошибка', details: message }, { status: 500 });
+    return NextResponse.json({ error: 'Внутренняя ошибка' }, { status: 500 });
   }
 }
 
@@ -247,8 +244,7 @@ export async function POST() {
     }
     return NextResponse.json(result);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
     console.error('Ошибка синхронизации VK (manual):', error);
-    return NextResponse.json({ error: 'Внутренняя ошибка', details: message }, { status: 500 });
+    return NextResponse.json({ error: 'Внутренняя ошибка' }, { status: 500 });
   }
 }

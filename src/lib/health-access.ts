@@ -3,7 +3,7 @@
  * Full payload: loopback without X-Forwarded-For, or HEALTH_MONITOR_TOKEN.
  */
 export function isDetailedHealthRequest(req: { headers: { get(name: string): string | null } }) {
-  const token = (process.env.HEALTH_MONITOR_TOKEN || process.env.CRON_SECRET || '').trim();
+  const token = (process.env.HEALTH_MONITOR_TOKEN || '').trim();
   const given = (
     req.headers.get('x-yp-health-token') ||
     req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ||

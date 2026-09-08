@@ -160,9 +160,7 @@ export async function POST(req: Request) {
       });
       return NextResponse.json(
         {
-          code: 'EMAIL_EXISTS',
-          message: 'Аккаунт с такой почтой уже существует',
-          email,
+          message: EXISTING_ACCOUNT_MSG,
         },
         { status: 409 }
       );

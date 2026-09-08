@@ -6,9 +6,12 @@ import { AclError, aclJsonError, requireEndUser } from "@/lib/acl";
 import { notifyBookingStatus, notifyStaffNewBooking } from "@/lib/notifications";
 import { promoteToParticipant } from "@/lib/participant";
 import { bookingHourLimiter, rateLimitJson } from "@/lib/rateLimit";
+import { assertSameOrigin } from "@/lib/csrf-origin";
 
 export async function POST(req: Request) {
   try {
+    const csrf = assertSameOrigin(req);
+    if (csrf) return csrf;
     const session = await requireEndUser();
     const userId = session.user.id;
     if (!userId) {

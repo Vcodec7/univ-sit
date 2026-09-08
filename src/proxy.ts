@@ -6,6 +6,7 @@ import { canAccessAdminPath, canUseScanner, isTechRole } from '@/lib/acl-shared'
 import { shouldForcePasswordChange } from '@/lib/force-password-change';
 import { moduleKeyForPath } from '@/lib/module-flags-edge';
 import { clientIp, edgeRateAllow } from '@/lib/edge-rate-limit';
+import { assertSameOrigin } from '@/lib/csrf-origin';
 
 // Public pages are ISR (root layout revalidate=60). A per-request script nonce
 // cannot match cached HTML, and 'strict-dynamic' disables host allowlists —
@@ -144,6 +145,22 @@ export default async function proxy(req: NextRequest) {
   };
 
   const method = req.method.toUpperCase();
+  if (
+    pathname.startsWith('/api/') &&
+    method !== 'GET' &&
+    method !== 'HEAD' &&
+    method !== 'OPTIONS'
+  ) {
+    const skipCsrf =
+      pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/api/integrations/telegram/webhook') ||
+      pathname.startsWith('/api/integrations/max/webhook');
+    if (!skipCsrf) {
+      const blocked = assertSameOrigin(req);
+      if (blocked) return blocked;
+    }
+  }
+
   const pdfPretty = pathname.match(/^\/documents\/([^/]+\.pdf)$/i);
   if (pdfPretty && (method === 'GET' || method === 'HEAD')) {
     const stem = pdfPretty[1].replace(/\.pdf$/i, '');

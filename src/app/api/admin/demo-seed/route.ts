@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { fakerRU as faker } from '@faker-js/faker';
 import bcrypt from 'bcrypt';
+import { randomBytes } from 'node:crypto';
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +31,9 @@ export async function POST(req: Request) {
     await prisma.news.deleteMany({ where: { isDemoData: true } });
     await prisma.user.deleteMany({ where: { isDemoData: true } });
 
-    const passwordHash = await bcrypt.hash('demo_password_123', 10);
+    const demoPass = randomBytes(18).toString('base64url');
+    const passwordHash = await bcrypt.hash(demoPass, 10);
+    console.info('[demo-seed] demo user password stored in container logs only');
 
     // 1. Создаем пользователей (100)
     const timestamp = Date.now();
@@ -154,7 +157,10 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ message: 'Демо-данные успешно сгенерированы! Пароль для пользователей: demo_password_123' }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Демо-данные успешно сгенерированы. Пароль демо-пользователей только в логах сервера.' },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Ошибка демо-сидирования:', error);
     return NextResponse.json({ message: 'Ошибка при создании демо-данных. Смотрите логи сервера.' }, { status: 500 });
