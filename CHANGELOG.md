@@ -1,5 +1,13 @@
 # Changelog — YoungPortal
 
+## [1.6.183] — 2026-09-08
+
+### Каталог проектов / TTFB
+- RSC prefetch карточек больше не штурмует on-demand ISR (пустой generateStaticParams на сборке без БД → 503)
+- Metadata проектов/клубов/новостей и brandedMetadata без `headers()`
+- Публичные GET в proxy не ждут JWT и status (кэш модулей в фоне)
+- Убран лишний preload `sochi-sea.jpg`, который next/image не использует
+
 ## [1.6.182] — 2026-09-08
 
 ### Главная (аудит BUG-04 / BUG-06)

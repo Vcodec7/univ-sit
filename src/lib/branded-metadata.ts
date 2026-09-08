@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { getSiteIdentity, withSiteBrand } from '@/lib/site-identity';
+import { getSiteIdentityStatic, withSiteBrand } from '@/lib/site-identity';
 
 /** Dynamic page metadata branded with current SiteSettings.siteName. */
 export async function brandedMetadata(
   pageTitle: string,
   extras?: Omit<Metadata, 'title'> & { titleAbsolute?: boolean; canonicalPath?: string }
 ): Promise<Metadata> {
-  const { siteName, publicOrigin } = await getSiteIdentity();
+  const { siteName, publicOrigin } = await getSiteIdentityStatic();
   const { titleAbsolute, canonicalPath, ...rest } = extras || {};
   const clean = withSiteBrand(pageTitle, siteName);
   const ogUrl =

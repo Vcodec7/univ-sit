@@ -151,6 +151,33 @@ export default async function proxy(req: NextRequest) {
     return withCsp(NextResponse.rewrite(url));
   }
 
+  const publicHtmlGet =
+    (method === 'GET' || method === 'HEAD') &&
+    !pathname.startsWith('/api/') &&
+    !pathname.startsWith('/admin') &&
+    !pathname.startsWith('/ops') &&
+    !pathname.startsWith('/dashboard') &&
+    !pathname.startsWith('/scanner') &&
+    !pathname.startsWith('/scan') &&
+    pathname !== '/login' &&
+    pathname !== '/register';
+  if (publicHtmlGet) {
+    if (!statusCache || Date.now() - statusCache.at >= STATUS_TTL_MS) {
+      void fetchPublicStatus(req);
+    }
+    const cached = statusCache?.data;
+    if (cached?.maintenanceMode && pathname !== '/maintenance' && !isMaintenanceBypassPath(pathname)) {
+      return NextResponse.redirect(new URL('/maintenance', req.url));
+    }
+    const key = moduleKeyForPath(pathname);
+    if (key && key !== 'maintenance' && cached?.modules && cached.modules[key] === false && !pathname.startsWith('/unavailable')) {
+      const mode = cached.offModes?.[key] === 'soon' ? 'soon' : 'hide';
+      const q = new URLSearchParams({ m: key, mode });
+      return NextResponse.redirect(new URL(`/unavailable?${q.toString()}`, req.url));
+    }
+    return withCsp(NextResponse.next({ request: { headers: requestHeaders } }));
+  }
+
   const ip = clientIp(req);
   const authPost =
     method === 'POST' &&

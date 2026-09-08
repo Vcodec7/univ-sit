@@ -27,7 +27,7 @@ export default function HomeLiftFeedCard({
 }) {
   return (
     <article className="free-now-card yp-feed-card lift-feed-card">
-      <Link href={href} className="lift-feed-card__media" aria-label={title}>
+      <Link href={href} className="lift-feed-card__media" aria-label={title} prefetch={false}>
         <div className="free-now-avatar yp-feed-card__media">
           {cover}
           {badge ? <span className="free-now-badge">{badge}</span> : null}
@@ -43,12 +43,12 @@ export default function HomeLiftFeedCard({
           ) : (
             <>
               {secondary ? (
-                <Link href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost">
+                <Link href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost" prefetch={false}>
                   {secondary.label}
                 </Link>
               ) : null}
               {primary ? (
-                <Link href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
+                <Link href={primary.href} className="lift-hero__btn lift-hero__btn--lime" prefetch={false}>
                   {primary.label}
                 </Link>
               ) : null}
