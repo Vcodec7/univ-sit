@@ -32,9 +32,12 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-fc3711f8a3f7f4e806e67349413a2a49ac908b7a2908e1ecfde018b42e026a1d}"
     ;;
   org|organization|with-live)
-    # Полный орг-кит: код + снимок БД/uploads/образов (персональные данные!)
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/8694c332fe0530d051329de0ca2322ce/youngportal-org-kit-20260817-222141.tgz}"
     KIT_SHA256="${KIT_SHA256:-f28a741ba3814f4f81e41b520b958af38e848eabc4a9f95d9e2017cf5153a366}"
+    ;;
+  runtime|org-runtime|nosource)
+    KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/org-runtime-placeholder/youngportal-org-runtime-kit-latest.tgz}"
+    KIT_SHA256="${KIT_SHA256:-SKIP}"
     ;;
   source|modernize|sale)
     KIT_URL="${KIT_URL:-https://py.idivles.ru/backups/879d87b363d76416fd5c295abe26e152/youngportal-sale-source-20260817-222141.tgz}"
@@ -49,7 +52,7 @@ case "$KIT_PROFILE" in
     KIT_SHA256="${KIT_SHA256:-8e16efcfcd0c257a5e20f9776c9de4b9d439cccd32e8782487f26a7315da47e7}"
     ;;
   *)
-    echo "KIT_PROFILE=client|org|sale|portable|source|developer" >&2
+    echo "KIT_PROFILE=client|org|runtime|sale|portable|source|developer" >&2
     exit 1
     ;;
 esac

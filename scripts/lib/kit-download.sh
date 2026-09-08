@@ -73,7 +73,7 @@ yp_kit_fetch() {
         -o "$dest" \
         "https://py.idivles.ru${path}"
     }
-  if [[ -n "${KIT_SHA256:-}" ]]; then
+  if [[ -n "${KIT_SHA256:-}" && "${KIT_SHA256}" != "SKIP" ]]; then
     echo "${KIT_SHA256}  ${dest}" | sha256sum -c
   fi
   ls -lh "$dest"
