@@ -1,5 +1,5 @@
 /**
- * Replace SiteDocument library with official CRM / VK-channel materials.
+ * Replace SiteDocument library with official CRM / VK-channel materials (PDF).
  * Removes test/demo docs, keeps (or recreates) #правилаДМ + signup memo,
  * and adds additional official memos for the portal.
  *
@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import fs from 'fs';
 import path from 'path';
+import { buildPlainTextPdf } from './lib/plain-text-pdf.mjs';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -23,17 +24,22 @@ const prisma = new PrismaClient({
 
 const PUBLIC = process.env.PUBLIC_DIR || path.join(process.cwd(), 'public');
 
-function writeTxt(id, body) {
+async function writePdf(id, title, body) {
   const dir = path.join(PUBLIC, 'uploads', 'documents');
   fs.mkdirSync(dir, { recursive: true });
-  const fileName = `${id}.txt`;
+  const fileName = `${id}.pdf`;
   const full = path.join(dir, fileName);
-  const buf = Buffer.from(String(body).trim() + '\n', 'utf8');
+  const buf = await buildPlainTextPdf(
+    { title, body: String(body).trim() + '\n', footer: 'Официальный документ портала · PDF' },
+    path.join(PUBLIC, 'fonts')
+  );
   fs.writeFileSync(full, buf);
+  const txtLegacy = path.join(dir, `${id}.txt`);
+  if (fs.existsSync(txtLegacy)) fs.unlinkSync(txtLegacy);
   return {
     url: `/uploads/documents/${fileName}`,
     fileName,
-    mimeType: 'text/plain',
+    mimeType: 'application/pdf',
     sizeBytes: buf.length,
   };
 }
@@ -166,7 +172,7 @@ FAQ на портале: /faq
 ];
 
 async function upsertDoc(meta) {
-  const file = writeTxt(meta.id, meta.body);
+  const file = await writePdf(meta.id, meta.title, meta.body);
   const existing = await prisma.siteDocument.findUnique({ where: { id: meta.id } });
   const data = {
     title: meta.title,

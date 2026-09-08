@@ -57,35 +57,6 @@ function GoogleDocsFrame({ src, title }: { src: string; title: string }) {
   );
 }
 
-function TextViewer({ url }: { url: string }) {
-  const [textBody, setTextBody] = useState<string | null>(null);
-  const [textError, setTextError] = useState('');
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(url)
-      .then((r) => {
-        if (!r.ok) throw new Error('Не удалось загрузить файл');
-        return r.text();
-      })
-      .then((t) => {
-        if (!cancelled) setTextBody(t);
-      })
-      .catch((e: Error) => {
-        if (!cancelled) setTextError(e.message || 'Ошибка загрузки');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  return (
-    <pre className="yp-doc-text">
-      {textError || textBody || 'Загрузка…'}
-    </pre>
-  );
-}
-
 export default function DocumentViewer({
   documentId,
   fileUrl,
@@ -104,10 +75,39 @@ export default function DocumentViewer({
   );
   const newTabUrl = useMemo(() => `/documents/${documentId}`, [documentId]);
   const [localDocx, setLocalDocx] = useState(false);
+  const namedPdf =
+    mimeType === 'application/pdf' ||
+    fileName.toLowerCase().endsWith('.pdf') ||
+    mimeType === 'text/plain' ||
+    fileName.toLowerCase().endsWith('.txt');
+  const [isPdf, setIsPdf] = useState(namedPdf);
 
-  const isPdf = mimeType === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+  useEffect(() => {
+    if (namedPdf) {
+      setIsPdf(true);
+      return;
+    }
+    let cancelled = false;
+    fetch(inlineUrl, { headers: { Range: 'bytes=0-7' } })
+      .then(async (r) => {
+        const ct = (r.headers.get('content-type') || '').toLowerCase();
+        const cd = r.headers.get('content-disposition') || '';
+        if (ct.includes('application/pdf') || /\.pdf/i.test(cd)) {
+          if (!cancelled) setIsPdf(true);
+          return;
+        }
+        const buf = new Uint8Array(await r.arrayBuffer());
+        if (buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46) {
+          if (!cancelled) setIsPdf(true);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [inlineUrl, namedPdf]);
+
   const isImage = mimeType.startsWith('image/');
-  const isText = mimeType === 'text/plain' || fileName.toLowerCase().endsWith('.txt');
   const docx = isDocx(mimeType, fileName);
   const legacyDoc = isLegacyDoc(mimeType, fileName);
   const cloudDocx = Boolean(docx && publicFileUrl && /^https:\/\//i.test(publicFileUrl) && !localDocx);
@@ -121,7 +121,7 @@ export default function DocumentViewer({
         </div>
         <div className="yp-doc-viewer__actions">
           <a href={downloadUrl} className="btn btn-secondary">
-            <Download size={16} /> Скачать
+            <Download size={16} /> {isPdf ? 'Скачать PDF' : 'Скачать'}
           </a>
           <a href={newTabUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
             <ExternalLink size={16} /> Открыть в новой вкладке
@@ -152,9 +152,7 @@ export default function DocumentViewer({
         <img src={fileUrl} alt={title} className="yp-doc-viewer__img" />
       ) : null}
 
-      {isText && <TextViewer url={inlineUrl} />}
-
-      {!isPdf && !docx && !legacyDoc && !isImage && !isText ? (
+      {!isPdf && !docx && !legacyDoc && !isImage ? (
         <div className="yp-doc-viewer__note">Предпросмотр для этого формата недоступен. Скачайте файл.</div>
       ) : null}
 

@@ -1,5 +1,5 @@
 /**
- * Seed test documents (PDF + TXT) into SiteDocument.
+ * Seed test documents (PDF) into SiteDocument.
  * Run: docker-compose exec -T -e PUBLIC_DIR=/app/public web node /app/scripts/seed-documents.mjs
  */
 import { PrismaClient } from '@prisma/client';
@@ -150,44 +150,41 @@ async function main() {
     console.log('seeded', meta.id, saved.url);
   }
 
-  const txt = Buffer.from(
-    `Политика конфиденциальности (тестовый фрагмент)
-
-Портал «Молодёжь Сочи» обрабатывает персональные данные участников
-в соответствии с законодательством РФ. Полная версия — на странице /privacy.
-
-Контакты поддержки указаны в разделе «Контакты».
-`,
-    'utf8'
-  );
-  const txtSaved = writeDoc('privacy-excerpt.txt', txt);
+  const privacyPdf = buildPdf([
+    'Politika konfidentsialnosti (fragment)',
+    '',
+    'Portal obrabatyvaet personalnye dannye uchastnikov',
+    'v sootvetstvii s zakonodatelstvom RF.',
+    'Polnaya versiya — stranica /privacy.',
+  ]);
+  const privacySaved = writeDoc('privacy-excerpt.pdf', privacyPdf);
   await prisma.siteDocument.upsert({
     where: { id: 'doc_privacy_excerpt' },
     create: {
       id: 'doc_privacy_excerpt',
       title: 'Выдержка из политики конфиденциальности',
-      description: 'Тестовый текстовый документ для проверки просмотра TXT на сайте.',
+      description: 'Тестовый PDF: фрагмент политики для проверки просмотра на сайте.',
       category: 'Общее',
-      fileUrl: txtSaved.url,
-      fileName: txtSaved.fileName,
-      mimeType: 'text/plain',
-      sizeBytes: txtSaved.sizeBytes,
+      fileUrl: privacySaved.url,
+      fileName: privacySaved.fileName,
+      mimeType: 'application/pdf',
+      sizeBytes: privacySaved.sizeBytes,
       status: 'PUBLISHED',
       publishedAt: new Date(),
       isDemoData: true,
     },
     update: {
       title: 'Выдержка из политики конфиденциальности',
-      description: 'Тестовый текстовый документ для проверки просмотра TXT на сайте.',
-      fileUrl: txtSaved.url,
-      fileName: txtSaved.fileName,
-      mimeType: 'text/plain',
-      sizeBytes: txtSaved.sizeBytes,
+      description: 'Тестовый PDF: фрагмент политики для проверки просмотра на сайте.',
+      fileUrl: privacySaved.url,
+      fileName: privacySaved.fileName,
+      mimeType: 'application/pdf',
+      sizeBytes: privacySaved.sizeBytes,
       status: 'PUBLISHED',
       publishedAt: new Date(),
     },
   });
-  console.log('seeded doc_privacy_excerpt', txtSaved.url);
+  console.log('seeded doc_privacy_excerpt', privacySaved.url);
   console.log('Done');
 }
 

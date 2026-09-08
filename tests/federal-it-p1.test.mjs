@@ -18,9 +18,28 @@ test('document API and viewer use PDF MIME and Google Docs Viewer', () => {
   const ngx = readFileSync(join(root, 'deploy/nginx-py-ty-dual.conf'), 'utf8');
   const csp = readFileSync(join(root, 'src/proxy.ts'), 'utf8');
   assert.match(api, /sniffDocumentMime/);
+  assert.match(api, /buildPlainTextPdf/);
+  assert.match(api, /isPlainTextDocument/);
   assert.match(view, /docs\.google\.com\/gview/);
+  assert.match(view, /text\/plain/);
   assert.match(ngx, /charset off/);
   assert.match(csp, /docs\.google\.com/);
+  const seed = readFileSync(join(root, 'scripts/seed-official-documents.mjs'), 'utf8');
+  assert.match(seed, /application\/pdf/);
+  assert.match(seed, /buildPlainTextPdf/);
+});
+
+test('plain-text catalog helper writes real PDF magic bytes', async () => {
+  const { buildPlainTextPdf } = await import('../scripts/lib/plain-text-pdf.mjs');
+  const buf = await buildPlainTextPdf(
+    { title: 'Правила ДМ', body: 'Посещение клубов — по записи.\nMAX: +7 988 236-50-22' },
+    join(root, 'public', 'fonts')
+  );
+  assert.equal(buf[0], 0x25);
+  assert.equal(buf[1], 0x50);
+  assert.equal(buf[2], 0x44);
+  assert.equal(buf[3], 0x46);
+  assert.ok(buf.length > 800);
 });
 
 test('scanner does not pin event filter on coworking QR', () => {
