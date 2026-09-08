@@ -115,7 +115,7 @@ else
         -v "$APP/scripts/prisma-push.config.mjs:/work/prisma.config.mjs:ro" \
         -w /work \
         node:22-bookworm-slim \
-        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs --accept-data-loss'; then
+        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs'; then
       pushed=1
     fi
   fi
