@@ -199,6 +199,7 @@ function MessagesInner() {
   const [body, setBody] = useState('');
   const [loading, setLoading] = useState(true);
   const [threadLoading, setThreadLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const swipeStart = useRef(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState(false);
