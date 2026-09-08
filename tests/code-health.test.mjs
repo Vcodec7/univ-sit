@@ -15,6 +15,8 @@ test('code-health script is checked in', () => {
   assert.equal(existsSync(join(root, 'scripts/code-health-check.sh')), true);
   const pkg = JSON.parse(read('package.json'));
   assert.equal(pkg.scripts.health, 'bash scripts/code-health-check.sh');
+  assert.equal(pkg.scripts['security:ty'], 'node scripts/security-live-check.mjs');
+  assert.equal(existsSync(join(root, 'scripts/security-live-check.mjs')), true);
 });
 
 test('SW never caches HTML navigations (incl. /games)', () => {

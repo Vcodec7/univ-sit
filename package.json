@@ -15,6 +15,7 @@
     "ui:guard": "node scripts/ui-guard.mjs",
     "dev:loop": "bash scripts/dev-loop.sh",
     "health": "bash scripts/code-health-check.sh",
+    "security:ty": "node scripts/security-live-check.mjs",
     "ty": "bash scripts/apply-staging.sh",
     "smoke:ty": "bash scripts/smoke-sites.sh --staging-only",
     "qa": "node scripts/qa-all.mjs",

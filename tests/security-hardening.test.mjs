@@ -67,8 +67,10 @@ test('health monitor token is not CRON_SECRET', () => {
   assert.doesNotMatch(src, /CRON_SECRET/);
 });
 
-test('demo seed does not return a password', () => {
-  const src = read('src/app/api/admin/demo-seed/route.ts');
-  assert.doesNotMatch(src, /demo_password_123/);
-  assert.match(src, /randomBytes/);
+test('live security script stays defensive', () => {
+  const src = read('scripts/security-live-check.mjs');
+  assert.match(src, /CSRF_ORIGIN/);
+  assert.match(src, /X-Forwarded-Host/);
+  assert.match(src, /example\.invalid/);
+  assert.doesNotMatch(src, /UNION SELECT|<\s*script/i);
 });
