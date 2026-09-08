@@ -48,9 +48,11 @@ fi
 echo "==> [5/6] Install npm dependencies"
 npm ci
 
-echo "==> [6/6] Prisma client, schema sync and demo seed"
+echo "==> [6/6] Prisma client, schema sync and seeds"
 npx prisma generate
 npx prisma db push
 npm run db:seed
+# Public, non-demo catalog content so a fresh dev site is populated.
+npm run seed:dev
 
 echo "==> install complete"
