@@ -110,11 +110,13 @@ if (!/\.glass-nav-inner\.container[\s\S]{0,120}max-width:\s*none\s*!important/.t
 if (!/\.home-page--lift \.home-section[\s\S]{0,80}margin-bottom:\s*0\.85rem\s*!important/.test(unify)) {
   fails.push('home sections must stay tight, not 2.5rem wells');
 }
-if (!/\.home-page--lift \.home-rail__slide > \*[\s\S]{0,80}min-height:\s*0\s*!important/.test(unify)) {
-  fails.push('home rail cards must hug content, not stretch to equal height wells');
+const lastRail = lastMatch(unify, /\.home-page(?:\.home-page)?--lift \.home-rail\s*\{[^}]+\}/g);
+if (!lastRail || !/align-items:\s*stretch\s*!important/.test(lastRail)) {
+  fails.push('home rails must stretch so feed CTAs share one baseline');
 }
-if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}margin-top:\s*0\.35rem\s*!important/.test(unify)) {
-  fails.push('feed card CTAs must not use margin-top:auto empty wells');
+const lastActions = lastMatch(unify, /\.home-page(?:\.home-page)?--lift \.free-now-actions\s*\{[^}]+\}/g);
+if (!lastActions || !/margin-top:\s*auto\s*!important/.test(lastActions)) {
+  fails.push('feed card CTAs must pin to the bottom of stretched cards');
 }
 if (!/\.catalog-page-header__intro \.page-hero-title[\s\S]{0,240}overflow-wrap:\s*break-word\s*!important/.test(unify)) {
   fails.push('catalog titles must wrap on words, not overflow-wrap:anywhere');

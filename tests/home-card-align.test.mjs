@@ -18,7 +18,7 @@ test('home free-now cards align actions and hide empty afisha', () => {
   const events = readFileSync(join(root, 'src/components/UpcomingEvents.tsx'), 'utf8');
   const page = readFileSync(join(root, 'src/app/page.tsx'), 'utf8');
   const covers = readFileSync(join(root, 'src/lib/theme-covers.ts'), 'utf8');
-  assert.match(unify, /\.home-page--lift \.free-now \.free-now-actions \{[\s\S]*?margin-top:\s*auto/);
+  assert.match(unify, /\.home-page\.home-page--lift \.free-now-actions \{[\s\S]*?margin-top:\s*auto/);
   assert.match(unify, /\.home-page--lift \.lift-deck__go \{[\s\S]*?margin-top:\s*auto/);
   assert.match(unify, /\.home-page--lift \.home-cta-split \.lift-hero__btn \{[\s\S]*?margin-top:\s*auto/);
   assert.match(unify, /gov-strip-actions \.gov-chip \{[\s\S]*?min-height:\s*3\.35rem/);

@@ -27396,7 +27396,7 @@ button.btn,
   margin-inline: 0 !important;
   gap: var(--rail-gap) !important;
   scroll-padding-inline: 0;
-  align-items: flex-start !important;
+  align-items: stretch !important;
 }
 .home-page--lift .home-rail::-webkit-scrollbar {
   height: 0 !important;
@@ -27407,13 +27407,14 @@ button.btn,
   width: calc((100% - (var(--rail-cols) - 1) * var(--rail-gap)) / var(--rail-cols)) !important;
   max-width: none !important;
   height: auto !important;
-  align-self: start;
+  align-self: stretch;
+  display: flex;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 .home-page--lift .home-rail__slide > * {
   min-height: 0;
-  height: auto !important;
+  height: 100% !important;
   display: flex;
   flex-direction: column;
 }
