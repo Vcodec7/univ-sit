@@ -1,10 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo } from 'react';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
-import { ArrowRight } from 'lucide-react';
-import EntityCoverImage from '@/components/EntityCoverImage';
+import CatalogEntityCard from '@/components/catalog/CatalogEntityCard';
 import CatalogFilterPopover from '@/components/CatalogFilterPopover';
 import CatalogPagination from '@/components/CatalogPagination';
 import { encodeRouteParam } from '@/lib/route-id';
@@ -115,35 +113,20 @@ export default function ProjectsCatalogClient({ items }: { items: PublicProjectC
               );
               const catLabel = PROJECT_SOFT_CATEGORIES.find((c) => c.id === cats[0])?.label;
               return (
-                <Link key={project.id} href={`/projects/${encodeRouteParam(project.id)}`} className="catalog-card">
-                  <div className={`catalog-badge${project.status === 'COMPLETED' ? ' status-completed' : ''}`}>
-                    {project.status === 'COMPLETED' ? 'Завершен' : 'Активный'}
-                  </div>
-                  <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                    <EntityCoverImage
-                      src={projectCover(project, skip + projectIdx)}
-                      alt={project.title}
-                      fallback={projectCover(project, skip + projectIdx + 5)}
-                      className="catalog-img"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      priority={skip === 0 && projectIdx < 2}
-                    />
-                  </div>
-                  <div className="catalog-card__body">
-                    {catLabel ? <span className="catalog-card__cat">{catLabel}</span> : null}
-                    <h3>{project.title.replace(/^Проект:\s*/i, '')}</h3>
-                    <p className="line-clamp-3">{project.pitch || stripHtml(project.description)}</p>
-                    {project.who && project.who !== project.pitch ? (
-                      <p className="catalog-card__who">Кому: {project.who}</p>
-                    ) : null}
-                    <div className="catalog-card-meta">
-                      <span>{project.applicationsCount} заявок</span>
-                      <span>
-                        Подробнее <ArrowRight size={16} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+                <CatalogEntityCard
+                  key={project.id}
+                  href={`/projects/${encodeRouteParam(project.id)}`}
+                  title={project.title.replace(/^Проект:\s*/i, '')}
+                  cover={projectCover(project, skip + projectIdx)}
+                  fallback={projectCover(project, skip + projectIdx + 5)}
+                  badge={project.status === 'COMPLETED' ? 'Завершен' : 'Активный'}
+                  badgeDone={project.status === 'COMPLETED'}
+                  category={catLabel}
+                  excerpt={project.pitch || stripHtml(project.description)}
+                  who={project.who}
+                  metaLeft={`${project.applicationsCount} заявок`}
+                  priority={skip === 0 && projectIdx < 2}
+                />
               );
             })}
           </div>

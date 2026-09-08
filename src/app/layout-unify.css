@@ -3015,6 +3015,25 @@ body:has(.home-page--lift) {
   .profile-hero__bento-b { grid-template-columns: 1fr; }
 }
 
+.scanner-hub__tabs {
+  display: flex; gap: 0.4rem; padding: 0.75rem 0.75rem 0;
+}
+.scanner-hub__tabs button {
+  border: 1px solid #e5e7eb; background: #fff; border-radius: 999px;
+  padding: 0.4rem 0.85rem; font-weight: 700; cursor: pointer; color: #0a0c2a;
+}
+.scanner-hub__tabs button.is-on { background: #0a0c2a; color: #fff; border-color: #0a0c2a; }
+.docs-legal-hub {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.65rem; margin: 0 0 1.25rem;
+}
+.docs-legal-hub__card {
+  display: flex; flex-direction: column; gap: 0.25rem; padding: 0.85rem 1rem;
+  border: 1px solid #e5e7eb; border-radius: 14px; background: #fff; text-decoration: none; color: #0a0c2a;
+}
+.docs-legal-hub__card span { color: #4b5563; font-size: 0.88rem; }
+.docs-legal-hub__card:hover { border-color: #8562d8; }
+
 
 
 

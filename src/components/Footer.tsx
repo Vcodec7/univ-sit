@@ -162,23 +162,15 @@ export default async function Footer() {
             &copy; {new Date().getFullYear()} {settings?.siteName || DEFAULT_SITE_NAME}
           </p>
           <nav className="site-footer-legal-links" aria-label="Правовая информация">
+            <Link href="/documents">Документы</Link>
+            <span className="site-footer-legal-sep" aria-hidden>
+              ·
+            </span>
             <Link href="/privacy">152-ФЗ / cookie</Link>
             <span className="site-footer-legal-sep" aria-hidden>
               ·
             </span>
             <CookieSettingsLink />
-            <span className="site-footer-legal-sep" aria-hidden>
-              ·
-            </span>
-            <Link href="/rules">Правила</Link>
-            <span className="site-footer-legal-sep" aria-hidden>
-              ·
-            </span>
-            <Link href="/terms">Соглашение</Link>
-            <span className="site-footer-legal-sep" aria-hidden>
-              ·
-            </span>
-            <Link href="/documents/verify">Проверить документ</Link>
           </nav>
           <p className="site-footer-version" title={`YoungPortal ${APP_VERSION}`}>
             версия {APP_VERSION}

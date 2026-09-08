@@ -6,10 +6,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = dirname(fileURLToPath(import.meta.url));
 
-test('footer participate has no friends link; document verify is listed', () => {
+test('footer participate has no friends link; documents hub is listed', () => {
   const footer = readFileSync(join(root, '../src/components/Footer.tsx'), 'utf8');
   assert.doesNotMatch(footer, /dashboard\/friends/);
-  assert.match(footer, /documents\/verify/);
+  assert.match(footer, /href="\/documents"/);
+  assert.doesNotMatch(footer, /href="\/rules"/);
+  assert.doesNotMatch(footer, /href="\/terms"/);
 });
 
 test('contests and vacancies lists are public', () => {

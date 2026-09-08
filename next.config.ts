@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
       { source: '/p/self-gov', destination: '/self-gov', permanent: true },
       // /documents is the file library + viewer (not CMS)
       { source: '/p/documents', destination: '/documents', permanent: true },
+      { source: '/scan', destination: '/scanner?tab=pass', permanent: true },
     ];
   },
   async rewrites() {

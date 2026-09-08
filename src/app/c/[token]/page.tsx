@@ -33,10 +33,10 @@ export default async function PresenceTokenPage({
         {resolved.user.publicCode ? ` · ${resolved.user.publicCode}` : ''}
       </p>
       <p className="presence-muted" style={{ marginTop: '0.75rem' }}>
-        Для чек-ина отсканируйте этот QR на странице сотрудника /scan.
+        Для чек-ина отсканируйте этот QR в сканере сотрудника (/scanner).
       </p>
       <p style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <Link href="/scan" className="btn btn-primary">
+        <Link href="/scanner?tab=pass" className="btn btn-primary">
           Открыть сканер
         </Link>
         <Link href="/dashboard" className="btn btn-secondary">
