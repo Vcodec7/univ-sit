@@ -54,7 +54,11 @@ type Row = {
   passCode?: string;
 };
 
-function statusMark(kind: Row['kind'], status: string, end: string) {
+function isPast(end: string) {
+  return new Date(end).getTime() < Date.now();
+}
+
+function statusMark(_kind: Row['kind'], status: string, end: string) {
   const u = String(status || '').toUpperCase();
   if (isPast(end) || u === 'ATTENDED' || u === 'NO_SHOW' || u === 'CANCELLED' || u === 'REJECTED') {
     return { emoji: '⚪', label: 'Прошло' };
