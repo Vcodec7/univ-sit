@@ -44,10 +44,32 @@ export function parseFeatureConsents(prefsJson: string | null | undefined): Part
       : {};
   const out: Partial<Record<FeatureConsentKey, string>> = {};
   for (const key of FEATURE_CONSENT_KEYS) {
-    const v = nested[key];
+    const v = nested[key] ?? parsed[key];
     if (typeof v === 'string' && v.trim()) out[key] = v;
   }
   return out;
+}
+
+export function mergeFeatureConsentSources(
+  ...jsons: Array<string | null | undefined>
+): Partial<Record<FeatureConsentKey, string>> {
+  const out: Partial<Record<FeatureConsentKey, string>> = {};
+  for (const json of jsons) {
+    Object.assign(out, parseFeatureConsents(json));
+  }
+  return out;
+}
+
+export function userHasFeatureConsent(
+  user:
+    | { notificationPrefsJson?: string | null; featureConsentsJson?: string | null }
+    | null
+    | undefined,
+  key: FeatureConsentKey
+): boolean {
+  return Boolean(
+    mergeFeatureConsentSources(user?.featureConsentsJson, user?.notificationPrefsJson)[key]
+  );
 }
 
 export function writeFeatureConsent(

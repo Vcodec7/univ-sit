@@ -12,7 +12,7 @@ import { needsPrivacyReconsent } from '@/lib/privacy-consent';
 import { unlockAchievement } from '@/lib/award-achievements';
 import {
   FEATURE_CONSENT_COPY,
-  parseFeatureConsents,
+  mergeFeatureConsentSources,
   writeFeatureConsent,
   type FeatureConsentKey,
 } from '@/lib/feature-consents';
@@ -38,11 +38,15 @@ export async function GET() {
       cookiesSignature: true,
       cookiesPolicyVersion: true,
       notificationPrefsJson: true,
+      featureConsentsJson: true,
     },
   });
   return NextResponse.json({
     ...(user || {}),
-    featureConsents: parseFeatureConsents(user?.notificationPrefsJson),
+    featureConsents: mergeFeatureConsentSources(
+      user?.featureConsentsJson,
+      user?.notificationPrefsJson
+    ),
     currentPrivacyVersion: PRIVACY_POLICY_VERSION,
     currentCookiesVersion: COOKIES_POLICY_VERSION,
     needsPrivacyReconsent: needsPrivacyReconsent(user),
@@ -84,24 +88,29 @@ export async function POST(req: Request) {
   if (feature) {
     const existing = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { notificationPrefsJson: true },
+      select: { notificationPrefsJson: true, featureConsentsJson: true },
     });
     const key: FeatureConsentKey = feature;
-    const nextJson = writeFeatureConsent(
-      existing?.notificationPrefsJson,
-      key,
-      new Date().toISOString()
-    );
+    const at = new Date().toISOString();
+    const nextJson = writeFeatureConsent(existing?.notificationPrefsJson, key, at);
+    const merged = mergeFeatureConsentSources(existing?.featureConsentsJson, nextJson);
+    merged[key] = at;
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: { notificationPrefsJson: nextJson },
-      select: { notificationPrefsJson: true },
+      data: {
+        notificationPrefsJson: nextJson,
+        featureConsentsJson: JSON.stringify(merged),
+      },
+      select: { notificationPrefsJson: true, featureConsentsJson: true },
     });
     return NextResponse.json({
       ok: true,
       feature: key,
       copy: FEATURE_CONSENT_COPY[key],
-      featureConsents: parseFeatureConsents(user.notificationPrefsJson),
+      featureConsents: mergeFeatureConsentSources(
+        user.featureConsentsJson,
+        user.notificationPrefsJson
+      ),
     });
   }
 

@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { assertCleanText, ProfanityError } from '@/lib/censor';
 import { createUserNotification } from '@/lib/security';
 import { hashPortfolioContent, toPortfolioPayload } from '@/lib/portfolio';
-import { hasFeatureConsent } from '@/lib/feature-consents';
+import { userHasFeatureConsent } from '@/lib/feature-consents';
 import { hasPermission } from '@/lib/acl-shared';
 import {
   buildPortfolioDiff,
@@ -144,9 +144,9 @@ export async function PUT(req: Request) {
     if (submit) {
       const consentRow = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { notificationPrefsJson: true },
+        select: { notificationPrefsJson: true, featureConsentsJson: true },
       });
-      if (!hasFeatureConsent(consentRow?.notificationPrefsJson, 'portfolio')) {
+      if (!userHasFeatureConsent(consentRow, 'portfolio')) {
         return NextResponse.json(
           { message: 'Нужно коротко подтвердить правила портфолио', code: 'NEED_FEATURE_CONSENT', feature: 'portfolio' },
           { status: 412 }

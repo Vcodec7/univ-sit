@@ -98,53 +98,32 @@ sudo -n chown -R 1000:1000 /opt/sochi-portal/public/uploads 2>/dev/null || sudo 
 sudo -n docker build -f "$EXTRACT/Dockerfile.prebuilt" -t sochi-staging_web:latest "$EXTRACT"
 sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml up -d --no-build web
 
-# Additive column: prisma db push is blocked by leftover User.featureConsentsJson
-# (do not --accept-data-loss). Nullable TEXT is safe on the shared DB.
+# Shared live DB: never Prisma db-push (warns/hangs on User.featureConsentsJson,
+# and --accept-data-loss would drop that column). Additive ALTER only.
 DB_CTR="$(sudo -n docker ps --format '{{.Names}}' | grep -E 'sochi-portal.*db|_db_' | head -1 || true)"
 if [[ -n "$DB_CTR" ]]; then
-  echo "==> ensure SiteSettings.oauthSsoJson exists ($DB_CTR)"
+  echo "==> additive ALTER on $DB_CTR (no Prisma db-push)"
   sudo -n docker exec "$DB_CTR" psql -U sochi -d sochi_portal -v ON_ERROR_STOP=1 \
-    -c 'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "oauthSsoJson" TEXT;' \
-    || echo "WARN: ALTER oauthSsoJson failed"
+    -c 'ALTER TABLE "SiteSettings" ADD COLUMN IF NOT EXISTS "oauthSsoJson" TEXT; ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "featureConsentsJson" TEXT;' \
+    || echo "WARN: additive ALTER failed"
+  echo "$NEW_SHA" | sudo -n tee "$APP/.yp-schema-sha" >/dev/null
 else
-  echo "WARN: postgres container not found for oauthSsoJson" >&2
+  echo "WARN: postgres container not found for ALTER" >&2
 fi
-
 if [[ "$NEW_SHA" == "$OLD_SHA" ]]; then
-  echo "==> prisma schema unchanged, skip db push"
+  echo "==> prisma schema unchanged"
 else
-  echo "==> prisma schema changed, db push (additive, no data-loss flag)"
-  pushed=0
-  if sudo -n docker compose -p sochi-staging -f docker-compose.staging.yml exec -T web \
-      sh -c 'test -x ./node_modules/.bin/prisma && ./node_modules/.bin/prisma db push'; then
-    pushed=1
-  elif [[ -f "$APP/.env" && -f "$APP/prisma/schema.prisma" ]]; then
-    echo "==> prisma CLI missing in web image, one-shot node container"
-    if sudo -n docker run --rm \
-        --network sochi-portal_default \
-        --env-file "$APP/.env" \
-        -v "$APP/prisma:/work/prisma:ro" \
-        -v "$APP/scripts/prisma-push.config.mjs:/work/prisma.config.mjs:ro" \
-        -w /work \
-        node:22-bookworm-slim \
-        sh -c 'npx --yes prisma@7.9.1 db push --config prisma.config.mjs'; then
-      pushed=1
-    fi
-  fi
-  if [[ "$pushed" == "1" ]]; then
-    echo "$NEW_SHA" | sudo -n tee "$APP/.yp-schema-sha" >/dev/null
-  else
-    echo "WARN: prisma schema not applied. Image still started." >&2
-  fi
+  echo "==> prisma schema changed; skipped db-push (shared DB)"
 fi
 
 sudo -n rm -rf "$EXTRACT"
 
 echo "==> wait localhost:3001"
 ok=0
-for i in 1 2 3 4 5 6 7 8 9 10 12 14; do
+for i in $(seq 1 30); do
   body="$(curl -sS --max-time 3 http://127.0.0.1:3001/api/health || true)"
-  if echo "$body" | grep -q '"ok":true'; then
+  # Public-shaped payload is {status:ok}; loopback detailed has ok:true.
+  if echo "$body" | grep -qE '"status":"ok"|"ok":true'; then
     echo "$body"
     ok=1
     break

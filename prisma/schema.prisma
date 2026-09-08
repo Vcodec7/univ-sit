@@ -107,6 +107,8 @@ model User {
   collectiblesJson String?
   /** In-app notification prefs JSON: { muted[], emailDigest, sound, push } */
   notificationPrefsJson String?
+  /** Согласия по фичам (коворкинг, портфолио). Живая колонка — не дропать db push. */
+  featureConsentsJson String?
   attendedCount    Int @default(0)
   noShowCount      Int @default(0)
 

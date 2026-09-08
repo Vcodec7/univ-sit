@@ -104,14 +104,11 @@ else
       # Existing dual stack was created as project "sochi-staging"
       COMPOSE_PROJECT_NAME="\${COMPOSE_PROJECT_NAME:-sochi-staging}"
       export COMPOSE_PROJECT_NAME
-      yp_compose -f docker-compose.staging.yml up -d --build web
-      yp_compose -f docker-compose.staging.yml exec -T web npx prisma db push || echo "WARN: prisma db push failed"
+      echo "ERROR: do not docker compose --build on the VPS. Use apply-staging.sh prebuilt." >&2
+      exit 1
     else
-      if grep -q "3001:3000" docker-compose.yml 2>/dev/null; then
-        yp_compose up -d --build web
-      else
-        bash scripts/safe-rebuild-web.sh
-      fi
+      echo "ERROR: do not docker compose --build on the VPS. Use apply-staging.sh prebuilt." >&2
+      exit 1
     fi
   else
     bash scripts/safe-rebuild-web.sh

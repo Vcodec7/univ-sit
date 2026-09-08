@@ -16,7 +16,7 @@ import {
 import { getCoworkingAvailability } from '@/lib/coworking-availability';
 import { groupInclude, newCoworkingInviteToken } from '@/lib/coworking-group';
 import { adjustScore, M_BALL } from '@/lib/score-scales';
-import { hasFeatureConsent } from '@/lib/feature-consents';
+import { userHasFeatureConsent } from '@/lib/feature-consents';
 import { buildCoworkingCode } from '@/lib/tickets';
 
 export const dynamic = 'force-dynamic';
@@ -93,9 +93,9 @@ export async function POST(req: Request) {
 
   const userRow = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { notificationPrefsJson: true },
+    select: { notificationPrefsJson: true, featureConsentsJson: true },
   });
-  if (!hasFeatureConsent(userRow?.notificationPrefsJson, 'coworking')) {
+  if (!userHasFeatureConsent(userRow, 'coworking')) {
     return NextResponse.json(
       { message: 'Нужно коротко подтвердить правила коворкинга', code: 'NEED_FEATURE_CONSENT', feature: 'coworking' },
       { status: 412 }

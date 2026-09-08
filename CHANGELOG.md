@@ -1,5 +1,13 @@
 # Changelog — YoungPortal
 
+## [1.6.179] — 2026-09-08
+
+### Staging / схема
+- В Prisma снова `User.featureConsentsJson` — колонка живая, `db push` больше не предлагает её дропнуть
+- Согласия коворкинга/портфолио читаются из колонки и из `notificationPrefsJson`
+- `apply-staging` prebuilt: только `ALTER TABLE … IF NOT EXISTS`, без `prisma db push` и без `--accept-data-loss`
+- Ожидание health принимает `{status:"ok"}`, не только `"ok":true`
+
 ## [1.6.178] — 2026-09-08
 
 ### Документы
