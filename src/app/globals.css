@@ -26521,8 +26521,15 @@ html[data-eco-banner] .profile-hero--cabinet {
   html[data-eco-ticket='ticket_pulse'] .yp-ticket-qr,
   html[data-eco-aura='wave'] .profile-hero__avatar,
   html[data-eco-aura='wave'] .profile-hero__avatar-inner,
-  html[data-eco-aura='ember'] .profile-hero__avatar {
+  html[data-eco-aura='ember'] .profile-hero__avatar,
+  .player-hud,
+  .player-hud__badge-glow,
+  .player-hud__xp-shine {
     animation: none !important;
+  }
+  .player-hud__badge-glow,
+  .player-hud__xp-shine {
+    display: none !important;
   }
 }
 @media (max-width: 899px) {

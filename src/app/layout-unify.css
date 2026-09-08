@@ -558,8 +558,28 @@
   .dashboard-page .presence-panel,
   .dashboard-page .profile-hero,
   .dashboard-page .cw-cabinet {
-    content-visibility: visible !important;
-    contain: none !important;
+    content-visibility: visible;
+    contain: layout paint;
+  }
+  .player-hud,
+  .player-hud__badge-glow,
+  .player-hud__xp-shine {
+    animation: none !important;
+  }
+  .player-hud__badge-glow,
+  .player-hud__xp-shine {
+    display: none !important;
+  }
+  .dashboard-page .profile-hero,
+  .dashboard-page .player-hud {
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  html.has-bottom-nav .yp-bottom-nav,
+  body.has-bottom-nav .yp-bottom-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #fff !important;
   }
   .profile-hero__avatar-inner {
     transform: none !important;
@@ -2800,6 +2820,24 @@ body:has(.home-page--lift) .glass-nav {
     height: 0 !important;
     overflow: hidden !important;
     border: 0 !important;
+  }
+}
+
+/* Last-win: dashboard profile scroll on phones (HUD spin + dock blur) */
+@media (max-width: 900px), (pointer: coarse) {
+  .player-hud__badge-glow,
+  .player-hud__xp-shine {
+    display: none !important;
+    animation: none !important;
+  }
+  .player-hud {
+    animation: none !important;
+  }
+  html.has-bottom-nav .yp-bottom-nav,
+  body.has-bottom-nav .yp-bottom-nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #fff !important;
   }
 }
 

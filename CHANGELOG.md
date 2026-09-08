@@ -1,5 +1,10 @@
 # Changelog — YoungPortal
 
+## [1.6.160] — 2026-09-08
+
+### Performance
+- Кабинет `/dashboard` на телефоне: без бесконечного spin/shine HUD, без blur нижней панели, без prefetch всех пунктов меню при скролле
+
 ## [1.6.159] — 2026-09-08
 
 ### Fixed
