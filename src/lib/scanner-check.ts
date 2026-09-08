@@ -396,13 +396,50 @@ export async function runScannerCheck(opts: {
     });
   }
 
+  const now = new Date();
+  const eventWindow = {
+    startTime: { lte: new Date(now.getTime() + 2 * 3600000) },
+    endTime: { gte: new Date(now.getTime() - 30 * 60000) },
+    status: 'APPROVED' as const,
+  };
+  const asGuest = await prisma.bookingParticipant.findFirst({
+    where: {
+      userId: resolved.user.id,
+      attendanceStatus: { in: ['PENDING', 'CHECKED_IN'] },
+      booking: {
+        ...eventWindow,
+        ...(opts.expectedBookingId ? { id: opts.expectedBookingId } : {}),
+      },
+    },
+    select: { bookingId: true },
+  });
+  const asHost = await prisma.booking.findFirst({
+    where: {
+      userId: resolved.user.id,
+      ...eventWindow,
+      ...(opts.expectedBookingId ? { id: opts.expectedBookingId } : {}),
+    },
+    select: { id: true, userId: true },
+  });
+  const bookingId = asGuest?.bookingId || asHost?.id;
+  if (bookingId) {
+    return checkTicketPass({
+      bookingId,
+      userId: resolved.user.id,
+      passType: 'ticket',
+      expectedBookingId: opts.expectedBookingId,
+      scannedById: opts.scannedById,
+      method: opts.method,
+    });
+  }
+
   const holder = await holderById(resolved.user.id);
   return {
     http: 400,
     body: {
       ok: false,
       status: 'NOT_REGISTERED',
-      message: 'Нет активной брони коворкинга на сегодня',
+      message: 'Нет активной брони коворкинга и нет билета на ближайшее мероприятие',
       passType: 'presence',
       guest: holder,
     },

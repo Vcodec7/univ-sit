@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 type SiteStatus = {
   publicSiteUrl: string;
   effectiveOrigin: string;
+  oauth?: { vk?: boolean; yandex?: boolean; telegram?: boolean; esia?: boolean };
   max: {
     enabled: boolean;
     hasToken: boolean;
@@ -134,6 +135,20 @@ export default function OpsSitePanel() {
             Цель: <code>{data.max.webhookUrl}</code>
           </p>
         ) : null}
+      </section>
+      <section className="ops-site__card">
+        <h2>SSO (VK / Яндекс / Telegram)</h2>
+        <p className="bots-muted">
+          Кнопки входа включаются ключами в <code>.env</code> контейнера, не из этой формы. Сейчас: VK{' '}
+          {data?.oauth?.vk ? 'вкл' : 'выкл'} · Яндекс {data?.oauth?.yandex ? 'вкл' : 'выкл'} · Telegram{' '}
+          {data?.oauth?.telegram ? 'вкл' : 'выкл'}.
+        </p>
+        <p className="bots-hint">
+          Redirect: <code>{data?.effectiveOrigin || 'https://домен'}/api/auth/callback/vk</code> и{' '}
+          <code>…/callback/yandex</code>. Переменные: <code>VK_CLIENT_ID/SECRET</code>,{' '}
+          <code>YANDEX_CLIENT_ID/SECRET</code>, <code>TELEGRAM_BOT_TOKEN</code>,{' '}
+          <code>TELEGRAM_BOT_USERNAME</code>. После правки .env — recreate web.
+        </p>
       </section>
     </div>
   );

@@ -1,12 +1,12 @@
 {
-  "at": "2026-09-08T00:09:59Z",
-  "localStamp": "2026-09-08_000959",
+  "at": "2026-09-08T13:14:00Z",
+  "localStamp": "2026-09-08_131400",
   "operator": "ubuntu",
-  "note": "manual promote",
+  "note": "1.6.174 federal P1 + design system (user approved)",
   "status": "ok",
   "exitCode": 0,
   "prodDomain": "py.idivles.ru",
   "stagingDomain": "ty.idivles.ru",
-  "youngHealthRaw": "{\"ok\":true,\"db\":true,\"version\":\"1.6.158\",\"maintenanceMode\":false,\"siteName\":\"Молодёжь Сочи\",\"uptimeSec\":21,\"latencyMs\":4}",
-  "y1HealthRaw": "{\"ok\":true,\"db\":true,\"version\":\"1.6.158\",\"maintenanceMode\":false,\"siteName\":\"Молодёжь Сочи\",\"uptimeSec\":839,\"latencyMs\":4}"
+  "youngHealthRaw": "{\"status\":\"ok\"}",
+  "y1HealthRaw": "{\"status\":\"ok\"}"
 }

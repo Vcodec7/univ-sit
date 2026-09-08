@@ -51,5 +51,5 @@ test('legal centered reading, qr sheet, register CTA, dashboard settings sheet',
   assert.match(qr, /MobileSheet/);
   assert.match(dash, /settingsSheet/);
   assert.match(reg, /Войти по этому Email/);
-  assert.match(ver, /1\.6\.173/);
+  assert.match(ver, /APP_VERSION = '1\.6\./);
 });

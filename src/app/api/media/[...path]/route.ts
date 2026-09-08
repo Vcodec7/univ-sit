@@ -2,18 +2,7 @@ import { NextResponse } from 'next/server';
 import { readFile, stat } from 'fs/promises';
 import path from 'path';
 import { isPathInside } from '@/lib/safe-path';
-
-const MIME: Record<string, string> = {
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-  '.gif': 'image/gif',
-  '.pdf': 'application/pdf',
-  '.txt': 'text/plain',
-  '.doc': 'application/msword',
-  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-};
+import { contentTypeHeader, sniffDocumentMime } from '@/lib/document-mime';
 
 /**
  * Fallback media serving for environments where nginx does not alias /uploads.
@@ -41,15 +30,15 @@ export async function GET(
       return NextResponse.json({ message: 'Not found' }, { status: 404 });
     }
     const buf = await readFile(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    const mime = MIME[ext] || 'application/octet-stream';
-    const disposition = ext === '.pdf' || ext.startsWith('.jp') || ext === '.png' || ext === '.webp' || ext === '.gif' || ext === '.txt'
-      ? 'inline'
-      : 'attachment';
+    const mime = sniffDocumentMime(buf, filePath);
+    const disposition =
+      mime === 'application/pdf' || mime.startsWith('image/') || mime.startsWith('text/')
+        ? 'inline'
+        : 'attachment';
     const name = path.basename(filePath).replace(/["\r\n]/g, '_');
     return new NextResponse(buf, {
       headers: {
-        'Content-Type': mime,
+        'Content-Type': contentTypeHeader(mime),
         'Content-Disposition': `${disposition}; filename="${name}"`,
         'Cache-Control': 'public, max-age=604800',
         'X-Content-Type-Options': 'nosniff',

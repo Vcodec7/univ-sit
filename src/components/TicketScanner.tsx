@@ -329,10 +329,11 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
           return;
         }
 
+        const looksTicket = /TICKET-|SPACE-/i.test(trimmed) || /"type"\s*:\s*"(ticket|event|space)"/i.test(trimmed);
         const { res, data } = await postScan({
           code: trimmed,
           method,
-          bookingId: selectedEventId || undefined,
+          bookingId: looksTicket ? selectedEventId || undefined : undefined,
         });
         setLast(data);
         setShowResult(true);

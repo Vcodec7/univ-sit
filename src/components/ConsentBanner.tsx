@@ -155,7 +155,7 @@ export default function ConsentBanner({ enabled = true }: Props) {
       ariaLabel="Согласие на использование cookies"
       zIndex={10060}
       icon={icon}
-      title={customize ? 'Настройки cookie' : 'Cookie и данные'}
+      title={customize ? 'Настройки cookie' : 'Cookie'}
       onDismiss={forceOpen ? dismissSettings : undefined}
       actions={
         customize ? (
@@ -246,8 +246,10 @@ export default function ConsentBanner({ enabled = true }: Props) {
         </div>
       ) : (
         <p>
-          Нужны для входа и безопасности. Аналитика (Яндекс.Метрика) — только если включите её здесь.
-          Подробнее: <Link href="/privacy">политика</Link>.
+          Нужны для входа (152-ФЗ). Метрика — только после «Принять».{' '}
+          <Link href="/privacy">Политика</Link>
+          {' · '}
+          <Link href="/documents">Документы</Link>
           <span className="yp-onboard-meta"> v{COOKIES_POLICY_VERSION}</span>
         </p>
       )}
