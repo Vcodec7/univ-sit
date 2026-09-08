@@ -130,7 +130,7 @@ export default async function RootLayout({
           id="yp-pwa-early"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{window.__ypPwa=window.__ypPwa||{deferred:null};window.addEventListener('beforeinstallprompt',function(e){var skip=false;try{skip=localStorage.getItem('yp-pwa-install-never')==='1'||sessionStorage.getItem('yp-pwa-install-dismissed-session')==='1'||document.cookie.indexOf('yp_pwa_never=')>=0}catch(x){}window.__ypPwa.deferred=e;if(skip)return;e.preventDefault();window.dispatchEvent(new Event('yp-beforeinstallprompt'))});window.addEventListener('appinstalled',function(){window.__ypPwa.deferred=null;window.dispatchEvent(new Event('yp-appinstalled'))});if('serviceWorker'in navigator){var reg=function(){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){})};if(document.readyState==='complete'){setTimeout(reg,1500)}else window.addEventListener('load',function(){setTimeout(reg,1500)})}}catch(e){}})();`,
+            __html: `(function(){try{if('serviceWorker'in navigator){var reg=function(){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){})};if(document.readyState==='complete'){setTimeout(reg,1500)}else window.addEventListener('load',function(){setTimeout(reg,1500)})}}catch(e){}})();`,
           }}
         />
         <Providers>

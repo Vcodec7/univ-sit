@@ -1,5 +1,11 @@
 # Changelog — YoungPortal
 
+## [1.6.185] — 2026-09-08
+
+### Консоль
+- PWA: ранний скрипт только регистрирует SW — без `preventDefault` на `beforeinstallprompt` (нет спама Banner not shown)
+- Заявка работодателя: гость не дергает GET `/api/employers/apply`; API отдаёт `{ employer: null }` без 401; кнопка «Войти»
+
 ## [1.6.184] — 2026-09-08
 
 ### Консоль / гидрация

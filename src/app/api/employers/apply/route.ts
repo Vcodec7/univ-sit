@@ -91,7 +91,7 @@ export async function GET() {
   }
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ message: 'Войдите' }, { status: 401 });
+    return NextResponse.json({ employer: null });
   }
   const employer = await prisma.employer.findFirst({
     where: { submittedById: session.user.id },

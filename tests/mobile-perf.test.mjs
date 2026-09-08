@@ -19,7 +19,7 @@ test('home uses ISR so TTFB is not request-dynamic', () => {
   assert.match(page, /export const dynamic = 'force-static'/);
   assert.doesNotMatch(page, /export const dynamic = 'force-dynamic'/);
   assert.match(layout, /suppressHydrationWarning/);
-  assert.match(layout, /yp-pwa-install-never/);
+  assert.doesNotMatch(layout, /beforeinstallprompt/);
   assert.doesNotMatch(layout, /getSiteIdentity\(\)/);
   assert.match(proxy, /hasAuthCookie/);
   assert.match(proxy, /process\.env\.PORT/);

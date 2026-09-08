@@ -69,3 +69,12 @@ test('logged-in apply does not require captcha token', () => {
   assert.match(pub, /vacancyWins:/);
   assert.match(admin, /Отклик не принят/);
 });
+
+test('employer apply does not 401 guests on GET', () => {
+  const emp = readFileSync(join(root, 'src/app/api/employers/apply/route.ts'), 'utf8');
+  const ui = readFileSync(join(root, 'src/components/EmployerApplyClient.tsx'), 'utf8');
+  assert.match(emp, /export async function GET\(\)[\s\S]*employer: null/);
+  assert.doesNotMatch(emp, /export async function GET\(\)[\s\S]*status: 401/);
+  assert.match(ui, /status !== 'authenticated'/);
+  assert.match(ui, /Войти, чтобы отправить заявку/);
+});
