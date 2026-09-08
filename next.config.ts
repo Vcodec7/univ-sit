@@ -71,6 +71,12 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: '/',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
+        ],
+      },
+      {
         source: '/brand/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },

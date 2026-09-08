@@ -13,7 +13,7 @@ const rail = readFileSync(join(root, '../src/components/HomeSlideRail.tsx'), 'ut
 test('home and events show live afisha, not the weekly bulletin', () => {
   assert.doesNotMatch(page, /WeeklyAfisha/);
   assert.doesNotMatch(events, /WeeklyAfisha/);
-  assert.match(page, /home-section-title">Афиша/);
+  assert.match(page, /home-section-title[^>]*>Афиша/);
   assert.match(page, /UpcomingEvents/);
 });
 

@@ -13,9 +13,20 @@ const unify = readFileSync(join(root, '../src/app/layout-unify.css'), 'utf8');
 const hero = readFileSync(join(root, '../src/components/HomeServiceHero.tsx'), 'utf8');
 
 test('home uses ISR so TTFB is not request-dynamic', () => {
+  const layout = readFileSync(join(root, '../src/app/layout.tsx'), 'utf8');
+  const proxy = readFileSync(join(root, '../src/proxy.ts'), 'utf8');
   assert.match(page, /export const revalidate = 60/);
   assert.match(page, /export const dynamic = 'force-static'/);
   assert.doesNotMatch(page, /export const dynamic = 'force-dynamic'/);
+  assert.match(layout, /getCachedPublicChromeSettings/);
+  assert.doesNotMatch(layout, /getSiteIdentity\(\)/);
+  assert.match(proxy, /hasAuthCookie/);
+  assert.match(proxy, /process\.env\.PORT/);
+  assert.match(proxy, /x-maintenance-check/);
+  assert.match(proxy, /api\/public\/status/);
+  assert.match(hero, /break-words overflow-hidden/);
+  assert.match(page, /home-section-title break-words overflow-hidden/);
+  assert.match(unify, /\.break-words \{/);
 });
 
 test('hero video does not autoplay until desktop motion is allowed', () => {

@@ -3321,21 +3321,37 @@ footer.site-footer { margin-top: auto !important; }
   min-width: 0;
   max-width: 100%;
 }
+.break-words {
+  overflow-wrap: break-word !important;
+  word-break: break-word;
+  white-space: normal !important;
+  max-width: 100%;
+}
+.overflow-hidden {
+  overflow: hidden !important;
+  max-width: 100%;
+}
 .home-page h1,
 .home-page h2,
 .home-page h3,
 .home-page h4,
 .home-page h5,
 .home-page p,
+.home-page a,
+.home-page span,
+.home-page strong,
 .home-page .home-section-title,
 .home-page .home-section-sub,
+.home-page .home-section-link,
 .home-page .svc-hero h1,
 .home-page .svc-hero p,
 .home-page .lift-hero__title,
 .home-page .lift-hero__title span,
+.home-page .lift-hero__eyebrow,
 .home-page .yp-feed-card h3,
 .home-page .catalog-card-title,
-.home-page .free-now-body h3 {
+.home-page .free-now-body h3,
+.home-page .free-now-slot {
   overflow-wrap: break-word !important;
   word-break: break-word;
   white-space: normal !important;
@@ -3348,6 +3364,16 @@ footer.site-footer { margin-top: auto !important; }
   .home-page .home-section-title,
   .home-page .home-section-sub {
     flex: 1 1 100%;
+  }
+  .home-page .lift-hero__eyebrow {
+    letter-spacing: 0.04em !important;
+  }
+  .home-page.home-page--lift .home-section-link,
+  .home-page--lift a.home-section-link {
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    white-space: normal !important;
   }
 }
 .catalog-page,

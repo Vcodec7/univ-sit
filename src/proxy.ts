@@ -49,9 +49,10 @@ async function fetchPublicStatus(req: NextRequest): Promise<PublicStatusPayload>
   if (statusInflight) return statusInflight;
 
   statusInflight = (async () => {
+    const port = process.env.PORT || '3000';
     const headers = { 'x-maintenance-check': '1' };
     const candidates = [
-      'http://127.0.0.1:3000/api/public/status',
+      `http://127.0.0.1:${port}/api/public/status`,
       process.env.INTERNAL_APP_URL
         ? new URL('/api/public/status', process.env.INTERNAL_APP_URL).toString()
         : '',
@@ -61,7 +62,7 @@ async function fetchPublicStatus(req: NextRequest): Promise<PublicStatusPayload>
     let data: PublicStatusPayload = {};
     for (const statusUrl of candidates) {
       const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 2000);
+      const timer = setTimeout(() => ctrl.abort(), 250);
       try {
         const res = await fetch(statusUrl, {
           headers,
@@ -106,6 +107,13 @@ async function checkMaintenance(req: NextRequest, role?: string | null) {
 
 export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  if (
+    req.headers.get('x-maintenance-check') === '1' ||
+    pathname === '/api/public/status' ||
+    pathname === '/api/health'
+  ) {
+    return NextResponse.next();
+  }
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
 
@@ -164,10 +172,15 @@ export default async function proxy(req: NextRequest) {
     }
   }
 
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+  const hasAuthCookie = req.cookies
+    .getAll()
+    .some((c) => /session-token|next-auth\.session/i.test(c.name));
+  const token = hasAuthCookie
+    ? await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      })
+    : null;
   const role = token?.role as string | undefined;
   const permissions = (token?.permissions as string) || '';
   const mustChangePassword = Boolean((token as { mustChangePassword?: boolean } | null)?.mustChangePassword);
@@ -390,6 +403,6 @@ export default async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|map|txt|xml)$).*)',
+    '/((?!_next/static|_next/image|api/health|api/public/status|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|map|txt|xml)$).*)',
   ],
 };
