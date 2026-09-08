@@ -69,6 +69,16 @@ test('slideover on users and applications', () => {
   assert.match(slide, /admin-slideover/);
 });
 
+test('admin bookings does not pass closures into the client board', () => {
+  const page = readFileSync(join(root, 'src/app/admin/bookings/page.tsx'), 'utf8');
+  assert.doesNotMatch(page, /hrefFor=\{\(opts\)/);
+  assert.match(page, /listTab=\{activeTab\}/);
+  const apps = readFileSync(join(root, 'src/app/admin/applications/page.tsx'), 'utf8');
+  assert.match(apps, /@\/lib\/serialize-application/);
+  const err = readFileSync(join(root, 'src/app/admin/error.tsx'), 'utf8');
+  assert.match(err, /Попробовать снова/);
+});
+
 test('admin toasts: Russian, 5s, no raw codes', () => {
   const fetch = readFileSync(join(root, 'src/lib/admin-fetch.ts'), 'utf8');
   assert.match(fetch, /duration: TOAST_MS/);

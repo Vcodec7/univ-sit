@@ -21,17 +21,26 @@ export type BookingRow = {
 
 export default function BookingsBoard({
   rows,
-  hrefFor,
+  listTab,
+  listStatus,
   updateStatus,
   bulkApprove,
 }: {
   rows: BookingRow[];
-  hrefFor: (opts: { view?: string }) => string;
+  listTab: string;
+  listStatus: string;
   updateStatus: (formData: FormData) => void | Promise<void>;
   bulkApprove: (formData: FormData) => void | Promise<void>;
 }) {
+  const viewHref = (id: string) => {
+    const p = new URLSearchParams();
+    if (listTab === 'archive') p.set('tab', 'archive');
+    p.set('status', listStatus);
+    p.set('view', id);
+    return `?${p.toString()}`;
+  };
   const [picked, setPicked] = useState<Record<string, boolean>>({});
-  const pendingIds = useMemo(() => rows.filter((r) => r.status === 'PENDING').map((r) => r.id), [rows]);
+  const pendingIds = useMemo(() => (rows || []).filter((r) => r.status === 'PENDING').map((r) => r.id), [rows]);
   const selected = pendingIds.filter((id) => picked[id]);
   const allOn = pendingIds.length > 0 && pendingIds.every((id) => picked[id]);
 
@@ -76,7 +85,7 @@ export default function BookingsBoard({
             </tr>
           </thead>
           <tbody>
-            {rows.map((booking) => (
+            {(rows || []).map((booking) => (
               <tr key={booking.id}>
                 <td data-label="">
                   {booking.status === 'PENDING' ? (
@@ -99,7 +108,7 @@ export default function BookingsBoard({
                 </td>
                 <td data-label="Участники">
                   {booking.participantCount > 0 ? (
-                    <Link href={hrefFor({ view: booking.id })}>
+                    <Link href={viewHref(booking.id)}>
                       <Users size={16} /> {booking.participantCount}
                     </Link>
                   ) : (

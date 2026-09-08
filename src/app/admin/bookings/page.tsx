@@ -275,7 +275,7 @@ export default async function AdminBookings({
       />
 
       <BookingsBoard
-        rows={bookings.map(
+        rows={(bookings || []).map(
           (booking): BookingRow => ({
             id: booking.id,
             title: booking.title,
@@ -289,7 +289,8 @@ export default async function AdminBookings({
             participantCount: booking.participants?.length || 0,
           })
         )}
-        hrefFor={(opts) => hrefFor({ tab: activeTab, status: statusFilter, view: opts.view })}
+        listTab={activeTab}
+        listStatus={statusFilter}
         updateStatus={updateStatus}
         bulkApprove={bulkApprove}
       />
@@ -315,7 +316,7 @@ export default async function AdminBookings({
               </div>
             </div>
 
-            {viewedBooking.participants?.length > 0 ? (
+            {Array.isArray(viewedBooking.participants) && viewedBooking.participants.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {viewedBooking.participants.map((p: any) => (
                   <div
