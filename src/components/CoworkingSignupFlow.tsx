@@ -327,7 +327,7 @@ export default function CoworkingSignupFlow({
             </select>
           </label>
 
-          <SvcDateField value={dayKey} min={todayYmd()} onChange={setDayKey} />
+          <SvcDateField value={dayKey} min={todayYmd()} onChange={setDayKey} variant="rail" />
 
           <div className="cw-field" role="group" aria-labelledby="cw-interval-label">
             <span id="cw-interval-label">Час</span>
@@ -337,11 +337,12 @@ export default function CoworkingSignupFlow({
                 const info = space?.periods.find((x) => x.id === p.id);
                 const slotLeft = info?.left;
                 const full = typeof slotLeft === 'number' && slotLeft <= 0;
+                const low = typeof slotLeft === 'number' && slotLeft > 0 && slotLeft <= 5;
                 return (
                   <button
                     key={p.id}
                     type="button"
-                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}`}
+                    className={`cw-period cw-period--hour${period === p.id ? ' is-active' : ''}${full ? ' is-full' : ''}${low ? ' is-low' : ''}`}
                     aria-pressed={period === p.id}
                     onClick={() => setPeriod(p.id)}
                   >
@@ -351,8 +352,10 @@ export default function CoworkingSignupFlow({
                     <em>
                       {typeof slotLeft === 'number'
                         ? slotLeft > 0
-                          ? `Свободно мест: ${slotLeft}`
-                          : 'нет мест'
+                          ? low
+                            ? `Осталось ${slotLeft}`
+                            : `Свободно: ${slotLeft}`
+                          : 'мест нет'
                         : busy
                           ? '…'
                           : '—'}

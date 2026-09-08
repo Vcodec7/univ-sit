@@ -92,6 +92,9 @@ if (!/\.home-page--lift \.free-now-actions[\s\S]{0,80}grid-template-columns:\s*1
 if (!/\.home-page\.home-page--lift[\s\S]{0,80}background-color:\s*#f9fafb\s*!important/.test(unify)) {
   fails.push('home page canvas must be light gray #f9fafb (60%)');
 }
+if (!/html, body \{[\s\S]{0,80}background-color: #f9fafb !important/.test(unify)) {
+  fails.push('global html/body canvas must be #f9fafb');
+}
 if (!/\.home-page\.home-page--lift \.home-section-title::after[\s\S]{0,200}display:\s*none\s*!important/.test(unify)) {
   fails.push('home section titles must not use dual-color dashes');
 }

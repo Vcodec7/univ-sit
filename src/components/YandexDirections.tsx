@@ -59,7 +59,9 @@ function LazyMapEmbed({
         />
       ) : (
         <button type="button" className="yp-map-embed__wake" onClick={() => setLoad(true)}>
-          Показать карту
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="yp-map-embed__poster" src="/brand/templates/section-contacts.svg" alt="" />
+          <span>Открыть интерактивную карту</span>
         </button>
       )}
     </div>

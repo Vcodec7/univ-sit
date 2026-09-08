@@ -61,17 +61,12 @@ function statusHeadline(result: ScanResult) {
     case 'ALREADY_CHECKED':
       return 'Уже отмечен';
     case 'INVALID':
-      return 'Неверный формат';
     case 'NOT_FOUND':
-      return 'Не найден';
     case 'WRONG_EVENT':
-      return 'Другое мероприятие';
     case 'NOT_APPROVED':
-      return 'Заявка не одобрена';
     case 'USER_NOT_FOUND':
-      return 'Пользователь не найден';
     case 'NOT_REGISTERED':
-      return 'Нет регистрации';
+      return 'ПРОПУСК НЕДЕЙСТВИТЕЛЕН';
     case 'QUEUED':
       return 'В очереди';
     default:
@@ -875,7 +870,7 @@ export default function TicketScanner({ compact = false }: { compact?: boolean }
                 <strong>{last.guest.name}</strong>
               </p>
             ) : null}
-            <h2>{statusHeadline(last)}</h2>
+            <h2 className="scanner-result-headline">{ok || last.status === 'ALREADY_CHECKED' ? statusHeadline(last) : 'ПРОПУСК НЕДЕЙСТВИТЕЛЕН'}</h2>
             {last.message && last.status !== 'OK' && last.status !== 'LIVE' ? (
               <p className="scanner-result-message">{last.message}</p>
             ) : null}

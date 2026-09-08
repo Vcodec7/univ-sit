@@ -17,6 +17,7 @@ import { normalizeEventCategory, normalizeEventContactMode } from '@/lib/event-m
 import EventHomeCarousel from './EventHomeCarousel';
 import HomeSlideRail from './HomeSlideRail';
 import HomeLiftFeedCard from './HomeLiftFeedCard';
+import AfishaTagFilter from './AfishaTagFilter';
 import ViewBeacon from '@/components/ViewBeacon';
 import { isJunkEventTitle } from '@/lib/afisha-filters';
 import { eventRewardBadge, isEcoTagged } from '@/lib/score-scales';
@@ -385,7 +386,13 @@ export default async function UpcomingEvents({ spaceId, hideTitle, withinDays, m
           ))}
         </EventHomeCarousel>
       ) : (
-        <div className="event-grid">{cards}</div>
+        <AfishaTagFilter>
+          {events.map((event, index) => (
+            <div key={event.id} data-event-cat={normalizeEventCategory(event.category)}>
+              <EventCard event={event} index={index} spaceId={spaceId} iconActions={false} compact={compact} />
+            </div>
+          ))}
+        </AfishaTagFilter>
       )}
     </div>
   );

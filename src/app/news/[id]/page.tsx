@@ -67,7 +67,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
   });
 
   return (
-    <div className="container news-detail-page" style={{ padding: '1.5rem 1rem 3rem' }}>
+    <div className={`container news-detail-page${String(item.text || '').length < 480 ? ' news-detail-page--slim' : ''}`} style={{ padding: '1.5rem 1rem 3rem' }}>
       <Breadcrumbs
         items={[
           { href: '/', label: 'Главная' },

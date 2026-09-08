@@ -13,7 +13,7 @@ const cover = readFileSync(join(root, 'src/components/EntityCoverImage.tsx'), 'u
 
 test('contacts page paints without waiting for geocode or map iframe', () => {
   assert.doesNotMatch(contacts, /geocodeAddress/);
-  assert.match(maps, /Показать карту/);
+  assert.match(maps, /Открыть интерактивную карту/);
   assert.match(maps, /loading="lazy"/);
   assert.doesNotMatch(maps, /IntersectionObserver/);
 });

@@ -8,6 +8,9 @@ type Props = {
   min?: string;
   onChange: (ymd: string) => void;
   label?: string;
+  /** Horizontal day chips (booking flows). */
+  variant?: 'calendar' | 'rail';
+  railDays?: number;
 };
 
 function parseYmd(ymd: string) {
@@ -30,7 +33,20 @@ function formatRu(ymd: string) {
 }
 
 /** Custom date field — no native Windows date picker chrome. */
-export default function SvcDateField({ value, min, onChange, label = 'Дата' }: Props) {
+function addDaysYmd(ymd: string, delta: number) {
+  const { y, m, d } = parseYmd(ymd);
+  const dt = new Date(y, m - 1, d + delta);
+  return toYmd(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+}
+
+export default function SvcDateField({
+  value,
+  min,
+  onChange,
+  label = 'Дата',
+  variant = 'calendar',
+  railDays = 14,
+}: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const { y: vy, m: vm } = parseYmd(value);
@@ -81,6 +97,35 @@ export default function SvcDateField({ value, min, onChange, label = 'Дата' 
     if (min && ymd < min) return;
     onChange(ymd);
     setOpen(false);
+  }
+
+  if (variant === 'rail') {
+    const start = min && min > value ? min : min || value;
+    const days = Array.from({ length: railDays }, (_, i) => addDaysYmd(start, i));
+    return (
+      <div className="cw-date-rail" ref={rootRef}>
+        <span className="svc-date__label">{label}</span>
+        <div className="cw-date-rail__track" role="listbox" aria-label={label}>
+          {days.map((ymd) => {
+            const p = parseYmd(ymd);
+            const wd = new Date(p.y, p.m - 1, p.d).toLocaleDateString('ru-RU', { weekday: 'short' });
+            return (
+              <button
+                key={ymd}
+                type="button"
+                role="option"
+                aria-selected={ymd === value}
+                className={`cw-date-rail__chip${ymd === value ? ' is-active' : ''}`}
+                onClick={() => onChange(ymd)}
+              >
+                <em>{wd}</em>
+                <strong>{p.d}</strong>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
   }
 
   return (
