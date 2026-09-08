@@ -47,7 +47,7 @@ const accounts = [
 const guestPages = ['/', '/events', '/projects', '/clubs', '/spaces', '/news', '/coworking', '/login', '/privacy', '/contacts'];
 const userPages = ['/dashboard', '/dashboard/settings', '/dashboard/applications', '/more'];
 const staffPages = ['/admin', '/admin/occupancy', '/admin/spaces', '/admin/bookings', '/admin/users'];
-const scannerPages = ['/scan', '/scanner', '/admin/scanner'];
+const scannerPages = ['/scanner', '/admin/scanner'];
 const techPages = ['/ops'];
 
 function jarStore(jar, res) {

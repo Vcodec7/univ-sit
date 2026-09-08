@@ -1,15 +1,19 @@
-import TicketScanner from '@/components/TicketScanner';
+import ScannerHub from '@/components/ScannerHub';
 import OrgEntranceQr from '@/components/OrgEntranceQr';
-import ScannerErrorBoundary from '@/components/ScannerErrorBoundary';
 import { requirePermissionPage } from '@/lib/acl';
 import { buildOrgEntranceCheckInUrl, buildOrgEntranceCode } from '@/lib/tickets';
 
 export const metadata = {
-  title: 'Сканер билетов',
+  title: 'Сканер',
 };
 
-export default async function AdminScannerPage() {
+export default async function AdminScannerPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   await requirePermissionPage('scanner');
+  const { tab } = await searchParams;
 
   const orgUrl = buildOrgEntranceCheckInUrl();
   const orgCode = buildOrgEntranceCode();
@@ -23,9 +27,7 @@ export default async function AdminScannerPage() {
         <OrgEntranceQr url={orgUrl} codeLabel={orgCode} />
       </details>
       <div className="admin-scanner-page__scanner">
-        <ScannerErrorBoundary>
-          <TicketScanner />
-        </ScannerErrorBoundary>
+        <ScannerHub initialTab={tab} />
       </div>
     </div>
   );

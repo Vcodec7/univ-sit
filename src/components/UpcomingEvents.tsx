@@ -16,7 +16,7 @@ import { eventCover, sectionCover } from '@/lib/theme-covers';
 import { normalizeEventCategory, normalizeEventContactMode } from '@/lib/event-meta';
 import EventHomeCarousel from './EventHomeCarousel';
 import HomeSlideRail from './HomeSlideRail';
-import ViewBeacon from '@/components/ViewBeacon';
+import HomeLiftFeedCard from './HomeLiftFeedCard';
 import { isJunkEventTitle } from '@/lib/afisha-filters';
 import { eventRewardBadge, isEcoTagged } from '@/lib/score-scales';
 import { POINTS } from '@/lib/points-labels';
@@ -174,27 +174,23 @@ function EventCard({
     const when = formatMskDate(event.startTime, { day: 'numeric', month: 'short' });
     const line = [formatMskTimeRange(event.startTime, event.endTime), event.space.title].filter(Boolean).join(' · ');
     return (
-      <article className="free-now-card yp-feed-card lift-feed-card">
-        <Link href="/events" className="lift-feed-card__media" aria-label={event.title}>
-          <div className="free-now-avatar yp-feed-card__media">
-            <EntityCoverImage
-              src={cover}
-              alt={event.title}
-              fallback={sectionCover('events')}
-              className="free-now-img"
-              sizes="(max-width: 768px) 85vw, 280px"
-            />
-            <span className="free-now-badge">{category}</span>
-          </div>
-        </Link>
-        <div className="free-now-body">
-          <h3>{event.title}</h3>
-          {line ? <p>{line}</p> : null}
-          <strong className="free-now-slot">
-            {when}
-            {isFull ? ' · мест нет' : ' · есть места'}
-          </strong>
-          <div className="free-now-actions">
+      <HomeLiftFeedCard
+        href="/events"
+        cover={
+          <EntityCoverImage
+            src={cover}
+            alt={event.title}
+            fallback={sectionCover('events')}
+            className="free-now-img"
+            sizes="(max-width: 768px) 85vw, 280px"
+          />
+        }
+        badge={category}
+        title={event.title}
+        line={line}
+        highlight={`${when}${isFull ? ' · мест нет' : ' · есть места'}`}
+        actions={
+          <>
             <Link
               href={`/spaces/${encodeRouteParam(event.spaceId)}?from=list`}
               className="lift-hero__btn lift-hero__btn--ghost"
@@ -213,9 +209,9 @@ function EventCard({
               description={event.description}
               compact
             />
-          </div>
-        </div>
-      </article>
+          </>
+        }
+      />
     );
   }
 

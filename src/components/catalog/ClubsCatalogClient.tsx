@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useSafeSearchParams } from '@/lib/use-safe-search-params';
 import { useSession } from 'next-auth/react';
-import { ArrowRight, Calendar, MapPin, Users } from 'lucide-react';
-import EntityCoverImage from '@/components/EntityCoverImage';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import CatalogEntityCard from '@/components/catalog/CatalogEntityCard';
 import CatalogFilterPopover from '@/components/CatalogFilterPopover';
 import { parseClubTags, stripHtml } from '@/lib/clubs';
 import YandexDirections from '@/components/YandexDirections';
@@ -139,69 +138,55 @@ export default function ClubsCatalogClient({ items }: { items: PublicClubCard[] 
             const excerpt = club.pitch || stripHtml(club.description).slice(0, 140);
 
             return (
-              <Link key={club.id} href={`/clubs/${encodeRouteParam(club.id)}`} className="catalog-card">
-                <div className={`catalog-badge${club.status === 'COMPLETED' ? ' status-completed' : ''}`}>
-                  {club.status === 'COMPLETED' ? 'Завершён' : 'Активный'}
-                </div>
-                <div className="catalog-img-wrap" style={{ position: 'relative' }}>
-                  <EntityCoverImage
-                    src={clubCover(club, skip + idx)}
-                    alt={club.title}
-                    fallback={clubCover(club, skip + idx + 5)}
-                    className="catalog-img"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="catalog-card__body">
-                  <h3>{club.title.replace(/^Клуб:\s*/i, '')}</h3>
-                  {tags.length > 0 && (
-                    <div className="catalog-card__tags">
-                      {tags.slice(0, 4).map((t) => (
-                        <span key={t}>{t.startsWith('#') ? t : `#${t}`}</span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="line-clamp-3">{excerpt || 'Подробности на странице клуба.'}</p>
-                  {club.who && club.who !== excerpt ? (
-                    <p className="catalog-card__who">Кому: {club.who}</p>
+              <CatalogEntityCard
+                key={club.id}
+                href={`/clubs/${encodeRouteParam(club.id)}`}
+                title={club.title.replace(/^Клуб:\s*/i, '')}
+                cover={clubCover(club, skip + idx)}
+                fallback={clubCover(club, skip + idx + 5)}
+                badge={club.status === 'COMPLETED' ? 'Завершён' : 'Активный'}
+                badgeDone={club.status === 'COMPLETED'}
+                excerpt={excerpt || 'Подробности на странице клуба.'}
+                who={club.who}
+                metaLeft={
+                  mine === 'APPROVED'
+                    ? 'Вы участник'
+                    : mine === 'PENDING'
+                      ? 'Заявка на рассмотрении'
+                      : open
+                        ? 'Открыт для заявок'
+                        : 'Набор закрыт'
+                }
+              >
+                {tags.length > 0 ? (
+                  <div className="catalog-card__tags">
+                    {tags.slice(0, 4).map((t) => (
+                      <span key={t}>{t.startsWith('#') ? t : `#${t}`}</span>
+                    ))}
+                  </div>
+                ) : null}
+                <div className="catalog-card__facts">
+                  {club.meetingSchedule ? (
+                    <span>
+                      <Calendar size={14} /> {club.meetingSchedule}
+                    </span>
                   ) : null}
-                  <div className="catalog-card__facts">
-                    {club.meetingSchedule && (
-                      <span>
-                        <Calendar size={14} /> {club.meetingSchedule}
-                      </span>
-                    )}
-                    {club.meetingPlace && (
-                      <span style={{ position: 'relative', zIndex: 2 }}>
-                        <MapPin size={14} /> {club.meetingPlace}
-                        <YandexDirections address={club.meetingPlace} placeName={club.title} compact />
-                      </span>
-                    )}
-                    <span>
-                      <Users size={14} /> {members}{' '}
-                      {members % 10 === 1 && members % 100 !== 11
-                        ? 'участник'
-                        : members % 10 >= 2 && members % 10 <= 4 && (members % 100 < 10 || members % 100 >= 20)
-                          ? 'участника'
-                          : 'участников'}
+                  {club.meetingPlace ? (
+                    <span style={{ position: 'relative', zIndex: 2 }}>
+                      <MapPin size={14} /> {club.meetingPlace}
+                      <YandexDirections address={club.meetingPlace} placeName={club.title} compact />
                     </span>
-                  </div>
-                  <div className="catalog-card-meta">
-                    <span>
-                      {mine === 'APPROVED'
-                        ? 'Вы участник'
-                        : mine === 'PENDING'
-                          ? 'Заявка на рассмотрении'
-                          : open
-                            ? 'Открыт для заявок'
-                            : 'Набор закрыт'}
-                    </span>
-                    <span>
-                      {open ? 'Подробнее' : 'Смотреть'} <ArrowRight size={16} />
-                    </span>
-                  </div>
+                  ) : null}
+                  <span>
+                    <Users size={14} /> {members}{' '}
+                    {members % 10 === 1 && members % 100 !== 11
+                      ? 'участник'
+                      : members % 10 >= 2 && members % 10 <= 4 && (members % 100 < 10 || members % 100 >= 20)
+                        ? 'участника'
+                        : 'участников'}
+                  </span>
                 </div>
-              </Link>
+              </CatalogEntityCard>
             );
           })}
         </div>

@@ -304,7 +304,13 @@ export default async function proxy(req: NextRequest) {
     }
   }
 
-  if (pathname.startsWith('/scanner') || pathname.startsWith('/scan')) {
+  if (pathname === '/scan' || pathname.startsWith('/scan/')) {
+    const u = new URL('/scanner', req.url);
+    u.searchParams.set('tab', 'pass');
+    return NextResponse.redirect(u, 308);
+  }
+
+  if (pathname.startsWith('/scanner')) {
     if (!token) {
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}&staff=1`, req.url)

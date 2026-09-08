@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 type Action = { href: string; label: string };
 
-/** Homepage feed card in the same ink / lime language as «Сейчас свободно». */
+/** Homepage and catalog feed card (events, projects teasers). */
 export default function HomeLiftFeedCard({
   href,
   cover,
@@ -13,6 +13,7 @@ export default function HomeLiftFeedCard({
   highlight,
   primary,
   secondary,
+  actions,
 }: {
   href: string;
   cover: ReactNode;
@@ -20,8 +21,9 @@ export default function HomeLiftFeedCard({
   title: string;
   line?: string | null;
   highlight?: string | null;
-  primary: Action;
+  primary?: Action;
   secondary?: Action | null;
+  actions?: ReactNode;
 }) {
   return (
     <article className="free-now-card yp-feed-card lift-feed-card">
@@ -36,14 +38,22 @@ export default function HomeLiftFeedCard({
         {line ? <p>{line}</p> : null}
         {highlight ? <strong className="free-now-slot">{highlight}</strong> : null}
         <div className="free-now-actions">
-          {secondary ? (
-            <Link href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost">
-              {secondary.label}
-            </Link>
-          ) : null}
-          <Link href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
-            {primary.label}
-          </Link>
+          {actions ? (
+            actions
+          ) : (
+            <>
+              {secondary ? (
+                <Link href={secondary.href} className="lift-hero__btn lift-hero__btn--ghost">
+                  {secondary.label}
+                </Link>
+              ) : null}
+              {primary ? (
+                <Link href={primary.href} className="lift-hero__btn lift-hero__btn--lime">
+                  {primary.label}
+                </Link>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
     </article>
