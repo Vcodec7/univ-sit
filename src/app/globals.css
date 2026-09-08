@@ -6811,9 +6811,11 @@ a.dashboard-nav-btn {
   color: #0a0c2a;
   background: #fff;
 }
-.legal-simple {
-  font-size: 1.05rem;
-  line-height: 1.45;
+.legal-clause {
+  margin: 0 0 1.15rem;
+}
+.legal-clause h2 {
+  margin-top: 0;
 }
 .legal-flash {
   animation: legal-flash-hl 1.4s ease;

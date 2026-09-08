@@ -1,55 +1,37 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { useLegalHuman } from '@/components/LegalHumanContext';
 
-type ClauseProps = {
-  legalText: string;
+export type LegalClauseProps = {
+  id: string;
+  title: string;
+  legalText?: string;
   simpleText: string;
-  human?: boolean;
+  children?: ReactNode;
 };
 
-/** MDX/React clause: legal vs plain language. */
-export function LegalClause({ legalText, simpleText, human = false }: ClauseProps) {
-  return <p>{human ? simpleText : legalText}</p>;
-}
+/** MDX clause: тумблер «человеческий язык» выбирает simpleText или legalText. */
+export function LegalClause({ id, title, legalText, simpleText, children }: LegalClauseProps) {
+  const { human, hitId, register } = useLegalHuman();
+  const legal =
+    legalText ||
+    (typeof children === 'string'
+      ? children
+      : Array.isArray(children)
+        ? children.join('')
+        : '');
 
-export function LegalHumanProvider({
-  children,
-  human,
-}: {
-  children: ReactNode;
-  human: boolean;
-}) {
-  void human;
-  return <>{children}</>;
-}
+  useEffect(() => {
+    register({ id, title, legalText: String(legal), simpleText });
+  }, [id, title, legal, simpleText, register]);
 
-export default function LegalDiffBlock({
-  lines,
-}: {
-  lines: { type: 'same' | 'add' | 'del'; text: string }[];
-}) {
-  const [open, setOpen] = useState(true);
-  const meaningful = useMemo(
-    () => lines.filter((l) => l.type !== 'same').length,
-    [lines]
-  );
-  if (!meaningful) return null;
   return (
-    <div className="legal-diff">
-      <button type="button" className="legal-diff__toggle" onClick={() => setOpen((v) => !v)}>
-        {open ? 'Скрыть, что изменилось' : 'Показать, что изменилось'}
-      </button>
-      {open ? (
-        <div className="legal-diff__body" aria-label="Изменения документа">
-          {lines.map((line, i) => (
-            <p key={`${line.type}-${i}`} className={`legal-diff__line is-${line.type}`}>
-              {line.text}
-            </p>
-          ))}
-        </div>
-      ) : null}
-    </div>
+    <section id={id} className={hitId === id ? 'legal-flash legal-clause' : 'legal-clause'}>
+      <h2>{title}</h2>
+      <p>{human ? simpleText : legal}</p>
+    </section>
   );
 }
+
+export default LegalClause;

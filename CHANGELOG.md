@@ -1,5 +1,13 @@
 # Changelog — YoungPortal
 
+## [1.6.169] — 2026-09-08
+
+### Legal UX
+- Документы `/privacy`, `/rules`, `/terms` — MDX (`next-mdx-remote`) с `<LegalClause legalText simpleText />`
+- Тумблер «человеческий язык» через React context, поиск fuse.js, flash найденного блока
+- Diff редакций из `content/legal/*.v1.mdx` в окне повторного согласия
+- Согласия коворкинга и портфолио по-прежнему в момент использования
+
 ## [1.6.168] — 2026-09-08
 
 ### Auth

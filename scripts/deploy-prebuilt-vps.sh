@@ -33,6 +33,7 @@ tar -czf "$BUNDLE" \
   scripts \
   public \
   src \
+  content \
   .next/standalone \
   .next/static
 
