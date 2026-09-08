@@ -18,7 +18,8 @@ test('home uses ISR so TTFB is not request-dynamic', () => {
   assert.match(page, /export const revalidate = 60/);
   assert.match(page, /export const dynamic = 'force-static'/);
   assert.doesNotMatch(page, /export const dynamic = 'force-dynamic'/);
-  assert.match(layout, /getCachedPublicChromeSettings/);
+  assert.match(layout, /suppressHydrationWarning/);
+  assert.match(layout, /yp-pwa-install-never/);
   assert.doesNotMatch(layout, /getSiteIdentity\(\)/);
   assert.match(proxy, /hasAuthCookie/);
   assert.match(proxy, /process\.env\.PORT/);
@@ -56,7 +57,8 @@ test('home defers heavy client rails without unmounting the sky', () => {
 test('hero photo uses next/image srcset for phones', () => {
   assert.match(media, /from 'next\/image'/);
   assert.match(media, /sizes="\(max-width: 860px\) 100vw, 1600px"/);
-  assert.match(media, /priority/);
+  assert.match(media, /loading="eager"/);
+  assert.doesNotMatch(media, /\n\s*priority\n/);
   assert.match(media, /quality=\{55\}/);
 });
 
