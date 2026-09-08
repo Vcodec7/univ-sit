@@ -30,6 +30,7 @@ tar "${TAR_I[@]}" -cf "$OUT" \
   scripts \
   public \
   certs \
+  content \
   .next/standalone \
   .next/static
 
