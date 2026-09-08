@@ -1,5 +1,12 @@
 # Changelog — YoungPortal
 
+## [1.6.181] — 2026-09-08
+
+### Аудит (остаток)
+- `/documents/rules.pdf` отдаёт PDF (`application/pdf`), а не HTML страницы `[id]`
+- Главная: `break-word` у h1–h5/p, `min-width: 0` у секций
+- Главная ISR `revalidate: 60` + `force-static` (каноникал из NEXTAUTH_URL/БД, без `headers()`)
+
 ## [1.6.180] — 2026-09-08
 
 ### Аудит UI (реестр багов)

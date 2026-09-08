@@ -13,6 +13,8 @@ test('scan aliases to canonical scanner', () => {
   assert.match(scan, /permanentRedirect\('\/scanner\?tab=pass'\)/);
   assert.match(cfg, /source: '\/scan'/);
   assert.match(proxy, /pathname === '\/scan'/);
+  assert.match(cfg, /source: '\/documents\/:name.pdf'/);
+  assert.match(proxy, /api\/documents\/by-name/);
 });
 
 test('documents page is a legal hub', () => {

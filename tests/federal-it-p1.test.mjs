@@ -14,12 +14,15 @@ test('PDF magic bytes are detected in document MIME helper', () => {
 
 test('document API and viewer use PDF MIME and Google Docs Viewer', () => {
   const api = readFileSync(join(root, 'src/app/api/documents/[id]/file/route.ts'), 'utf8');
+  const serve = readFileSync(join(root, 'src/lib/site-document-file.ts'), 'utf8');
   const view = readFileSync(join(root, 'src/components/DocumentViewer.tsx'), 'utf8');
   const ngx = readFileSync(join(root, 'deploy/nginx-py-ty-dual.conf'), 'utf8');
   const csp = readFileSync(join(root, 'src/proxy.ts'), 'utf8');
-  assert.match(api, /sniffDocumentMime/);
-  assert.match(api, /buildPlainTextPdf/);
-  assert.match(api, /isPlainTextDocument/);
+  assert.match(api, /servePublishedDocumentFile/);
+  assert.match(serve, /sniffDocumentMime/);
+  assert.match(serve, /buildPlainTextPdf/);
+  assert.match(serve, /isPlainTextDocument/);
+  assert.match(serve, /rules: \['doc_pravila_dm'/);
   assert.match(view, /docs\.google\.com\/gview/);
   assert.match(view, /text\/plain/);
   assert.match(ngx, /charset off/);

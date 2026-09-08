@@ -25,7 +25,7 @@ description: YoungPortal (ty/py.idivles.ru) — SSH, staging, бренд, деп
 - Прод: `https://py.idivles.ru` → `/opt/sochi-portal` → `:3000`
 - SSH: `cursor-site@77.110.125.241`, ключ `~/.ssh/id_ed25519_cursor_site` (локально может быть `id_ed25519_yp`)
 - **Не катить на py** без явного «одобряю»
-- Staging после последнего деплоя: **1.6.180** на ty (не путать с py)
+- Staging после последнего деплоя: **1.6.181** на ty (не путать с py)
 
 ## Не делать заново (ops)
 

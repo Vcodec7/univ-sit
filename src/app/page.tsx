@@ -3,7 +3,7 @@ import nextDynamic from 'next/dynamic';
 import HomeServiceHero, { HomeSochiStrip } from '@/components/HomeServiceHero';
 import HomeGallery from '@/components/HomeGallery';
 import HomeLiftFeedCard from '@/components/HomeLiftFeedCard';
-import { getSiteIdentity, isLocalOrigin } from '@/lib/site-identity';
+import { getSiteIdentityStatic, isLocalOrigin } from '@/lib/site-identity';
 import { clubCover, projectCover, spaceCover } from '@/lib/theme-covers';
 import { getHomeCatalog } from '@/lib/home-catalog';
 import { resolveHomeHeroPoster } from '@/lib/home-hero';
@@ -27,7 +27,7 @@ const HomeGalleryAuth = nextDynamic(() => import('@/components/HomeGalleryAuth')
 const AuthAfishaSection = nextDynamic(() => import('@/components/AuthAfishaSection'));
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { siteName, publicOrigin } = await getSiteIdentity();
+  const { siteName, publicOrigin } = await getSiteIdentityStatic();
   const publicUrl = isLocalOrigin(publicOrigin) ? undefined : publicOrigin;
   return {
     title: { absolute: `${siteName} | Официальный портал` },
@@ -36,9 +36,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const dynamic = 'force-dynamic';
-// Request-time HTML so canonical/og:url follow Host (ISR bake is localhost).
-// Catalog still hits unstable_cache; phones are limited by GPU layers, not this.
+export const revalidate = 60;
+export const dynamic = 'force-static';
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -46,7 +45,7 @@ function stripHtml(html: string) {
 
 export default async function Home() {
   const [{ latestProjects, latestClubs, latestSpaces, latestNews, siteSettings }, modules, { siteName }] =
-    await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentity()]);
+    await Promise.all([getHomeCatalog(), getModuleFlags(), getSiteIdentityStatic()]);
   const heroUrl = resolveHomeHeroPoster(siteSettings?.heroImageUrl);
   // Both assets may be stored; display mode is exclusive (image | video).
   const heroVideo = (siteSettings?.heroVideoUrl || '').trim() || null;

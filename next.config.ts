@@ -42,7 +42,10 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [{ source: '/service-worker.js', destination: '/sw.js' }];
+    return [
+      { source: '/service-worker.js', destination: '/sw.js' },
+      { source: '/documents/:name.pdf', destination: '/api/documents/by-name/:name' },
+    ];
   },
   async headers() {
     return [

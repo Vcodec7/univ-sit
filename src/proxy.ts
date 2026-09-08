@@ -135,6 +135,14 @@ export default async function proxy(req: NextRequest) {
   };
 
   const method = req.method.toUpperCase();
+  const pdfPretty = pathname.match(/^\/documents\/([^/]+\.pdf)$/i);
+  if (pdfPretty && (method === 'GET' || method === 'HEAD')) {
+    const stem = pdfPretty[1].replace(/\.pdf$/i, '');
+    const url = req.nextUrl.clone();
+    url.pathname = `/api/documents/by-name/${encodeURIComponent(stem)}`;
+    return withCsp(NextResponse.rewrite(url));
+  }
+
   const ip = clientIp(req);
   const authPost =
     method === 'POST' &&

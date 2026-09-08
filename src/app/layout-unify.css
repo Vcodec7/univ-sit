@@ -3313,13 +3313,42 @@ footer.site-footer { margin-top: auto !important; }
   opacity: 0.45;
   cursor: not-allowed;
 }
-.page-hero-title,
-.home-section-title,
-.svc-hero h1,
-.svc-hero p,
-.catalog-page-header__intro h1 {
-  overflow-wrap: break-word;
+.home-page,
+.home-page--lift,
+.home-page .home-sections,
+.home-page .home-section-head,
+.home-page .home-section-head > div {
+  min-width: 0;
   max-width: 100%;
+}
+.home-page h1,
+.home-page h2,
+.home-page h3,
+.home-page h4,
+.home-page h5,
+.home-page p,
+.home-page .home-section-title,
+.home-page .home-section-sub,
+.home-page .svc-hero h1,
+.home-page .svc-hero p,
+.home-page .lift-hero__title,
+.home-page .lift-hero__title span,
+.home-page .yp-feed-card h3,
+.home-page .catalog-card-title,
+.home-page .free-now-body h3 {
+  overflow-wrap: break-word !important;
+  word-break: break-word;
+  white-space: normal !important;
+  max-width: 100%;
+}
+@media (max-width: 860px) {
+  .home-page .home-section-head {
+    flex-wrap: wrap !important;
+  }
+  .home-page .home-section-title,
+  .home-page .home-section-sub {
+    flex: 1 1 100%;
+  }
 }
 .catalog-page,
 .yp-shell {

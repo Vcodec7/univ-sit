@@ -76,7 +76,9 @@ test('home feeds reuse lift cards for projects clubs spaces news', () => {
   assert.match(page, /home-section-sub/);
   assert.match(page, /Инициативы, в которые можно включиться сейчас/);
   assert.match(page, /book\?from=list/);
-  assert.match(page, /force-dynamic/);
+  assert.match(page, /export const revalidate = 60/);
+  assert.match(page, /getSiteIdentityStatic/);
+  assert.doesNotMatch(page, /force-dynamic/);
   assert.match(page, /encodeRouteParam/);
   assert.doesNotMatch(page, /Открыт для заявок/);
   assert.doesNotMatch(page, /home-feed-grid/);
