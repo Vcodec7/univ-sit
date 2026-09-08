@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminCommandPalette from '@/components/admin/AdminCommandPalette';
 import Link from 'next/link';
 import { pingSecurity } from '@/lib/device-fingerprint';
 import { canAccessAdminPath } from '@/lib/acl-shared';
@@ -125,6 +126,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="admin-layout-wrapper" data-admin-shell="1">
       <AdminSidebar userRole={userRole} userPermissions={userPermissions} />
+      <AdminCommandPalette userRole={userRole} userPermissions={userPermissions} />
       <main className="admin-main" id="admin-main">
         {pathname !== '/admin' ? (
           <nav className="admin-escape-bar" aria-label="Выход из раздела">

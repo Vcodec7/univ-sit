@@ -1,24 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import DashboardClient from '@/components/DashboardClient';
+import MobileSheet from '@/components/ui/MobileSheet';
 
 export default function ProfileEditInterceptModal() {
   const router = useRouter();
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    if (!open) router.back();
+  }, [open, router]);
   return (
-    <div className="yp-edit-intercept" role="dialog" aria-modal="true" aria-labelledby="yp-edit-intercept-title">
-      <button
-        type="button"
-        className="yp-edit-intercept__backdrop"
-        aria-label="Закрыть"
-        onClick={() => router.back()}
-      />
-      <div className="yp-edit-intercept__sheet">
-        <h2 id="yp-edit-intercept-title" className="sr-only">
-          Редактирование профиля
-        </h2>
-        <DashboardClient view="edit" embedded />
-      </div>
-    </div>
+    <MobileSheet open={open} onOpenChange={setOpen} title="Редактирование профиля">
+      <DashboardClient view="edit" embedded />
+    </MobileSheet>
   );
 }

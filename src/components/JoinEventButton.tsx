@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { startTransition, useOptimistic, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -45,8 +45,10 @@ export default function JoinEventButton({
   const loginHref = `/login?callbackUrl=${encodeURIComponent(pathname)}`;
 
   const [isJoined, setIsJoined] = useState(initialIsJoined);
+  const [optimisticJoined, setOptimisticJoined] = useOptimistic(isJoined);
   const [isFull, setIsFull] = useState(initialIsFull);
   const [waitlisted, setWaitlisted] = useState(initialWaitlisted);
+  const [optimisticWait, setOptimisticWait] = useOptimistic(waitlisted);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -67,6 +69,17 @@ export default function JoinEventButton({
     const leaving = isJoined || waitlisted;
 
     // Optimistic UI — don't wait on slow email side-effects
+    startTransition(() => {
+      if (joining) {
+        setOptimisticJoined(true);
+        setOptimisticWait(false);
+      } else if (waitlisting) {
+        setOptimisticWait(true);
+      } else if (leaving) {
+        setOptimisticJoined(false);
+        setOptimisticWait(false);
+      }
+    });
     if (joining) {
       setIsJoined(true);
       setWaitlisted(false);
@@ -129,9 +142,9 @@ export default function JoinEventButton({
 
   const label = isLoading
     ? 'Загрузка...'
-    : isJoined
+    : optimisticJoined
       ? 'Вы записаны'
-      : waitlisted
+      : optimisticWait
         ? 'В листе ожидания'
         : isFull
           ? 'В лист ожидания'
@@ -139,32 +152,32 @@ export default function JoinEventButton({
 
   const actionLabel = isLoading
     ? 'Загрузка...'
-    : isJoined
+    : optimisticJoined
       ? 'Отменить участие'
-      : waitlisted
+      : optimisticWait
         ? 'Покинуть лист ожидания'
         : isFull
           ? 'В лист ожидания'
           : 'Я пойду';
 
-  const showCalendar = isJoined && title && startTime && endTime;
+  const showCalendar = optimisticJoined && title && startTime && endTime;
   const pad = compact ? '0.4rem 0.55rem' : '0.75rem';
   const fontSize = compact ? '0.78rem' : '0.9rem';
   if (iconOnly) {
-    const needsLogin = !session && !isJoined && !waitlisted;
+    const needsLogin = !session && !optimisticJoined && !optimisticWait;
     const pendingMod = Boolean(session?.user?.moderationPending);
     const iconTitle = pendingMod
       ? 'Аккаунт на проверке'
       : needsLogin
       ? 'Войти'
-      : isJoined
+      : optimisticJoined
         ? 'Отменить участие'
-        : waitlisted
+        : optimisticWait
           ? 'Покинуть лист ожидания'
           : isFull
             ? 'В лист ожидания'
             : 'Записаться на мероприятие';
-    const Icon = isJoined || waitlisted ? UserMinus : isFull ? ListPlus : UserPlus;
+    const Icon = optimisticJoined || optimisticWait ? UserMinus : isFull ? ListPlus : UserPlus;
     return (
       <button
         type="button"

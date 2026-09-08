@@ -159,9 +159,12 @@ export default function AdminYouthStudioForm({
     try {
       const raw = localStorage.getItem(draftKey);
       if (!raw || item?.id) return;
-      const d = JSON.parse(raw) as { title?: string; mission?: string };
+      const d = JSON.parse(raw) as { title?: string; mission?: string; goal?: string; audience?: string; whatHappens?: string };
       if (d.title) setTitle(d.title);
       if (d.mission) setMission(d.mission);
+      if (d.goal) setGoal(d.goal);
+      if (d.audience) setAudience(d.audience);
+      if (d.whatHappens) setWhatHappens(d.whatHappens);
     } catch {
       /* ignore */
     }
@@ -170,13 +173,13 @@ export default function AdminYouthStudioForm({
   useEffect(() => {
     const t = window.setTimeout(() => {
       try {
-        localStorage.setItem(draftKey, JSON.stringify({ title, mission, goal, audience }));
+        localStorage.setItem(draftKey, JSON.stringify({ title, mission, goal, audience, whatHappens, howToJoin, format, status }));
       } catch {
         /* ignore */
       }
-    }, 600);
+    }, 1000);
     return () => window.clearTimeout(t);
-  }, [draftKey, title, mission, goal, audience]);
+  }, [draftKey, title, mission, goal, audience, whatHappens, howToJoin, format, status]);
 
   const applyTemplate = (key: string) => {
     const t = YOUTH_TEMPLATES[key];
